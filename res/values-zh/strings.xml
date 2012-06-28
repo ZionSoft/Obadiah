@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">圣经</string>
+    <string name="button_previous">上一章</string>
+    <string name="button_next">下一章</string>
+    <string name="menu_continue_reading">继续阅读</string>
+    <string name="menu_select_translation">选择译本</string>
+    <string name="title_select_translation">选择译本</string>
+
+</resources>

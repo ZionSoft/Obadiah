@@ -1,0 +1,12 @@
+bin
+gen
+*.apk
+*.ap_
+*.dex
+*.class
+
+.classpath
+.project
+.settings
+
+project.properties
