@@ -2,11 +2,16 @@
 <resources>
 
     <string name="app_name">圣经</string>
+    <string name="button_download">下载更多译本</string>
     <string name="button_next">下一章</string>
     <string name="button_previous">上一章</string>
     <string name="menu_continue_reading">继续阅读</string>
     <string name="menu_select_translation">选择译本</string>
+    <string name="text_downloading">下载中，请稍候。</string>
     <string name="text_initializing">初始化中，请等待。</string>
+    <string name="text_no_available_translation">没有可供下载的译本。</string>
+    <string name="text_no_network">没有可用的网络连接，请检查后重试！</string>
+    <string name="title_download_translation">请选择要下载的译本</string>
     <string name="title_select_translation">选择译本</string>
 
 </resources>

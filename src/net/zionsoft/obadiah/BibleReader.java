@@ -17,41 +17,49 @@ public class BibleReader
 
     public void setRootDir(File rootDir)
     {
+        m_rootDir = rootDir;
+        refresh();
+    }
+    
+    public void refresh()
+    {
         try {
-            File[] directories = rootDir.listFiles();
+            File[] directories = m_rootDir.listFiles();
             final int length = directories.length;
-            m_translationInfo = new TranslationInfo[length];
+            if (length == 0)
+                return;
+            m_installedTranslations = new TranslationInfo[length];
             for (int i = 0; i < length; ++i) {
                 FileInputStream fis = new FileInputStream(new File(directories[i], BOOKS_FILE));
                 byte[] buffer = new byte[fis.available()];
                 fis.read(buffer);
                 fis.close();
 
-                m_translationInfo[i] = new TranslationInfo();
-                m_translationInfo[i].path = directories[i].getAbsolutePath();
+                m_installedTranslations[i] = new TranslationInfo();
+                m_installedTranslations[i].path = directories[i].getAbsolutePath();
 
                 JSONObject booksInfoObject = new JSONObject(new String(buffer, "UTF8"));
-                m_translationInfo[i].name = booksInfoObject.getString("name");
+                m_installedTranslations[i].name = booksInfoObject.getString("name");
 
                 JSONArray booksArray = booksInfoObject.getJSONArray("books");
                 final int booksCount = booksArray.length();
-                m_translationInfo[i].bookName = new String[booksCount];
+                m_installedTranslations[i].bookName = new String[booksCount];
                 for (int j = 0; j < booksCount; ++j)
-                    m_translationInfo[i].bookName[j] = booksArray.getString(j);
+                    m_installedTranslations[i].bookName[j] = booksArray.getString(j);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public TranslationInfo[] availableTranslations()
+    public TranslationInfo[] installedTranslations()
     {
-        return m_translationInfo;
+        return m_installedTranslations;
     }
 
     public void selectTranslation(int index)
     {
-        if (index < 0 || m_translationInfo == null || index >= m_translationInfo.length)
+        if (index < 0 || m_installedTranslations == null || index >= m_installedTranslations.length)
             return;
 
         m_selectedTranslation = index;
@@ -59,7 +67,7 @@ public class BibleReader
 
     public TranslationInfo selectedTranslation()
     {
-        return (m_selectedTranslation == -1) ? null : m_translationInfo[m_selectedTranslation];
+        return (m_selectedTranslation == -1) ? null : m_installedTranslations[m_selectedTranslation];
     }
 
     public int chapterCount(int book)
@@ -72,7 +80,7 @@ public class BibleReader
     public String[] verses(int book, int chapter)
     {
         try {
-            String path = m_translationInfo[m_selectedTranslation].path + "/" + book + "-" + chapter + ".json";
+            String path = m_installedTranslations[m_selectedTranslation].path + "/" + book + "-" + chapter + ".json";
             FileInputStream fis = new FileInputStream(new File(path));
             byte[] buffer = new byte[fis.available()];
             fis.read(buffer);
@@ -107,6 +115,7 @@ public class BibleReader
 
     private static BibleReader instance;
 
-    private int m_selectedTranslation;
-    private TranslationInfo[] m_translationInfo;
+    private int m_selectedTranslation = -1;
+    private File m_rootDir;
+    private TranslationInfo[] m_installedTranslations;
 }

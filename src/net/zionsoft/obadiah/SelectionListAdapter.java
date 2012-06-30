@@ -10,9 +10,9 @@ import android.widget.TextView;
 
 public class SelectionListAdapter extends ListBaseAdapter
 {
-    public SelectionListAdapter(Context context, String[] texts)
+    public SelectionListAdapter(Context context)
     {
-        super(context, texts);
+        super(context);
     }
 
     public View getView(int position, View convertView, ViewGroup parent)

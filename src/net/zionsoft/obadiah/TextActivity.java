@@ -25,7 +25,8 @@ public class TextActivity extends Activity
         m_bibleReader = BibleReader.getInstance();
         m_translationInfo = m_bibleReader.selectedTranslation();
 
-        m_listAdapter = new TextListAdapter(this, m_bibleReader.verses(m_currentBook, m_currentChapter));
+        m_listAdapter = new TextListAdapter(this);
+        m_listAdapter.setTexts(m_bibleReader.verses(m_currentBook, m_currentChapter));
         m_listView = (ListView) findViewById(R.id.listView);
         m_listView.setAdapter(m_listAdapter);
 

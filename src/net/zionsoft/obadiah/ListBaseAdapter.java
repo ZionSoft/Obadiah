@@ -5,12 +5,11 @@ import android.widget.BaseAdapter;
 
 public abstract class ListBaseAdapter extends BaseAdapter
 {
-    public ListBaseAdapter(Context context, String[] texts)
+    public ListBaseAdapter(Context context)
     {
         super();
 
         m_context = context;
-        m_texts = texts;
     }
 
     public void setTexts(String[] texts)

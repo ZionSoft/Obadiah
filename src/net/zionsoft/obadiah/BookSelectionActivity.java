@@ -42,7 +42,7 @@ public class BookSelectionActivity extends Activity
         GridView gridView = (GridView) findViewById(R.id.gridView);
         gridView.setColumnWidth((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 144, getResources()
                 .getDisplayMetrics()));
-        m_listAdapter = new SelectionListAdapter(this, bibleReader.selectedTranslation().bookName);
+        m_listAdapter = new SelectionListAdapter(this);
         gridView.setAdapter(m_listAdapter);
         gridView.setOnItemClickListener(new OnItemClickListener()
         {
@@ -61,6 +61,8 @@ public class BookSelectionActivity extends Activity
         super.onResume();
 
         TranslationInfo translationInfo = BibleReader.getInstance().selectedTranslation();
+        if (translationInfo == null)
+            return;
         setTitle(translationInfo.name);
         m_listAdapter.setTexts(translationInfo.bookName);
     }
@@ -154,8 +156,6 @@ public class BookSelectionActivity extends Activity
                         publishProgress(++unzipped / total);
                     }
                     zis.close();
-
-                    // clears the cache
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -173,6 +173,15 @@ public class BookSelectionActivity extends Activity
         protected void onPostExecute(Void result)
         {
             // running in the main thread
+            BibleReader bibleReader = BibleReader.getInstance();
+            bibleReader.refresh();
+            bibleReader.selectTranslation(0);
+            TranslationInfo translationInfo = bibleReader.selectedTranslation();
+            if (translationInfo != null) {
+                setTitle(translationInfo.name);
+                m_listAdapter.setTexts(translationInfo.bookName);
+            }
+
             m_progressDialog.dismiss();
         }
 

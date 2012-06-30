@@ -30,7 +30,11 @@ public class ChapterSelectionActivity extends Activity
         GridView gridView = (GridView) findViewById(R.id.gridView);
         gridView.setColumnWidth((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, getResources()
                 .getDisplayMetrics()));
-        gridView.setAdapter(new SelectionListAdapter(this, chapters));
+        
+        SelectionListAdapter adapter = new SelectionListAdapter(this);
+        adapter.setTexts(chapters);
+        gridView.setAdapter(adapter);
+        
         gridView.setOnItemClickListener(new OnItemClickListener()
         {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id)

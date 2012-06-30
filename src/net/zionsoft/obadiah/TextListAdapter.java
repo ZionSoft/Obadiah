@@ -10,9 +10,9 @@ import android.widget.TextView;
 
 public class TextListAdapter extends ListBaseAdapter
 {
-    public TextListAdapter(Context context, String[] texts)
+    public TextListAdapter(Context context)
     {
-        super(context, texts);
+        super(context);
     }
 
     public View getView(int position, View convertView, ViewGroup parent)
