@@ -1,7 +1,17 @@
 package net.zionsoft.obadiah;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.res.AssetManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.Menu;
@@ -19,8 +29,14 @@ public class BookSelectionActivity extends Activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_gridview);
 
+        File filesDir = getFilesDir();
+        final int length = filesDir.list().length;
+        // first time use
+        if (length == 0)
+            new FileCopyAsyncTask().execute(this);
+
         BibleReader bibleReader = BibleReader.getInstance();
-        bibleReader.setAssetManager(getAssets());
+        bibleReader.setRootDir(filesDir);
         bibleReader.selectTranslation(getSharedPreferences("settings", MODE_PRIVATE).getInt("selectedTranslation", 0));
 
         GridView gridView = (GridView) findViewById(R.id.gridView);
@@ -85,6 +101,82 @@ public class BookSelectionActivity extends Activity
         default:
             return super.onOptionsItemSelected(item);
         }
+    }
+
+    private class FileCopyAsyncTask extends AsyncTask<Activity, Integer, Void>
+    {
+        protected void onPreExecute()
+        {
+            // running in the main thread
+            m_progressDialog = new ProgressDialog(BookSelectionActivity.this);
+            m_progressDialog.setCancelable(false);
+            m_progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+            m_progressDialog.setMessage(getText(R.string.text_initializing));
+            m_progressDialog.setMax(100);
+            m_progressDialog.setProgress(0);
+            m_progressDialog.show();
+        }
+
+        protected Void doInBackground(Activity... activities)
+        {
+            // running in the worker thread
+            try {
+                Activity activity = activities[0];
+                AssetManager assetManager = activity.getAssets();
+                String[] fileList = assetManager.list("bible");
+                final int fileCount = fileList.length;
+                
+                final int total = 12 * fileCount;
+                int unzipped = 0;
+                
+                byte[] buffer = new byte[BUFFER_LENGTH];
+                int read = -1;
+                File filesDir = activity.getFilesDir();
+                for (int i = 0; i < fileCount; ++i) {
+                    // creates sub-folder
+                    String fileName = fileList[i];
+                    File dir = new File(filesDir, fileName.substring(0, fileName.length() - 4));
+                    dir.mkdir();
+                    
+                    // writes to internal storage
+                    ZipInputStream zis = new ZipInputStream(new BufferedInputStream(assetManager.open("bible/" + fileName)));
+                    ZipEntry entry;
+                    while((entry = zis.getNextEntry()) != null) {
+                        FileOutputStream fos = new FileOutputStream(new File(dir, entry.getName()));
+                        BufferedOutputStream os = new BufferedOutputStream(fos, BUFFER_LENGTH);
+                        while ((read = zis.read(buffer, 0, BUFFER_LENGTH)) != -1)
+                            os.write(buffer, 0, read);
+                        os.flush();
+                        os.close();
+                        
+                        // notifies the progress
+                        publishProgress(++unzipped / total);
+                    }
+                    zis.close();
+                    
+                    // clears the cache
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        protected void onProgressUpdate(Integer... progress)
+        {
+            // running in the main thread
+            m_progressDialog.setProgress(progress[0]);
+        }
+
+        protected void onPostExecute(Void result)
+        {
+            // running in the main thread
+            m_progressDialog.dismiss();
+        }
+
+        private static final int BUFFER_LENGTH = 2048;
+        private ProgressDialog m_progressDialog;
     }
 
     private SelectionListAdapter m_listAdapter;

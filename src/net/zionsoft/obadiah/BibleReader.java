@@ -1,11 +1,10 @@
 package net.zionsoft.obadiah;
 
-import java.io.InputStream;
+import java.io.File;
+import java.io.FileInputStream;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-
-import android.content.res.AssetManager;
 
 public class BibleReader
 {
@@ -16,62 +15,46 @@ public class BibleReader
         return instance;
     }
 
-    public void setAssetManager(AssetManager assetManager)
+    public void setRootDir(File rootDir)
     {
-        m_assetManager = assetManager;
+        try {
+            File[] directories = rootDir.listFiles();
+            final int length = directories.length;
+            m_translationInfo = new TranslationInfo[length];
+            for (int i = 0; i < length; ++i) {
+                FileInputStream fis = new FileInputStream(new File(directories[i], BOOKS_FILE));
+                byte[] buffer = new byte[fis.available()];
+                fis.read(buffer);
+                fis.close();
+
+                m_translationInfo[i] = new TranslationInfo();
+                m_translationInfo[i].path = directories[i].getAbsolutePath();
+
+                JSONObject booksInfoObject = new JSONObject(new String(buffer, "UTF8"));
+                m_translationInfo[i].name = booksInfoObject.getString("name");
+
+                JSONArray booksArray = booksInfoObject.getJSONArray("books");
+                final int booksCount = booksArray.length();
+                m_translationInfo[i].bookName = new String[booksCount];
+                for (int j = 0; j < booksCount; ++j)
+                    m_translationInfo[i].bookName[j] = booksArray.getString(j);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public TranslationInfo[] availableTranslations()
     {
-        try {
-            if (m_translationInfo == null) {
-                InputStream inputStream = m_assetManager.open("bible/translations.json", AssetManager.ACCESS_BUFFER);
-                byte[] buffer = new byte[inputStream.available()];
-                inputStream.read(buffer);
-                JSONArray booksArray = new JSONArray(new String(buffer, "UTF8"));
-                int bookCount = booksArray.length();
-                m_translationInfo = new TranslationInfo[bookCount];
-                for (int i = 0; i < bookCount; ++i) {
-                    JSONObject bookObject = booksArray.getJSONObject(i);
-                    m_translationInfo[i] = new TranslationInfo();
-                    m_translationInfo[i].name = bookObject.getString("name");
-                    m_translationInfo[i].path = bookObject.getString("path");
-                }
-                inputStream.close();
-            }
-            return m_translationInfo;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
+        return m_translationInfo;
     }
 
     public void selectTranslation(int index)
     {
-        availableTranslations();
         if (index < 0 || m_translationInfo == null || index >= m_translationInfo.length)
             return;
 
         m_selectedTranslation = index;
-        TranslationInfo translationInfo = m_translationInfo[m_selectedTranslation];
-        if (translationInfo.bookName != null)
-            return;
-
-        try {
-            InputStream inputStream = m_assetManager.open("bible/" + translationInfo.path + "/books.json",
-                    AssetManager.ACCESS_BUFFER);
-            byte[] buffer = new byte[inputStream.available()];
-            inputStream.read(buffer);
-            JSONObject translationInfoObject = new JSONObject(new String(buffer, "UTF8"));
-            JSONArray booksArray = translationInfoObject.getJSONArray("books");
-            int bookCount = booksArray.length();
-            translationInfo.bookName = new String[bookCount];
-            for (int i = 0; i < bookCount; ++i)
-                translationInfo.bookName[i] = booksArray.getString(i);
-            inputStream.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     public TranslationInfo selectedTranslation()
@@ -89,18 +72,18 @@ public class BibleReader
     public String[] verses(int book, int chapter)
     {
         try {
-            String path = "bible/" + m_translationInfo[m_selectedTranslation].path + "/" + book + "-" + chapter
-                    + ".json";
-            InputStream inputStream = m_assetManager.open(path, AssetManager.ACCESS_BUFFER);
-            byte[] buffer = new byte[inputStream.available()];
-            inputStream.read(buffer);
+            String path = m_translationInfo[m_selectedTranslation].path + "/" + book + "-" + chapter + ".json";
+            FileInputStream fis = new FileInputStream(new File(path));
+            byte[] buffer = new byte[fis.available()];
+            fis.read(buffer);
+            fis.close();
+
             JSONObject jsonObject = new JSONObject(new String(buffer, "UTF8"));
             JSONArray paragraphArray = jsonObject.getJSONArray("verses");
             int paragraphCount = paragraphArray.length();
             String[] paragraphs = new String[paragraphCount];
             for (int i = 0; i < paragraphCount; ++i)
                 paragraphs[i] = paragraphArray.getString(i);
-            inputStream.close();
             return paragraphs;
         } catch (Exception e) {
             e.printStackTrace();
@@ -120,8 +103,10 @@ public class BibleReader
     }
 
     private static final int[] CHAPTER_COUNT;
+    private static final String BOOKS_FILE = "books.json";
+
     private static BibleReader instance;
-    private AssetManager m_assetManager;
+
+    private int m_selectedTranslation;
     private TranslationInfo[] m_translationInfo;
-    private int m_selectedTranslation = -1;
 }

@@ -16,10 +16,7 @@ public class TranslationSelectionActivity extends Activity
         setContentView(R.layout.layout_translationselection);
         setTitle(R.string.title_select_translation);
 
-        BibleReader bibleReader = BibleReader.getInstance();
-        bibleReader.setAssetManager(getAssets());
-
-        TranslationInfo[] translationInfo = bibleReader.availableTranslations();
+        TranslationInfo[] translationInfo = BibleReader.getInstance().availableTranslations();
         int translationCount = translationInfo.length;
         String[] translationNames = new String[translationCount];
         for (int i = 0; i < translationCount; ++i)

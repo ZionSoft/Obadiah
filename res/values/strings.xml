@@ -2,10 +2,11 @@
 <resources>
 
     <string name="app_name">Bible</string>
-    <string name="button_previous">Previous Chapter</string>
     <string name="button_next">Next Chapter</string>
+    <string name="button_previous">Previous Chapter</string>
     <string name="menu_continue_reading">Continue Reading</string>
     <string name="menu_select_translation">Select Translation</string>
+    <string name="text_initializing">Initializing, please wait.</string>
     <string name="title_select_translation">Select a translation</string>
 
 </resources>
