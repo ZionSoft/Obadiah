@@ -125,10 +125,10 @@ public class BookSelectionActivity extends Activity
                 AssetManager assetManager = activity.getAssets();
                 String[] fileList = assetManager.list("bible");
                 final int fileCount = fileList.length;
-                
+
                 final int total = 12 * fileCount;
                 int unzipped = 0;
-                
+
                 byte[] buffer = new byte[BUFFER_LENGTH];
                 int read = -1;
                 File filesDir = activity.getFilesDir();
@@ -137,23 +137,24 @@ public class BookSelectionActivity extends Activity
                     String fileName = fileList[i];
                     File dir = new File(filesDir, fileName.substring(0, fileName.length() - 4));
                     dir.mkdir();
-                    
+
                     // writes to internal storage
-                    ZipInputStream zis = new ZipInputStream(new BufferedInputStream(assetManager.open("bible/" + fileName)));
+                    ZipInputStream zis = new ZipInputStream(new BufferedInputStream(assetManager.open("bible/"
+                            + fileName)));
                     ZipEntry entry;
-                    while((entry = zis.getNextEntry()) != null) {
+                    while ((entry = zis.getNextEntry()) != null) {
                         FileOutputStream fos = new FileOutputStream(new File(dir, entry.getName()));
                         BufferedOutputStream os = new BufferedOutputStream(fos, BUFFER_LENGTH);
                         while ((read = zis.read(buffer, 0, BUFFER_LENGTH)) != -1)
                             os.write(buffer, 0, read);
                         os.flush();
                         os.close();
-                        
+
                         // notifies the progress
                         publishProgress(++unzipped / total);
                     }
                     zis.close();
-                    
+
                     // clears the cache
                 }
             } catch (Exception e) {
