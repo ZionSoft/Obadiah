@@ -13,7 +13,6 @@ import java.util.zip.ZipInputStream;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
