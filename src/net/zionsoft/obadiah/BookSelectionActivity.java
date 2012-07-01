@@ -10,6 +10,7 @@ import java.util.zip.ZipInputStream;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -37,7 +38,22 @@ public class BookSelectionActivity extends Activity
 
         BibleReader bibleReader = BibleReader.getInstance();
         bibleReader.setRootDir(filesDir);
-        bibleReader.selectTranslation(getSharedPreferences("settings", MODE_PRIVATE).getInt("selectedTranslation", 0));
+
+        SharedPreferences preferences = getSharedPreferences("settings", MODE_PRIVATE);
+
+        String selectedTranslation = null;
+        try {
+            selectedTranslation = preferences.getString("selectedTranslation", null);
+        } catch (ClassCastException e) {
+            // the value is an integer for 1.0 and 1.1
+            int selected = preferences.getInt("selectedTranslation", 0);
+            if (selected == 0)
+                selectedTranslation = "authorized-king-james";
+            else if (selected == 1)
+                selectedTranslation = "chinese-union-simplified";
+        }
+
+        bibleReader.selectTranslation(selectedTranslation);
 
         GridView gridView = (GridView) findViewById(R.id.gridView);
         gridView.setColumnWidth((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 144, getResources()
@@ -175,7 +191,7 @@ public class BookSelectionActivity extends Activity
             // running in the main thread
             BibleReader bibleReader = BibleReader.getInstance();
             bibleReader.refresh();
-            bibleReader.selectTranslation(0);
+            bibleReader.selectTranslation(null);
             TranslationInfo translationInfo = bibleReader.selectedTranslation();
             if (translationInfo != null) {
                 setTitle(translationInfo.name);

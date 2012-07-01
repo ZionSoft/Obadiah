@@ -20,7 +20,7 @@ public class BibleReader
         m_rootDir = rootDir;
         refresh();
     }
-    
+
     public void refresh()
     {
         try {
@@ -57,12 +57,23 @@ public class BibleReader
         return m_installedTranslations;
     }
 
-    public void selectTranslation(int index)
+    public void selectTranslation(String translation)
     {
-        if (index < 0 || m_installedTranslations == null || index >= m_installedTranslations.length)
+        if (m_installedTranslations == null)
             return;
 
-        m_selectedTranslation = index;
+        if (translation == null) {
+            m_selectedTranslation = 0;
+            return;
+        }
+
+        int length = m_installedTranslations.length;
+        for (int i = 0; i < length; ++i) {
+            if (m_installedTranslations[i].path.endsWith(translation)) {
+                m_selectedTranslation = i;
+                return;
+            }
+        }
     }
 
     public TranslationInfo selectedTranslation()
