@@ -63,14 +63,15 @@ public class BibleReader
             return;
 
         if (translation == null) {
-            m_selectedTranslation = 0;
+            m_selectedTranslation = m_installedTranslations[0].path;
             return;
         }
 
         int length = m_installedTranslations.length;
         for (int i = 0; i < length; ++i) {
+            String path = m_installedTranslations[i].path;
             if (m_installedTranslations[i].path.endsWith(translation)) {
-                m_selectedTranslation = i;
+                m_selectedTranslation = path;
                 return;
             }
         }
@@ -78,7 +79,16 @@ public class BibleReader
 
     public TranslationInfo selectedTranslation()
     {
-        return (m_selectedTranslation == -1) ? null : m_installedTranslations[m_selectedTranslation];
+        if (m_selectedTranslation == null)
+            return null;
+        
+        int length = m_installedTranslations.length;
+        for (int i = 0; i < length; ++i) {
+            if (m_installedTranslations[i].path == m_selectedTranslation)
+                return m_installedTranslations[i];
+        }
+        
+        return null;
     }
 
     public int chapterCount(int book)
@@ -91,7 +101,7 @@ public class BibleReader
     public String[] verses(int book, int chapter)
     {
         try {
-            String path = m_installedTranslations[m_selectedTranslation].path + "/" + book + "-" + chapter + ".json";
+            String path = m_selectedTranslation + "/" + book + "-" + chapter + ".json";
             FileInputStream fis = new FileInputStream(new File(path));
             byte[] buffer = new byte[fis.available()];
             fis.read(buffer);
@@ -126,7 +136,7 @@ public class BibleReader
 
     private static BibleReader instance;
 
-    private int m_selectedTranslation = -1;
     private File m_rootDir;
+    private String m_selectedTranslation;
     private TranslationInfo[] m_installedTranslations;
 }
