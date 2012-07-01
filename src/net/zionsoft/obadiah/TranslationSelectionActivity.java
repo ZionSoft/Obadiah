@@ -66,11 +66,12 @@ public class TranslationSelectionActivity extends Activity
             public void onItemClick(AdapterView<?> parent, View view, int position, long id)
             {
                 SharedPreferences.Editor editor = getSharedPreferences("settings", MODE_PRIVATE).edit();
-                String selectedTranslation = BibleReader.getInstance().installedTranslations()[position].path;
+                BibleReader bibleReader = BibleReader.getInstance();
+                String selectedTranslation = bibleReader.installedTranslations()[position].path;
                 editor.putString("selectedTranslation", selectedTranslation);
                 editor.commit();
 
-                BibleReader.getInstance().selectTranslation(selectedTranslation);
+                bibleReader.selectTranslation(selectedTranslation);
 
                 finish();
             }
