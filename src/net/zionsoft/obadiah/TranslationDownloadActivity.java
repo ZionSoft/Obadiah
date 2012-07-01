@@ -70,6 +70,7 @@ public class TranslationDownloadActivity extends Activity
                 case MESSAGE_TRANSLATION_DOWNLOADED: {
                     BibleReader.getInstance().refresh();
                     m_progressDialog.dismiss();
+                    finish();
                     break;
                 }
                 case MESSAGE_DOWNLOAD_PROGRESS: {
