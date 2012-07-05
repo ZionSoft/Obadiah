@@ -3,6 +3,7 @@ package net.zionsoft.obadiah;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -15,6 +16,7 @@ import org.json.JSONObject;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
@@ -60,13 +62,34 @@ public class TranslationDownloadActivity extends Activity
         {
             // running in the worker thread
             try {
-                URL url = new URL(BASE_URL + TRANSLATIONS_FILE);
-                HttpURLConnection httpConnection = (HttpURLConnection) url.openConnection();
-                InputStream in = new BufferedInputStream(httpConnection.getInputStream());
-                byte[] buffer = new byte[in.available()];
-                in.read(buffer);
-                in.close();
+                // the translation list is cached for 24 hours
+                byte[] buffer = null;
+                final long lastUpdated = getSharedPreferences("settings", MODE_PRIVATE).getLong("lastUpdated", 0);
+                final long now = System.currentTimeMillis();
 
+                if (lastUpdated <= 0 || lastUpdated >= now || ((now - lastUpdated) >= 86400000)) {
+                    URL url = new URL(BASE_URL + TRANSLATIONS_FILE);
+                    HttpURLConnection httpConnection = (HttpURLConnection) url.openConnection();
+                    InputStream in = new BufferedInputStream(httpConnection.getInputStream());
+                    buffer = new byte[in.available()];
+                    in.read(buffer);
+                    in.close();
+
+                    // saves to internal storage
+                    FileOutputStream fos = new FileOutputStream(new File(getFilesDir(), TRANSLATIONS_FILE));
+                    BufferedOutputStream os = new BufferedOutputStream(fos);
+                    os.write(buffer, 0, buffer.length);
+                    os.flush();
+                    os.close();
+                } else {
+                    FileInputStream fis = new FileInputStream(getFilesDir() + File.separator + TRANSLATIONS_FILE);
+                    BufferedInputStream is = new BufferedInputStream(fis);
+                    int length = is.available();
+                    buffer = new byte[length];
+                    is.read(buffer);
+                }
+
+                // parses the result
                 TranslationInfo[] installedTranslations = BibleReader.getInstance().installedTranslations();
                 int installedCount = installedTranslations.length;
 
@@ -107,6 +130,10 @@ public class TranslationDownloadActivity extends Activity
         protected void onPostExecute(Void result)
         {
             // running in the main thread
+            SharedPreferences.Editor editor = getSharedPreferences("settings", MODE_PRIVATE).edit();
+            editor.putLong("lastUpdated", System.currentTimeMillis());
+            editor.commit();
+
             if (m_availableTranslations == null || m_availableTranslations.length == 0) {
                 m_progressDialog.dismiss();
                 Toast.makeText(TranslationDownloadActivity.this, R.string.text_no_available_translation,
