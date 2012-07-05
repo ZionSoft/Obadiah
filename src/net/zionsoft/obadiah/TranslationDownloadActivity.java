@@ -25,10 +25,6 @@ import android.widget.AdapterView.OnItemClickListener;
 
 public class TranslationDownloadActivity extends Activity
 {
-    public static final int MESSAGE_TRANSLATIONLIST_DOWNLOADED = 1;
-    public static final int MESSAGE_TRANSLATION_DOWNLOADED = 2;
-    public static final int MESSAGE_DOWNLOAD_PROGRESS = 3;
-
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
