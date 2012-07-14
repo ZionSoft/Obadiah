@@ -20,6 +20,7 @@ public class SelectionListAdapter extends ListBaseAdapter
         TextView textView;
         if (convertView == null) {
             textView = new TextView(m_context);
+            // Obsoleted by setBackground() since API level 16.
             textView.setBackgroundDrawable(m_context.getResources().getDrawable(R.drawable.btn_button));
             textView.setGravity(Gravity.CENTER);
             textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 17);

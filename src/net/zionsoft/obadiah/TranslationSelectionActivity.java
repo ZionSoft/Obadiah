@@ -29,6 +29,7 @@ public class TranslationSelectionActivity extends Activity
 
         // set footer
         TextView textView = new TextView(this);
+        // Obsoleted by setBackground() since API level 16.
         textView.setBackgroundDrawable(getResources().getDrawable(R.drawable.btn_button));
         textView.setGravity(Gravity.CENTER);
         textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 17);
