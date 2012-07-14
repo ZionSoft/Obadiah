@@ -2,6 +2,8 @@ package net.zionsoft.obadiah;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.text.SpannableString;
+import android.text.style.BackgroundColorSpan;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
@@ -76,20 +78,25 @@ public class TextListAdapter extends ListBaseAdapter
             linearLayout = (LinearLayout) convertView;
         }
 
-        if (m_selected[position])
-            linearLayout.setBackgroundColor(Color.LTGRAY);
-        else
-            linearLayout.setBackgroundColor(Color.WHITE);
-
         TextView verseIndex = (TextView) linearLayout.getChildAt(0);
         verseIndex.setText(Integer.toString(position + 1));
 
         TextView verse = (TextView) linearLayout.getChildAt(1);
-        verse.setText(m_texts[position]);
+        if (m_selected[position]) {
+            SpannableString string = new SpannableString(m_texts[position]);
+            if (m_backgroundColorSpan == null)
+                m_backgroundColorSpan = new BackgroundColorSpan(Color.LTGRAY);
+            string.setSpan(m_backgroundColorSpan, 0, m_texts[position].length(),
+                    SpannableString.SPAN_INCLUSIVE_INCLUSIVE);
+            verse.setText(string);
+        } else {
+            verse.setText(m_texts[position]);
+        }
 
         return linearLayout;
     }
 
     private boolean m_selected[];
     private int m_selectedCount;
+    private BackgroundColorSpan m_backgroundColorSpan;
 }
