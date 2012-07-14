@@ -15,6 +15,26 @@ public class TextListAdapter extends ListBaseAdapter
         super(context);
     }
 
+    public void clickItem(int position)
+    {
+        if (position < 0 || position >= m_texts.length)
+            return;
+
+        m_selected[position] ^= true;
+        notifyDataSetChanged();
+    }
+
+    public void setTexts(String[] texts)
+    {
+        super.setTexts(texts);
+
+        final int length = texts.length;
+        if (m_selected == null || length > m_selected.length)
+            m_selected = new boolean[length];
+        for (int i = 0; i < length; ++i)
+            m_selected[i] = false;
+    }
+
     public View getView(int position, View convertView, ViewGroup parent)
     {
         LinearLayout linearLayout;
@@ -30,10 +50,20 @@ public class TextListAdapter extends ListBaseAdapter
         } else {
             linearLayout = (LinearLayout) convertView;
         }
+
+        if (m_selected[position])
+            linearLayout.setBackgroundColor(Color.LTGRAY);
+        else
+            linearLayout.setBackgroundColor(Color.WHITE);
+
         TextView verseIndex = (TextView) linearLayout.getChildAt(0);
         verseIndex.setText(Integer.toString(position + 1));
+
         TextView verse = (TextView) linearLayout.getChildAt(1);
         verse.setText(m_texts[position]);
+
         return linearLayout;
     }
+
+    private boolean m_selected[];
 }

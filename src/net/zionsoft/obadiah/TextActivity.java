@@ -8,8 +8,10 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.AdapterView.OnItemClickListener;
 
 public class TextActivity extends Activity
 {
@@ -29,15 +31,22 @@ public class TextActivity extends Activity
         m_listAdapter.setTexts(m_bibleReader.verses(m_currentBook, m_currentChapter));
         m_listView = (ListView) findViewById(R.id.listView);
         m_listView.setAdapter(m_listAdapter);
+        m_listView.setOnItemClickListener(new OnItemClickListener()
+        {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+            {
+                m_listAdapter.clickItem(position);
+            }
+        });
 
         m_prevButton = (Button) findViewById(R.id.prevButton);
         m_nextButton = (Button) findViewById(R.id.nextButton);
         updateButtonState();
-        
+
         if (bundle.getBoolean("continueReading", false))
             m_listView.setSelection(getSharedPreferences("settings", MODE_PRIVATE).getInt("currentVerse", 0));
     }
-    
+
     protected void onResume()
     {
         super.onResume();
@@ -57,7 +66,7 @@ public class TextActivity extends Activity
         editor.putInt("currentVerse", m_listView.pointToPosition(0, 0));
         editor.commit();
     }
-    
+
     public boolean onCreateOptionsMenu(Menu menu)
     {
         MenuInflater inflater = getMenuInflater();
