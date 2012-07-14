@@ -7,12 +7,14 @@
     <string name="button_previous">Previous Chapter</string>
     <string name="menu_continue_reading">Continue Reading</string>
     <string name="menu_select_translation">Select Translation</string>
+    <string name="menu_share">Share</string>
     <string name="text_downloading">Downloading, please wait.</string>
     <string name="text_no_available_translation">No available translations available for download.</string>
     <string name="text_no_network">No network connection available, please check before try again!</string>
     <string name="text_no_translation">No translation installed, please download from the Internet.</string>
     <string name="text_yes">Yes</string>
     <string name="text_no">No</string>
+    <string name="text_share_with">Share with&#8230;</string>
     <string name="title_download_translation">Available translations</string>
     <string name="title_select_translation">Select a translation</string>
 

@@ -15,13 +15,38 @@ public class TextListAdapter extends ListBaseAdapter
         super(context);
     }
 
-    public void clickItem(int position)
+    public void selectItem(int position)
     {
         if (position < 0 || position >= m_texts.length)
             return;
 
         m_selected[position] ^= true;
+        if (m_selected[position])
+            ++m_selectedCount;
+        else
+            --m_selectedCount;
+
         notifyDataSetChanged();
+    }
+
+    public boolean hasItemSelected()
+    {
+        return (m_selectedCount > 0);
+    }
+
+    public String[] selectedTexts()
+    {
+        if (!hasItemSelected())
+            return null;
+
+        String[] texts = new String[m_selectedCount];
+        int length = m_texts.length;
+        int index = 0;
+        for (int i = 0; i < length; ++i) {
+            if (m_selected[i])
+                texts[index++] = Integer.toString(i + 1) + " " + m_texts[i];
+        }
+        return texts;
     }
 
     public void setTexts(String[] texts)
@@ -66,4 +91,5 @@ public class TextListAdapter extends ListBaseAdapter
     }
 
     private boolean m_selected[];
+    private int m_selectedCount;
 }

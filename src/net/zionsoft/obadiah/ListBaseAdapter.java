@@ -14,10 +14,8 @@ public abstract class ListBaseAdapter extends BaseAdapter
 
     public void setTexts(String[] texts)
     {
-        if (m_texts != texts) {
-            m_texts = texts;
-            notifyDataSetChanged();
-        }
+        m_texts = texts;
+        notifyDataSetChanged();
     }
 
     public int getCount()
