@@ -76,7 +76,7 @@ public class BibleReader
 
     public void selectTranslation(String translation)
     {
-        if (m_installedTranslations == null)
+        if (m_installedTranslations == null || m_installedTranslations.length == 0)
             return;
 
         if (translation == null) {
@@ -96,8 +96,14 @@ public class BibleReader
 
     public TranslationInfo selectedTranslation()
     {
-        if (m_selectedTranslation == null)
-            return null;
+        if (m_selectedTranslation == null) {
+            if (m_installedTranslations != null && m_installedTranslations.length > 0) {
+                m_selectedTranslation = m_installedTranslations[0].path;
+                return m_installedTranslations[0];
+            } else {
+                return null;
+            }
+        }
 
         int length = m_installedTranslations.length;
         for (int i = 0; i < length; ++i) {

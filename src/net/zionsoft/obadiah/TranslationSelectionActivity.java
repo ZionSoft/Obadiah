@@ -40,20 +40,7 @@ public class TranslationSelectionActivity extends Activity
         {
             public void onClick(View view)
             {
-                // checks connectivity
-                ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-                NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
-                if (networkInfo == null || !networkInfo.isConnected()) {
-                    Toast.makeText(TranslationSelectionActivity.this, R.string.text_no_network, Toast.LENGTH_LONG)
-                            .show();
-                    return;
-                }
-                // HTTP connection reuse was buggy before Froyo
-                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.FROYO)
-                    System.setProperty("http.keepAlive", "false");
-
-                Intent intent = new Intent(TranslationSelectionActivity.this, TranslationDownloadActivity.class);
-                startActivity(intent);
+                openTranslationDownloadActivity();
             }
         });
         ListView listView = (ListView) findViewById(R.id.listView);
@@ -84,16 +71,38 @@ public class TranslationSelectionActivity extends Activity
         super.onResume();
 
         TranslationInfo[] installedTranslations = BibleReader.getInstance().installedTranslations();
-        if (installedTranslations == null)
+        final int translationCount = (installedTranslations == null) ? 0 : installedTranslations.length;
+        if (translationCount == 0) {
+            // only directly opens TranslationDownloadActivity once
+            if (m_firstTime) {
+                openTranslationDownloadActivity();
+                m_firstTime = false;
+            }
             return;
-        int translationCount = installedTranslations.length;
-        if (translationCount == 0)
-            return;
+        }
         String[] translationNames = new String[translationCount];
         for (int i = 0; i < translationCount; ++i)
             translationNames[i] = installedTranslations[i].name;
         m_listAdapter.setTexts(translationNames);
     }
 
+    private void openTranslationDownloadActivity()
+    {
+        // checks connectivity
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        if (networkInfo == null || !networkInfo.isConnected()) {
+            Toast.makeText(TranslationSelectionActivity.this, R.string.text_no_network, Toast.LENGTH_LONG).show();
+            return;
+        }
+        // HTTP connection reuse was buggy before Froyo
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.FROYO)
+            System.setProperty("http.keepAlive", "false");
+
+        Intent intent = new Intent(TranslationSelectionActivity.this, TranslationDownloadActivity.class);
+        startActivity(intent);
+    }
+
+    private boolean m_firstTime = true;
     private SelectionListAdapter m_listAdapter;
 }

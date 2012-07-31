@@ -1,8 +1,8 @@
 package net.zionsoft.obadiah;
 
-import java.io.File;
-
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -13,7 +13,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
-import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 
 public class BookSelectionActivity extends Activity
@@ -33,7 +32,7 @@ public class BookSelectionActivity extends Activity
             selectedTranslation = preferences.getString("selectedTranslation", null);
         } catch (ClassCastException e) {
             // the value is an integer for 1.0 and 1.1
-            int selected = preferences.getInt("selectedTranslation", 0);
+            int selected = preferences.getInt("selectedTranslation", -1);
             if (selected == 0)
                 selectedTranslation = "authorized-king-james";
             else if (selected == 1)
@@ -59,21 +58,36 @@ public class BookSelectionActivity extends Activity
         });
     }
 
-    protected void onStart()
-    {
-        super.onStart();
-
-        File filesDir = getFilesDir();
-        if (filesDir.list().length == 0) {
-            // no translation installed
-            Toast.makeText(this, R.string.text_no_translation, Toast.LENGTH_LONG).show();
-            openTranslationSelectionActivity();
-        }
-    }
-
     protected void onResume()
     {
         super.onResume();
+        
+        final String[] list = getFilesDir().list();
+        final int length = list.length;
+        if (length == 0 || (length == 1 && list[0].equals(TRANSLATIONS_FILE))) {
+            // no translation installed
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+            alertDialogBuilder.setMessage(R.string.text_no_translation).setCancelable(false)
+                    .setPositiveButton(R.string.text_yes, new DialogInterface.OnClickListener()
+                    {
+                        public void onClick(DialogInterface dialog, int id)
+                        {
+                            dialog.dismiss();
+                            openTranslationSelectionActivity();
+
+                        }
+                    }).setNegativeButton(R.string.text_no, new DialogInterface.OnClickListener()
+                    {
+                        public void onClick(DialogInterface dialog, int id)
+                        {
+                            dialog.cancel();
+                            BookSelectionActivity.this.finish();
+                        }
+                    });
+            AlertDialog alertDialog = alertDialogBuilder.create();
+            alertDialog.show();
+            return;
+        }
 
         TranslationInfo translationInfo = BibleReader.getInstance().selectedTranslation();
         if (translationInfo == null)
@@ -125,5 +139,6 @@ public class BookSelectionActivity extends Activity
         startActivity(intent);
     }
 
+    private static final String TRANSLATIONS_FILE = "translations.json";
     private SelectionListAdapter m_listAdapter;
 }

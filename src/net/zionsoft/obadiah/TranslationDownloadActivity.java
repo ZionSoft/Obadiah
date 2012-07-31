@@ -91,7 +91,7 @@ public class TranslationDownloadActivity extends Activity
 
                 // parses the result
                 TranslationInfo[] installedTranslations = BibleReader.getInstance().installedTranslations();
-                int installedCount = installedTranslations.length;
+                int installedCount = (installedTranslations == null) ? 0 : installedTranslations.length;
 
                 JSONArray replyArray = new JSONArray(new String(buffer, "UTF8"));
                 final int length = replyArray.length();
@@ -116,7 +116,9 @@ public class TranslationDownloadActivity extends Activity
                     ++count;
                 }
 
-                if (count > 0) {
+                if (installedCount == 0) {
+                    m_availableTranslations = availableTranslations;
+                } else if (count > 0) {
                     m_availableTranslations = new TranslationInfo[count];
                     for (int i = 0; i < count; ++i)
                         m_availableTranslations[i] = availableTranslations[i];
