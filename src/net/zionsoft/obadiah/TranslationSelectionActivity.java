@@ -24,7 +24,7 @@ public class TranslationSelectionActivity extends Activity
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.layout_translations);
+        setContentView(R.layout.layout_translationselection_activity);
         setTitle(R.string.title_select_translation);
 
         // set footer

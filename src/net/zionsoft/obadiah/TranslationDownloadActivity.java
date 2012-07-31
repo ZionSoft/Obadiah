@@ -30,7 +30,7 @@ public class TranslationDownloadActivity extends Activity
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.layout_translations);
+        setContentView(R.layout.layout_translationdownload_activity);
         setTitle(R.string.title_download_translation);
 
         ListView listView = (ListView) findViewById(R.id.listView);

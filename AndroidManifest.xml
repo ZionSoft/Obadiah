@@ -37,6 +37,9 @@
         <activity
             android:name=".TextActivity"
             android:screenOrientation="portrait" />
+        <activity
+            android:name="com.google.ads.AdActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize" />
     </application>
 
 </manifest>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" >
+
+    <com.google.ads.AdView
+        xmlns:googleads="http://schemas.android.com/apk/lib/com.google.ads"
+        android:id="@+id/adView"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        googleads:adSize="SMART_BANNER"
+        googleads:adUnitId="a150181da1a3a23"
+        googleads:keywords="bible, jesus, christian, 圣经, 耶稣, 基督, raamattu"
+        googleads:loadAdOnCreate="true" />
+
+    <ListView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/listView"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_above="@id/adView"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="5dip"
+        android:padding="5dip" />
+
+</RelativeLayout>
