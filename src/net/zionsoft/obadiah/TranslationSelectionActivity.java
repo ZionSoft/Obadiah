@@ -84,6 +84,8 @@ public class TranslationSelectionActivity extends Activity
         super.onResume();
 
         TranslationInfo[] installedTranslations = BibleReader.getInstance().installedTranslations();
+        if (installedTranslations == null)
+            return;
         int translationCount = installedTranslations.length;
         if (translationCount == 0)
             return;
