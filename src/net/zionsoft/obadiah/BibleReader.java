@@ -37,10 +37,16 @@ public class BibleReader
                 }
             }
 
-            if (hasTranslationsFile)
-                m_installedTranslations = new TranslationInfo[length - 1];
-            else
-                m_installedTranslations = new TranslationInfo[length];
+            if (hasTranslationsFile) {
+                if (length > 1)
+                    m_installedTranslations = new TranslationInfo[length - 1];
+                else
+                    return;
+            } else {
+                if (length > 0)
+                    m_installedTranslations = new TranslationInfo[length];
+                else return;
+            }
             for (int i = 0, index = 0; i < length; ++i) {
                 if (directories[i].isFile())
                     continue;
