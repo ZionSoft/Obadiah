@@ -23,10 +23,11 @@ public class BookSelectionActivity extends Activity
         setContentView(R.layout.layout_gridview);
 
         BibleReader bibleReader = BibleReader.getInstance();
+        // NOTE must call this before BibleReader is further used
         bibleReader.setRootDir(getFilesDir());
 
+        // loads the translation as used last time
         SharedPreferences preferences = getSharedPreferences("settings", MODE_PRIVATE);
-
         String selectedTranslation = null;
         try {
             selectedTranslation = preferences.getString("selectedTranslation", null);
@@ -38,9 +39,9 @@ public class BookSelectionActivity extends Activity
             else if (selected == 1)
                 selectedTranslation = "chinese-union-simplified";
         }
-
         bibleReader.selectTranslation(selectedTranslation);
 
+        // initializes the view for book names
         GridView gridView = (GridView) findViewById(R.id.gridView);
         gridView.setColumnWidth((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 144, getResources()
                 .getDisplayMetrics()));
@@ -50,22 +51,23 @@ public class BookSelectionActivity extends Activity
         {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id)
             {
-                Intent intent = new Intent(BookSelectionActivity.this, ChapterSelectionActivity.class);
-                intent.putExtra("continueReading", false);
-                intent.putExtra("selectedBook", position);
-                startActivity(intent);
+                startChapterSelectionActivity(false, position);
             }
         });
+
+        // initializes the UI based on the selected translation
+        setupUi();
     }
 
     protected void onResume()
     {
         super.onResume();
-        
+
+        // opens dialog if no translation installed
+        // the code is here in case the user doesn't download anything
         final String[] list = getFilesDir().list();
         final int length = list.length;
         if (length == 0 || (length == 1 && list[0].equals(TRANSLATIONS_FILE))) {
-            // no translation installed
             AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
             alertDialogBuilder.setMessage(R.string.text_no_translation).setCancelable(false)
                     .setPositiveButton(R.string.text_yes, new DialogInterface.OnClickListener()
@@ -73,8 +75,7 @@ public class BookSelectionActivity extends Activity
                         public void onClick(DialogInterface dialog, int id)
                         {
                             dialog.dismiss();
-                            openTranslationSelectionActivity();
-
+                            startTranslationSelectionActivity();
                         }
                     }).setNegativeButton(R.string.text_no, new DialogInterface.OnClickListener()
                     {
@@ -89,11 +90,9 @@ public class BookSelectionActivity extends Activity
             return;
         }
 
-        TranslationInfo translationInfo = BibleReader.getInstance().selectedTranslation();
-        if (translationInfo == null)
-            return;
-        setTitle(translationInfo.name);
-        m_listAdapter.setTexts(translationInfo.bookName);
+        // updates the UI if resumed from TranslationSelectionActivity
+        if (m_fromTranslationSelectionActivity)
+            setupUi();
     }
 
     public boolean onCreateOptionsMenu(Menu menu)
@@ -105,11 +104,21 @@ public class BookSelectionActivity extends Activity
 
     public boolean onPrepareOptionsMenu(Menu menu)
     {
-        MenuItem menuItem = menu.findItem(R.id.menu_continue_reading);
-        if (getSharedPreferences("settings", MODE_PRIVATE).getInt("currentBook", -1) >= 0) {
-            menuItem.setVisible(true);
+        if (m_continueReadingMenuItem == null)
+            m_continueReadingMenuItem = menu.findItem(R.id.menu_continue_reading);
+
+        if (m_canContinueReading) {
+            m_continueReadingMenuItem.setVisible(true);
         } else {
-            menuItem.setVisible(false);
+            // only needs to check if resumed from ChapterSelectionActivity,
+            // which opens TextActivity, which sets "currentBook"
+            if (m_fromChapterSelectionActivity
+                    && getSharedPreferences("settings", MODE_PRIVATE).getInt("currentBook", -1) >= 0) {
+                m_continueReadingMenuItem.setVisible(true);
+                m_canContinueReading = true;
+            } else {
+                m_continueReadingMenuItem.setVisible(false);
+            }
         }
         return true;
     }
@@ -118,14 +127,11 @@ public class BookSelectionActivity extends Activity
     {
         switch (item.getItemId()) {
         case R.id.menu_continue_reading: {
-            Intent intent = new Intent(this, ChapterSelectionActivity.class);
-            intent.putExtra("continueReading", true);
-            intent.putExtra("selectedBook", getSharedPreferences("settings", MODE_PRIVATE).getInt("currentBook", 0));
-            startActivity(intent);
+            startChapterSelectionActivity(true, getSharedPreferences("settings", MODE_PRIVATE).getInt("currentBook", 0));
             return true;
         }
         case R.id.menu_select_translation: {
-            openTranslationSelectionActivity();
+            startTranslationSelectionActivity();
             return true;
         }
         default:
@@ -133,12 +139,40 @@ public class BookSelectionActivity extends Activity
         }
     }
 
-    private void openTranslationSelectionActivity()
+    private void startChapterSelectionActivity(boolean continueReading, int selectedBook)
     {
+        m_fromChapterSelectionActivity = true;
+        m_fromTranslationSelectionActivity = false;
+
+        Intent intent = new Intent(this, ChapterSelectionActivity.class);
+        intent.putExtra("continueReading", continueReading);
+        intent.putExtra("selectedBook", selectedBook);
+        startActivity(intent);
+    }
+
+    private void startTranslationSelectionActivity()
+    {
+        m_fromChapterSelectionActivity = false;
+        m_fromTranslationSelectionActivity = true;
+
         Intent intent = new Intent(this, TranslationSelectionActivity.class);
         startActivity(intent);
     }
 
+    private void setupUi()
+    {
+        TranslationInfo translationInfo = BibleReader.getInstance().selectedTranslation();
+        if (translationInfo == null)
+            return;
+        setTitle(translationInfo.name);
+        m_listAdapter.setTexts(translationInfo.bookName);
+    }
+
     private static final String TRANSLATIONS_FILE = "translations.json";
+
+    private boolean m_fromChapterSelectionActivity;
+    private boolean m_fromTranslationSelectionActivity;
+    private boolean m_canContinueReading;
+    private MenuItem m_continueReadingMenuItem;
     private SelectionListAdapter m_listAdapter;
 }
