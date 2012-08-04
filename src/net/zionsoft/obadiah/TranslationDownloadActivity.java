@@ -16,6 +16,7 @@ import org.json.JSONObject;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -162,7 +163,15 @@ public class TranslationDownloadActivity extends Activity
         {
             // running in the main thread
             m_progressDialog = new ProgressDialog(TranslationDownloadActivity.this);
-            m_progressDialog.setCancelable(false);
+            m_progressDialog.setCancelable(true);
+            m_progressDialog.setCanceledOnTouchOutside(false);
+            m_progressDialog.setOnCancelListener(new DialogInterface.OnCancelListener()
+            {
+                public void onCancel(DialogInterface dialog)
+                {
+                    TranslationDownloadAsyncTask.this.cancel(true);
+                }
+            });
             m_progressDialog.setMessage(getText(R.string.text_downloading));
             m_progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
             m_progressDialog.setMax(100);
@@ -178,8 +187,8 @@ public class TranslationDownloadActivity extends Activity
                 String path = translationToDownload.path;
 
                 // creates sub-folder
-                File dir = new File(getFilesDir(), path);
-                dir.mkdir();
+                m_dir = new File(getFilesDir(), path);
+                m_dir.mkdir();
 
                 URL url = new URL(BASE_URL + path + ".zip");
                 HttpURLConnection httpConnection = (HttpURLConnection) url.openConnection();
@@ -190,8 +199,11 @@ public class TranslationDownloadActivity extends Activity
                 int read = -1;
                 int downloaded = 0;
                 while ((entry = zis.getNextEntry()) != null) {
+                    if (isCancelled())
+                        break;
+                    
                     // unzips and writes to internal storage
-                    FileOutputStream fos = new FileOutputStream(new File(dir, entry.getName()));
+                    FileOutputStream fos = new FileOutputStream(new File(m_dir, entry.getName()));
                     BufferedOutputStream os = new BufferedOutputStream(fos, BUFFER_LENGTH);
                     while ((read = zis.read(buffer, 0, BUFFER_LENGTH)) != -1)
                         os.write(buffer, 0, read);
@@ -214,9 +226,22 @@ public class TranslationDownloadActivity extends Activity
             m_progressDialog.setProgress(progress[0]);
         }
 
+        protected void onCancelled()
+        {
+            // running in the main thread
+            if (m_dir != null) {
+                File[] files = m_dir.listFiles();
+                for (File file : files)
+                    file.delete();
+                m_dir.delete();
+                m_dir = null;
+            }
+        }
+
         protected void onPostExecute(Void result)
         {
             // running in the main thread
+            m_dir = null;
             BibleReader.getInstance().refresh();
             m_progressDialog.dismiss();
             finish();
@@ -224,6 +249,7 @@ public class TranslationDownloadActivity extends Activity
 
         private static final int BUFFER_LENGTH = 2048;
 
+        private File m_dir;
         private ProgressDialog m_progressDialog;
     }
 
