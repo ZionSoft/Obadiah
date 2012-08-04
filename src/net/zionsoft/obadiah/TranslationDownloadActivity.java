@@ -230,10 +230,7 @@ public class TranslationDownloadActivity extends Activity
         {
             // running in the main thread
             if (m_dir != null) {
-                File[] files = m_dir.listFiles();
-                for (File file : files)
-                    file.delete();
-                m_dir.delete();
+                Utils.removeDirectory(m_dir);
                 m_dir = null;
             }
         }

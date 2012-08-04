@@ -29,46 +29,44 @@ public class BibleReader
             if (length == 0)
                 return;
 
-            boolean hasTranslationsFile = false;
+            TranslationInfo[] translations = new TranslationInfo[length];
+            int count = 0;
             for (int i = 0; i < length; ++i) {
-                if (directories[i].isFile()) {
-                    hasTranslationsFile = true;
-                    break;
-                }
-            }
-
-            if (hasTranslationsFile) {
-                if (length > 1)
-                    m_installedTranslations = new TranslationInfo[length - 1];
-                else
-                    return;
-            } else {
-                if (length > 0)
-                    m_installedTranslations = new TranslationInfo[length];
-                else return;
-            }
-            for (int i = 0, index = 0; i < length; ++i) {
                 if (directories[i].isFile())
                     continue;
 
-                FileInputStream fis = new FileInputStream(new File(directories[i], BOOKS_FILE));
+                File booksFile = new File(directories[i], BOOKS_FILE);
+                if (!booksFile.exists()) {
+                    Utils.removeDirectory(directories[i]);
+                    continue;
+                }
+
+                FileInputStream fis = new FileInputStream(booksFile);
                 byte[] buffer = new byte[fis.available()];
                 fis.read(buffer);
                 fis.close();
 
-                m_installedTranslations[index] = new TranslationInfo();
-                m_installedTranslations[index].path = directories[i].getAbsolutePath();
+                translations[i] = new TranslationInfo();
+                translations[i].path = directories[i].getAbsolutePath();
 
                 JSONObject booksInfoObject = new JSONObject(new String(buffer, "UTF8"));
-                m_installedTranslations[index].name = booksInfoObject.getString("name");
+                translations[i].name = booksInfoObject.getString("name");
 
                 JSONArray booksArray = booksInfoObject.getJSONArray("books");
                 final int booksCount = booksArray.length();
-                m_installedTranslations[index].bookName = new String[booksCount];
+                translations[i].bookName = new String[booksCount];
                 for (int j = 0; j < booksCount; ++j)
-                    m_installedTranslations[index].bookName[j] = booksArray.getString(j);
+                    translations[i].bookName[j] = booksArray.getString(j);
 
-                ++index;
+                ++count;
+            }
+
+            if (count > 0) {
+                m_installedTranslations = new TranslationInfo[count];
+                for (int i = 0, index = 0; i < length; ++i) {
+                    if (translations[i] != null)
+                        m_installedTranslations[index++] = translations[i];
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
