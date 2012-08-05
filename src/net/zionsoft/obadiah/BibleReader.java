@@ -35,14 +35,16 @@ public class BibleReader
                 if (directories[i].isFile())
                     continue;
 
+                // removes the translation if it doesn't contain books.json
                 File booksFile = new File(directories[i], BOOKS_FILE);
                 if (!booksFile.exists()) {
                     Utils.removeDirectory(directories[i]);
                     continue;
                 }
 
+                // reads and parses the books.json file
                 FileInputStream fis = new FileInputStream(booksFile);
-                byte[] buffer = new byte[fis.available()];
+                byte[] buffer = new byte[(int) booksFile.length()];
                 fis.read(buffer);
                 fis.close();
 
@@ -53,9 +55,8 @@ public class BibleReader
                 translations[i].name = booksInfoObject.getString("name");
 
                 JSONArray booksArray = booksInfoObject.getJSONArray("books");
-                final int booksCount = booksArray.length();
-                translations[i].bookName = new String[booksCount];
-                for (int j = 0; j < booksCount; ++j)
+                translations[i].bookName = new String[BOOK_COUNT];
+                for (int j = 0; j < BOOK_COUNT; ++j)
                     translations[i].bookName[j] = booksArray.getString(j);
 
                 ++count;
@@ -67,6 +68,8 @@ public class BibleReader
                     if (translations[i] != null)
                         m_installedTranslations[index++] = translations[i];
                 }
+            } else {
+                m_installedTranslations = null;
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -80,15 +83,19 @@ public class BibleReader
 
     public void selectTranslation(String translation)
     {
-        if (m_installedTranslations == null || m_installedTranslations.length == 0)
-            return;
-
-        if (translation == null) {
-            m_selectedTranslation = m_installedTranslations[0].path;
+        if (m_installedTranslations == null || m_installedTranslations.length == 0) {
+            m_selectedTranslation = null;
             return;
         }
 
-        int length = m_installedTranslations.length;
+        if (translation == null) {
+            if (m_selectedTranslation == null)
+                m_selectedTranslation = m_installedTranslations[0].path;
+            return;
+        }
+
+        // tries to find the translation
+        final int length = m_installedTranslations.length;
         for (int i = 0; i < length; ++i) {
             String path = m_installedTranslations[i].path;
             if (m_installedTranslations[i].path.endsWith(translation)) {
@@ -96,31 +103,38 @@ public class BibleReader
                 return;
             }
         }
+
+        // selects the first translation if no matching found
+        if (m_selectedTranslation == null)
+            m_selectedTranslation = m_installedTranslations[0].path;
     }
 
     public TranslationInfo selectedTranslation()
     {
         if (m_selectedTranslation == null) {
-            if (m_installedTranslations != null && m_installedTranslations.length > 0) {
-                m_selectedTranslation = m_installedTranslations[0].path;
-                return m_installedTranslations[0];
-            } else {
+            if (m_installedTranslations == null || m_installedTranslations.length == 0) {
                 return null;
             }
+
+            m_selectedTranslation = m_installedTranslations[0].path;
+            return m_installedTranslations[0];
         }
 
-        int length = m_installedTranslations.length;
-        for (int i = 0; i < length; ++i) {
-            if (m_installedTranslations[i].path == m_selectedTranslation)
-                return m_installedTranslations[i];
+        // tries to find the selected translation
+        for (TranslationInfo translationInfo : m_installedTranslations) {
+            if (translationInfo.path == m_selectedTranslation)
+                return translationInfo;
         }
 
-        return null;
+        // selects and returns the first translation if no matching found
+        TranslationInfo translationInfo = m_installedTranslations[0];
+        m_selectedTranslation = translationInfo.path;
+        return translationInfo;
     }
 
     public int chapterCount(int book)
     {
-        if (book < 0 || book >= CHAPTER_COUNT.length)
+        if (book < 0 || book >= BOOK_COUNT)
             return 0;
         return CHAPTER_COUNT[book];
     }
@@ -128,15 +142,18 @@ public class BibleReader
     public String[] verses(int book, int chapter)
     {
         try {
+            // TODO handles if the selected chapter is invalid
+
             String path = m_selectedTranslation + "/" + book + "-" + chapter + ".json";
-            FileInputStream fis = new FileInputStream(new File(path));
-            byte[] buffer = new byte[fis.available()];
+            File file = new File(path);
+            FileInputStream fis = new FileInputStream(file);
+            byte[] buffer = new byte[(int) file.length()];
             fis.read(buffer);
             fis.close();
 
             JSONObject jsonObject = new JSONObject(new String(buffer, "UTF8"));
             JSONArray paragraphArray = jsonObject.getJSONArray("verses");
-            int paragraphCount = paragraphArray.length();
+            final int paragraphCount = paragraphArray.length();
             String[] paragraphs = new String[paragraphCount];
             for (int i = 0; i < paragraphCount; ++i)
                 paragraphs[i] = paragraphArray.getString(i);
@@ -152,13 +169,10 @@ public class BibleReader
         // do nothing
     }
 
-    static {
-        CHAPTER_COUNT = new int[] { 50, 40, 27, 36, 34, 24, 21, 4, 31, 24, 22, 25, 29, 36, 10, 13, 10, 42, 150, 31, 12,
-                8, 66, 52, 5, 48, 12, 14, 3, 9, 1, 4, 7, 3, 3, 3, 2, 14, 4, 28, 16, 24, 21, 28, 16, 16, 13, 6, 6, 4, 4,
-                5, 3, 6, 4, 3, 1, 13, 5, 5, 3, 5, 1, 1, 1, 22 };
-    }
-
-    private static final int[] CHAPTER_COUNT;
+    private static final int BOOK_COUNT = 66;
+    private static final int[] CHAPTER_COUNT = { 50, 40, 27, 36, 34, 24, 21, 4, 31, 24, 22, 25, 29, 36, 10, 13, 10, 42,
+            150, 31, 12, 8, 66, 52, 5, 48, 12, 14, 3, 9, 1, 4, 7, 3, 3, 3, 2, 14, 4, 28, 16, 24, 21, 28, 16, 16, 13, 6,
+            6, 4, 4, 5, 3, 6, 4, 3, 1, 13, 5, 5, 3, 5, 1, 1, 1, 22 };
     private static final String BOOKS_FILE = "books.json";
 
     private static BibleReader instance;
