@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 
 public class TextActivity extends Activity
@@ -25,11 +26,8 @@ public class TextActivity extends Activity
         m_currentChapter = bundle.getInt("selectedChapter");
 
         m_bibleReader = BibleReader.getInstance();
-        m_translationInfo = m_bibleReader.selectedTranslation();
-        setTitle(m_translationInfo.bookName[m_currentBook] + ", " + (m_currentChapter + 1));
-
         m_listAdapter = new TextListAdapter(this);
-        m_listAdapter.setTexts(m_bibleReader.verses(m_currentBook, m_currentChapter));
+        setupUi(true);
 
         m_listView = (ListView) findViewById(R.id.listView);
         m_listView.setAdapter(m_listAdapter);
@@ -45,6 +43,7 @@ public class TextActivity extends Activity
         m_nextButton = (Button) findViewById(R.id.nextButton);
         updateButtonState();
 
+        // scrolls to last read verse if opened as continue reading
         if (bundle.getBoolean("continueReading", false))
             m_listView.setSelection(getSharedPreferences("settings", MODE_PRIVATE).getInt("currentVerse", 0));
     }
@@ -55,9 +54,7 @@ public class TextActivity extends Activity
 
         if (m_fromTranslationSelection) {
             m_fromTranslationSelection = false;
-            m_translationInfo = m_bibleReader.selectedTranslation();
-            setTitle(m_translationInfo.bookName[m_currentBook] + ", " + (m_currentChapter + 1));
-            m_listAdapter.setTexts(m_bibleReader.verses(m_currentBook, m_currentChapter));
+            setupUi(true);
         }
     }
 
@@ -83,6 +80,7 @@ public class TextActivity extends Activity
     {
         if (m_shareMenuItem == null)
             m_shareMenuItem = menu.findItem(R.id.menu_share);
+
         if (m_listAdapter.hasItemSelected())
             m_shareMenuItem.setVisible(true);
         else
@@ -134,8 +132,7 @@ public class TextActivity extends Activity
 
         --m_currentChapter;
         updateButtonState();
-        setTitle(m_translationInfo.bookName[m_currentBook] + ", " + (m_currentChapter + 1));
-        m_listAdapter.setTexts(m_bibleReader.verses(m_currentBook, m_currentChapter));
+        setupUi(false);
         m_listView.setSelectionAfterHeaderView();
     }
 
@@ -146,8 +143,7 @@ public class TextActivity extends Activity
 
         ++m_currentChapter;
         updateButtonState();
-        setTitle(m_translationInfo.bookName[m_currentBook] + ", " + (m_currentChapter + 1));
-        m_listAdapter.setTexts(m_bibleReader.verses(m_currentBook, m_currentChapter));
+        setupUi(false);
         m_listView.setSelectionAfterHeaderView();
     }
 
@@ -162,6 +158,23 @@ public class TextActivity extends Activity
             m_nextButton.setEnabled(false);
         else
             m_nextButton.setEnabled(true);
+    }
+
+    private void setupUi(boolean updateSelectedTranslation)
+    {
+        if (updateSelectedTranslation) {
+            m_translationInfo = m_bibleReader.selectedTranslation();
+            if (m_translationInfo == null) {
+                Toast.makeText(this, R.string.text_no_selected_translation, Toast.LENGTH_LONG).show();
+                finish();
+                return;
+            }
+            setTitle(m_translationInfo.bookName[m_currentBook] + ", " + (m_currentChapter + 1));
+        }
+
+        // TODO handles if the translation is corrupted
+        String[] verses = m_bibleReader.verses(m_currentBook, m_currentChapter);
+        m_listAdapter.setTexts(verses);
     }
 
     private boolean m_fromTranslationSelection;
