@@ -22,37 +22,36 @@ public class ChapterSelectionActivity extends Activity
         Bundle bundle = getIntent().getExtras();
         m_selectedBook = bundle.getInt("selectedBook");
 
-        int chapterCount = BibleReader.getInstance().chapterCount(m_selectedBook);
+        BibleReader bibleReader = BibleReader.getInstance();
+        setTitle(bibleReader.selectedTranslation().bookName[m_selectedBook]);
+
+        // creates strings for chapter listing
+        final int chapterCount = bibleReader.chapterCount(m_selectedBook);
         String[] chapters = new String[chapterCount];
         for (int i = 0; i < chapterCount; ++i)
             chapters[i] = Integer.toString(i + 1);
 
+        // initializes UI for chapter selection
         GridView gridView = (GridView) findViewById(R.id.gridView);
         gridView.setColumnWidth((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, getResources()
                 .getDisplayMetrics()));
-        
+
         SelectionListAdapter adapter = new SelectionListAdapter(this);
         adapter.setTexts(chapters);
         gridView.setAdapter(adapter);
-        
+
         gridView.setOnItemClickListener(new OnItemClickListener()
         {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id)
             {
-                Intent intent = new Intent(ChapterSelectionActivity.this, TextActivity.class);
-                intent.putExtra("selectedBook", m_selectedBook);
-                intent.putExtra("selectedChapter", position);
-                startActivity(intent);
+                startTextActivity(false, m_selectedBook, position);
             }
         });
 
+        // starts TextActivity if this activity is opened as continue reading
         if (bundle.getBoolean("continueReading", false)) {
-            Intent intent = new Intent(this, TextActivity.class);
-            intent.putExtra("continueReading", true);
-            intent.putExtra("selectedBook", m_selectedBook);
-            intent.putExtra("selectedChapter",
+            startTextActivity(true, m_selectedBook,
                     getSharedPreferences("settings", MODE_PRIVATE).getInt("currentChapter", 0));
-            startActivity(intent);
         }
     }
 
@@ -60,7 +59,9 @@ public class ChapterSelectionActivity extends Activity
     {
         super.onResume();
 
-        setTitle(BibleReader.getInstance().selectedTranslation().bookName[m_selectedBook]);
+        // only updates the title if resumed from TranslationSelectionActivity
+        if (m_TranslationSelectionActivity)
+            setTitle(BibleReader.getInstance().selectedTranslation().bookName[m_selectedBook]);
     }
 
     public boolean onCreateOptionsMenu(Menu menu)
@@ -74,8 +75,7 @@ public class ChapterSelectionActivity extends Activity
     {
         switch (item.getItemId()) {
         case R.id.menu_select_translation: {
-            Intent intent = new Intent(this, TranslationSelectionActivity.class);
-            startActivity(intent);
+            startTranslationSelectionActivity();
             return true;
         }
         default:
@@ -83,5 +83,23 @@ public class ChapterSelectionActivity extends Activity
         }
     }
 
+    private void startTextActivity(boolean continueReading, int selectedBook, int selectedChapter)
+    {
+        m_TranslationSelectionActivity = false;
+        Intent intent = new Intent(ChapterSelectionActivity.this, TextActivity.class);
+        intent.putExtra("continueReading", continueReading);
+        intent.putExtra("selectedBook", selectedBook);
+        intent.putExtra("selectedChapter", selectedChapter);
+        startActivity(intent);
+    }
+
+    private void startTranslationSelectionActivity()
+    {
+        m_TranslationSelectionActivity = true;
+        Intent intent = new Intent(this, TranslationSelectionActivity.class);
+        startActivity(intent);
+    }
+
+    private boolean m_TranslationSelectionActivity;
     private int m_selectedBook;
 }
