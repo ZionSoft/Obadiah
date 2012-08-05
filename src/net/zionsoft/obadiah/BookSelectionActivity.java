@@ -109,9 +109,9 @@ public class BookSelectionActivity extends Activity
         if (m_canContinueReading) {
             m_continueReadingMenuItem.setVisible(true);
         } else {
-            // only needs to check if resumed from ChapterSelectionActivity,
-            // which opens TextActivity, which sets "currentBook"
-            if (m_fromChapterSelectionActivity
+            // checks if from ChapterSelectionActivity or first boot
+            // i.e. not from TranslationSelectionActivity
+            if (!m_fromTranslationSelectionActivity
                     && getSharedPreferences("settings", MODE_PRIVATE).getInt("currentBook", -1) >= 0) {
                 m_continueReadingMenuItem.setVisible(true);
                 m_canContinueReading = true;
@@ -140,7 +140,6 @@ public class BookSelectionActivity extends Activity
 
     private void startChapterSelectionActivity(boolean continueReading, int selectedBook)
     {
-        m_fromChapterSelectionActivity = true;
         m_fromTranslationSelectionActivity = false;
 
         Intent intent = new Intent(this, ChapterSelectionActivity.class);
@@ -151,7 +150,6 @@ public class BookSelectionActivity extends Activity
 
     private void startTranslationSelectionActivity()
     {
-        m_fromChapterSelectionActivity = false;
         m_fromTranslationSelectionActivity = true;
 
         Intent intent = new Intent(this, TranslationSelectionActivity.class);
@@ -167,7 +165,6 @@ public class BookSelectionActivity extends Activity
         m_listAdapter.setTexts(translationInfo.bookName);
     }
 
-    private boolean m_fromChapterSelectionActivity;
     private boolean m_fromTranslationSelectionActivity;
     private boolean m_canContinueReading;
     private MenuItem m_continueReadingMenuItem;
