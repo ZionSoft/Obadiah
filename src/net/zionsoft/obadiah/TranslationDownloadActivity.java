@@ -5,7 +5,6 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.zip.ZipEntry;
@@ -34,18 +33,30 @@ public class TranslationDownloadActivity extends Activity
         setContentView(R.layout.layout_translationdownload_activity);
         setTitle(R.string.title_download_translation);
 
+        // initializes UI
         ListView listView = (ListView) findViewById(R.id.listView);
-        m_adapter = new SelectionListAdapter(this);
-        listView.setAdapter(m_adapter);
+        m_translationListAdapter = new SelectionListAdapter(this);
+        listView.setAdapter(m_translationListAdapter);
         listView.setOnItemClickListener(new OnItemClickListener()
         {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id)
             {
-                new TranslationDownloadAsyncTask().execute(position);
+                m_translationDownloadAsyncTask = new TranslationDownloadAsyncTask();
+                m_translationDownloadAsyncTask.execute(position);
             }
         });
 
+        // gets translation list
         new TranslationListDownloadAsyncTask().execute();
+    }
+
+    public void onPause()
+    {
+        super.onPause();
+
+        // cancel existing download async tasks
+        if (m_translationDownloadAsyncTask != null)
+            m_translationDownloadAsyncTask.cancel(true);
     }
 
     private class TranslationListDownloadAsyncTask extends AsyncTask<Void, Void, Void>
@@ -63,34 +74,34 @@ public class TranslationDownloadActivity extends Activity
         {
             // running in the worker thread
             try {
-                // the translation list is cached for 24 hours
-                byte[] buffer = null;
                 final long lastUpdated = getSharedPreferences("settings", MODE_PRIVATE).getLong("lastUpdated", 0);
                 final long now = System.currentTimeMillis();
 
                 if (lastUpdated <= 0 || lastUpdated >= now || ((now - lastUpdated) >= 86400000)) {
+                    // no valid local cache, downloads from Internet and writes
+                    // to local cache
                     URL url = new URL(BASE_URL + TRANSLATIONS_FILE);
                     HttpURLConnection httpConnection = (HttpURLConnection) url.openConnection();
-                    InputStream in = new BufferedInputStream(httpConnection.getInputStream());
-                    buffer = new byte[in.available()];
-                    in.read(buffer);
-                    in.close();
+                    BufferedInputStream bis = new BufferedInputStream(httpConnection.getInputStream());
 
-                    // saves to internal storage
                     FileOutputStream fos = new FileOutputStream(new File(getFilesDir(), TRANSLATIONS_FILE));
-                    BufferedOutputStream os = new BufferedOutputStream(fos);
-                    os.write(buffer, 0, buffer.length);
+                    BufferedOutputStream os = new BufferedOutputStream(fos, BUFFER_LENGTH);
+                    byte buffer[] = new byte[BUFFER_LENGTH];
+                    int read = -1;
+                    while ((read = bis.read(buffer, 0, BUFFER_LENGTH)) != -1)
+                        os.write(buffer, 0, read);
                     os.flush();
                     os.close();
-                } else {
-                    FileInputStream fis = new FileInputStream(getFilesDir() + File.separator + TRANSLATIONS_FILE);
-                    BufferedInputStream is = new BufferedInputStream(fis);
-                    int length = is.available();
-                    buffer = new byte[length];
-                    is.read(buffer);
                 }
 
+                // reads from local cache
+                File translationsFile = new File(getFilesDir() + File.separator + TRANSLATIONS_FILE);
+                byte[] buffer = new byte[(int) translationsFile.length()];
+                BufferedInputStream bis = new BufferedInputStream(new FileInputStream(translationsFile));
+                bis.read(buffer);
+
                 // parses the result
+                // TODO checks if the translation file is valid
                 TranslationInfo[] installedTranslations = BibleReader.getInstance().installedTranslations();
                 int installedCount = (installedTranslations == null) ? 0 : installedTranslations.length;
 
@@ -147,11 +158,12 @@ public class TranslationDownloadActivity extends Activity
                 String[] texts = new String[length];
                 for (int i = 0; i < length; ++i)
                     texts[i] = m_availableTranslations[i].name + " (" + m_availableTranslations[i].size + " KB)";
-                m_adapter.setTexts(texts);
+                TranslationDownloadActivity.this.m_translationListAdapter.setTexts(texts);
                 m_progressDialog.dismiss();
             }
         }
 
+        private static final int BUFFER_LENGTH = 2048;
         private static final String TRANSLATIONS_FILE = "translations.json";
 
         private ProgressDialog m_progressDialog;
@@ -201,7 +213,7 @@ public class TranslationDownloadActivity extends Activity
                 while ((entry = zis.getNextEntry()) != null) {
                     if (isCancelled())
                         break;
-                    
+
                     // unzips and writes to internal storage
                     FileOutputStream fos = new FileOutputStream(new File(m_dir, entry.getName()));
                     BufferedOutputStream os = new BufferedOutputStream(fos, BUFFER_LENGTH);
@@ -214,6 +226,8 @@ public class TranslationDownloadActivity extends Activity
                     publishProgress(++downloaded / 11);
                 }
                 zis.close();
+
+                // TODO checks if the downloaded translation is valid
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -229,17 +243,18 @@ public class TranslationDownloadActivity extends Activity
         protected void onCancelled()
         {
             // running in the main thread
-            if (m_dir != null) {
-                Utils.removeDirectory(m_dir);
-                m_dir = null;
-            }
+            Utils.removeDirectory(m_dir);
+            m_dir = null;
+            TranslationDownloadActivity.this.m_translationDownloadAsyncTask = null;
+            m_progressDialog.dismiss();
         }
 
         protected void onPostExecute(Void result)
         {
             // running in the main thread
-            m_dir = null;
             BibleReader.getInstance().refresh();
+            m_dir = null;
+            TranslationDownloadActivity.this.m_translationDownloadAsyncTask = null;
             m_progressDialog.dismiss();
             finish();
         }
@@ -252,6 +267,7 @@ public class TranslationDownloadActivity extends Activity
 
     private static final String BASE_URL = "http://bible.zionsoft.net/";
 
-    private SelectionListAdapter m_adapter;
+    private SelectionListAdapter m_translationListAdapter;
+    private TranslationDownloadAsyncTask m_translationDownloadAsyncTask;
     private TranslationInfo[] m_availableTranslations;
 }
