@@ -27,7 +27,7 @@ public class TranslationSelectionActivity extends Activity
         setContentView(R.layout.layout_translationselection_activity);
         setTitle(R.string.title_select_translation);
 
-        // set footer
+        // initializes UI
         TextView textView = new TextView(this);
         // Obsoleted by setBackground() since API level 16.
         textView.setBackgroundDrawable(getResources().getDrawable(R.drawable.btn_button));
@@ -40,7 +40,7 @@ public class TranslationSelectionActivity extends Activity
         {
             public void onClick(View view)
             {
-                openTranslationDownloadActivity();
+                startTranslationDownloadActivity();
             }
         });
         ListView listView = (ListView) findViewById(R.id.listView);
@@ -48,7 +48,6 @@ public class TranslationSelectionActivity extends Activity
 
         m_listAdapter = new SelectionListAdapter(this);
         listView.setAdapter(m_listAdapter);
-
         listView.setOnItemClickListener(new OnItemClickListener()
         {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id)
@@ -75,7 +74,7 @@ public class TranslationSelectionActivity extends Activity
         if (translationCount == 0) {
             // only directly opens TranslationDownloadActivity once
             if (m_firstTime) {
-                openTranslationDownloadActivity();
+                startTranslationDownloadActivity();
                 m_firstTime = false;
             }
             return;
@@ -86,7 +85,7 @@ public class TranslationSelectionActivity extends Activity
         m_listAdapter.setTexts(translationNames);
     }
 
-    private void openTranslationDownloadActivity()
+    private void startTranslationDownloadActivity()
     {
         // checks connectivity
         ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -95,6 +94,7 @@ public class TranslationSelectionActivity extends Activity
             Toast.makeText(TranslationSelectionActivity.this, R.string.text_no_network, Toast.LENGTH_LONG).show();
             return;
         }
+
         // HTTP connection reuse was buggy before Froyo
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.FROYO)
             System.setProperty("http.keepAlive", "false");
