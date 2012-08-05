@@ -65,9 +65,8 @@ public class BookSelectionActivity extends Activity
 
         // opens dialog if no translation installed
         // the code is here in case the user doesn't download anything
-        final String[] list = getFilesDir().list();
-        final int length = list.length;
-        if (length == 0 || (length == 1 && list[0].equals(TRANSLATIONS_FILE))) {
+        final TranslationInfo[] installedTranslations = BibleReader.getInstance().installedTranslations();
+        if (installedTranslations == null || installedTranslations.length == 0) {
             AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
             alertDialogBuilder.setMessage(R.string.text_no_translation).setCancelable(false)
                     .setPositiveButton(R.string.text_yes, new DialogInterface.OnClickListener()
@@ -167,8 +166,6 @@ public class BookSelectionActivity extends Activity
         setTitle(translationInfo.name);
         m_listAdapter.setTexts(translationInfo.bookName);
     }
-
-    private static final String TRANSLATIONS_FILE = "translations.json";
 
     private boolean m_fromChapterSelectionActivity;
     private boolean m_fromTranslationSelectionActivity;
