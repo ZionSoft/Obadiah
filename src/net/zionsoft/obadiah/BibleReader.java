@@ -122,7 +122,7 @@ public class BibleReader
 
         // tries to find the selected translation
         for (TranslationInfo translationInfo : m_installedTranslations) {
-            if (translationInfo.path == m_selectedTranslation)
+            if (translationInfo.path.equals(m_selectedTranslation))
                 return translationInfo;
         }
 

@@ -27,7 +27,7 @@ public class TextActivity extends Activity
 
         m_bibleReader = BibleReader.getInstance();
         m_listAdapter = new TextListAdapter(this);
-        setupUi(true);
+        setupUi();
 
         m_listView = (ListView) findViewById(R.id.listView);
         m_listView.setAdapter(m_listAdapter);
@@ -54,7 +54,7 @@ public class TextActivity extends Activity
 
         if (m_fromTranslationSelection) {
             m_fromTranslationSelection = false;
-            setupUi(true);
+            setupUi();
         }
     }
 
@@ -132,7 +132,7 @@ public class TextActivity extends Activity
 
         --m_currentChapter;
         updateButtonState();
-        setupUi(false);
+        setupUi();
         m_listView.setSelectionAfterHeaderView();
     }
 
@@ -143,7 +143,7 @@ public class TextActivity extends Activity
 
         ++m_currentChapter;
         updateButtonState();
-        setupUi(false);
+        setupUi();
         m_listView.setSelectionAfterHeaderView();
     }
 
@@ -160,17 +160,15 @@ public class TextActivity extends Activity
             m_nextButton.setEnabled(true);
     }
 
-    private void setupUi(boolean updateSelectedTranslation)
+    private void setupUi()
     {
-        if (updateSelectedTranslation) {
-            m_translationInfo = m_bibleReader.selectedTranslation();
-            if (m_translationInfo == null) {
-                Toast.makeText(this, R.string.text_no_selected_translation, Toast.LENGTH_LONG).show();
-                finish();
-                return;
-            }
-            setTitle(m_translationInfo.bookName[m_currentBook] + ", " + (m_currentChapter + 1));
+        m_translationInfo = m_bibleReader.selectedTranslation();
+        if (m_translationInfo == null) {
+            Toast.makeText(this, R.string.text_no_selected_translation, Toast.LENGTH_LONG).show();
+            finish();
+            return;
         }
+        setTitle(m_translationInfo.bookName[m_currentBook] + ", " + (m_currentChapter + 1));
 
         // TODO handles if the translation is corrupted
         String[] verses = m_bibleReader.verses(m_currentBook, m_currentChapter);

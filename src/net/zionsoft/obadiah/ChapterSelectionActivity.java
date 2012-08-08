@@ -22,11 +22,8 @@ public class ChapterSelectionActivity extends Activity
         Bundle bundle = getIntent().getExtras();
         m_selectedBook = bundle.getInt("selectedBook");
 
-        BibleReader bibleReader = BibleReader.getInstance();
-        setTitle(bibleReader.selectedTranslation().bookName[m_selectedBook]);
-
         // creates strings for chapter listing
-        final int chapterCount = bibleReader.chapterCount(m_selectedBook);
+        final int chapterCount = BibleReader.getInstance().chapterCount(m_selectedBook);
         String[] chapters = new String[chapterCount];
         for (int i = 0; i < chapterCount; ++i)
             chapters[i] = Integer.toString(i + 1);
@@ -59,9 +56,9 @@ public class ChapterSelectionActivity extends Activity
     {
         super.onResume();
 
-        // only updates the title if resumed from TranslationSelectionActivity
-        if (m_TranslationSelectionActivity)
-            setTitle(BibleReader.getInstance().selectedTranslation().bookName[m_selectedBook]);
+        // updates the title
+        // TODO no need to update if selected translation is not changed
+        setTitle(BibleReader.getInstance().selectedTranslation().bookName[m_selectedBook]);
     }
 
     public boolean onCreateOptionsMenu(Menu menu)
@@ -85,7 +82,6 @@ public class ChapterSelectionActivity extends Activity
 
     private void startTextActivity(boolean continueReading, int selectedBook, int selectedChapter)
     {
-        m_TranslationSelectionActivity = false;
         Intent intent = new Intent(ChapterSelectionActivity.this, TextActivity.class);
         intent.putExtra("continueReading", continueReading);
         intent.putExtra("selectedBook", selectedBook);
@@ -95,11 +91,9 @@ public class ChapterSelectionActivity extends Activity
 
     private void startTranslationSelectionActivity()
     {
-        m_TranslationSelectionActivity = true;
         Intent intent = new Intent(this, TranslationSelectionActivity.class);
         startActivity(intent);
     }
 
-    private boolean m_TranslationSelectionActivity;
     private int m_selectedBook;
 }

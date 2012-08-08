@@ -54,9 +54,6 @@ public class BookSelectionActivity extends Activity
                 startChapterSelectionActivity(false, position);
             }
         });
-
-        // initializes the UI based on the selected translation
-        setupUi();
     }
 
     protected void onResume()
@@ -89,9 +86,13 @@ public class BookSelectionActivity extends Activity
             return;
         }
 
-        // updates the UI if resumed from TranslationSelectionActivity
-        if (m_fromTranslationSelectionActivity)
-            setupUi();
+        // updates the title and texts
+        // TODO no need to update if selected translation is not changed
+        TranslationInfo translationInfo = BibleReader.getInstance().selectedTranslation();
+        if (translationInfo == null)
+            return;
+        setTitle(translationInfo.name);
+        m_listAdapter.setTexts(translationInfo.bookName);
     }
 
     public boolean onCreateOptionsMenu(Menu menu)
@@ -154,15 +155,6 @@ public class BookSelectionActivity extends Activity
 
         Intent intent = new Intent(this, TranslationSelectionActivity.class);
         startActivity(intent);
-    }
-
-    private void setupUi()
-    {
-        TranslationInfo translationInfo = BibleReader.getInstance().selectedTranslation();
-        if (translationInfo == null)
-            return;
-        setTitle(translationInfo.name);
-        m_listAdapter.setTexts(translationInfo.bookName);
     }
 
     private boolean m_fromTranslationSelectionActivity;
