@@ -73,6 +73,7 @@ public class TranslationDownloadActivity extends Activity
         protected Void doInBackground(Void... params)
         {
             // running in the worker thread
+            File translationsFile = null;
             try {
                 final long lastUpdated = getSharedPreferences("settings", MODE_PRIVATE).getLong("lastUpdated", 0);
                 final long now = System.currentTimeMillis();
@@ -95,13 +96,12 @@ public class TranslationDownloadActivity extends Activity
                 }
 
                 // reads from local cache
-                File translationsFile = new File(getFilesDir() + File.separator + TRANSLATIONS_FILE);
+                translationsFile = new File(getFilesDir() + File.separator + TRANSLATIONS_FILE);
                 byte[] buffer = new byte[(int) translationsFile.length()];
                 BufferedInputStream bis = new BufferedInputStream(new FileInputStream(translationsFile));
                 bis.read(buffer);
 
                 // parses the result
-                // TODO checks if the translation file is valid
                 TranslationInfo[] installedTranslations = BibleReader.getInstance().installedTranslations();
                 int installedCount = (installedTranslations == null) ? 0 : installedTranslations.length;
 
@@ -137,6 +137,15 @@ public class TranslationDownloadActivity extends Activity
                 }
             } catch (Exception e) {
                 e.printStackTrace();
+
+                m_hasError = true;
+                m_availableTranslations = null;
+                if (translationsFile != null)
+                    translationsFile.delete();
+            } finally {
+                SharedPreferences.Editor editor = getSharedPreferences("settings", MODE_PRIVATE).edit();
+                editor.putLong("lastUpdated", m_hasError ? 0 : System.currentTimeMillis());
+                editor.commit();
             }
             return null;
         }
@@ -144,13 +153,10 @@ public class TranslationDownloadActivity extends Activity
         protected void onPostExecute(Void result)
         {
             // running in the main thread
-            SharedPreferences.Editor editor = getSharedPreferences("settings", MODE_PRIVATE).edit();
-            editor.putLong("lastUpdated", System.currentTimeMillis());
-            editor.commit();
-
-            if (m_availableTranslations == null || m_availableTranslations.length == 0) {
+            if (m_hasError || m_availableTranslations == null || m_availableTranslations.length == 0) {
                 m_progressDialog.dismiss();
-                Toast.makeText(TranslationDownloadActivity.this, R.string.text_no_available_translation,
+                Toast.makeText(TranslationDownloadActivity.this,
+                        m_hasError ? R.string.text_fail_to_fetch_translations : R.string.text_no_available_translation,
                         Toast.LENGTH_SHORT).show();
                 finish();
             } else {
@@ -166,6 +172,7 @@ public class TranslationDownloadActivity extends Activity
         private static final int BUFFER_LENGTH = 2048;
         private static final String TRANSLATIONS_FILE = "translations.json";
 
+        private boolean m_hasError;
         private ProgressDialog m_progressDialog;
     }
 

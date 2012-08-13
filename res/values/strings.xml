@@ -9,6 +9,7 @@
     <string name="menu_select_translation">Select Translation</string>
     <string name="menu_share">Share</string>
     <string name="text_downloading">Downloading, please wait.</string>
+    <string name="text_fail_to_fetch_translations">Can not fetch the translations list, please try again!</string>
     <string name="text_no_available_translation">No available translations available for download.</string>
     <string name="text_no_network">No network connection available, please check before try again!</string>
     <string name="text_no_selected_translation">No translation selected.</string>
