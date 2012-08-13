@@ -155,9 +155,10 @@ public class TranslationDownloadActivity extends Activity
             // running in the main thread
             if (m_hasError || m_availableTranslations == null || m_availableTranslations.length == 0) {
                 m_progressDialog.dismiss();
-                Toast.makeText(TranslationDownloadActivity.this,
-                        m_hasError ? R.string.text_fail_to_fetch_translations : R.string.text_no_available_translation,
-                        Toast.LENGTH_SHORT).show();
+                Toast.makeText(
+                        TranslationDownloadActivity.this,
+                        m_hasError ? R.string.text_fail_to_fetch_translations_list
+                                : R.string.text_no_available_translation, Toast.LENGTH_SHORT).show();
                 finish();
             } else {
                 int length = m_availableTranslations.length;
@@ -237,6 +238,10 @@ public class TranslationDownloadActivity extends Activity
                 // TODO checks if the downloaded translation is valid
             } catch (Exception e) {
                 e.printStackTrace();
+
+                Utils.removeDirectory(m_dir);
+                m_dir = null;
+                m_hasError = true;
             }
             return null;
         }
@@ -259,15 +264,22 @@ public class TranslationDownloadActivity extends Activity
         protected void onPostExecute(Void result)
         {
             // running in the main thread
-            BibleReader.getInstance().refresh();
-            m_dir = null;
-            TranslationDownloadActivity.this.m_translationDownloadAsyncTask = null;
-            m_progressDialog.dismiss();
-            finish();
+            if (m_hasError) {
+                m_progressDialog.dismiss();
+                Toast.makeText(TranslationDownloadActivity.this, R.string.text_fail_to_fetch_translation,
+                        Toast.LENGTH_SHORT).show();
+            } else {
+                BibleReader.getInstance().refresh();
+                m_dir = null;
+                TranslationDownloadActivity.this.m_translationDownloadAsyncTask = null;
+                m_progressDialog.dismiss();
+                finish();
+            }
         }
 
         private static final int BUFFER_LENGTH = 2048;
 
+        private boolean m_hasError;
         private File m_dir;
         private ProgressDialog m_progressDialog;
     }
