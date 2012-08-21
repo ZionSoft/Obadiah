@@ -5,22 +5,23 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.TypedValue;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.GridView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.TextView;
 
 public class BookSelectionActivity extends Activity
 {
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.layout_gridview);
+        setContentView(R.layout.layout_bookselection_activity);
 
         BibleReader bibleReader = BibleReader.getInstance();
         // NOTE must call this before BibleReader is further used
@@ -52,6 +53,57 @@ public class BookSelectionActivity extends Activity
             public void onItemClick(AdapterView<?> parent, View view, int position, long id)
             {
                 startChapterSelectionActivity(false, position);
+            }
+        });
+
+        // initialize the menu button handler
+        Button button = (Button) findViewById(R.id.menuButton);
+        button.setOnClickListener(new OnClickListener()
+        {
+            public void onClick(View v)
+            {
+                AlertDialog.Builder builder = new AlertDialog.Builder(BookSelectionActivity.this);
+                builder.setTitle(R.string.dialog_menu_title);
+
+                CharSequence[] items = null;
+                Resources resources = BookSelectionActivity.this.getResources();
+                if (m_canContinueReading) {
+                    items = new CharSequence[2];
+                    items[0] = resources.getText(R.string.menu_select_translation);
+                    items[1] = resources.getText(R.string.menu_continue_reading);
+                } else {
+                    // checks if from ChapterSelectionActivity or first boot
+                    // i.e. not from TranslationSelectionActivity
+                    if (!m_fromTranslationSelectionActivity
+                            && getSharedPreferences("settings", MODE_PRIVATE).getInt("currentBook", -1) >= 0) {
+                        items = new CharSequence[2];
+                        items[0] = resources.getText(R.string.menu_select_translation);
+                        items[1] = resources.getText(R.string.menu_continue_reading);
+                        m_canContinueReading = true;
+                    } else {
+                        items = new CharSequence[1];
+                        items[0] = resources.getText(R.string.menu_select_translation);
+                    }
+                }
+                builder.setItems(items, new DialogInterface.OnClickListener()
+                {
+                    public void onClick(DialogInterface dialog, int which)
+                    {
+                        dialog.dismiss();
+
+                        switch (which) {
+                        case 0: // select translation
+                            startTranslationSelectionActivity();
+                            break;
+                        case 1: // continue reading
+                            startChapterSelectionActivity(true,
+                                    getSharedPreferences("settings", MODE_PRIVATE).getInt("currentBook", 0));
+                            break;
+                        }
+                    }
+                });
+
+                builder.create().show();
             }
         });
     }
@@ -91,52 +143,10 @@ public class BookSelectionActivity extends Activity
         TranslationInfo translationInfo = BibleReader.getInstance().selectedTranslation();
         if (translationInfo == null)
             return;
-        setTitle(translationInfo.name);
+        if (m_titleTextView == null)
+            m_titleTextView = (TextView)findViewById(R.id.titleText);
+        m_titleTextView.setText(translationInfo.name);
         m_listAdapter.setTexts(translationInfo.bookName);
-    }
-
-    public boolean onCreateOptionsMenu(Menu menu)
-    {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_book_selection_activity, menu);
-        return true;
-    }
-
-    public boolean onPrepareOptionsMenu(Menu menu)
-    {
-        if (m_continueReadingMenuItem == null)
-            m_continueReadingMenuItem = menu.findItem(R.id.menu_continue_reading);
-
-        if (m_canContinueReading) {
-            m_continueReadingMenuItem.setVisible(true);
-        } else {
-            // checks if from ChapterSelectionActivity or first boot
-            // i.e. not from TranslationSelectionActivity
-            if (!m_fromTranslationSelectionActivity
-                    && getSharedPreferences("settings", MODE_PRIVATE).getInt("currentBook", -1) >= 0) {
-                m_continueReadingMenuItem.setVisible(true);
-                m_canContinueReading = true;
-            } else {
-                m_continueReadingMenuItem.setVisible(false);
-            }
-        }
-        return true;
-    }
-
-    public boolean onOptionsItemSelected(MenuItem item)
-    {
-        switch (item.getItemId()) {
-        case R.id.menu_continue_reading: {
-            startChapterSelectionActivity(true, getSharedPreferences("settings", MODE_PRIVATE).getInt("currentBook", 0));
-            return true;
-        }
-        case R.id.menu_select_translation: {
-            startTranslationSelectionActivity();
-            return true;
-        }
-        default:
-            return super.onOptionsItemSelected(item);
-        }
     }
 
     private void startChapterSelectionActivity(boolean continueReading, int selectedBook)
@@ -159,6 +169,6 @@ public class BookSelectionActivity extends Activity
 
     private boolean m_fromTranslationSelectionActivity;
     private boolean m_canContinueReading;
-    private MenuItem m_continueReadingMenuItem;
     private SelectionListAdapter m_listAdapter;
+    private TextView m_titleTextView;
 }
