@@ -31,7 +31,6 @@ public class TranslationDownloadActivity extends Activity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_translationdownload_activity);
-        setTitle(R.string.title_download_translation);
 
         // initializes UI
         ListView listView = (ListView) findViewById(R.id.listView);

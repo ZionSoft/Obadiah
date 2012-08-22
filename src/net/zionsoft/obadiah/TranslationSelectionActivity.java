@@ -25,7 +25,6 @@ public class TranslationSelectionActivity extends Activity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_translationselection_activity);
-        setTitle(R.string.title_select_translation);
 
         // initializes UI
         TextView textView = new TextView(this);
