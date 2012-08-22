@@ -21,7 +21,7 @@
             android:layout_centerVertical="true"
             android:text="@string/title_download_translation"
             android:textColor="#ffffff"
-            android:textSize="17dip"
+            android:textSize="18dip"
             android:textStyle="bold" />
     </RelativeLayout>
 
