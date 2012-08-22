@@ -3,6 +3,28 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent" >
 
+    <RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/toolBar"
+        android:layout_width="fill_parent"
+        android:layout_height="43dip"
+        android:layout_alignParentTop="true"
+        android:background="#6486cb"
+        android:orientation="horizontal"
+        android:paddingLeft="8dip" >
+
+        <TextView
+            android:id="@+id/titleText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:text="@string/title_download_translation"
+            android:textColor="#ffffff"
+            android:textSize="17dip"
+            android:textStyle="bold" />
+    </RelativeLayout>
+
     <com.google.ads.AdView
         xmlns:googleads="http://schemas.android.com/apk/lib/com.google.ads"
         android:id="@+id/adView"
@@ -20,6 +42,7 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:layout_above="@id/adView"
+        android:layout_below="@id/toolBar"
         android:divider="@android:color/transparent"
         android:dividerHeight="5dip"
         android:padding="5dip" />
