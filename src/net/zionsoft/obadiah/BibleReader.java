@@ -54,6 +54,31 @@ public class BibleReader
                 JSONObject booksInfoObject = new JSONObject(new String(buffer, "UTF8"));
                 translations[i].name = booksInfoObject.getString("name");
 
+                if (booksInfoObject.has("shortName")) {
+                    translations[i].shortName = booksInfoObject.getString("shortName");
+                } else {
+                    // old books.json doesn't have "shortName"
+                    String name = translations[i].name;
+                    if (name.equals("Authorized King James"))
+                        translations[i].shortName = "KJV";
+                    else if (name.equals("American King James"))
+                        translations[i].shortName = "AKJV";
+                    else if (name.equals("Basic English"))
+                        translations[i].shortName = "BBE";
+                    else if (name.equals("Raamattu 1938"))
+                        translations[i].shortName = "PR1938";
+                    else if (name.equals("Luther's Biblia"))
+                        translations[i].shortName = "Lut1545";
+                    else if (name.equals("Italian Deodati Bibbia") || name.equals("Italian Diodati Bibbia")) // typo
+                        translations[i].shortName = "Dio";
+                    else if (name.equals("Korean Revised (개역성경)"))
+                        translations[i].shortName = "개역성경";
+                    else if (name.equals("Reina-Valera 1569"))
+                        translations[i].shortName = "RV1569";
+                    else
+                        translations[i].shortName = name;
+                }
+
                 JSONArray booksArray = booksInfoObject.getJSONArray("books");
                 translations[i].bookName = new String[BOOK_COUNT];
                 for (int j = 0; j < BOOK_COUNT; ++j)

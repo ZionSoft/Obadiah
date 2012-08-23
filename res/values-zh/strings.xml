@@ -3,11 +3,6 @@
 
     <string name="app_name">圣经</string>
     <string name="button_download">下载更多译本</string>
-    <string name="button_next">下一章</string>
-    <string name="button_previous">上一章</string>
-    <string name="menu_continue_reading">继续阅读</string>
-    <string name="menu_select_translation">选择译本</string>
-    <string name="menu_share">分享</string>
     <string name="text_downloading">下载中，请稍候。</string>
     <string name="text_fail_to_fetch_translations_list">无法获取译本列表，请重试！</string>
     <string name="text_fail_to_fetch_translation">无法获取指定译本，请重试！</string>

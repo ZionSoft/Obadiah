@@ -24,9 +24,13 @@ public class TranslationSelectionActivity extends Activity
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.layout_translationselection_activity);
+        setContentView(R.layout.translationselection_activity);
 
-        // initializes UI
+        // initializes title bar
+        TextView titleBarTextView = (TextView) findViewById(R.id.txtTitle);
+        titleBarTextView.setText(R.string.title_select_translation);
+
+        // initializes list view showing installed translations
         TextView textView = new TextView(this);
         // Obsoleted by setBackground() since API level 16.
         textView.setBackgroundDrawable(getResources().getDrawable(R.drawable.btn_button));

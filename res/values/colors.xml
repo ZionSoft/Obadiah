@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="button_background_pressed">#fab900</color>
+    <color name="titlebar_background">#6486cb</color>
+
+</resources>

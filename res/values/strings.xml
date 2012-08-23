@@ -3,12 +3,6 @@
 
     <string name="app_name">Bible</string>
     <string name="button_download">Download more translations</string>
-    <string name="button_next">Next Chapter</string>
-    <string name="button_previous">Previous Chapter</string>
-    <string name="dialog_menu_title">Menu</string>
-    <string name="menu_continue_reading">Continue Reading</string>
-    <string name="menu_select_translation">Select Translation</string>
-    <string name="menu_share">Share</string>
     <string name="text_downloading">Downloading, please wait.</string>
     <string name="text_fail_to_fetch_translations_list">Can not fetch the translations list, please try again!</string>
     <string name="text_fail_to_fetch_translation">Can not fetch the translation, please try again!</string>

@@ -22,6 +22,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 
@@ -30,9 +31,13 @@ public class TranslationDownloadActivity extends Activity
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.layout_translationdownload_activity);
+        setContentView(R.layout.translationdownload_activity);
 
-        // initializes UI
+        // initializes title bar
+        TextView titleBarTextView = (TextView) findViewById(R.id.txtTitle);
+        titleBarTextView.setText(R.string.title_download_translation);
+
+        // initializes list view showing available translations
         ListView listView = (ListView) findViewById(R.id.listView);
         m_translationListAdapter = new SelectionListAdapter(this);
         listView.setAdapter(m_translationListAdapter);

@@ -1,16 +1,13 @@
 package net.zionsoft.obadiah;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
-import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -21,7 +18,7 @@ public class TextActivity extends Activity
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.layout_text_activity);
+        setContentView(R.layout.text_activity);
 
         Bundle bundle = getIntent().getExtras();
         m_currentBook = bundle.getInt("selectedBook");
@@ -29,7 +26,11 @@ public class TextActivity extends Activity
 
         m_bibleReader = BibleReader.getInstance();
         m_listAdapter = new TextListAdapter(this);
+        m_titleTranslationTextView = (TextView) findViewById(R.id.textTranslationSelection);
         setupUi();
+
+        m_shareButton = (ImageButton) findViewById(R.id.shareButton);
+        m_shareButton.setEnabled(false);
 
         m_listView = (ListView) findViewById(R.id.listView);
         m_listView.setAdapter(m_listAdapter);
@@ -38,50 +39,23 @@ public class TextActivity extends Activity
             public void onItemClick(AdapterView<?> parent, View view, int position, long id)
             {
                 m_listAdapter.selectItem(position);
+                if (m_listAdapter.hasItemSelected())
+                    m_shareButton.setEnabled(true);
+                else
+                    m_shareButton.setEnabled(false);
             }
         });
 
-        m_prevButton = (Button) findViewById(R.id.prevButton);
-        m_nextButton = (Button) findViewById(R.id.nextButton);
+        m_prevButton = (ImageButton) findViewById(R.id.prevButton);
+        m_nextButton = (ImageButton) findViewById(R.id.nextButton);
         updateButtonState();
 
-        // initialize the menu button handler
-        Button button = (Button) findViewById(R.id.menuButton);
-        button.setOnClickListener(new OnClickListener()
+        // initializes the title bar
+        m_titleTranslationTextView.setOnClickListener(new OnClickListener()
         {
             public void onClick(View v)
             {
-                AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(TextActivity.this);
-                dialogBuilder.setTitle(R.string.dialog_menu_title);
-
-                CharSequence[] items = null;
-                Resources resources = TextActivity.this.getResources();
-                if (m_listAdapter.hasItemSelected()) {
-                    items = new CharSequence[2];
-                    items[0] = resources.getText(R.string.menu_select_translation);
-                    items[1] = resources.getText(R.string.menu_share);
-                } else {
-                    items = new CharSequence[1];
-                    items[0] = resources.getText(R.string.menu_select_translation);
-                }
-                dialogBuilder.setItems(items, new DialogInterface.OnClickListener()
-                {
-                    public void onClick(DialogInterface dialog, int which)
-                    {
-                        dialog.dismiss();
-
-                        switch (which) {
-                        case 0: // select translation
-                            startTranslationSelectionActivity();
-                            break;
-                        case 1: // share
-                            startShareActivity();
-                            break;
-                        }
-                    }
-                });
-
-                dialogBuilder.create().show();
+                startTranslationSelectionActivity();
             }
         });
 
@@ -133,37 +107,7 @@ public class TextActivity extends Activity
         m_listView.setSelectionAfterHeaderView();
     }
 
-    private void updateButtonState()
-    {
-        if (m_currentChapter == 0)
-            m_prevButton.setEnabled(false);
-        else
-            m_prevButton.setEnabled(true);
-
-        if (m_currentChapter == m_bibleReader.chapterCount(m_currentBook) - 1)
-            m_nextButton.setEnabled(false);
-        else
-            m_nextButton.setEnabled(true);
-    }
-
-    private void setupUi()
-    {
-        m_translationInfo = m_bibleReader.selectedTranslation();
-        if (m_translationInfo == null) {
-            Toast.makeText(this, R.string.text_no_selected_translation, Toast.LENGTH_LONG).show();
-            finish();
-            return;
-        }
-        if (m_titleTextView == null)
-            m_titleTextView = (TextView) findViewById(R.id.titleText);
-        m_titleTextView.setText(m_translationInfo.bookName[m_currentBook] + ", " + (m_currentChapter + 1));
-
-        // TODO handles if the translation is corrupted
-        String[] verses = m_bibleReader.verses(m_currentBook, m_currentChapter);
-        m_listAdapter.setTexts(verses);
-    }
-
-    private void startShareActivity()
+    public void share(View view)
     {
         if (m_listAdapter.hasItemSelected()) {
             Intent intent = new Intent();
@@ -185,6 +129,39 @@ public class TextActivity extends Activity
         }
     }
 
+    private void updateButtonState()
+    {
+        if (m_currentChapter == 0)
+            m_prevButton.setEnabled(false);
+        else
+            m_prevButton.setEnabled(true);
+
+        if (m_currentChapter == m_bibleReader.chapterCount(m_currentBook) - 1)
+            m_nextButton.setEnabled(false);
+        else
+            m_nextButton.setEnabled(true);
+    }
+
+    private void setupUi()
+    {
+        m_translationInfo = m_bibleReader.selectedTranslation();
+        if (m_translationInfo == null) {
+            Toast.makeText(this, R.string.text_no_selected_translation, Toast.LENGTH_LONG).show();
+            finish();
+            return;
+        }
+
+        m_titleTranslationTextView.setText(m_translationInfo.shortName);
+
+        if (m_titleBookNameTextView == null)
+            m_titleBookNameTextView = (TextView) findViewById(R.id.textBookName);
+        m_titleBookNameTextView.setText(m_translationInfo.bookName[m_currentBook] + ", " + (m_currentChapter + 1));
+
+        // TODO handles if the translation is corrupted
+        String[] verses = m_bibleReader.verses(m_currentBook, m_currentChapter);
+        m_listAdapter.setTexts(verses);
+    }
+
     private void startTranslationSelectionActivity()
     {
         m_fromTranslationSelection = true;
@@ -196,10 +173,12 @@ public class TextActivity extends Activity
     private int m_currentBook;
     private int m_currentChapter;
     private BibleReader m_bibleReader;
-    private Button m_prevButton;
-    private Button m_nextButton;
+    private ImageButton m_prevButton;
+    private ImageButton m_nextButton;
+    private ImageButton m_shareButton;
     private ListView m_listView;
     private TextListAdapter m_listAdapter;
-    private TextView m_titleTextView;
+    private TextView m_titleBookNameTextView;
+    private TextView m_titleTranslationTextView;
     private TranslationInfo m_translationInfo;
 }
