@@ -1,9 +1,11 @@
 package net.zionsoft.obadiah;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.ClipboardManager;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
@@ -32,6 +34,9 @@ public class TextActivity extends Activity
         m_shareButton = (ImageButton) findViewById(R.id.shareButton);
         m_shareButton.setEnabled(false);
 
+        m_copyButton = (ImageButton) findViewById(R.id.copyButton);
+        m_copyButton.setEnabled(false);
+
         m_listView = (ListView) findViewById(R.id.listView);
         m_listView.setAdapter(m_listAdapter);
         m_listView.setOnItemClickListener(new OnItemClickListener()
@@ -39,10 +44,13 @@ public class TextActivity extends Activity
             public void onItemClick(AdapterView<?> parent, View view, int position, long id)
             {
                 m_listAdapter.selectItem(position);
-                if (m_listAdapter.hasItemSelected())
+                if (m_listAdapter.hasItemSelected()) {
                     m_shareButton.setEnabled(true);
-                else
+                    m_copyButton.setEnabled(true);
+                } else {
                     m_shareButton.setEnabled(false);
+                    m_copyButton.setEnabled(false);
+                }
             }
         });
 
@@ -113,20 +121,34 @@ public class TextActivity extends Activity
             Intent intent = new Intent();
             intent.setAction(Intent.ACTION_SEND);
             intent.setType("text/plain");
-
-            String[] selectedTexts = m_listAdapter.selectedTexts();
-            String content = null;
-            for (String text : selectedTexts) {
-                if (content == null) {
-                    content = m_translationInfo.bookName[m_currentBook] + " " + (m_currentChapter + 1) + ":" + text;
-                } else {
-                    content += ("\n" + m_translationInfo.bookName[m_currentBook] + " " + (m_currentChapter + 1) + ":" + text);
-                }
-            }
-            intent.putExtra(Intent.EXTRA_TEXT, content);
-
+            intent.putExtra(Intent.EXTRA_TEXT, selectedText());
             startActivity(Intent.createChooser(intent, getResources().getText(R.string.text_share_with)));
         }
+    }
+
+    public void copy(View view)
+    {
+        if (m_listAdapter.hasItemSelected()) {
+            if (m_clipboardManager == null)
+                m_clipboardManager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+            m_clipboardManager.setText(selectedText());
+            Toast.makeText(this, R.string.text_copied, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private String selectedText()
+    {
+        if (!m_listAdapter.hasItemSelected())
+            return null;
+        String[] texts = m_listAdapter.selectedTexts();
+        String selected = null;
+        for (String text : texts) {
+            if (selected == null)
+                selected = m_translationInfo.bookName[m_currentBook] + " " + (m_currentChapter + 1) + ":" + text;
+            else
+                selected += ("\n" + m_translationInfo.bookName[m_currentBook] + " " + (m_currentChapter + 1) + ":" + text);
+        }
+        return selected;
     }
 
     private void updateButtonState()
@@ -173,9 +195,11 @@ public class TextActivity extends Activity
     private int m_currentBook;
     private int m_currentChapter;
     private BibleReader m_bibleReader;
+    private ClipboardManager m_clipboardManager; // Obsoleted by android.content.ClipboardManager since API level 11.
     private ImageButton m_prevButton;
     private ImageButton m_nextButton;
     private ImageButton m_shareButton;
+    private ImageButton m_copyButton;
     private ListView m_listView;
     private TextListAdapter m_listAdapter;
     private TextView m_titleBookNameTextView;

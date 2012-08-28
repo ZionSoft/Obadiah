@@ -3,6 +3,7 @@
 
     <string name="app_name">圣经</string>
     <string name="button_download">下载更多译本</string>
+    <string name="text_copied">文本已成功复制到剪贴板。</string>
     <string name="text_downloading">下载中，请稍候。</string>
     <string name="text_fail_to_fetch_translations_list">无法获取译本列表，请重试！</string>
     <string name="text_fail_to_fetch_translation">无法获取指定译本，请重试！</string>

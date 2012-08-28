@@ -18,25 +18,26 @@
         android:orientation="horizontal" >
 
         <ImageButton
-            android:id="@+id/prevButton"
+            android:id="@+id/shareButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
             android:background="@drawable/button_background"
-            android:onClick="previousChapter"
-            android:padding="8dip"
-            android:src="@drawable/prev_button" />
-
-        <ImageButton
-            android:id="@+id/shareButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:background="@drawable/button_background"
             android:onClick="share"
             android:padding="8dip"
             android:src="@drawable/share_button" />
+
+        <ImageButton
+            android:id="@+id/copyButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@id/shareButton"
+            android:background="@drawable/button_background"
+            android:onClick="copy"
+            android:padding="8dip"
+            android:src="@drawable/copy_button" />
 
         <ImageButton
             android:id="@+id/nextButton"
@@ -48,6 +49,17 @@
             android:onClick="nextChapter"
             android:padding="8dip"
             android:src="@drawable/next_button" />
+
+        <ImageButton
+            android:id="@+id/prevButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@id/nextButton"
+            android:background="@drawable/button_background"
+            android:onClick="previousChapter"
+            android:padding="8dip"
+            android:src="@drawable/prev_button" />
     </RelativeLayout>
 
     <ListView
