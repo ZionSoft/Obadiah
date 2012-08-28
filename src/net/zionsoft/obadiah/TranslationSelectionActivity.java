@@ -143,7 +143,6 @@ public class TranslationSelectionActivity extends Activity
             else
                 textView.setTextColor(Color.BLACK);
             return textView;
-
         }
     }
 
