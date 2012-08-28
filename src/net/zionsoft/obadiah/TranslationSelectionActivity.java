@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -32,11 +33,9 @@ public class TranslationSelectionActivity extends Activity
 
         // initializes list view showing installed translations
         TextView textView = new TextView(this);
-        // Obsoleted by setBackground() since API level 16.
-        textView.setBackgroundDrawable(getResources().getDrawable(R.drawable.btn_button));
-        textView.setGravity(Gravity.CENTER);
+        textView.setGravity(Gravity.CENTER_VERTICAL);
         textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 17);
-        textView.setPadding(10, 10, 10, 10);
+        textView.setPadding(30, 20, 30, 20);
         textView.setTextColor(Color.BLACK);
         textView.setText(R.string.button_download);
         textView.setOnClickListener(new OnClickListener()
@@ -49,12 +48,15 @@ public class TranslationSelectionActivity extends Activity
         ListView listView = (ListView) findViewById(R.id.listView);
         listView.addFooterView(textView);
 
-        m_listAdapter = new SelectionListAdapter(this);
+        m_listAdapter = new TranslationSelectionListAdapter(this);
         listView.setAdapter(m_listAdapter);
         listView.setOnItemClickListener(new OnItemClickListener()
         {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id)
             {
+                if (position == m_selectedTranslationIndex)
+                    return;
+
                 BibleReader bibleReader = BibleReader.getInstance();
                 String selectedTranslation = bibleReader.installedTranslations()[position].path;
                 SharedPreferences.Editor editor = getSharedPreferences("settings", MODE_PRIVATE).edit();
@@ -72,7 +74,8 @@ public class TranslationSelectionActivity extends Activity
     {
         super.onResume();
 
-        TranslationInfo[] installedTranslations = BibleReader.getInstance().installedTranslations();
+        BibleReader bibleReader = BibleReader.getInstance();
+        TranslationInfo[] installedTranslations = bibleReader.installedTranslations();
         final int translationCount = (installedTranslations == null) ? 0 : installedTranslations.length;
         if (translationCount == 0) {
             // only directly opens TranslationDownloadActivity once
@@ -82,9 +85,17 @@ public class TranslationSelectionActivity extends Activity
             }
             return;
         }
+
+        TranslationInfo selectedTranslation = bibleReader.selectedTranslation();
+        m_selectedTranslationIndex = -1;
         String[] translationNames = new String[translationCount];
-        for (int i = 0; i < translationCount; ++i)
+        for (int i = 0; i < translationCount; ++i) {
             translationNames[i] = installedTranslations[i].name;
+            if (m_selectedTranslationIndex == -1 && selectedTranslation != null
+                    && selectedTranslation.name.equals(installedTranslations[i].name)) {
+                m_selectedTranslationIndex = i;
+            }
+        }
         m_listAdapter.setTexts(translationNames);
     }
 
@@ -106,6 +117,37 @@ public class TranslationSelectionActivity extends Activity
         startActivity(intent);
     }
 
+    private class TranslationSelectionListAdapter extends ListBaseAdapter
+    {
+        public TranslationSelectionListAdapter(Context context)
+        {
+            super(context);
+        }
+
+        public View getView(int position, View convertView, ViewGroup parent)
+        {
+            TextView textView;
+            if (convertView == null) {
+                textView = new TextView(m_context);
+                textView.setGravity(Gravity.CENTER_VERTICAL);
+                textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 17);
+                textView.setPadding(30, 20, 30, 20);
+            } else {
+                textView = (TextView) convertView;
+            }
+
+            String text = m_texts[position];
+            textView.setText(text);
+            if (m_selectedTranslationIndex == position)
+                textView.setTextColor(Color.LTGRAY);
+            else
+                textView.setTextColor(Color.BLACK);
+            return textView;
+
+        }
+    }
+
     private boolean m_firstTime = true;
-    private SelectionListAdapter m_listAdapter;
+    private int m_selectedTranslationIndex;
+    private TranslationSelectionListAdapter m_listAdapter;
 }
