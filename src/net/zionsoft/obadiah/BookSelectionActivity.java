@@ -76,14 +76,14 @@ public class BookSelectionActivity extends Activity
         if (installedTranslations == null || installedTranslations.length == 0) {
             AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
             alertDialogBuilder.setMessage(R.string.text_no_translation).setCancelable(false)
-                    .setPositiveButton(R.string.text_yes, new DialogInterface.OnClickListener()
+                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener()
                     {
                         public void onClick(DialogInterface dialog, int id)
                         {
                             dialog.dismiss();
                             startTranslationSelectionActivity();
                         }
-                    }).setNegativeButton(R.string.text_no, new DialogInterface.OnClickListener()
+                    }).setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener()
                     {
                         public void onClick(DialogInterface dialog, int id)
                         {

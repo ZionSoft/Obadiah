@@ -12,8 +12,6 @@
     <string name="text_no_selected_translation">No translation selected.</string>
     <string name="text_no_translation">No translation installed, please download from the Internet.</string>
     <string name="text_size">Size:\u0020</string>
-    <string name="text_yes">Yes</string>
-    <string name="text_no">No</string>
     <string name="text_share_with">Share with&#8230;</string>
     <string name="title_download_translation">Available translations</string>
     <string name="title_select_translation">Select a translation</string>
