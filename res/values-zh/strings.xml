@@ -11,6 +11,7 @@
     <string name="text_no_network">没有可用的网络连接，请检查后重试！</string>
     <string name="text_no_selected_translation">尚未选择任何译本。</string>
     <string name="text_no_translation">没有已安装的译本，请从互联网下载。</string>
+    <string name="text_size">体积：</string>
     <string name="text_yes">好的</string>
     <string name="text_no">取消</string>
     <string name="text_share_with">分享到&#8230;</string>

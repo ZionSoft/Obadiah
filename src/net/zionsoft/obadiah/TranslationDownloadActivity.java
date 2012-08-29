@@ -15,12 +15,18 @@ import org.json.JSONObject;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -39,7 +45,7 @@ public class TranslationDownloadActivity extends Activity
 
         // initializes list view showing available translations
         ListView listView = (ListView) findViewById(R.id.listView);
-        m_translationListAdapter = new SelectionListAdapter(this);
+        m_translationListAdapter = new TranslationDownloadListAdapter(this);
         listView.setAdapter(m_translationListAdapter);
         listView.setOnItemClickListener(new OnItemClickListener()
         {
@@ -167,9 +173,12 @@ public class TranslationDownloadActivity extends Activity
             } else {
                 int length = m_availableTranslations.length;
                 String[] texts = new String[length];
-                for (int i = 0; i < length; ++i)
-                    texts[i] = m_availableTranslations[i].name + " (" + m_availableTranslations[i].size + " KB)";
-                TranslationDownloadActivity.this.m_translationListAdapter.setTexts(texts);
+                int[] sizes = new int[length];
+                for (int i = 0; i < length; ++i) {
+                    texts[i] = m_availableTranslations[i].name;
+                    sizes[i] = m_availableTranslations[i].size;
+                }
+                TranslationDownloadActivity.this.m_translationListAdapter.setTexts(texts, sizes);
                 m_progressDialog.dismiss();
             }
         }
@@ -288,9 +297,69 @@ public class TranslationDownloadActivity extends Activity
         private ProgressDialog m_progressDialog;
     }
 
+    private class TranslationDownloadListAdapter extends ListBaseAdapter
+    {
+        public TranslationDownloadListAdapter(Context context)
+        {
+            super(context);
+        }
+
+        public void setTexts(String[] texts, int[] sizes)
+        {
+            m_texts = texts;
+
+            final int length = sizes.length;
+            m_subTexts = new String[length];
+            final String size = TranslationDownloadActivity.this.getResources().getText(R.string.text_size).toString();
+            for (int i = 0; i < length; ++i)
+                m_subTexts[i] = size + sizes[i] + "KB";
+
+            notifyDataSetChanged();
+        }
+
+        public View getView(int position, View convertView, ViewGroup parent)
+        {
+            LinearLayout linearLayout;
+            if (convertView == null) {
+                linearLayout = new LinearLayout(m_context);
+                linearLayout.setOrientation(LinearLayout.VERTICAL);
+
+                // first line
+                TextView textView = new TextView(m_context);
+                textView.setGravity(Gravity.CENTER_VERTICAL);
+                textView.setTextColor(Color.BLACK);
+                textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 17);
+                textView.setPadding(30, 20, 30, 0);
+                linearLayout.addView(textView);
+
+                // second line
+                textView = new TextView(m_context);
+                textView.setGravity(Gravity.CENTER_VERTICAL);
+                textView.setTextColor(Color.GRAY);
+                textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
+                textView.setPadding(30, 0, 30, 20);
+                linearLayout.addView(textView);
+            } else {
+                linearLayout = (LinearLayout) convertView;
+            }
+
+            // first line
+            TextView textView = (TextView) linearLayout.getChildAt(0);
+            textView.setText(m_texts[position]);
+
+            // second line
+            textView = (TextView) linearLayout.getChildAt(1);
+            textView.setText(m_subTexts[position]);
+
+            return linearLayout;
+        }
+
+        private String[] m_subTexts;
+    }
+
     private static final String BASE_URL = "http://bible.zionsoft.net/";
 
-    private SelectionListAdapter m_translationListAdapter;
+    private TranslationDownloadListAdapter m_translationListAdapter;
     private TranslationDownloadAsyncTask m_translationDownloadAsyncTask;
     private TranslationInfo[] m_availableTranslations;
 }
