@@ -53,13 +53,15 @@ public class TextListAdapter extends ListBaseAdapter
 
     public void setTexts(String[] texts)
     {
-        super.setTexts(texts);
+        m_texts = texts;
 
         final int length = texts.length;
         if (m_selected == null || length > m_selected.length)
             m_selected = new boolean[length];
         for (int i = 0; i < length; ++i)
             m_selected[i] = false;
+        
+        notifyDataSetChanged();
     }
 
     public View getView(int position, View convertView, ViewGroup parent)

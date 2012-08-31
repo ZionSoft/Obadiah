@@ -15,6 +15,12 @@ public class SelectionListAdapter extends ListBaseAdapter
         super(context);
     }
 
+    public void setTexts(String[] texts)
+    {
+        m_texts = texts;
+        notifyDataSetChanged();
+    }
+
     public View getView(int position, View convertView, ViewGroup parent)
     {
         TextView textView;

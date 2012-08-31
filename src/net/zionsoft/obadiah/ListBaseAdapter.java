@@ -12,12 +12,6 @@ public abstract class ListBaseAdapter extends BaseAdapter
         m_context = context;
     }
 
-    public void setTexts(String[] texts)
-    {
-        m_texts = texts;
-        notifyDataSetChanged();
-    }
-
     public int getCount()
     {
         return (m_texts == null) ? 0 : m_texts.length;

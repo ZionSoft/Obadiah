@@ -13,7 +13,6 @@ import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -32,23 +31,8 @@ public class TranslationSelectionActivity extends Activity
         titleBarTextView.setText(R.string.title_select_translation);
 
         // initializes list view showing installed translations
-        TextView textView = new TextView(this);
-        textView.setGravity(Gravity.CENTER_VERTICAL);
-        textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 17);
-        textView.setPadding(30, 20, 30, 20);
-        textView.setTextColor(Color.BLACK);
-        textView.setText(R.string.button_download);
-        textView.setOnClickListener(new OnClickListener()
-        {
-            public void onClick(View view)
-            {
-                startTranslationDownloadActivity();
-            }
-        });
-        ListView listView = (ListView) findViewById(R.id.listView);
-        listView.addFooterView(textView);
-
         m_listAdapter = new TranslationSelectionListAdapter(this);
+        ListView listView = (ListView) findViewById(R.id.listView);
         listView.setAdapter(m_listAdapter);
         listView.setOnItemClickListener(new OnItemClickListener()
         {
@@ -56,6 +40,11 @@ public class TranslationSelectionActivity extends Activity
             {
                 if (position == m_selectedTranslationIndex)
                     return;
+
+                if (position == m_listAdapter.getCount() - 1) {
+                    startTranslationDownloadActivity();
+                    return;
+                }
 
                 BibleReader bibleReader = BibleReader.getInstance();
                 String selectedTranslation = bibleReader.installedTranslations()[position].path;
@@ -124,17 +113,25 @@ public class TranslationSelectionActivity extends Activity
             super(context);
         }
 
+        public void setTexts(String[] texts)
+        {
+            int length = (texts == null) ? 0 : texts.length;
+            m_texts = new String[length + 1];
+            for (int i = 0; i < length; ++i)
+                m_texts[i] = texts[i];
+
+            m_texts[length] = m_context.getResources().getString(R.string.button_download);
+
+            notifyDataSetChanged();
+        }
+
         public View getView(int position, View convertView, ViewGroup parent)
         {
-            TextView textView;
-            if (convertView == null) {
-                textView = new TextView(m_context);
-                textView.setGravity(Gravity.CENTER_VERTICAL);
-                textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 17);
-                textView.setPadding(30, 20, 30, 20);
-            } else {
-                textView = (TextView) convertView;
-            }
+            TranslationSelectionItemTextView textView;
+            if (convertView == null)
+                textView = new TranslationSelectionItemTextView(m_context);
+            else
+                textView = (TranslationSelectionItemTextView) convertView;
 
             String text = m_texts[position];
             textView.setText(text);
@@ -148,6 +145,18 @@ public class TranslationSelectionActivity extends Activity
         public boolean isEnabled(int position)
         {
             return (m_selectedTranslationIndex != position);
+        }
+
+        private class TranslationSelectionItemTextView extends TextView
+        {
+            public TranslationSelectionItemTextView(Context context)
+            {
+                super(context);
+
+                setGravity(Gravity.CENTER_VERTICAL);
+                setTextSize(TypedValue.COMPLEX_UNIT_DIP, 17);
+                setPadding(30, 20, 30, 20);
+            }
         }
     }
 
