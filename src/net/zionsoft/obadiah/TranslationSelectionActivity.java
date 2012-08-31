@@ -144,6 +144,11 @@ public class TranslationSelectionActivity extends Activity
                 textView.setTextColor(Color.BLACK);
             return textView;
         }
+
+        public boolean isEnabled(int position)
+        {
+            return (m_selectedTranslationIndex != position);
+        }
     }
 
     private boolean m_firstTime = true;
