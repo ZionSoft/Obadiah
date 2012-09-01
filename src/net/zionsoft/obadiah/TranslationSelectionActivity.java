@@ -1,12 +1,19 @@
 package net.zionsoft.obadiah;
 
+import java.io.File;
+
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.TypedValue;
@@ -15,7 +22,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,7 +40,7 @@ public class TranslationSelectionActivity extends Activity
         m_listAdapter = new TranslationSelectionListAdapter(this);
         ListView listView = (ListView) findViewById(R.id.listView);
         listView.setAdapter(m_listAdapter);
-        listView.setOnItemClickListener(new OnItemClickListener()
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener()
         {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id)
             {
@@ -57,12 +63,92 @@ public class TranslationSelectionActivity extends Activity
                 finish();
             }
         });
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener()
+        {
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id)
+            {
+                if (position == m_selectedTranslationIndex || position == m_listAdapter.getCount() - 1)
+                    return false;
+
+                final int selectedIndex = position;
+                final Resources resources = TranslationSelectionActivity.this.getResources();
+                final CharSequence[] items = { resources.getText(R.string.text_delete) };
+                AlertDialog.Builder contextMenuDialogBuilder = new AlertDialog.Builder(
+                        TranslationSelectionActivity.this);
+                contextMenuDialogBuilder.setItems(items, new DialogInterface.OnClickListener()
+                {
+                    public void onClick(DialogInterface dialog, int which)
+                    {
+                        switch (which) {
+                        case 0: // delete
+                            AlertDialog.Builder deleteConfirmDialogBuilder = new AlertDialog.Builder(
+                                    TranslationSelectionActivity.this);
+                            deleteConfirmDialogBuilder.setMessage(resources.getText(R.string.text_delete_confirm))
+                                    .setCancelable(true)
+                                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener()
+                                    {
+                                        public void onClick(DialogInterface dialog, int id)
+                                        {
+                                            new TranslationDeleteAsyncTask().execute(new File(BibleReader.getInstance()
+                                                    .installedTranslations()[selectedIndex].path));
+                                        }
+                                    }).setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener()
+                                    {
+                                        public void onClick(DialogInterface dialog, int id)
+                                        {
+                                        }
+                                    });
+                            deleteConfirmDialogBuilder.create().show();
+                            break;
+                        }
+                    }
+                });
+                contextMenuDialogBuilder.create().show();
+
+                return true;
+            }
+
+            class TranslationDeleteAsyncTask extends AsyncTask<File, Void, Void>
+            {
+                protected void onPreExecute()
+                {
+                    // running in the main thread
+                    m_progressDialog = new ProgressDialog(TranslationSelectionActivity.this);
+                    m_progressDialog.setCancelable(false);
+                    m_progressDialog.setMessage(getText(R.string.text_deleting));
+                    m_progressDialog.show();
+                }
+
+                protected Void doInBackground(File... params)
+                {
+                    // running in the worker thread
+                    Utils.removeDirectory(params[0]);
+                    return null;
+                }
+
+                protected void onPostExecute(Void result)
+                {
+                    // running in the main thread
+                    BibleReader.getInstance().refresh();
+                    TranslationSelectionActivity.this.refresh();
+                    m_progressDialog.cancel();
+                    Toast.makeText(TranslationSelectionActivity.this, R.string.text_deleted, Toast.LENGTH_SHORT).show();
+                }
+
+                private ProgressDialog m_progressDialog;
+            }
+        });
     }
 
     protected void onResume()
     {
         super.onResume();
 
+        refresh();
+    }
+
+    private void refresh()
+    {
         BibleReader bibleReader = BibleReader.getInstance();
         TranslationInfo[] installedTranslations = bibleReader.installedTranslations();
         final int translationCount = (installedTranslations == null) ? 0 : installedTranslations.length;

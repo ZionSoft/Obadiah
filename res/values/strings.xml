@@ -5,6 +5,10 @@
     <string name="button_download">Download more translations</string>
     <string name="text_downloading">Downloading, please wait.</string>
     <string name="text_copied">Texts copied to clipboard.</string>
+    <string name="text_delete">Delete</string>
+    <string name="text_delete_confirm">Are you sure to delete this translation?</string>
+    <string name="text_deleted">Deleted.</string>
+    <string name="text_deleting">Deleting, please wait.</string>
     <string name="text_fail_to_fetch_translations_list">Can not fetch the translations list, please try again!</string>
     <string name="text_fail_to_fetch_translation">Can not fetch the translation, please try again!</string>
     <string name="text_no_available_translation">No available translations available for download.</string>
