@@ -15,30 +15,32 @@
             android:id="@+id/textTranslationSelection"
             android:layout_alignParentLeft="true"
             layout="@layout/titlebar_button" />
-
-        <ImageButton
-            android:id="@+id/continueButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:background="@drawable/button_background"
-            android:onClick="continueReading"
-            android:padding="8dip"
-            android:src="@drawable/btn_continue"
-            android:visibility="invisible" />
     </RelativeLayout>
+
+    <ListView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/bookListView"
+        android:layout_width="144dip"
+        android:layout_height="fill_parent"
+        android:layout_below="@id/titleBar"
+        android:cacheColorHint="@android:color/transparent"
+        android:divider="@null"
+        android:dividerHeight="0dip"
+        android:listSelector="@null"
+        android:numColumns="auto_fit" />
 
     <GridView
         xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/gridView"
+        android:id="@+id/chapterGridView"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:layout_below="@id/titleBar"
+        android:layout_toRightOf="@id/bookListView"
+        android:cacheColorHint="@android:color/transparent"
+        android:columnWidth="48dip"
         android:gravity="center"
-        android:horizontalSpacing="10dp"
+        android:listSelector="@null"
         android:numColumns="auto_fit"
-        android:stretchMode="columnWidth"
-        android:verticalSpacing="5dp" />
+        android:stretchMode="columnWidth" />
 
 </RelativeLayout>

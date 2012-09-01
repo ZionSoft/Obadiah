@@ -22,7 +22,7 @@ public class TextActivity extends Activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.text_activity);
 
-        Bundle bundle = getIntent().getExtras();
+        final Bundle bundle = getIntent().getExtras();
         m_currentBook = bundle.getInt("selectedBook");
         m_currentChapter = bundle.getInt("selectedChapter");
 
@@ -67,9 +67,8 @@ public class TextActivity extends Activity
             }
         });
 
-        // scrolls to last read verse if opened as continue reading
-        if (bundle.getBoolean("continueReading", false))
-            m_listView.setSelection(getSharedPreferences("settings", MODE_PRIVATE).getInt("currentVerse", 0));
+        // scrolls to last read verse if necessary
+        m_listView.setSelection(bundle.getInt("selectedVerse", 0));
     }
 
     protected void onResume()
