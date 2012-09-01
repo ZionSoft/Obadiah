@@ -206,7 +206,7 @@ public class TranslationSelectionActivity extends Activity
             for (int i = 0; i < length; ++i)
                 m_texts[i] = texts[i];
 
-            m_texts[length] = m_context.getResources().getString(R.string.button_download);
+            m_texts[length] = m_context.getResources().getString(R.string.text_download);
 
             notifyDataSetChanged();
         }

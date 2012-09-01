@@ -2,7 +2,7 @@
 <resources>
 
     <string name="app_name">圣经</string>
-    <string name="button_download">下载更多译本</string>
+    <string name="text_download">下载更多译本</string>
     <string name="text_copied">文本已成功复制到剪贴板。</string>
     <string name="text_delete">删除</string>
     <string name="text_delete_confirm">确定删除该译本？</string>

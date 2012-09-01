@@ -2,7 +2,7 @@
 <resources>
 
     <string name="app_name">Bible</string>
-    <string name="button_download">Download more translations</string>
+    <string name="text_download">Download more translations</string>
     <string name="text_downloading">Downloading, please wait.</string>
     <string name="text_copied">Texts copied to clipboard.</string>
     <string name="text_delete">Delete</string>
