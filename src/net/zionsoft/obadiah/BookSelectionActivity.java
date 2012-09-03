@@ -201,16 +201,19 @@ public class BookSelectionActivity extends Activity
                 textView.setGravity(Gravity.CENTER);
                 textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 17);
                 textView.setHeight(m_textViewHeight);
-                textView.setBackgroundResource(R.drawable.book_list_item_border);
+                textView.setBackgroundResource(R.drawable.book_list_item_background);
                 textView.setTextColor(Color.BLACK);
             } else {
                 textView = (TextView) convertView;
             }
 
-            if (m_selectedBook == position)
+            if (m_selectedBook == position) {
                 textView.setTypeface(null, Typeface.BOLD);
-            else
+                textView.setBackgroundResource(R.drawable.book_list_item_background_selected);
+            } else {
                 textView.setTypeface(null, Typeface.NORMAL);
+                textView.setBackgroundResource(R.drawable.book_list_item_background);
+            }
             textView.setText(m_texts[position]);
             return textView;
         }
@@ -239,7 +242,7 @@ public class BookSelectionActivity extends Activity
             TextView textView;
             if (convertView == null) {
                 textView = new TextView(m_context);
-                textView.setBackgroundResource(R.drawable.book_list_item_border);
+                textView.setBackgroundResource(R.drawable.book_list_item_background);
                 textView.setGravity(Gravity.CENTER);
                 textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 17);
                 textView.setHeight(m_textViewHeight);
