@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -222,10 +223,13 @@ public class TranslationSelectionActivity extends Activity
 
             String text = m_texts[position];
             textView.setText(text);
-            if (m_selectedTranslationIndex == position)
-                textView.setTextColor(Color.LTGRAY);
-            else
-                textView.setTextColor(Color.BLACK);
+            if (m_selectedTranslationIndex == position) {
+                textView.setTypeface(null, Typeface.BOLD);
+                textView.setBackgroundResource(R.drawable.list_item_background_selected);
+            } else {
+                textView.setTypeface(null, Typeface.NORMAL);
+                textView.setBackgroundResource(R.drawable.list_item_background);
+            }
             return textView;
         }
 
@@ -243,6 +247,7 @@ public class TranslationSelectionActivity extends Activity
                 setGravity(Gravity.CENTER_VERTICAL);
                 setTextSize(TypedValue.COMPLEX_UNIT_DIP, 17);
                 setPadding(30, 20, 30, 20);
+                setTextColor(Color.BLACK);
             }
         }
     }

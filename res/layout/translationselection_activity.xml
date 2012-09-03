@@ -15,7 +15,8 @@
         android:layout_height="fill_parent"
         android:layout_below="@id/titleBar"
         android:cacheColorHint="@android:color/transparent"
-        android:divider="@android:color/darker_gray"
-        android:dividerHeight="1dip" />
+        android:divider="@null"
+        android:dividerHeight="0dip"
+        android:listSelector="@null" />
 
 </RelativeLayout>
