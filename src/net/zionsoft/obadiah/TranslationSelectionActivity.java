@@ -151,6 +151,7 @@ public class TranslationSelectionActivity extends Activity
     {
         BibleReader bibleReader = BibleReader.getInstance();
         TranslationInfo[] installedTranslations = bibleReader.installedTranslations();
+        m_selectedTranslationIndex = -1;
         final int translationCount = (installedTranslations == null) ? 0 : installedTranslations.length;
         if (translationCount == 0) {
             // only directly opens TranslationDownloadActivity once
@@ -158,11 +159,11 @@ public class TranslationSelectionActivity extends Activity
                 startTranslationDownloadActivity();
                 m_firstTime = false;
             }
+            m_listAdapter.setTexts(null);   // adds the footer
             return;
         }
 
         TranslationInfo selectedTranslation = bibleReader.selectedTranslation();
-        m_selectedTranslationIndex = -1;
         String[] translationNames = new String[translationCount];
         for (int i = 0; i < translationCount; ++i) {
             translationNames[i] = installedTranslations[i].name;
