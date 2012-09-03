@@ -133,8 +133,10 @@ public class BookSelectionActivity extends Activity
             m_lastReadChapter = preferences.getInt("currentChapter", -1);
             m_lastReadVerse = preferences.getInt("currentVerse", -1);
 
-            if (m_startup)
+            if (m_startup) {
                 m_selectedBook = m_lastReadBook;
+                m_startup = false;
+            }
         }
 
         // sets the chapter lists if from TextActivity or TranslationSelectionActivity with 1st download translation
@@ -154,10 +156,7 @@ public class BookSelectionActivity extends Activity
         m_titleTranslationTextView.setText(translationInfo.shortName);
         m_bookSelectionListAdapter.setTexts(translationInfo.bookName);
 
-        if (m_startup) {
-            m_bookListView.setSelection(m_selectedBook);
-            m_startup = false;
-        }
+        m_bookListView.setSelection(m_selectedBook);
     }
 
     private void updateChapterSelectionListAdapter()
