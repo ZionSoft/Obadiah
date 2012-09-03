@@ -129,14 +129,21 @@ public class BookSelectionActivity extends Activity
         // i.e. not from TranslationSelectionActivity
         if (m_needToUpdateLastRead) {
             final SharedPreferences preferences = getSharedPreferences("settings", MODE_PRIVATE);
-            m_lastReadBook = preferences.getInt("currentBook", 0);
-            m_lastReadChapter = preferences.getInt("currentChapter", 0);
-            m_lastReadVerse = preferences.getInt("currentVerse", 0);
+            m_lastReadBook = preferences.getInt("currentBook", -1);
+            m_lastReadChapter = preferences.getInt("currentChapter", -1);
+            m_lastReadVerse = preferences.getInt("currentVerse", -1);
 
             if (m_startup)
                 m_selectedBook = m_lastReadBook;
+        }
 
+        // sets the chapter lists if from TextActivity or TranslationSelectionActivity with 1st download translation
+        if (m_needToUpdateLastRead || m_selectedBook < 0) {
+            if (m_selectedBook < 0)
+                m_selectedBook = 0;
             updateChapterSelectionListAdapter();
+
+            m_needToUpdateLastRead = false;
         }
 
         // updates the title and texts
@@ -207,7 +214,7 @@ public class BookSelectionActivity extends Activity
             textView.setText(m_texts[position]);
             return textView;
         }
-        
+
         private int m_textViewHeight;
     }
 
@@ -254,10 +261,10 @@ public class BookSelectionActivity extends Activity
 
     private boolean m_startup = true;
     private boolean m_needToUpdateLastRead = true;
-    private int m_lastReadBook;
-    private int m_lastReadChapter;
-    private int m_lastReadVerse;
-    private int m_selectedBook;
+    private int m_lastReadBook = -1;
+    private int m_lastReadChapter = -1;
+    private int m_lastReadVerse = -1;
+    private int m_selectedBook = -1;
     private BookSelectionListAdapter m_bookSelectionListAdapter;
     private ChapterSelectionListAdapter m_chapterSelectionListAdapter;
     private ListView m_bookListView;
