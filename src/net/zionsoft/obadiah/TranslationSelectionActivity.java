@@ -45,9 +45,6 @@ public class TranslationSelectionActivity extends Activity
         {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id)
             {
-                if (position == m_selectedTranslationIndex)
-                    return;
-
                 if (position == m_listAdapter.getCount() - 1) {
                     startTranslationDownloadActivity();
                     return;
@@ -160,7 +157,7 @@ public class TranslationSelectionActivity extends Activity
                 startTranslationDownloadActivity();
                 m_firstTime = false;
             }
-            m_listAdapter.setTexts(null);   // adds the footer
+            m_listAdapter.setTexts(null); // adds the footer
             return;
         }
 
@@ -231,11 +228,6 @@ public class TranslationSelectionActivity extends Activity
                 textView.setBackgroundResource(R.drawable.list_item_background);
             }
             return textView;
-        }
-
-        public boolean isEnabled(int position)
-        {
-            return (m_selectedTranslationIndex != position);
         }
 
         private class TranslationSelectionItemTextView extends TextView
