@@ -3,19 +3,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
-    <RelativeLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
+    <include
         android:id="@+id/titleBar"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:background="#6486cb"
-        android:orientation="horizontal" >
-
-        <include
-            android:id="@+id/textTranslationSelection"
-            android:layout_alignParentLeft="true"
-            layout="@layout/titlebar_button" />
-    </RelativeLayout>
+        android:layout_alignParentTop="true"
+        layout="@layout/titlebar" />
 
     <ListView
         xmlns:android="http://schemas.android.com/apk/res/android"

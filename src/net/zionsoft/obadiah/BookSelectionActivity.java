@@ -58,6 +58,8 @@ public class BookSelectionActivity extends Activity
                     return;
 
                 m_selectedBook = position;
+                m_titleBookNameTextView
+                        .setText(BibleReader.getInstance().selectedTranslation().bookName[m_selectedBook]);
                 m_bookSelectionListAdapter.notifyDataSetChanged();
                 updateChapterSelectionListAdapter();
             }
@@ -93,6 +95,7 @@ public class BookSelectionActivity extends Activity
                 startTranslationSelectionActivity();
             }
         });
+        m_titleBookNameTextView = (TextView) findViewById(R.id.textBookName);
     }
 
     protected void onResume()
@@ -148,12 +151,13 @@ public class BookSelectionActivity extends Activity
             m_needToUpdateLastRead = false;
         }
 
-        // updates the title and texts
+        // updates the title and book names
         // TODO no need to update if selected translation is not changed
         TranslationInfo translationInfo = BibleReader.getInstance().selectedTranslation();
         if (translationInfo == null)
             return;
         m_titleTranslationTextView.setText(translationInfo.shortName);
+        m_titleBookNameTextView.setText(translationInfo.bookName[m_selectedBook]);
         m_bookSelectionListAdapter.setTexts(translationInfo.bookName);
 
         m_bookListView.setSelection(m_selectedBook);
@@ -271,5 +275,6 @@ public class BookSelectionActivity extends Activity
     private ChapterSelectionListAdapter m_chapterSelectionListAdapter;
     private ListView m_bookListView;
     private GridView m_chapterGridView;
+    private TextView m_titleBookNameTextView;
     private TextView m_titleTranslationTextView;
 }
