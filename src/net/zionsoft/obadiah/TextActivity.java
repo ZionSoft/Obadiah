@@ -26,7 +26,9 @@ public class TextActivity extends Activity
         m_currentBook = bundle.getInt("selectedBook");
         m_currentChapter = bundle.getInt("selectedChapter");
 
-        m_bibleReader = BibleReader.getInstance();
+        m_translationReader = new TranslationReader(this);
+        m_translationReader.selectTranslation(bundle.getString("selectedTranslationShortName"));
+
         m_listAdapter = new TextListAdapter(this);
         m_titleTranslationTextView = (TextView) findViewById(R.id.textTranslationSelection);
         setupUi();
@@ -86,6 +88,7 @@ public class TextActivity extends Activity
         super.onPause();
 
         SharedPreferences.Editor editor = getSharedPreferences("settings", MODE_PRIVATE).edit();
+        editor.putString("selectedTranslation", m_translationReader.selectedTranslationShortName());
         editor.putInt("currentBook", m_currentBook);
         editor.putInt("currentChapter", m_currentChapter);
         editor.putInt("currentVerse", m_listView.pointToPosition(0, 0));
@@ -105,7 +108,7 @@ public class TextActivity extends Activity
 
     public void nextChapter(View view)
     {
-        if (m_currentChapter == m_bibleReader.chapterCount(m_currentBook) - 1)
+        if (m_currentChapter == m_translationReader.chapterCount(m_currentBook) - 1)
             return;
 
         ++m_currentChapter;
@@ -143,9 +146,9 @@ public class TextActivity extends Activity
         String selected = null;
         for (String text : texts) {
             if (selected == null)
-                selected = m_translationInfo.bookName[m_currentBook] + " " + (m_currentChapter + 1) + ":" + text;
+                selected = m_translationReader.bookNames()[m_currentBook] + " " + (m_currentChapter + 1) + ":" + text;
             else
-                selected += ("\n" + m_translationInfo.bookName[m_currentBook] + " " + (m_currentChapter + 1) + ":" + text);
+                selected += ("\n" + m_translationReader.bookNames()[m_currentBook] + " " + (m_currentChapter + 1) + ":" + text);
         }
         return selected;
     }
@@ -157,7 +160,7 @@ public class TextActivity extends Activity
         else
             m_prevButton.setEnabled(true);
 
-        if (m_currentChapter == m_bibleReader.chapterCount(m_currentBook) - 1)
+        if (m_currentChapter == m_translationReader.chapterCount(m_currentBook) - 1)
             m_nextButton.setEnabled(false);
         else
             m_nextButton.setEnabled(true);
@@ -165,21 +168,14 @@ public class TextActivity extends Activity
 
     private void setupUi()
     {
-        m_translationInfo = m_bibleReader.selectedTranslation();
-        if (m_translationInfo == null) {
-            Toast.makeText(this, R.string.text_no_selected_translation, Toast.LENGTH_LONG).show();
-            finish();
-            return;
-        }
-
-        m_titleTranslationTextView.setText(m_translationInfo.shortName);
+        m_titleTranslationTextView.setText(m_translationReader.selectedTranslationShortName());
 
         if (m_titleBookNameTextView == null)
             m_titleBookNameTextView = (TextView) findViewById(R.id.textBookName);
-        m_titleBookNameTextView.setText(m_translationInfo.bookName[m_currentBook] + ", " + (m_currentChapter + 1));
+        m_titleBookNameTextView.setText(m_translationReader.bookNames()[m_currentBook] + ", " + (m_currentChapter + 1));
 
         // TODO handles if the translation is corrupted
-        String[] verses = m_bibleReader.verses(m_currentBook, m_currentChapter);
+        String[] verses = m_translationReader.verses(m_currentBook, m_currentChapter);
         m_listAdapter.setTexts(verses);
     }
 
@@ -193,7 +189,6 @@ public class TextActivity extends Activity
     private boolean m_fromTranslationSelection;
     private int m_currentBook;
     private int m_currentChapter;
-    private BibleReader m_bibleReader;
     private ClipboardManager m_clipboardManager; // Obsoleted by android.content.ClipboardManager since API level 11.
     private ImageButton m_prevButton;
     private ImageButton m_nextButton;
@@ -203,5 +198,5 @@ public class TextActivity extends Activity
     private TextListAdapter m_listAdapter;
     private TextView m_titleBookNameTextView;
     private TextView m_titleTranslationTextView;
-    private TranslationInfo m_translationInfo;
+    private TranslationReader m_translationReader;
 }
