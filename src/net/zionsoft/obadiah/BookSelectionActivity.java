@@ -186,17 +186,19 @@ public class BookSelectionActivity extends Activity
     private void startTranslationSelectionActivity()
     {
         Intent intent = new Intent(this, TranslationSelectionActivity.class);
+        intent.putExtra("selectedTranslationShortName", m_translationReader.selectedTranslationShortName());
         startActivity(intent);
     }
 
-    private class BookSelectionListAdapter extends ListBaseAdapter
+    private static class BookSelectionListAdapter extends ListBaseAdapter
     {
-        public BookSelectionListAdapter(Context context)
+        public BookSelectionListAdapter(BookSelectionActivity activity)
         {
-            super(context);
+            super(activity);
 
-            m_textViewHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 47, getResources()
-                    .getDisplayMetrics());
+            m_bookSelectionActivity = activity;
+            m_textViewHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 47, m_bookSelectionActivity
+                    .getResources().getDisplayMetrics());
         }
 
         public void setTexts(String[] texts)
@@ -219,7 +221,7 @@ public class BookSelectionActivity extends Activity
                 textView = (TextView) convertView;
             }
 
-            if (m_selectedBook == position) {
+            if (m_bookSelectionActivity.m_selectedBook == position) {
                 textView.setTypeface(null, Typeface.BOLD);
                 textView.setBackgroundResource(R.drawable.list_item_background_selected);
             } else {
@@ -231,6 +233,7 @@ public class BookSelectionActivity extends Activity
         }
 
         private int m_textViewHeight;
+        private BookSelectionActivity m_bookSelectionActivity;
     }
 
     public class ChapterSelectionListAdapter extends ListBaseAdapter
