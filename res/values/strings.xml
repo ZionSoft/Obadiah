@@ -11,6 +11,7 @@
     <string name="text_deleting">Deleting, please wait.</string>
     <string name="text_fail_to_fetch_translations_list">Can not fetch the translations list, please try again!</string>
     <string name="text_fail_to_fetch_translation">Can not fetch the translation, please try again!</string>
+    <string name="text_initializing">Initializing, please wait.</string>
     <string name="text_no_available_translation">No available translations available for download.</string>
     <string name="text_no_network">No network connection available, please check before try again!</string>
     <string name="text_no_selected_translation">No translation selected.</string>

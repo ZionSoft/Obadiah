@@ -168,7 +168,7 @@ public class TranslationManager
             return null;
         }
 
-        final int languageColumnIndex = cursor.getColumnIndex(TranslationsDatabaseHelper.COLUMN_LANGUAGE);
+//        final int languageColumnIndex = cursor.getColumnIndex(TranslationsDatabaseHelper.COLUMN_LANGUAGE);
         final int translationNameColumnIndex = cursor
                 .getColumnIndex(TranslationsDatabaseHelper.COLUMN_TRANSLATION_NAME);
         final int translationShortNameColumnIndex = cursor
@@ -183,7 +183,7 @@ public class TranslationManager
             translationinfo.size = cursor.getInt(downloadSizeColumnIndex);
             translationinfo.shortName = cursor.getString(translationShortNameColumnIndex);
             translationinfo.name = cursor.getString(translationNameColumnIndex);
-            translationinfo.language = cursor.getString(languageColumnIndex);
+//            translationinfo.language = cursor.getString(languageColumnIndex);
             translationinfo.path = translationinfo.shortName;
             translations[i++] = translationinfo;
         }
