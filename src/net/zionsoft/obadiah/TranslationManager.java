@@ -32,6 +32,29 @@ public class TranslationManager
     // }
     // }
 
+    public void removeTranslation(String translationShortName)
+    {
+        if (translationShortName == null)
+            throw new IllegalArgumentException();
+
+        SQLiteDatabase db = m_translationsDatabaseHelper.getWritableDatabase();
+        db.beginTransaction();
+        try {
+            db.execSQL("DROP TABLE IF EXISTS " + translationShortName);
+
+            ContentValues values = new ContentValues(1);
+            values.put(TranslationsDatabaseHelper.COLUMN_INSTALLED, 0);
+            db.update(TranslationsDatabaseHelper.TABLE_TRANSLATIONS, values,
+                    TranslationsDatabaseHelper.COLUMN_TRANSLATION_SHORTNAME + " = ?",
+                    new String[] { translationShortName });
+
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+            db.close();
+        }
+    }
+
     // translations before version 1.5.0 uses the old format
     public void convertFromOldFormat()
     {
@@ -155,7 +178,7 @@ public class TranslationManager
     {
         SQLiteDatabase db = m_translationsDatabaseHelper.getReadableDatabase();
         String[] columns = new String[] { TranslationsDatabaseHelper.COLUMN_TRANSLATION_NAME,
-                TranslationsDatabaseHelper.COLUMN_TRANSLATION_SHORTNAME,
+                TranslationsDatabaseHelper.COLUMN_TRANSLATION_SHORTNAME, TranslationsDatabaseHelper.COLUMN_LANGUAGE,
                 TranslationsDatabaseHelper.COLUMN_DOWNLOAD_SIZE, TranslationsDatabaseHelper.COLUMN_INSTALLED };
         Cursor cursor = db.query(TranslationsDatabaseHelper.TABLE_TRANSLATIONS, columns, null, null, null, null, null);
         if (cursor == null) {
@@ -168,7 +191,7 @@ public class TranslationManager
             return null;
         }
 
-//        final int languageColumnIndex = cursor.getColumnIndex(TranslationsDatabaseHelper.COLUMN_LANGUAGE);
+        final int languageColumnIndex = cursor.getColumnIndex(TranslationsDatabaseHelper.COLUMN_LANGUAGE);
         final int translationNameColumnIndex = cursor
                 .getColumnIndex(TranslationsDatabaseHelper.COLUMN_TRANSLATION_NAME);
         final int translationShortNameColumnIndex = cursor
@@ -183,7 +206,7 @@ public class TranslationManager
             translationinfo.size = cursor.getInt(downloadSizeColumnIndex);
             translationinfo.shortName = cursor.getString(translationShortNameColumnIndex);
             translationinfo.name = cursor.getString(translationNameColumnIndex);
-//            translationinfo.language = cursor.getString(languageColumnIndex);
+            translationinfo.language = cursor.getString(languageColumnIndex);
             translationinfo.path = translationinfo.shortName;
             translations[i++] = translationinfo;
         }
