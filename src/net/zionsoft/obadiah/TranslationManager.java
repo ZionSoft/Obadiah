@@ -1,5 +1,16 @@
 package net.zionsoft.obadiah;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -13,24 +24,130 @@ public class TranslationManager
         m_translationsDatabaseHelper = new TranslationsDatabaseHelper(context);
     }
 
-    // public void addTranslations(TranslationInfo[] translations)
-    // {
-    // if (translations == null)
-    // throw new NullPointerException();
-    // if (translations.length == 0)
-    // throw new IllegalArgumentException();
-    //
-    // SQLiteDatabase db = m_translationsDatabaseOpenHelper.getWritableDatabase();
-    // ContentValues values = new ContentValues(5);
-    // values.put(COLUMN_INSTALLED, 0);
-    // for (TranslationInfo translationInfo : translations) {
-    // values.put(COLUMN_PATH, translationInfo.path);
-    // values.put(COLUMN_TRANSLATION_NAME, translationInfo.name);
-    // values.put(COLUMN_TRANSLATION_SHORTNAME, translationInfo.shortName);
-    // values.put(COLUMN_DOWNLOAD_SIZE, translationInfo.size);
-    // db.insert(TABLE_TRANSLATIONS, null, values);
-    // }
-    // }
+    public void addTranslations(TranslationInfo[] translations)
+    {
+        if (translations == null || translations.length == 0)
+            throw new IllegalArgumentException();
+
+        final TranslationInfo[] existingTranslations = translations();
+        final SQLiteDatabase db = m_translationsDatabaseHelper.getWritableDatabase();
+        final ContentValues values = new ContentValues(5);
+        db.beginTransaction();
+        try {
+            for (TranslationInfo translationInfo : translations) {
+                int i = 0;
+                for (; i < existingTranslations.length; ++i) {
+                    if (translationInfo.shortName.equals(existingTranslations[i].shortName))
+                        break;
+                }
+                if (i < existingTranslations.length)
+                    continue;
+
+                values.put(TranslationsDatabaseHelper.COLUMN_INSTALLED, 0);
+                values.put(TranslationsDatabaseHelper.COLUMN_TRANSLATION_NAME, translationInfo.name);
+                values.put(TranslationsDatabaseHelper.COLUMN_TRANSLATION_SHORTNAME, translationInfo.shortName);
+                values.put(TranslationsDatabaseHelper.COLUMN_LANGUAGE, translationInfo.language);
+                values.put(TranslationsDatabaseHelper.COLUMN_DOWNLOAD_SIZE, translationInfo.size);
+                db.insert(TranslationsDatabaseHelper.TABLE_TRANSLATIONS, null, values);
+            }
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+            db.close();
+        }
+    }
+
+    public boolean installTranslation(TranslationDownloadActivity.TranslationDownloadAsyncTask callback,
+            TranslationInfo translationToDownload)
+    {
+        SQLiteDatabase db = m_translationsDatabaseHelper.getWritableDatabase();
+        db.beginTransaction();
+        try {
+            // creates a translation table
+            db.execSQL("CREATE TABLE " + translationToDownload.shortName + " ("
+                    + TranslationsDatabaseHelper.COLUMN_BOOK_INDEX + " INTEGER NOT NULL, "
+                    + TranslationsDatabaseHelper.COLUMN_CHAPTER_INDEX + " INTEGER NOT NULL, "
+                    + TranslationsDatabaseHelper.COLUMN_VERSE_INDEX + " INTEGER NOT NULL, "
+                    + TranslationsDatabaseHelper.COLUMN_TEXT + " TEXT NOT NULL);");
+            db.execSQL("CREATE INDEX TRANSLATIONS_INDEX" + translationToDownload.shortName + " ON "
+                    + translationToDownload.shortName + " (" + TranslationsDatabaseHelper.COLUMN_BOOK_INDEX + ", "
+                    + TranslationsDatabaseHelper.COLUMN_CHAPTER_INDEX + ", "
+                    + TranslationsDatabaseHelper.COLUMN_VERSE_INDEX + ");");
+
+            final URL url = new URL(TranslationDownloadActivity.BASE_URL
+                    + URLEncoder.encode(translationToDownload.shortName, "UTF-8") + ".zip");
+            final HttpURLConnection httpConnection = (HttpURLConnection) url.openConnection();
+            final ZipInputStream zis = new ZipInputStream(new BufferedInputStream(httpConnection.getInputStream()));
+
+            final ContentValues versesValues = new ContentValues(4);
+            ZipEntry entry;
+            final byte buffer[] = new byte[BUFFER_LENGTH];
+            int read = -1;
+            int downloaded = 0;
+            while ((entry = zis.getNextEntry()) != null) {
+                if (callback.isCancelled())
+                    break;
+
+                final ByteArrayOutputStream os = new ByteArrayOutputStream();
+                while ((read = zis.read(buffer, 0, BUFFER_LENGTH)) != -1)
+                    os.write(buffer, 0, read);
+                final byte[] bytes = os.toByteArray();
+
+                String fileName = entry.getName();
+                fileName = fileName.substring(0, fileName.length() - 5);
+                if (fileName.equals("books")) {
+                    // writes the book names table
+                    final ContentValues bookNamesValues = new ContentValues(3);
+                    bookNamesValues.put(TranslationsDatabaseHelper.COLUMN_TRANSLATION_SHORTNAME,
+                            translationToDownload.shortName);
+
+                    final JSONObject booksInfoObject = new JSONObject(new String(bytes, "UTF8"));
+                    final JSONArray booksArray = booksInfoObject.getJSONArray("books");
+                    for (int i = 0; i < 66; ++i) {
+                        bookNamesValues.put(TranslationsDatabaseHelper.COLUMN_BOOK_INDEX, i);
+                        bookNamesValues.put(TranslationsDatabaseHelper.COLUMN_BOOK_NAME, booksArray.getString(i));
+                        db.insert(TranslationsDatabaseHelper.TABLE_BOOK_NAMES, null, bookNamesValues);
+                    }
+                } else {
+                    // writes the verses
+                    final String[] parts = fileName.split("-");
+                    final int bookIndex = Integer.parseInt(parts[0]);
+                    final int chapterIndex = Integer.parseInt(parts[1]);
+                    versesValues.put(TranslationsDatabaseHelper.COLUMN_BOOK_INDEX, bookIndex);
+                    versesValues.put(TranslationsDatabaseHelper.COLUMN_CHAPTER_INDEX, chapterIndex);
+
+                    final JSONObject jsonObject = new JSONObject(new String(bytes, "UTF8"));
+                    final JSONArray paragraphArray = jsonObject.getJSONArray("verses");
+                    final int paragraphCount = paragraphArray.length();
+                    for (int verseIndex = 0; verseIndex < paragraphCount; ++verseIndex) {
+                        versesValues.put(TranslationsDatabaseHelper.COLUMN_VERSE_INDEX, verseIndex);
+                        versesValues.put(TranslationsDatabaseHelper.COLUMN_TEXT, paragraphArray.getString(verseIndex));
+                        db.insert(translationToDownload.shortName, null, versesValues);
+                    }
+                }
+
+                // notifies the progress
+                callback.updateProgress(++downloaded / 12);
+            }
+            zis.close();
+
+            // sets as installed
+            final ContentValues translationInfoValues = new ContentValues(1);
+            translationInfoValues.put(TranslationsDatabaseHelper.COLUMN_INSTALLED, 1);
+            db.update(TranslationsDatabaseHelper.TABLE_TRANSLATIONS, translationInfoValues,
+                    TranslationsDatabaseHelper.COLUMN_TRANSLATION_SHORTNAME + " = ?",
+                    new String[] { translationToDownload.shortName });
+
+            db.setTransactionSuccessful();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            db.endTransaction();
+            db.close();
+        }
+        return true;
+    }
 
     public void removeTranslation(String translationShortName)
     {
@@ -58,17 +175,17 @@ public class TranslationManager
     // translations before version 1.5.0 uses the old format
     public void convertFromOldFormat()
     {
-        BibleReader oldReader = BibleReader.getInstance();
-        TranslationInfo[] installedTranslations = oldReader.installedTranslations();
+        final BibleReader oldReader = BibleReader.getInstance();
+        final TranslationInfo[] installedTranslations = oldReader.installedTranslations();
         if (installedTranslations == null || installedTranslations.length == 0)
             return;
 
-        SQLiteDatabase db = m_translationsDatabaseHelper.getWritableDatabase();
+        final SQLiteDatabase db = m_translationsDatabaseHelper.getWritableDatabase();
         db.beginTransaction();
         try {
-            ContentValues versesValues = new ContentValues(4);
-            ContentValues bookNamesValues = new ContentValues(3);
-            ContentValues translationInfoValues = new ContentValues(5);
+            final ContentValues versesValues = new ContentValues(4);
+            final ContentValues bookNamesValues = new ContentValues(3);
+            final ContentValues translationInfoValues = new ContentValues(5);
             translationInfoValues.put(TranslationsDatabaseHelper.COLUMN_INSTALLED, 1);
             for (TranslationInfo translationInfo : installedTranslations) {
                 // creates a translation table
@@ -77,8 +194,8 @@ public class TranslationManager
                         + TranslationsDatabaseHelper.COLUMN_CHAPTER_INDEX + " INTEGER NOT NULL, "
                         + TranslationsDatabaseHelper.COLUMN_VERSE_INDEX + " INTEGER NOT NULL, "
                         + TranslationsDatabaseHelper.COLUMN_TEXT + " TEXT NOT NULL);");
-                db.execSQL("CREATE INDEX TRANSLATIONS_INDEX ON " + translationInfo.shortName + " ("
-                        + TranslationsDatabaseHelper.COLUMN_BOOK_INDEX + ", "
+                db.execSQL("CREATE INDEX TRANSLATIONS_INDEX" + translationInfo.shortName + " ON "
+                        + translationInfo.shortName + " (" + TranslationsDatabaseHelper.COLUMN_BOOK_INDEX + ", "
                         + TranslationsDatabaseHelper.COLUMN_CHAPTER_INDEX + ", "
                         + TranslationsDatabaseHelper.COLUMN_VERSE_INDEX + ");");
 
@@ -100,7 +217,7 @@ public class TranslationManager
                     }
 
                     // writes book name
-                    bookNamesValues.put(TranslationsDatabaseHelper.COLUMN_BOOK_INDEX, Integer.toString(bookIndex));
+                    bookNamesValues.put(TranslationsDatabaseHelper.COLUMN_BOOK_INDEX, bookIndex);
                     bookNamesValues.put(TranslationsDatabaseHelper.COLUMN_BOOK_NAME,
                             translationInfo.bookName[bookIndex]);
                     db.insert(TranslationsDatabaseHelper.TABLE_BOOK_NAMES, null, bookNamesValues);
@@ -146,7 +263,7 @@ public class TranslationManager
                     translationInfoValues.put(TranslationsDatabaseHelper.COLUMN_LANGUAGE, "한국인");
                 } else if (translationInfo.shortName.equals("PorAR")) {
                     translationInfoValues.put(TranslationsDatabaseHelper.COLUMN_DOWNLOAD_SIZE, 1950);
-                    translationInfoValues.put(TranslationsDatabaseHelper.COLUMN_LANGUAGE, "português");
+                    translationInfoValues.put(TranslationsDatabaseHelper.COLUMN_LANGUAGE, "Português");
                 } else if (translationInfo.shortName.equals("RV1569")) {
                     translationInfoValues.put(TranslationsDatabaseHelper.COLUMN_DOWNLOAD_SIZE, 1855);
                     translationInfoValues.put(TranslationsDatabaseHelper.COLUMN_LANGUAGE, "Español");
@@ -213,6 +330,8 @@ public class TranslationManager
         db.close();
         return translations;
     }
+
+    private static final int BUFFER_LENGTH = 2048;
 
     private TranslationsDatabaseHelper m_translationsDatabaseHelper;
 }
