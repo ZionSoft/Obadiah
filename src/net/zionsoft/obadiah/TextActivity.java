@@ -183,6 +183,7 @@ public class TextActivity extends Activity
     {
         m_fromTranslationSelection = true;
         Intent intent = new Intent(this, TranslationSelectionActivity.class);
+        intent.putExtra("selectedTranslationShortName", m_translationReader.selectedTranslationShortName());
         startActivity(intent);
     }
 
