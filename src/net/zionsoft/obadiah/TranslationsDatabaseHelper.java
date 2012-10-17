@@ -23,13 +23,12 @@ public class TranslationsDatabaseHelper extends SQLiteOpenHelper
             // creates the books name table
             db.execSQL("CREATE TABLE " + TABLE_BOOK_NAMES + " (" + COLUMN_TRANSLATION_SHORTNAME + " TEXT NOT NULL, "
                     + COLUMN_BOOK_INDEX + " INTEGER NOT NULL, " + COLUMN_BOOK_NAME + " TEXT NOT NULL);");
-            db.execSQL("CREATE INDEX " + TABLE_BOOK_NAMES + " ON " + TABLE_BOOK_NAMES + " ("
+            db.execSQL("CREATE INDEX " + INDEX_TABLE_BOOK_NAMES + " ON " + TABLE_BOOK_NAMES + " ("
                     + COLUMN_TRANSLATION_SHORTNAME + ");");
 
             db.setTransactionSuccessful();
         } finally {
             db.endTransaction();
-            db.close();
         }
     }
 
@@ -40,6 +39,7 @@ public class TranslationsDatabaseHelper extends SQLiteOpenHelper
 
     public static final String TABLE_BOOK_NAMES = "TABLE_BOOK_NAMES";
     public static final String TABLE_TRANSLATIONS = "TABLE_TRANSLATIONS";
+    public static final String INDEX_TABLE_BOOK_NAMES = "INDEX_TABLE_BOOK_NAMES";
     public static final String COLUMN_TRANSLATION_NAME = "COLUMN_TRANSLATION_NAME";
     public static final String COLUMN_TRANSLATION_SHORTNAME = "COLUMN_TRANSLATION_SHORTNAME";
     public static final String COLUMN_LANGUAGE = "COLUMN_LANGUAGE";

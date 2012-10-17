@@ -170,6 +170,11 @@ public class TranslationSelectionActivity extends Activity
             if (translationInfo.installed)
                 installedTranslations[index++] = translationInfo;
         }
+
+        // 1st time resumed from TranslationDownloadActivity
+        if (m_selectedTranslationShortName == null)
+            m_selectedTranslationShortName = installedTranslations[0].shortName;
+
         m_listAdapter.setInstalledTranslations(installedTranslations);
         m_installedTranslations = installedTranslations;
     }

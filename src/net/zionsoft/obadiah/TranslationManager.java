@@ -35,13 +35,15 @@ public class TranslationManager
         db.beginTransaction();
         try {
             for (TranslationInfo translationInfo : translations) {
-                int i = 0;
-                for (; i < existingTranslations.length; ++i) {
-                    if (translationInfo.shortName.equals(existingTranslations[i].shortName))
-                        break;
+                if (existingTranslations != null) {
+                    int i = 0;
+                    for (; i < existingTranslations.length; ++i) {
+                        if (translationInfo.shortName.equals(existingTranslations[i].shortName))
+                            break;
+                    }
+                    if (i < existingTranslations.length)
+                        continue;
                 }
-                if (i < existingTranslations.length)
-                    continue;
 
                 values.put(TranslationsDatabaseHelper.COLUMN_INSTALLED, 0);
                 values.put(TranslationsDatabaseHelper.COLUMN_TRANSLATION_NAME, translationInfo.name);
@@ -70,7 +72,7 @@ public class TranslationManager
                     + TranslationsDatabaseHelper.COLUMN_CHAPTER_INDEX + " INTEGER NOT NULL, "
                     + TranslationsDatabaseHelper.COLUMN_VERSE_INDEX + " INTEGER NOT NULL, "
                     + TranslationsDatabaseHelper.COLUMN_TEXT + " TEXT NOT NULL);");
-            db.execSQL("CREATE INDEX TRANSLATIONS_INDEX" + translationToDownload.shortName + " ON "
+            db.execSQL("CREATE INDEX INDEX_" + translationToDownload.shortName + " ON "
                     + translationToDownload.shortName + " (" + TranslationsDatabaseHelper.COLUMN_BOOK_INDEX + ", "
                     + TranslationsDatabaseHelper.COLUMN_CHAPTER_INDEX + ", "
                     + TranslationsDatabaseHelper.COLUMN_VERSE_INDEX + ");");
@@ -196,8 +198,8 @@ public class TranslationManager
                         + TranslationsDatabaseHelper.COLUMN_CHAPTER_INDEX + " INTEGER NOT NULL, "
                         + TranslationsDatabaseHelper.COLUMN_VERSE_INDEX + " INTEGER NOT NULL, "
                         + TranslationsDatabaseHelper.COLUMN_TEXT + " TEXT NOT NULL);");
-                db.execSQL("CREATE INDEX TRANSLATIONS_INDEX" + translationInfo.shortName + " ON "
-                        + translationInfo.shortName + " (" + TranslationsDatabaseHelper.COLUMN_BOOK_INDEX + ", "
+                db.execSQL("CREATE INDEX INDEX_" + translationInfo.shortName + " ON " + translationInfo.shortName
+                        + " (" + TranslationsDatabaseHelper.COLUMN_BOOK_INDEX + ", "
                         + TranslationsDatabaseHelper.COLUMN_CHAPTER_INDEX + ", "
                         + TranslationsDatabaseHelper.COLUMN_VERSE_INDEX + ");");
 
