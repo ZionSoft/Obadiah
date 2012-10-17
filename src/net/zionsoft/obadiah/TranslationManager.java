@@ -30,8 +30,8 @@ public class TranslationManager
             throw new IllegalArgumentException();
 
         final TranslationInfo[] existingTranslations = translations();
-        final SQLiteDatabase db = m_translationsDatabaseHelper.getWritableDatabase();
         final ContentValues values = new ContentValues(5);
+        final SQLiteDatabase db = m_translationsDatabaseHelper.getWritableDatabase();
         db.beginTransaction();
         try {
             for (TranslationInfo translationInfo : translations) {
@@ -50,6 +50,7 @@ public class TranslationManager
                 values.put(TranslationsDatabaseHelper.COLUMN_DOWNLOAD_SIZE, translationInfo.size);
                 db.insert(TranslationsDatabaseHelper.TABLE_TRANSLATIONS, null, values);
             }
+
             db.setTransactionSuccessful();
         } finally {
             db.endTransaction();
@@ -60,7 +61,7 @@ public class TranslationManager
     public boolean installTranslation(TranslationDownloadActivity.TranslationDownloadAsyncTask callback,
             TranslationInfo translationToDownload)
     {
-        SQLiteDatabase db = m_translationsDatabaseHelper.getWritableDatabase();
+        final SQLiteDatabase db = m_translationsDatabaseHelper.getWritableDatabase();
         db.beginTransaction();
         try {
             // creates a translation table
@@ -74,16 +75,17 @@ public class TranslationManager
                     + TranslationsDatabaseHelper.COLUMN_CHAPTER_INDEX + ", "
                     + TranslationsDatabaseHelper.COLUMN_VERSE_INDEX + ");");
 
+            // gets the data and writes to table
             final URL url = new URL(TranslationDownloadActivity.BASE_URL
                     + URLEncoder.encode(translationToDownload.shortName, "UTF-8") + ".zip");
             final HttpURLConnection httpConnection = (HttpURLConnection) url.openConnection();
             final ZipInputStream zis = new ZipInputStream(new BufferedInputStream(httpConnection.getInputStream()));
 
-            final ContentValues versesValues = new ContentValues(4);
-            ZipEntry entry;
             final byte buffer[] = new byte[BUFFER_LENGTH];
+            final ContentValues versesValues = new ContentValues(4);
             int read = -1;
             int downloaded = 0;
+            ZipEntry entry;
             while ((entry = zis.getNextEntry()) != null) {
                 if (callback.isCancelled())
                     break;
@@ -94,7 +96,7 @@ public class TranslationManager
                 final byte[] bytes = os.toByteArray();
 
                 String fileName = entry.getName();
-                fileName = fileName.substring(0, fileName.length() - 5);
+                fileName = fileName.substring(0, fileName.length() - 5); // removes the trailing ".json"
                 if (fileName.equals("books")) {
                     // writes the book names table
                     final ContentValues bookNamesValues = new ContentValues(3);
@@ -103,7 +105,7 @@ public class TranslationManager
 
                     final JSONObject booksInfoObject = new JSONObject(new String(bytes, "UTF8"));
                     final JSONArray booksArray = booksInfoObject.getJSONArray("books");
-                    for (int i = 0; i < 66; ++i) {
+                    for (int i = 0; i < 66; ++i) { // TODO gets rid of magic number
                         bookNamesValues.put(TranslationsDatabaseHelper.COLUMN_BOOK_INDEX, i);
                         bookNamesValues.put(TranslationsDatabaseHelper.COLUMN_BOOK_NAME, booksArray.getString(i));
                         db.insert(TranslationsDatabaseHelper.TABLE_BOOK_NAMES, null, bookNamesValues);
@@ -154,12 +156,12 @@ public class TranslationManager
         if (translationShortName == null)
             throw new IllegalArgumentException();
 
-        SQLiteDatabase db = m_translationsDatabaseHelper.getWritableDatabase();
+        final SQLiteDatabase db = m_translationsDatabaseHelper.getWritableDatabase();
         db.beginTransaction();
         try {
             db.execSQL("DROP TABLE IF EXISTS " + translationShortName);
 
-            ContentValues values = new ContentValues(1);
+            final ContentValues values = new ContentValues(1);
             values.put(TranslationsDatabaseHelper.COLUMN_INSTALLED, 0);
             db.update(TranslationsDatabaseHelper.TABLE_TRANSLATIONS, values,
                     TranslationsDatabaseHelper.COLUMN_TRANSLATION_SHORTNAME + " = ?",
@@ -293,11 +295,12 @@ public class TranslationManager
 
     public TranslationInfo[] translations()
     {
-        SQLiteDatabase db = m_translationsDatabaseHelper.getReadableDatabase();
-        String[] columns = new String[] { TranslationsDatabaseHelper.COLUMN_TRANSLATION_NAME,
+        final SQLiteDatabase db = m_translationsDatabaseHelper.getReadableDatabase();
+        final String[] columns = new String[] { TranslationsDatabaseHelper.COLUMN_TRANSLATION_NAME,
                 TranslationsDatabaseHelper.COLUMN_TRANSLATION_SHORTNAME, TranslationsDatabaseHelper.COLUMN_LANGUAGE,
                 TranslationsDatabaseHelper.COLUMN_DOWNLOAD_SIZE, TranslationsDatabaseHelper.COLUMN_INSTALLED };
-        Cursor cursor = db.query(TranslationsDatabaseHelper.TABLE_TRANSLATIONS, columns, null, null, null, null, null);
+        final Cursor cursor = db.query(TranslationsDatabaseHelper.TABLE_TRANSLATIONS, columns, null, null, null, null,
+                null);
         if (cursor == null) {
             db.close();
             return null;
@@ -315,10 +318,10 @@ public class TranslationManager
                 .getColumnIndex(TranslationsDatabaseHelper.COLUMN_TRANSLATION_SHORTNAME);
         final int downloadSizeColumnIndex = cursor.getColumnIndex(TranslationsDatabaseHelper.COLUMN_DOWNLOAD_SIZE);
         final int installedColumnIndex = cursor.getColumnIndex(TranslationsDatabaseHelper.COLUMN_INSTALLED);
-        TranslationInfo[] translations = new TranslationInfo[count];
+        final TranslationInfo[] translations = new TranslationInfo[count];
         int i = 0;
         while (cursor.moveToNext()) {
-            TranslationInfo translationinfo = new TranslationInfo();
+            final TranslationInfo translationinfo = new TranslationInfo();
             translationinfo.installed = (cursor.getInt(installedColumnIndex) == 1) ? true : false;
             translationinfo.size = cursor.getInt(downloadSizeColumnIndex);
             translationinfo.shortName = cursor.getString(translationShortNameColumnIndex);
