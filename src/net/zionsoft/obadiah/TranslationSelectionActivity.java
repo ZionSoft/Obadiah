@@ -35,12 +35,12 @@ public class TranslationSelectionActivity extends Activity
         m_selectedTranslationShortName = getIntent().getExtras().getString("selectedTranslationShortName");
 
         // initializes title bar
-        TextView titleBarTextView = (TextView) findViewById(R.id.txtTitle);
+        final TextView titleBarTextView = (TextView) findViewById(R.id.txtTitle);
         titleBarTextView.setText(R.string.title_select_translation);
 
         // initializes list view showing installed translations
         m_listAdapter = new TranslationSelectionListAdapter(this);
-        ListView listView = (ListView) findViewById(R.id.listView);
+        final ListView listView = (ListView) findViewById(R.id.listView);
         listView.setAdapter(m_listAdapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener()
         {
@@ -51,7 +51,7 @@ public class TranslationSelectionActivity extends Activity
                     return;
                 }
 
-                SharedPreferences.Editor editor = getSharedPreferences("settings", MODE_PRIVATE).edit();
+                final SharedPreferences.Editor editor = getSharedPreferences("settings", MODE_PRIVATE).edit();
                 editor.putString("selectedTranslation", m_installedTranslations[position].shortName);
                 editor.commit();
 
@@ -70,7 +70,7 @@ public class TranslationSelectionActivity extends Activity
                 final int selectedIndex = position;
                 final Resources resources = TranslationSelectionActivity.this.getResources();
                 final CharSequence[] items = { resources.getText(R.string.text_delete) };
-                AlertDialog.Builder contextMenuDialogBuilder = new AlertDialog.Builder(
+                final AlertDialog.Builder contextMenuDialogBuilder = new AlertDialog.Builder(
                         TranslationSelectionActivity.this);
                 contextMenuDialogBuilder.setItems(items, new DialogInterface.OnClickListener()
                 {
@@ -78,7 +78,7 @@ public class TranslationSelectionActivity extends Activity
                     {
                         switch (which) {
                         case 0: // delete
-                            AlertDialog.Builder deleteConfirmDialogBuilder = new AlertDialog.Builder(
+                            final AlertDialog.Builder deleteConfirmDialogBuilder = new AlertDialog.Builder(
                                     TranslationSelectionActivity.this);
                             deleteConfirmDialogBuilder.setMessage(resources.getText(R.string.text_delete_confirm))
                                     .setCancelable(true)
@@ -145,7 +145,7 @@ public class TranslationSelectionActivity extends Activity
 
     private void populateUi()
     {
-        TranslationInfo[] translations = m_translationManager.translations();
+        final TranslationInfo[] translations = m_translationManager.translations();
         int installedTranslationCount = translations == null ? 0 : translations.length;
         if (installedTranslationCount > 0) {
             for (TranslationInfo translationInfo : translations) {
@@ -164,7 +164,7 @@ public class TranslationSelectionActivity extends Activity
             return;
         }
 
-        TranslationInfo[] installedTranslations = new TranslationInfo[installedTranslationCount];
+        final TranslationInfo[] installedTranslations = new TranslationInfo[installedTranslationCount];
         int index = 0;
         for (TranslationInfo translationInfo : translations) {
             if (translationInfo.installed)
@@ -177,8 +177,8 @@ public class TranslationSelectionActivity extends Activity
     private void startTranslationDownloadActivity()
     {
         // checks connectivity
-        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        final ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        final NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
         if (networkInfo == null || !networkInfo.isConnected()) {
             Toast.makeText(TranslationSelectionActivity.this, R.string.text_no_network, Toast.LENGTH_LONG).show();
             return;
@@ -188,8 +188,7 @@ public class TranslationSelectionActivity extends Activity
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.FROYO)
             System.setProperty("http.keepAlive", "false");
 
-        Intent intent = new Intent(TranslationSelectionActivity.this, TranslationDownloadActivity.class);
-        startActivity(intent);
+        startActivity(new Intent(TranslationSelectionActivity.this, TranslationDownloadActivity.class));
     }
 
     private static class TranslationSelectionListAdapter extends ListBaseAdapter
@@ -253,7 +252,7 @@ public class TranslationSelectionActivity extends Activity
         }
 
         private String m_footerText;
-        TranslationSelectionActivity m_translationSelectionActivity;
+        private TranslationSelectionActivity m_translationSelectionActivity;
         private TranslationInfo[] m_installedTranslations;
     }
 

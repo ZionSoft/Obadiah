@@ -141,7 +141,7 @@ public class TranslationDownloadActivity extends Activity
                 m_hasError = true;
                 m_translationDownloadActivity.m_availableTranslations = null;
             } finally {
-                SharedPreferences.Editor editor = m_translationDownloadActivity.getSharedPreferences("settings",
+                final SharedPreferences.Editor editor = m_translationDownloadActivity.getSharedPreferences("settings",
                         MODE_PRIVATE).edit();
                 editor.putLong(
                         "lastUpdated",
@@ -165,8 +165,8 @@ public class TranslationDownloadActivity extends Activity
                 m_translationDownloadActivity.finish();
             } else {
                 final int length = m_translationDownloadActivity.m_availableTranslations.length;
-                String[] texts = new String[length];
-                int[] sizes = new int[length];
+                final String[] texts = new String[length];
+                final int[] sizes = new int[length];
                 for (int i = 0; i < length; ++i) {
                     texts[i] = m_translationDownloadActivity.m_availableTranslations[i].name;
                     sizes[i] = m_translationDownloadActivity.m_availableTranslations[i].size;
@@ -265,9 +265,9 @@ public class TranslationDownloadActivity extends Activity
         {
             m_texts = texts;
 
+            final String size = m_translationDownloadActivity.getResources().getText(R.string.text_size).toString();
             final int length = sizes.length;
             m_subTexts = new String[length];
-            final String size = m_translationDownloadActivity.getResources().getText(R.string.text_size).toString();
             for (int i = 0; i < length; ++i)
                 m_subTexts[i] = size + sizes[i] + "KB";
 

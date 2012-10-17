@@ -8,7 +8,7 @@ public class Utils
     {
         if (directory == null)
             return true;
-        File[] files = directory.listFiles();
+        final File[] files = directory.listFiles();
         for (File file : files) {
             if (file.isDirectory())
                 removeDirectory(file);

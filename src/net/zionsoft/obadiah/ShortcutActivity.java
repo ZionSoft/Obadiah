@@ -10,7 +10,7 @@ public class ShortcutActivity extends Activity
     {
         super.onCreate(savedInstanceState);
 
-        Intent intent = new Intent();
+        final Intent intent = new Intent();
         intent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, new Intent(this, BookSelectionActivity.class));
         intent.putExtra(Intent.EXTRA_SHORTCUT_NAME, getString(R.string.app_name));
         intent.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE,
