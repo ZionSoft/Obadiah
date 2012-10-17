@@ -10,14 +10,13 @@ public class TranslationReader
     {
         super();
         m_translationsDatabaseHelper = new TranslationsDatabaseHelper(context);
-
         m_selectedTranslationChanged = true;
         m_bookNames = new String[66];
     }
 
     public void selectTranslation(String translationShortName)
     {
-        SQLiteDatabase db = m_translationsDatabaseHelper.getReadableDatabase();
+        final SQLiteDatabase db = m_translationsDatabaseHelper.getReadableDatabase();
         Cursor cursor = null;
         if (translationShortName != null) {
             // versions before 1.5.0 uses path instead of translation short name as the key
@@ -89,12 +88,12 @@ public class TranslationReader
         return m_selectedTranslationShortName;
     }
 
-    public int bookCount()
+    public static int bookCount()
     {
         return BOOK_COUNT;
     }
 
-    public int chapterCount(int bookIndex)
+    public static int chapterCount(int bookIndex)
     {
         if (bookIndex < 0 || bookIndex >= BOOK_COUNT)
             throw new IllegalArgumentException();
@@ -104,13 +103,14 @@ public class TranslationReader
     public String[] bookNames()
     {
         if (m_selectedTranslationShortName == null)
-            throw new IllegalArgumentException();
+            return null;
 
         if (!m_selectedTranslationChanged)
             return m_bookNames;
 
-        SQLiteDatabase db = m_translationsDatabaseHelper.getReadableDatabase();
-        Cursor cursor = db.query(TranslationsDatabaseHelper.TABLE_BOOK_NAMES,
+        // loads the book names
+        final SQLiteDatabase db = m_translationsDatabaseHelper.getReadableDatabase();
+        final Cursor cursor = db.query(TranslationsDatabaseHelper.TABLE_BOOK_NAMES,
                 new String[] { TranslationsDatabaseHelper.COLUMN_BOOK_NAME },
                 TranslationsDatabaseHelper.COLUMN_TRANSLATION_SHORTNAME + " = ?",
                 new String[] { m_selectedTranslationShortName }, null, null,
@@ -119,8 +119,10 @@ public class TranslationReader
             db.close();
             return null;
         }
+
         final int count = cursor.getCount();
-        if (count != 66) { // TODO error handling
+        if (count != BOOK_COUNT) {
+            // TODO handles the error that the book names table is corrupted
             db.close();
             return null;
         }
@@ -136,11 +138,16 @@ public class TranslationReader
 
     public String[] verses(int bookIndex, int chapterIndex)
     {
-        if (m_selectedTranslationShortName == null || chapterIndex < 0 || chapterIndex >= chapterCount(bookIndex))
+        // TODO caches the verses in memory
+
+        if (m_selectedTranslationShortName == null)
+            return null;
+
+        if (chapterIndex < 0 || chapterIndex >= chapterCount(bookIndex))
             throw new IllegalArgumentException();
 
-        SQLiteDatabase db = m_translationsDatabaseHelper.getReadableDatabase();
-        Cursor cursor = db.query(m_selectedTranslationShortName,
+        final SQLiteDatabase db = m_translationsDatabaseHelper.getReadableDatabase();
+        final Cursor cursor = db.query(m_selectedTranslationShortName,
                 new String[] { TranslationsDatabaseHelper.COLUMN_TEXT }, TranslationsDatabaseHelper.COLUMN_BOOK_INDEX
                         + " = ? AND " + TranslationsDatabaseHelper.COLUMN_CHAPTER_INDEX + " = ?", new String[] {
                         Integer.toString(bookIndex), Integer.toString(chapterIndex) }, null, null,
@@ -156,7 +163,7 @@ public class TranslationReader
         }
 
         final int textColumnIndex = cursor.getColumnIndex(TranslationsDatabaseHelper.COLUMN_TEXT);
-        String[] texts = new String[count];
+        final String[] texts = new String[count];
         int i = 0;
         while (cursor.moveToNext())
             texts[i++] = cursor.getString(textColumnIndex);
