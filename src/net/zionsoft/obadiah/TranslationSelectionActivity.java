@@ -1,7 +1,5 @@
 package net.zionsoft.obadiah;
 
-import java.io.File;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -33,6 +31,9 @@ public class TranslationSelectionActivity extends Activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.translationselection_activity);
 
+        m_translationManager = new TranslationManager(this);
+        m_selectedTranslationShortName = getIntent().getExtras().getString("selectedTranslationShortName");
+
         // initializes title bar
         TextView titleBarTextView = (TextView) findViewById(R.id.txtTitle);
         titleBarTextView.setText(R.string.title_select_translation);
@@ -50,13 +51,9 @@ public class TranslationSelectionActivity extends Activity
                     return;
                 }
 
-                BibleReader bibleReader = BibleReader.getInstance();
-                String selectedTranslation = bibleReader.installedTranslations()[position].path;
                 SharedPreferences.Editor editor = getSharedPreferences("settings", MODE_PRIVATE).edit();
-                editor.putString("selectedTranslation", selectedTranslation);
+                editor.putString("selectedTranslation", m_installedTranslations[position].shortName);
                 editor.commit();
-
-                bibleReader.selectTranslation(selectedTranslation);
 
                 finish();
             }
@@ -65,8 +62,10 @@ public class TranslationSelectionActivity extends Activity
         {
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id)
             {
-                if (position == m_selectedTranslationIndex || position == m_listAdapter.getCount() - 1)
+                if (position == m_listAdapter.getCount() - 1
+                        || m_installedTranslations[position].shortName.equals(m_selectedTranslationShortName)) {
                     return false;
+                }
 
                 final int selectedIndex = position;
                 final Resources resources = TranslationSelectionActivity.this.getResources();
@@ -87,8 +86,8 @@ public class TranslationSelectionActivity extends Activity
                                     {
                                         public void onClick(DialogInterface dialog, int id)
                                         {
-                                            new TranslationDeleteAsyncTask().execute(new File(BibleReader.getInstance()
-                                                    .installedTranslations()[selectedIndex].path));
+                                            new TranslationDeleteAsyncTask()
+                                                    .execute(m_installedTranslations[selectedIndex].shortName);
                                         }
                                     }).setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener()
                                     {
@@ -106,7 +105,7 @@ public class TranslationSelectionActivity extends Activity
                 return true;
             }
 
-            class TranslationDeleteAsyncTask extends AsyncTask<File, Void, Void>
+            class TranslationDeleteAsyncTask extends AsyncTask<String, Void, Void>
             {
                 protected void onPreExecute()
                 {
@@ -117,18 +116,17 @@ public class TranslationSelectionActivity extends Activity
                     m_progressDialog.show();
                 }
 
-                protected Void doInBackground(File... params)
+                protected Void doInBackground(String... params)
                 {
                     // running in the worker thread
-                    Utils.removeDirectory(params[0]);
+                    m_translationManager.removeTranslation(params[0]);
                     return null;
                 }
 
                 protected void onPostExecute(Void result)
                 {
                     // running in the main thread
-                    BibleReader.getInstance().refresh();
-                    TranslationSelectionActivity.this.refresh();
+                    TranslationSelectionActivity.this.populateUi();
                     m_progressDialog.cancel();
                     Toast.makeText(TranslationSelectionActivity.this, R.string.text_deleted, Toast.LENGTH_SHORT).show();
                 }
@@ -142,35 +140,38 @@ public class TranslationSelectionActivity extends Activity
     {
         super.onResume();
 
-        refresh();
+        populateUi();
     }
 
-    private void refresh()
+    private void populateUi()
     {
-        BibleReader bibleReader = BibleReader.getInstance();
-        TranslationInfo[] installedTranslations = bibleReader.installedTranslations();
-        m_selectedTranslationIndex = -1;
-        final int translationCount = (installedTranslations == null) ? 0 : installedTranslations.length;
-        if (translationCount == 0) {
+        TranslationInfo[] translations = m_translationManager.translations();
+        int installedTranslationCount = translations == null ? 0 : translations.length;
+        if (installedTranslationCount > 0) {
+            for (TranslationInfo translationInfo : translations) {
+                if (!translationInfo.installed)
+                    --installedTranslationCount;
+            }
+        }
+
+        if (installedTranslationCount == 0) {
             // only directly opens TranslationDownloadActivity once
             if (m_firstTime) {
                 startTranslationDownloadActivity();
                 m_firstTime = false;
             }
-            m_listAdapter.setTexts(null); // adds the footer
+            m_listAdapter.setInstalledTranslations(null);
             return;
         }
 
-        TranslationInfo selectedTranslation = bibleReader.selectedTranslation();
-        String[] translationNames = new String[translationCount];
-        for (int i = 0; i < translationCount; ++i) {
-            translationNames[i] = installedTranslations[i].name;
-            if (m_selectedTranslationIndex == -1 && selectedTranslation != null
-                    && selectedTranslation.name.equals(installedTranslations[i].name)) {
-                m_selectedTranslationIndex = i;
-            }
+        TranslationInfo[] installedTranslations = new TranslationInfo[installedTranslationCount];
+        int index = 0;
+        for (TranslationInfo translationInfo : translations) {
+            if (translationInfo.installed)
+                installedTranslations[index++] = translationInfo;
         }
-        m_listAdapter.setTexts(translationNames);
+        m_listAdapter.setInstalledTranslations(installedTranslations);
+        m_installedTranslations = installedTranslations;
     }
 
     private void startTranslationDownloadActivity()
@@ -183,7 +184,7 @@ public class TranslationSelectionActivity extends Activity
             return;
         }
 
-        // HTTP connection reuse was buggy before Froyo
+        // HTTP connection reuse was buggy before Froyo (i.e. Android 2.2, API Level 8)
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.FROYO)
             System.setProperty("http.keepAlive", "false");
 
@@ -191,23 +192,24 @@ public class TranslationSelectionActivity extends Activity
         startActivity(intent);
     }
 
-    private class TranslationSelectionListAdapter extends ListBaseAdapter
+    private static class TranslationSelectionListAdapter extends ListBaseAdapter
     {
-        public TranslationSelectionListAdapter(Context context)
+        public TranslationSelectionListAdapter(TranslationSelectionActivity activity)
         {
-            super(context);
+            super(activity);
+            m_translationSelectionActivity = activity;
+            m_footerText = m_translationSelectionActivity.getResources().getString(R.string.text_download);
         }
 
-        public void setTexts(String[] texts)
+        public void setInstalledTranslations(TranslationInfo[] translations)
         {
-            int length = (texts == null) ? 0 : texts.length;
-            m_texts = new String[length + 1];
-            for (int i = 0; i < length; ++i)
-                m_texts[i] = texts[i];
-
-            m_texts[length] = m_context.getResources().getString(R.string.text_download);
-
+            m_installedTranslations = translations;
             notifyDataSetChanged();
+        }
+
+        public int getCount()
+        {
+            return (m_installedTranslations == null) ? 1 : m_installedTranslations.length + 1;
         }
 
         public View getView(int position, View convertView, ViewGroup parent)
@@ -218,19 +220,26 @@ public class TranslationSelectionActivity extends Activity
             else
                 textView = (TranslationSelectionItemTextView) convertView;
 
-            String text = m_texts[position];
-            textView.setText(text);
-            if (m_selectedTranslationIndex == position) {
-                textView.setTypeface(null, Typeface.BOLD);
-                textView.setBackgroundResource(R.drawable.list_item_background_selected);
+            if (m_installedTranslations != null && position < m_installedTranslations.length) {
+                textView.setText(m_installedTranslations[position].name);
+                if (m_translationSelectionActivity.m_selectedTranslationShortName
+                        .equals(m_installedTranslations[position].shortName)) {
+                    textView.setTypeface(null, Typeface.BOLD);
+                    textView.setBackgroundResource(R.drawable.list_item_background_selected);
+                } else {
+                    textView.setTypeface(null, Typeface.NORMAL);
+                    textView.setBackgroundResource(R.drawable.list_item_background);
+                }
             } else {
+                textView.setText(m_footerText);
                 textView.setTypeface(null, Typeface.NORMAL);
                 textView.setBackgroundResource(R.drawable.list_item_background);
             }
+
             return textView;
         }
 
-        private class TranslationSelectionItemTextView extends TextView
+        private static class TranslationSelectionItemTextView extends TextView
         {
             public TranslationSelectionItemTextView(Context context)
             {
@@ -242,9 +251,15 @@ public class TranslationSelectionActivity extends Activity
                 setTextColor(Color.BLACK);
             }
         }
+
+        private String m_footerText;
+        TranslationSelectionActivity m_translationSelectionActivity;
+        private TranslationInfo[] m_installedTranslations;
     }
 
     private boolean m_firstTime = true;
-    private int m_selectedTranslationIndex;
+    private String m_selectedTranslationShortName;
+    private TranslationManager m_translationManager;
     private TranslationSelectionListAdapter m_listAdapter;
+    private TranslationInfo[] m_installedTranslations;
 }
