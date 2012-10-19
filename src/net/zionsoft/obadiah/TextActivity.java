@@ -69,7 +69,7 @@ public class TextActivity extends Activity
         {
             public void onClick(View v)
             {
-                startTranslationSelectionActivity();
+                startActivity(new Intent(TextActivity.this, TranslationSelectionActivity.class));
             }
         });
 
@@ -178,13 +178,6 @@ public class TextActivity extends Activity
 
         // TODO handles if the translation is corrupted
         m_listAdapter.setTexts(m_translationReader.verses(m_currentBook, m_currentChapter));
-    }
-
-    private void startTranslationSelectionActivity()
-    {
-        final Intent intent = new Intent(this, TranslationSelectionActivity.class);
-        intent.putExtra("selectedTranslationShortName", m_translationReader.selectedTranslationShortName());
-        startActivity(intent);
     }
 
     private static class TextListAdapter extends ListBaseAdapter

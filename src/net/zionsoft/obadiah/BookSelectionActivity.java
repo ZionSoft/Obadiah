@@ -178,9 +178,7 @@ public class BookSelectionActivity extends Activity
 
     private void startTranslationSelectionActivity()
     {
-        final Intent intent = new Intent(this, TranslationSelectionActivity.class);
-        intent.putExtra("selectedTranslationShortName", m_translationReader.selectedTranslationShortName());
-        startActivity(intent);
+        startActivity(new Intent(this, TranslationSelectionActivity.class));
     }
 
     private static class BookSelectionListAdapter extends ListBaseAdapter
