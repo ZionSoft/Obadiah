@@ -28,16 +28,14 @@ public class TextActivity extends Activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.text_activity);
 
+        m_translationReader = new TranslationReader(this);
+
         final Bundle bundle = getIntent().getExtras();
         m_currentBook = bundle.getInt("selectedBook");
         m_currentChapter = bundle.getInt("selectedChapter");
 
-        m_translationReader = new TranslationReader(this);
-        m_translationReader.selectTranslation(bundle.getString("selectedTranslationShortName"));
-
         m_listAdapter = new TextListAdapter(this);
         m_titleTranslationTextView = (TextView) findViewById(R.id.textTranslationSelection);
-        setupUi();
 
         m_shareButton = (ImageButton) findViewById(R.id.shareButton);
         m_shareButton.setEnabled(false);
@@ -83,10 +81,9 @@ public class TextActivity extends Activity
     {
         super.onResume();
 
-        if (m_fromTranslationSelection) {
-            m_fromTranslationSelection = false;
-            setupUi();
-        }
+        m_translationReader.selectTranslation(getSharedPreferences("settings", MODE_PRIVATE).getString(
+                "selectedTranslation", null));
+        setupUi();
     }
 
     protected void onPause()
@@ -94,7 +91,6 @@ public class TextActivity extends Activity
         super.onPause();
 
         final SharedPreferences.Editor editor = getSharedPreferences("settings", MODE_PRIVATE).edit();
-        editor.putString("selectedTranslation", m_translationReader.selectedTranslationShortName());
         editor.putInt("currentBook", m_currentBook);
         editor.putInt("currentChapter", m_currentChapter);
         editor.putInt("currentVerse", m_listView.pointToPosition(0, 0));
@@ -186,7 +182,6 @@ public class TextActivity extends Activity
 
     private void startTranslationSelectionActivity()
     {
-        m_fromTranslationSelection = true;
         final Intent intent = new Intent(this, TranslationSelectionActivity.class);
         intent.putExtra("selectedTranslationShortName", m_translationReader.selectedTranslationShortName());
         startActivity(intent);
@@ -284,7 +279,6 @@ public class TextActivity extends Activity
         private BackgroundColorSpan m_backgroundColorSpan;
     }
 
-    private boolean m_fromTranslationSelection;
     private int m_currentBook;
     private int m_currentChapter;
     private ClipboardManager m_clipboardManager; // Obsoleted by android.content.ClipboardManager since API level 11.

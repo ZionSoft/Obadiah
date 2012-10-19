@@ -67,7 +67,6 @@ public class BookSelectionActivity extends Activity
             public void onItemClick(AdapterView<?> parent, View view, int position, long id)
             {
                 final Intent intent = new Intent(BookSelectionActivity.this, TextActivity.class);
-                intent.putExtra("selectedTranslationShortName", m_translationReader.selectedTranslationShortName());
                 intent.putExtra("selectedBook", m_selectedBook);
                 intent.putExtra("selectedChapter", position);
                 startActivity(intent);
