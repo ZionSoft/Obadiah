@@ -72,18 +72,21 @@ public class TextActivity extends Activity
                 startActivity(new Intent(TextActivity.this, TranslationSelectionActivity.class));
             }
         });
-
-        // scrolls to last read verse if necessary
-        m_listView.setSelection(getSharedPreferences("settings", MODE_PRIVATE).getInt("currentVerse", 0));
     }
 
     protected void onResume()
     {
         super.onResume();
 
-        m_translationReader.selectTranslation(getSharedPreferences("settings", MODE_PRIVATE).getString(
-                "selectedTranslation", null));
+        final SharedPreferences preferences = getSharedPreferences("settings", MODE_PRIVATE);
+        m_translationReader.selectTranslation(preferences.getString("selectedTranslation", null));
+
         setupUi();
+
+        // scrolls to last read verse if necessary
+        if (preferences.getInt("currentBook", -1) == m_currentBook
+                && preferences.getInt("currentChapter", -1) == m_currentChapter)
+            m_listView.setSelection(getSharedPreferences("settings", MODE_PRIVATE).getInt("currentVerse", 0));
     }
 
     protected void onPause()
