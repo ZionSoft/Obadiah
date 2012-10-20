@@ -46,7 +46,7 @@
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:background="@drawable/button_background"
-            android:onClick="nextChapter"
+            android:onClick="changeChapter"
             android:padding="8dip"
             android:src="@drawable/next_button" />
 
@@ -57,7 +57,7 @@
             android:layout_centerVertical="true"
             android:layout_toLeftOf="@id/nextButton"
             android:background="@drawable/button_background"
-            android:onClick="previousChapter"
+            android:onClick="changeChapter"
             android:padding="8dip"
             android:src="@drawable/prev_button" />
     </RelativeLayout>

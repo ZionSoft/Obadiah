@@ -34,17 +34,23 @@ public class TextActivity extends Activity
         m_currentBook = bundle.getInt("selectedBook");
         m_currentChapter = bundle.getInt("selectedChapter");
 
-        m_listAdapter = new TextListAdapter(this);
-        m_titleTranslationTextView = (TextView) findViewById(R.id.textTranslationSelection);
-
+        // initializes the tool bar buttons
         m_shareButton = (ImageButton) findViewById(R.id.shareButton);
         m_shareButton.setEnabled(false);
 
         m_copyButton = (ImageButton) findViewById(R.id.copyButton);
         m_copyButton.setEnabled(false);
 
+        m_prevButton = (ImageButton) findViewById(R.id.prevButton);
+        m_nextButton = (ImageButton) findViewById(R.id.nextButton);
+        updateButtonState();
+
+        // initializes verses list view
         m_listView = (ListView) findViewById(R.id.listView);
+
+        m_listAdapter = new TextListAdapter(this);
         m_listView.setAdapter(m_listAdapter);
+
         m_listView.setOnItemClickListener(new OnItemClickListener()
         {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id)
@@ -60,11 +66,8 @@ public class TextActivity extends Activity
             }
         });
 
-        m_prevButton = (ImageButton) findViewById(R.id.prevButton);
-        m_nextButton = (ImageButton) findViewById(R.id.nextButton);
-        updateButtonState();
-
         // initializes the title bar
+        m_titleTranslationTextView = (TextView) findViewById(R.id.textTranslationSelection);
         m_titleTranslationTextView.setOnClickListener(new OnClickListener()
         {
             public void onClick(View v)
@@ -100,23 +103,22 @@ public class TextActivity extends Activity
         editor.commit();
     }
 
-    public void previousChapter(View view)
+    public void changeChapter(View view)
     {
-        if (m_currentChapter == 0)
+        if (view != m_prevButton && view != m_nextButton)
             return;
 
-        --m_currentChapter;
-        updateButtonState();
-        setupUi();
-        m_listView.setSelectionAfterHeaderView();
-    }
+        if (view == m_prevButton) {
+            if (m_currentChapter == 0)
+                return;
+            --m_currentChapter;
+        } else {
+            if (m_currentChapter == TranslationReader.chapterCount(m_currentBook) - 1)
+                return;
 
-    public void nextChapter(View view)
-    {
-        if (m_currentChapter == TranslationReader.chapterCount(m_currentBook) - 1)
-            return;
+            ++m_currentChapter;
+        }
 
-        ++m_currentChapter;
         updateButtonState();
         setupUi();
         m_listView.setSelectionAfterHeaderView();
@@ -128,7 +130,7 @@ public class TextActivity extends Activity
             final Intent intent = new Intent();
             intent.setAction(Intent.ACTION_SEND);
             intent.setType("text/plain");
-            intent.putExtra(Intent.EXTRA_TEXT, selectedText());
+            intent.putExtra(Intent.EXTRA_TEXT, m_listAdapter.selectedText());
             startActivity(Intent.createChooser(intent, getResources().getText(R.string.text_share_with)));
         }
     }
@@ -138,24 +140,9 @@ public class TextActivity extends Activity
         if (m_listAdapter.hasItemSelected()) {
             if (m_clipboardManager == null)
                 m_clipboardManager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-            m_clipboardManager.setText(selectedText());
+            m_clipboardManager.setText(m_listAdapter.selectedText());
             Toast.makeText(this, R.string.text_copied, Toast.LENGTH_SHORT).show();
         }
-    }
-
-    private String selectedText()
-    {
-        if (!m_listAdapter.hasItemSelected())
-            return null;
-        final String[] texts = m_listAdapter.selectedTexts();
-        String selected = null;
-        for (String text : texts) {
-            if (selected == null)
-                selected = m_translationReader.bookNames()[m_currentBook] + " " + (m_currentChapter + 1) + ":" + text;
-            else
-                selected += ("\n" + m_translationReader.bookNames()[m_currentBook] + " " + (m_currentChapter + 1) + ":" + text);
-        }
-        return selected;
     }
 
     private void updateButtonState()
@@ -185,9 +172,10 @@ public class TextActivity extends Activity
 
     private static class TextListAdapter extends ListBaseAdapter
     {
-        public TextListAdapter(Context context)
+        public TextListAdapter(TextActivity activity)
         {
-            super(context);
+            super(activity);
+            m_textActivity = activity;
         }
 
         public void selectItem(int position)
@@ -209,18 +197,28 @@ public class TextActivity extends Activity
             return (m_selectedCount > 0);
         }
 
-        public String[] selectedTexts()
+        public String selectedText()
         {
             if (!hasItemSelected())
                 return null;
 
-            final String[] texts = new String[m_selectedCount];
-            final int length = m_texts.length;
-            for (int i = 0, index = 0; i < length; ++i) {
-                if (m_selected[i])
-                    texts[index++] = Integer.toString(i + 1) + " " + m_texts[i];
+            final String prefix = m_textActivity.m_translationReader.bookNames()[m_textActivity.m_currentBook] + " "
+                    + Integer.toString(m_textActivity.m_currentChapter + 1) + ":";
+            String selected = null;
+            for (int i = 0; i < m_texts.length; ++i) {
+                if (m_selected[i]) {
+                    if (selected != null) {
+                        selected += "\n";
+                        selected += prefix;
+                    } else {
+                        selected = prefix;
+                    }
+                    selected += Integer.toString(i + 1);
+                    selected += " ";
+                    selected += m_texts[i];
+                }
             }
-            return texts;
+            return selected;
         }
 
         public void setTexts(String[] texts)
@@ -273,6 +271,7 @@ public class TextActivity extends Activity
         private boolean m_selected[];
         private int m_selectedCount;
         private BackgroundColorSpan m_backgroundColorSpan;
+        private TextActivity m_textActivity;
     }
 
     private int m_currentBook;
