@@ -66,10 +66,17 @@ public class BookSelectionActivity extends Activity
         {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id)
             {
-                final Intent intent = new Intent(BookSelectionActivity.this, TextActivity.class);
-                intent.putExtra("selectedBook", m_selectedBook);
-                intent.putExtra("selectedChapter", position);
-                startActivity(intent);
+                final SharedPreferences preferences = getSharedPreferences("settings", MODE_PRIVATE);
+                if (preferences.getInt("currentBook", -1) != m_selectedBook
+                        || preferences.getInt("currentChapter", -1) != position) {
+                    final SharedPreferences.Editor editor = preferences.edit();
+                    editor.putInt("currentBook", m_selectedBook);
+                    editor.putInt("currentChapter", position);
+                    editor.putInt("currentVerse", 0);
+                    editor.commit();
+                }
+
+                startActivity(new Intent(BookSelectionActivity.this, TextActivity.class));
             }
         });
 
@@ -104,6 +111,11 @@ public class BookSelectionActivity extends Activity
             }
         }
         showNoTranslationDialog();
+    }
+
+    public void search(View view)
+    {
+        startActivity(new Intent(this, SearchActivity.class));
     }
 
     private void showNoTranslationDialog()
@@ -151,8 +163,7 @@ public class BookSelectionActivity extends Activity
         m_lastReadChapter = preferences.getInt("currentChapter", -1);
 
         // sets the book that is currently selected
-        if (m_selectedBook < 0)
-            m_selectedBook = m_lastReadBook < 0 ? 0 : m_lastReadBook;
+        m_selectedBook = m_lastReadBook < 0 ? 0 : m_lastReadBook;
 
         // sets the chapter lists
         // TODO it's not needed if this activity is resumed from TranslationSelectionActivity

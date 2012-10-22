@@ -30,10 +30,6 @@ public class TextActivity extends Activity
 
         m_translationReader = new TranslationReader(this);
 
-        final Bundle bundle = getIntent().getExtras();
-        m_currentBook = bundle.getInt("selectedBook");
-        m_currentChapter = bundle.getInt("selectedChapter");
-
         // initializes the tool bar buttons
         m_shareButton = (ImageButton) findViewById(R.id.shareButton);
         m_shareButton.setEnabled(false);
@@ -82,14 +78,14 @@ public class TextActivity extends Activity
         super.onResume();
 
         final SharedPreferences preferences = getSharedPreferences("settings", MODE_PRIVATE);
+        m_currentBook = preferences.getInt("currentBook", 0);
+        m_currentChapter = preferences.getInt("currentChapter", 0);
         m_translationReader.selectTranslation(preferences.getString("selectedTranslation", null));
 
-        setupUi();
+        populateUi();
 
-        // scrolls to last read verse if necessary
-        if (preferences.getInt("currentBook", -1) == m_currentBook
-                && preferences.getInt("currentChapter", -1) == m_currentChapter)
-            m_listView.setSelection(getSharedPreferences("settings", MODE_PRIVATE).getInt("currentVerse", 0));
+        // scrolls to last read verse
+        m_listView.setSelection(getSharedPreferences("settings", MODE_PRIVATE).getInt("currentVerse", 0));
     }
 
     protected void onPause()
@@ -97,7 +93,6 @@ public class TextActivity extends Activity
         super.onPause();
 
         final SharedPreferences.Editor editor = getSharedPreferences("settings", MODE_PRIVATE).edit();
-        editor.putInt("currentBook", m_currentBook);
         editor.putInt("currentChapter", m_currentChapter);
         editor.putInt("currentVerse", m_listView.pointToPosition(0, 0));
         editor.commit();
@@ -120,7 +115,7 @@ public class TextActivity extends Activity
         }
 
         updateButtonState();
-        setupUi();
+        populateUi();
         m_listView.setSelectionAfterHeaderView();
     }
 
@@ -145,6 +140,13 @@ public class TextActivity extends Activity
         }
     }
 
+    public void search(View view)
+    {
+        final Intent intent = new Intent(this, SearchActivity.class);
+        intent.putExtra("fromTextActivity", true);
+        startActivity(intent);
+    }
+
     private void updateButtonState()
     {
         if (m_currentChapter == 0)
@@ -158,7 +160,7 @@ public class TextActivity extends Activity
             m_nextButton.setEnabled(true);
     }
 
-    private void setupUi()
+    private void populateUi()
     {
         m_titleTranslationTextView.setText(m_translationReader.selectedTranslationShortName());
 

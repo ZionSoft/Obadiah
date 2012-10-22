@@ -8,11 +8,33 @@
         android:layout_alignParentTop="true"
         layout="@layout/titlebar" />
 
+    <RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/toolBar"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@android:color/black"
+        android:orientation="horizontal" >
+
+        <ImageButton
+            android:id="@+id/searchButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:background="@drawable/button_background"
+            android:onClick="search"
+            android:padding="8dip"
+            android:src="@drawable/btn_search" />
+    </RelativeLayout>
+
     <ListView
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/bookListView"
         android:layout_width="144dip"
         android:layout_height="fill_parent"
+        android:layout_above="@id/toolBar"
         android:layout_below="@id/titleBar"
         android:cacheColorHint="@android:color/transparent"
         android:divider="@null"
@@ -25,6 +47,7 @@
         android:id="@+id/chapterGridView"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
+        android:layout_above="@id/toolBar"
         android:layout_below="@id/titleBar"
         android:layout_toRightOf="@id/bookListView"
         android:cacheColorHint="@android:color/transparent"

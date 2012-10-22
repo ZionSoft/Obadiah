@@ -16,6 +16,8 @@
     <string name="text_no_network">No network connection available, please check before try again!</string>
     <string name="text_no_selected_translation">No translation selected.</string>
     <string name="text_no_translation">No translation installed, please download from the Internet.</string>
+    <string name="text_searching">Searching&#8230;</string>
+    <string name="text_search_result">\u0020result(s) found.</string>
     <string name="text_size">Size:\u0020</string>
     <string name="text_share_with">Share with&#8230;</string>
     <string name="title_download_translation">Available translations</string>
