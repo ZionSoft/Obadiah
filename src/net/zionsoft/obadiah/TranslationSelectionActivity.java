@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -40,31 +41,33 @@ public class TranslationSelectionActivity extends Activity
         titleBarTextView.setText(R.string.title_select_translation);
 
         // initializes list view showing installed translations
-        m_listAdapter = new TranslationSelectionListAdapter(this);
-        final ListView listView = (ListView) findViewById(R.id.listView);
-        listView.setAdapter(m_listAdapter);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener()
+        m_translationListAdapter = new TranslationSelectionListAdapter(this);
+        final ListView translationListView = (ListView) findViewById(R.id.translationListView);
+        translationListView.setAdapter(m_translationListAdapter);
+        translationListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
         {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id)
             {
-                if (position == m_listAdapter.getCount() - 1) {
-                    startTranslationDownloadActivity();
+                if (position == TranslationSelectionActivity.this.m_translationListAdapter.getCount() - 1) {
+                    TranslationSelectionActivity.this.startTranslationDownloadActivity();
                     return;
                 }
 
-                final SharedPreferences.Editor editor = getSharedPreferences("settings", MODE_PRIVATE).edit();
+                final SharedPreferences.Editor editor = TranslationSelectionActivity.this.getSharedPreferences(
+                        "settings", MODE_PRIVATE).edit();
                 editor.putString("selectedTranslation", m_installedTranslations[position].shortName);
                 editor.commit();
 
                 finish();
             }
         });
-        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener()
+        translationListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener()
         {
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id)
             {
-                if (position == m_listAdapter.getCount() - 1
-                        || m_installedTranslations[position].shortName.equals(m_selectedTranslationShortName)) {
+                if (position == TranslationSelectionActivity.this.m_translationListAdapter.getCount() - 1
+                        || TranslationSelectionActivity.this.m_installedTranslations[position].shortName
+                                .equals(TranslationSelectionActivity.this.m_selectedTranslationShortName)) {
                     return false;
                 }
 
@@ -88,7 +91,7 @@ public class TranslationSelectionActivity extends Activity
                                         public void onClick(DialogInterface dialog, int id)
                                         {
                                             new TranslationDeleteAsyncTask()
-                                                    .execute(m_installedTranslations[selectedIndex].shortName);
+                                                    .execute(TranslationSelectionActivity.this.m_installedTranslations[selectedIndex].shortName);
                                         }
                                     }).setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener()
                                     {
@@ -111,6 +114,9 @@ public class TranslationSelectionActivity extends Activity
                 protected void onPreExecute()
                 {
                     // running in the main thread
+
+                    TranslationSelectionActivity.this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
+
                     m_progressDialog = new ProgressDialog(TranslationSelectionActivity.this);
                     m_progressDialog.setCancelable(false);
                     m_progressDialog.setMessage(getText(R.string.text_deleting));
@@ -120,16 +126,19 @@ public class TranslationSelectionActivity extends Activity
                 protected Void doInBackground(String... params)
                 {
                     // running in the worker thread
-                    m_translationManager.removeTranslation(params[0]);
+
+                    TranslationSelectionActivity.this.m_translationManager.removeTranslation(params[0]);
                     return null;
                 }
 
                 protected void onPostExecute(Void result)
                 {
                     // running in the main thread
+
                     TranslationSelectionActivity.this.populateUi();
                     m_progressDialog.cancel();
                     Toast.makeText(TranslationSelectionActivity.this, R.string.text_deleted, Toast.LENGTH_SHORT).show();
+                    TranslationSelectionActivity.this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
                 }
 
                 private ProgressDialog m_progressDialog;
@@ -161,7 +170,7 @@ public class TranslationSelectionActivity extends Activity
                 startTranslationDownloadActivity();
                 m_firstTime = false;
             }
-            m_listAdapter.setInstalledTranslations(null);
+            m_translationListAdapter.setInstalledTranslations(null);
             return;
         }
 
@@ -172,11 +181,11 @@ public class TranslationSelectionActivity extends Activity
                 installedTranslations[index++] = translationInfo;
         }
 
-        // 1st time resumed from TranslationDownloadActivity
+        // 1st time resumed from TranslationDownloadActivity with installed translation
         if (m_selectedTranslationShortName == null)
             m_selectedTranslationShortName = installedTranslations[0].shortName;
 
-        m_listAdapter.setInstalledTranslations(installedTranslations);
+        m_translationListAdapter.setInstalledTranslations(installedTranslations);
         m_installedTranslations = installedTranslations;
     }
 
@@ -197,13 +206,12 @@ public class TranslationSelectionActivity extends Activity
         startActivity(new Intent(TranslationSelectionActivity.this, TranslationDownloadActivity.class));
     }
 
-    private static class TranslationSelectionListAdapter extends ListBaseAdapter
+    private class TranslationSelectionListAdapter extends ListBaseAdapter
     {
-        public TranslationSelectionListAdapter(TranslationSelectionActivity activity)
+        public TranslationSelectionListAdapter(Context context)
         {
-            super(activity);
-            m_translationSelectionActivity = activity;
-            m_footerText = m_translationSelectionActivity.getResources().getString(R.string.text_download);
+            super(context);
+            m_footerText = context.getResources().getString(R.string.text_download);
         }
 
         public void setInstalledTranslations(TranslationInfo[] translations)
@@ -219,15 +227,20 @@ public class TranslationSelectionActivity extends Activity
 
         public View getView(int position, View convertView, ViewGroup parent)
         {
-            TranslationSelectionItemTextView textView;
-            if (convertView == null)
-                textView = new TranslationSelectionItemTextView(m_context);
-            else
-                textView = (TranslationSelectionItemTextView) convertView;
+            TextView textView;
+            if (convertView == null) {
+                textView = new TextView(m_context);
+                textView.setGravity(Gravity.CENTER_VERTICAL);
+                textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 17);
+                textView.setPadding(30, 20, 30, 20);
+                textView.setTextColor(Color.BLACK);
+            } else {
+                textView = (TextView) convertView;
+            }
 
             if (m_installedTranslations != null && position < m_installedTranslations.length) {
                 textView.setText(m_installedTranslations[position].name);
-                if (m_translationSelectionActivity.m_selectedTranslationShortName
+                if (TranslationSelectionActivity.this.m_selectedTranslationShortName
                         .equals(m_installedTranslations[position].shortName)) {
                     textView.setTypeface(null, Typeface.BOLD);
                     textView.setBackgroundResource(R.drawable.list_item_background_selected);
@@ -244,27 +257,13 @@ public class TranslationSelectionActivity extends Activity
             return textView;
         }
 
-        private static class TranslationSelectionItemTextView extends TextView
-        {
-            public TranslationSelectionItemTextView(Context context)
-            {
-                super(context);
-
-                setGravity(Gravity.CENTER_VERTICAL);
-                setTextSize(TypedValue.COMPLEX_UNIT_DIP, 17);
-                setPadding(30, 20, 30, 20);
-                setTextColor(Color.BLACK);
-            }
-        }
-
         private String m_footerText;
-        private TranslationSelectionActivity m_translationSelectionActivity;
         private TranslationInfo[] m_installedTranslations;
     }
 
     private boolean m_firstTime = true;
     private String m_selectedTranslationShortName;
     private TranslationManager m_translationManager;
-    private TranslationSelectionListAdapter m_listAdapter;
+    private TranslationSelectionListAdapter m_translationListAdapter;
     private TranslationInfo[] m_installedTranslations;
 }
