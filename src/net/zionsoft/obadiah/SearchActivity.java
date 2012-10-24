@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
@@ -38,8 +39,9 @@ public class SearchActivity extends Activity
         m_translationManager = new TranslationManager(this);
         m_translationReader = new TranslationReader(this);
 
-        m_titleBarTextView = (TextView) findViewById(R.id.textTranslationSelection);
-        m_titleBarTextView.setOnClickListener(new OnClickListener()
+        // initializes the title bar
+        m_selectedTranslationTextView = (TextView) findViewById(R.id.textTranslationSelection);
+        m_selectedTranslationTextView.setOnClickListener(new OnClickListener()
         {
             public void onClick(View v)
             {
@@ -47,19 +49,21 @@ public class SearchActivity extends Activity
             }
         });
 
+        // initializes the search bar
         m_searchText = (EditText) findViewById(R.id.searchText);
         m_searchText.setOnEditorActionListener(new OnEditorActionListener()
         {
             public boolean onEditorAction(TextView view, int actionId, KeyEvent event)
             {
                 if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                    search(null);
+                    SearchActivity.this.search(null);
                     return true;
                 }
                 return false;
             }
         });
 
+        // initializes the search results list view
         m_searchResultListView = (ListView) findViewById(R.id.searchResultListView);
         m_searchResultListAdapter = new SearchResultListAdapter(this);
         m_searchResultListView.setAdapter(m_searchResultListAdapter);
@@ -67,10 +71,10 @@ public class SearchActivity extends Activity
         {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id)
             {
-                if (position < 0 || position >= m_results.length)
+                if (position < 0 || position >= SearchActivity.this.m_results.length)
                     return;
 
-                final SearchResult result = m_results[position];
+                final SearchResult result = SearchActivity.this.m_results[position];
                 final SharedPreferences.Editor editor = getSharedPreferences("settings", MODE_PRIVATE).edit();
                 editor.putInt("currentBook", result.bookIndex);
                 editor.putInt("currentChapter", result.chapterIndex);
@@ -79,9 +83,9 @@ public class SearchActivity extends Activity
 
                 final Bundle bundle = getIntent().getExtras();
                 if (bundle != null && bundle.getBoolean("fromTextActivity", false))
-                    finish();
+                    SearchActivity.this.finish();
                 else
-                    startActivity(new Intent(SearchActivity.this, TextActivity.class));
+                    SearchActivity.this.startActivity(new Intent(SearchActivity.this, TextActivity.class));
 
             }
         });
@@ -98,7 +102,7 @@ public class SearchActivity extends Activity
         final TranslationInfo[] translations = m_translationManager.translations();
         for (TranslationInfo translationInfo : translations) {
             if (translationInfo.installed && translationInfo.shortName.equals(m_selectedTranslationShortName)) {
-                m_titleBarTextView.setText(translationInfo.name);
+                m_selectedTranslationTextView.setText(translationInfo.name);
                 break;
             }
         }
@@ -113,7 +117,7 @@ public class SearchActivity extends Activity
             return;
 
         // TODO should the search functionality be moved to TranslationReader?
-        new SearchAsyncTask(this).execute(searchToken);
+        new SearchAsyncTask().execute(searchToken);
     }
 
     private static class SearchResult
@@ -123,30 +127,26 @@ public class SearchActivity extends Activity
         public int verseIndex;
     }
 
-    private static class SearchAsyncTask extends AsyncTask<Editable, Void, Void>
+    private class SearchAsyncTask extends AsyncTask<Editable, Void, Void>
     {
-        public SearchAsyncTask(SearchActivity activity)
-        {
-            super();
-            m_searchActivity = activity;
-        }
-
         protected void onPreExecute()
         {
             // running in the main thread
 
-            m_searchActivity.m_searchResultListAdapter.setTexts(null);
+            SearchActivity.this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
 
-            InputMethodManager inputManager = (InputMethodManager) m_searchActivity
+            SearchActivity.this.m_searchResultListAdapter.setTexts(null);
+
+            InputMethodManager inputManager = (InputMethodManager) SearchActivity.this
                     .getSystemService(Context.INPUT_METHOD_SERVICE);
             if (inputManager != null) {
-                inputManager.hideSoftInputFromWindow(m_searchActivity.getCurrentFocus().getWindowToken(),
+                inputManager.hideSoftInputFromWindow(SearchActivity.this.getCurrentFocus().getWindowToken(),
                         InputMethodManager.HIDE_NOT_ALWAYS);
             }
 
-            m_progressDialog = new ProgressDialog(m_searchActivity);
+            m_progressDialog = new ProgressDialog(SearchActivity.this);
             m_progressDialog.setCancelable(false);
-            m_progressDialog.setMessage(m_searchActivity.getText(R.string.text_searching));
+            m_progressDialog.setMessage(SearchActivity.this.getText(R.string.text_searching));
             m_progressDialog.show();
         }
 
@@ -154,44 +154,42 @@ public class SearchActivity extends Activity
         {
             // running in the worker thread
 
-            final SQLiteDatabase db = m_searchActivity.m_translationsDatabaseHelper.getReadableDatabase();
-            final Cursor cursor = db.query(m_searchActivity.m_selectedTranslationShortName, new String[] {
+            final SQLiteDatabase db = SearchActivity.this.m_translationsDatabaseHelper.getReadableDatabase();
+            final Cursor cursor = db.query(SearchActivity.this.m_selectedTranslationShortName, new String[] {
                     TranslationsDatabaseHelper.COLUMN_BOOK_INDEX, TranslationsDatabaseHelper.COLUMN_CHAPTER_INDEX,
                     TranslationsDatabaseHelper.COLUMN_VERSE_INDEX, TranslationsDatabaseHelper.COLUMN_TEXT },
                     TranslationsDatabaseHelper.COLUMN_TEXT + " LIKE ?", new String[] { "%" + params[0] + "%" }, null,
                     null, null);
-            if (cursor == null) {
-                db.close();
-                return null;
-            }
-            final int count = cursor.getCount();
-            if (count == 0) {
-                db.close();
-                return null;
-            }
+            if (cursor != null) {
+                final int count = cursor.getCount();
+                if (count > 0) {
+                    final int bookIndexColumnIndex = cursor
+                            .getColumnIndex(TranslationsDatabaseHelper.COLUMN_BOOK_INDEX);
+                    final int chapterIndexColumnIndex = cursor
+                            .getColumnIndex(TranslationsDatabaseHelper.COLUMN_CHAPTER_INDEX);
+                    final int verseIndexColumnIndex = cursor
+                            .getColumnIndex(TranslationsDatabaseHelper.COLUMN_VERSE_INDEX);
+                    final int textColumnIndex = cursor.getColumnIndex(TranslationsDatabaseHelper.COLUMN_TEXT);
+                    m_texts = new String[count];
+                    SearchActivity.this.m_results = new SearchResult[count];
+                    int i = 0;
+                    while (cursor.moveToNext()) {
+                        final SearchResult result = new SearchResult();
+                        result.bookIndex = cursor.getInt(bookIndexColumnIndex);
+                        result.chapterIndex = cursor.getInt(chapterIndexColumnIndex);
+                        result.verseIndex = cursor.getInt(verseIndexColumnIndex);
+                        SearchActivity.this.m_results[i] = result;
 
-            final int bookIndexColumnIndex = cursor.getColumnIndex(TranslationsDatabaseHelper.COLUMN_BOOK_INDEX);
-            final int chapterIndexColumnIndex = cursor.getColumnIndex(TranslationsDatabaseHelper.COLUMN_CHAPTER_INDEX);
-            final int verseIndexColumnIndex = cursor.getColumnIndex(TranslationsDatabaseHelper.COLUMN_VERSE_INDEX);
-            final int textColumnIndex = cursor.getColumnIndex(TranslationsDatabaseHelper.COLUMN_TEXT);
-            m_texts = new String[count];
-            m_searchActivity.m_results = new SearchResult[count];
-            int i = 0;
-            while (cursor.moveToNext()) {
-                final SearchResult result = new SearchResult();
-                result.bookIndex = cursor.getInt(bookIndexColumnIndex);
-                result.chapterIndex = cursor.getInt(chapterIndexColumnIndex);
-                result.verseIndex = cursor.getInt(verseIndexColumnIndex);
-                m_searchActivity.m_results[i] = result;
-
-                String text = m_searchActivity.m_translationReader.bookNames()[result.bookIndex];
-                text += " ";
-                text += Integer.toString(result.chapterIndex + 1);
-                text += ":";
-                text += Integer.toString(result.verseIndex + 1);
-                text += "\n";
-                text += cursor.getString(textColumnIndex);
-                m_texts[i++] = text;
+                        String text = SearchActivity.this.m_translationReader.bookNames()[result.bookIndex];
+                        text += " ";
+                        text += Integer.toString(result.chapterIndex + 1);
+                        text += ":";
+                        text += Integer.toString(result.verseIndex + 1);
+                        text += "\n";
+                        text += cursor.getString(textColumnIndex);
+                        m_texts[i++] = text;
+                    }
+                }
             }
             db.close();
             return null;
@@ -201,32 +199,31 @@ public class SearchActivity extends Activity
         {
             // running in the main thread
 
-            m_searchActivity.m_searchResultListAdapter.setTexts(m_texts);
+            SearchActivity.this.m_searchResultListAdapter.setTexts(m_texts);
             m_progressDialog.dismiss();
 
             final CharSequence text = (m_texts == null ? "0" : Integer.toString(m_texts.length))
-                    + m_searchActivity.getResources().getText(R.string.text_search_result);
-            Toast.makeText(m_searchActivity, text, Toast.LENGTH_SHORT).show();
+                    + SearchActivity.this.getResources().getText(R.string.text_search_result);
+            Toast.makeText(SearchActivity.this, text, Toast.LENGTH_SHORT).show();
+
+            SearchActivity.this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
         }
 
         private ProgressDialog m_progressDialog;
-        private SearchActivity m_searchActivity;
         private String[] m_texts;
     }
 
-    private static class SearchResultListAdapter extends ListBaseAdapter
+    private class SearchResultListAdapter extends ListBaseAdapter
     {
-        public SearchResultListAdapter(SearchActivity activity)
+        public SearchResultListAdapter(Context context)
         {
-            super(activity);
-            m_searchActivity = activity;
+            super(context);
         }
 
         public void setTexts(String[] texts)
         {
             m_texts = texts;
             notifyDataSetChanged();
-            m_searchActivity.m_searchResultListView.setSelection(0);
         }
 
         public View getView(int position, View convertView, ViewGroup parent)
@@ -234,7 +231,6 @@ public class SearchActivity extends Activity
             TextView textView;
             if (convertView == null) {
                 textView = new TextView(m_context);
-                // textView.setBackgroundResource(R.drawable.list_item_background);
                 textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 17);
                 textView.setTextColor(Color.BLACK);
                 textView.setTypeface(null, Typeface.NORMAL);
@@ -245,8 +241,6 @@ public class SearchActivity extends Activity
             textView.setText(m_texts[position]);
             return textView;
         }
-
-        private SearchActivity m_searchActivity;
     }
 
     private EditText m_searchText;
@@ -254,7 +248,7 @@ public class SearchActivity extends Activity
     private SearchResult[] m_results;
     private SearchResultListAdapter m_searchResultListAdapter;
     private String m_selectedTranslationShortName;
-    private TextView m_titleBarTextView;
+    private TextView m_selectedTranslationTextView;
     private TranslationsDatabaseHelper m_translationsDatabaseHelper;
     private TranslationManager m_translationManager;
     private TranslationReader m_translationReader;
