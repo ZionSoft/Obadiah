@@ -84,13 +84,6 @@ public class TranslationReader
             return null;
         }
 
-        final int count = cursor.getCount();
-        if (count != BOOK_COUNT) {
-            // TODO handles the error that the book names table is corrupted
-            db.close();
-            return null;
-        }
-
         final int bookNameColumnIndex = cursor.getColumnIndex(TranslationsDatabaseHelper.COLUMN_BOOK_NAME);
         int i = 0;
         while (cursor.moveToNext())
