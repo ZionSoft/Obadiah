@@ -21,6 +21,7 @@ public class TranslationManager
     public TranslationManager(Context context)
     {
         super();
+        m_context = context;
         m_translationsDatabaseHelper = new TranslationsDatabaseHelper(context);
     }
 
@@ -179,7 +180,7 @@ public class TranslationManager
     // translations before version 1.5.0 uses the old format
     public void convertFromOldFormat()
     {
-        final BibleReader oldReader = BibleReader.getInstance();
+        final BibleReader oldReader = new BibleReader(m_context.getFilesDir());
         final TranslationInfo[] installedTranslations = oldReader.installedTranslations();
         if (installedTranslations == null || installedTranslations.length == 0)
             return;
@@ -208,7 +209,8 @@ public class TranslationManager
                 oldReader.selectTranslation(translationInfo.path);
                 for (int bookIndex = 0; bookIndex < 66; ++bookIndex) {
                     // writes verses
-                    for (int chapterIndex = 0; chapterIndex < oldReader.chapterCount(bookIndex); ++chapterIndex) {
+                    final int chapterCount = TranslationReader.chapterCount(bookIndex);
+                    for (int chapterIndex = 0; chapterIndex < chapterCount; ++chapterIndex) {
                         String[] texts = oldReader.verses(bookIndex, chapterIndex);
                         int verseIndex = 0;
                         for (String text : texts) {
@@ -338,5 +340,6 @@ public class TranslationManager
 
     private static final int BUFFER_LENGTH = 2048;
 
+    private Context m_context;
     private TranslationsDatabaseHelper m_translationsDatabaseHelper;
 }

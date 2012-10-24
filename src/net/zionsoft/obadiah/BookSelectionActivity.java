@@ -1,7 +1,5 @@
 package net.zionsoft.obadiah;
 
-import java.io.File;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -300,10 +298,8 @@ public class BookSelectionActivity extends Activity
         protected Void doInBackground(Void... params)
         {
             // running in the worker thread
-            final File root = m_bookSelectionActivity.getFilesDir();
-            BibleReader.getInstance().setRootDir(root);
             m_translationManager.convertFromOldFormat();
-            Utils.removeDirectory(root);
+            Utils.removeDirectory(m_bookSelectionActivity.getFilesDir());
             return null;
         }
 
