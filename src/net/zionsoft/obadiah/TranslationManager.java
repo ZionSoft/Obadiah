@@ -184,37 +184,35 @@ public class TranslationManager
                 TranslationsDatabaseHelper.COLUMN_DOWNLOAD_SIZE, TranslationsDatabaseHelper.COLUMN_INSTALLED };
         final Cursor cursor = db.query(TranslationsDatabaseHelper.TABLE_TRANSLATIONS, columns, null, null, null, null,
                 null);
-        if (cursor == null) {
-            db.close();
-            return null;
-        }
-        final int count = cursor.getCount();
-        if (count == 0) {
-            db.close();
-            return null;
-        }
-
-        final int languageColumnIndex = cursor.getColumnIndex(TranslationsDatabaseHelper.COLUMN_LANGUAGE);
-        final int translationNameColumnIndex = cursor
-                .getColumnIndex(TranslationsDatabaseHelper.COLUMN_TRANSLATION_NAME);
-        final int translationShortNameColumnIndex = cursor
-                .getColumnIndex(TranslationsDatabaseHelper.COLUMN_TRANSLATION_SHORTNAME);
-        final int downloadSizeColumnIndex = cursor.getColumnIndex(TranslationsDatabaseHelper.COLUMN_DOWNLOAD_SIZE);
-        final int installedColumnIndex = cursor.getColumnIndex(TranslationsDatabaseHelper.COLUMN_INSTALLED);
-        final TranslationInfo[] translations = new TranslationInfo[count];
-        int i = 0;
-        while (cursor.moveToNext()) {
-            final TranslationInfo translationinfo = new TranslationInfo();
-            translationinfo.installed = (cursor.getInt(installedColumnIndex) == 1) ? true : false;
-            translationinfo.size = cursor.getInt(downloadSizeColumnIndex);
-            translationinfo.shortName = cursor.getString(translationShortNameColumnIndex);
-            translationinfo.name = cursor.getString(translationNameColumnIndex);
-            translationinfo.language = cursor.getString(languageColumnIndex);
-            translationinfo.path = translationinfo.shortName;
-            translations[i++] = translationinfo;
+        if (cursor != null) {
+            final int count = cursor.getCount();
+            if (count > 0) {
+                final int languageColumnIndex = cursor.getColumnIndex(TranslationsDatabaseHelper.COLUMN_LANGUAGE);
+                final int translationNameColumnIndex = cursor
+                        .getColumnIndex(TranslationsDatabaseHelper.COLUMN_TRANSLATION_NAME);
+                final int translationShortNameColumnIndex = cursor
+                        .getColumnIndex(TranslationsDatabaseHelper.COLUMN_TRANSLATION_SHORTNAME);
+                final int downloadSizeColumnIndex = cursor
+                        .getColumnIndex(TranslationsDatabaseHelper.COLUMN_DOWNLOAD_SIZE);
+                final int installedColumnIndex = cursor.getColumnIndex(TranslationsDatabaseHelper.COLUMN_INSTALLED);
+                final TranslationInfo[] translations = new TranslationInfo[count];
+                int i = 0;
+                while (cursor.moveToNext()) {
+                    final TranslationInfo translationinfo = new TranslationInfo();
+                    translationinfo.installed = (cursor.getInt(installedColumnIndex) == 1) ? true : false;
+                    translationinfo.size = cursor.getInt(downloadSizeColumnIndex);
+                    translationinfo.shortName = cursor.getString(translationShortNameColumnIndex);
+                    translationinfo.name = cursor.getString(translationNameColumnIndex);
+                    translationinfo.language = cursor.getString(languageColumnIndex);
+                    translationinfo.path = translationinfo.shortName;
+                    translations[i++] = translationinfo;
+                }
+                db.close();
+                return translations;
+            }
         }
         db.close();
-        return translations;
+        return null;
     }
 
     private static final int BUFFER_LENGTH = 2048;
