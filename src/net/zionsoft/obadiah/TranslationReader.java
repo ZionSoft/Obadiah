@@ -11,7 +11,7 @@ public class TranslationReader
         super();
         m_translationsDatabaseHelper = new TranslationsDatabaseHelper(context);
         m_selectedTranslationChanged = true;
-        m_bookNames = new String[66];
+        m_bookNames = new String[BOOK_COUNT];
     }
 
     public void selectTranslation(String translationShortName)
@@ -19,42 +19,6 @@ public class TranslationReader
         final SQLiteDatabase db = m_translationsDatabaseHelper.getReadableDatabase();
         Cursor cursor = null;
         if (translationShortName != null) {
-            // versions before 1.5.0 uses path instead of translation short name as the key
-            if (translationShortName.equals("danske-bibel1871"))
-                translationShortName = "DA1871";
-            else if (translationShortName.equals("authorized-king-james"))
-                translationShortName = "KJV";
-            else if (translationShortName.equals("american-king-james"))
-                translationShortName = "AKJV";
-            else if (translationShortName.equals("basic-english"))
-                translationShortName = "BBE";
-            else if (translationShortName.equals("esv"))
-                translationShortName = "ESV";
-            else if (translationShortName.equals("raamattu1938"))
-                translationShortName = "PR1938";
-            else if (translationShortName.equals("fre-segond"))
-                translationShortName = "FreSegond";
-            else if (translationShortName.equals("darby-elb1905"))
-                translationShortName = "Elb1905";
-            else if (translationShortName.equals("luther-biblia"))
-                translationShortName = "Lut1545";
-            else if (translationShortName.equals("italian-diodati-bibbia"))
-                translationShortName = "Dio";
-            else if (translationShortName.equals("korean-revised"))
-                translationShortName = "개역성경";
-            else if (translationShortName.equals("biblia-almeida-recebida"))
-                translationShortName = "PorAR";
-            else if (translationShortName.equals("reina-valera1569"))
-                translationShortName = "RV1569";
-            else if (translationShortName.equals("chinese-union-traditional"))
-                translationShortName = "華語和合本";
-            else if (translationShortName.equals("chinese-union-simplified"))
-                translationShortName = "中文和合本";
-            else if (translationShortName.equals("chinese-new-version-traditional"))
-                translationShortName = "華語新譯本";
-            else if (translationShortName.equals("chinese-new-version-simplified"))
-                translationShortName = "中文新译本";
-
             cursor = db.query(TranslationsDatabaseHelper.TABLE_TRANSLATIONS,
                     new String[] { TranslationsDatabaseHelper.COLUMN_TRANSLATION_SHORTNAME },
                     TranslationsDatabaseHelper.COLUMN_TRANSLATION_SHORTNAME + " = ? AND "
