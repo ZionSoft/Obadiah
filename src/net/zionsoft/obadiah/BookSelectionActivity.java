@@ -10,7 +10,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.ActivityInfo;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -272,8 +271,6 @@ public class BookSelectionActivity extends Activity
         {
             // running in the main thread
 
-            BookSelectionActivity.this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
-
             m_progressDialog = new ProgressDialog(BookSelectionActivity.this);
             m_progressDialog.setCancelable(false);
             m_progressDialog.setMessage(BookSelectionActivity.this.getText(R.string.text_initializing));
@@ -359,8 +356,6 @@ public class BookSelectionActivity extends Activity
             BookSelectionActivity.this.populateUi();
             m_progressDialog.dismiss();
             BookSelectionActivity.this.m_converting = false;
-
-            BookSelectionActivity.this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
         }
 
         private void convertTranslations()

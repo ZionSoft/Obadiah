@@ -5,7 +5,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.ActivityInfo;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
@@ -133,8 +132,6 @@ public class SearchActivity extends Activity
         {
             // running in the main thread
 
-            SearchActivity.this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
-
             SearchActivity.this.m_searchResultListAdapter.setTexts(null);
 
             InputMethodManager inputManager = (InputMethodManager) SearchActivity.this
@@ -205,8 +202,6 @@ public class SearchActivity extends Activity
             final CharSequence text = (m_texts == null ? "0" : Integer.toString(m_texts.length))
                     + SearchActivity.this.getResources().getText(R.string.text_search_result);
             Toast.makeText(SearchActivity.this, text, Toast.LENGTH_SHORT).show();
-
-            SearchActivity.this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
         }
 
         private ProgressDialog m_progressDialog;

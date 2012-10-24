@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.ActivityInfo;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -115,8 +114,6 @@ public class TranslationSelectionActivity extends Activity
                 {
                     // running in the main thread
 
-                    TranslationSelectionActivity.this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
-
                     m_progressDialog = new ProgressDialog(TranslationSelectionActivity.this);
                     m_progressDialog.setCancelable(false);
                     m_progressDialog.setMessage(getText(R.string.text_deleting));
@@ -138,7 +135,6 @@ public class TranslationSelectionActivity extends Activity
                     TranslationSelectionActivity.this.populateUi();
                     m_progressDialog.cancel();
                     Toast.makeText(TranslationSelectionActivity.this, R.string.text_deleted, Toast.LENGTH_SHORT).show();
-                    TranslationSelectionActivity.this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
                 }
 
                 private ProgressDialog m_progressDialog;

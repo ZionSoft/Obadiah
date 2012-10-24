@@ -11,7 +11,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
-import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -40,7 +39,7 @@ public class TranslationDownloadActivity extends Activity
         titleBarTextView.setText(R.string.title_download_translation);
 
         // initializes list view showing available translations
-        final ListView translationListView = (ListView) findViewById(R.id.listView);
+        final ListView translationListView = (ListView) findViewById(R.id.translationListView);
         m_translationListAdapter = new TranslationListAdapter(this);
         translationListView.setAdapter(m_translationListAdapter);
         translationListView.setOnItemClickListener(new OnItemClickListener()
@@ -70,8 +69,6 @@ public class TranslationDownloadActivity extends Activity
         protected void onPreExecute()
         {
             // running in the main thread
-
-            TranslationDownloadActivity.this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
 
             m_progressDialog = new ProgressDialog(TranslationDownloadActivity.this);
             m_progressDialog.setCancelable(false);
@@ -157,7 +154,6 @@ public class TranslationDownloadActivity extends Activity
             // running in the main thread
 
             m_progressDialog.dismiss();
-            TranslationDownloadActivity.this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
 
             if (m_hasError || TranslationDownloadActivity.this.m_availableTranslations == null
                     || TranslationDownloadActivity.this.m_availableTranslations.length == 0) {
@@ -194,8 +190,6 @@ public class TranslationDownloadActivity extends Activity
         protected void onPreExecute()
         {
             // running in the main thread
-
-            TranslationDownloadActivity.this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
 
             m_progressDialog = new ProgressDialog(TranslationDownloadActivity.this);
             m_progressDialog.setCancelable(true);
@@ -235,7 +229,6 @@ public class TranslationDownloadActivity extends Activity
             // running in the main thread
 
             m_progressDialog.dismiss();
-            TranslationDownloadActivity.this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
         }
 
         protected void onPostExecute(Void result)
@@ -243,7 +236,6 @@ public class TranslationDownloadActivity extends Activity
             // running in the main thread
 
             m_progressDialog.dismiss();
-            TranslationDownloadActivity.this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
 
             if (m_hasError) {
                 Toast.makeText(TranslationDownloadActivity.this, R.string.text_fail_to_fetch_translation,
