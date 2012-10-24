@@ -94,19 +94,23 @@ public class SearchActivity extends Activity
     {
         super.onResume();
 
-        m_selectedTranslationShortName = getSharedPreferences("settings", MODE_PRIVATE).getString("currentTranslation",
-                null);
-        m_translationReader.selectTranslation(m_selectedTranslationShortName);
+        final String selectedTranslationShortName = getSharedPreferences("settings", MODE_PRIVATE).getString(
+                "currentTranslation", null);
+        if (selectedTranslationShortName == null
+                || !selectedTranslationShortName.equals(m_selectedTranslationShortName)) {
+            m_selectedTranslationShortName = selectedTranslationShortName;
+            m_translationReader.selectTranslation(m_selectedTranslationShortName);
 
-        final TranslationInfo[] translations = m_translationManager.translations();
-        for (TranslationInfo translationInfo : translations) {
-            if (translationInfo.installed && translationInfo.shortName.equals(m_selectedTranslationShortName)) {
-                m_selectedTranslationTextView.setText(translationInfo.name);
-                break;
+            final TranslationInfo[] translations = m_translationManager.translations();
+            for (TranslationInfo translationInfo : translations) {
+                if (translationInfo.installed && translationInfo.shortName.equals(m_selectedTranslationShortName)) {
+                    m_selectedTranslationTextView.setText(translationInfo.name);
+                    break;
+                }
             }
-        }
 
-        search(null);
+            search(null);
+        }
     }
 
     public void search(View view)
