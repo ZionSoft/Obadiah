@@ -8,7 +8,6 @@ public abstract class ListBaseAdapter extends BaseAdapter
     public ListBaseAdapter(Context context)
     {
         super();
-
         m_context = context;
     }
 

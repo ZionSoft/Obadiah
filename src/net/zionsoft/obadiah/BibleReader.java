@@ -68,9 +68,9 @@ public class BibleReader
                 }
 
                 final JSONArray booksArray = booksInfoObject.getJSONArray("books");
-                translations[i].bookName = new String[BOOK_COUNT];
+                translations[i].bookNames = new String[BOOK_COUNT];
                 for (int j = 0; j < BOOK_COUNT; ++j)
-                    translations[i].bookName[j] = booksArray.getString(j);
+                    translations[i].bookNames[j] = booksArray.getString(j);
 
                 ++count;
             }

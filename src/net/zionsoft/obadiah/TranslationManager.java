@@ -225,7 +225,7 @@ public class TranslationManager
                     // writes book name
                     bookNamesValues.put(TranslationsDatabaseHelper.COLUMN_BOOK_INDEX, bookIndex);
                     bookNamesValues.put(TranslationsDatabaseHelper.COLUMN_BOOK_NAME,
-                            translationInfo.bookName[bookIndex]);
+                            translationInfo.bookNames[bookIndex]);
                     db.insert(TranslationsDatabaseHelper.TABLE_BOOK_NAMES, null, bookNamesValues);
                 }
 
