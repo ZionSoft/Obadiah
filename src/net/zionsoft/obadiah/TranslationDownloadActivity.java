@@ -8,8 +8,10 @@ import org.json.JSONObject;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -38,20 +40,20 @@ public class TranslationDownloadActivity extends Activity
         titleBarTextView.setText(R.string.title_download_translation);
 
         // initializes list view showing available translations
-        final ListView listView = (ListView) findViewById(R.id.listView);
-        m_translationListAdapter = new TranslationDownloadListAdapter(this);
-        listView.setAdapter(m_translationListAdapter);
-        listView.setOnItemClickListener(new OnItemClickListener()
+        final ListView translationListView = (ListView) findViewById(R.id.listView);
+        m_translationListAdapter = new TranslationListAdapter(this);
+        translationListView.setAdapter(m_translationListAdapter);
+        translationListView.setOnItemClickListener(new OnItemClickListener()
         {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id)
             {
-                m_translationDownloadAsyncTask = new TranslationDownloadAsyncTask(TranslationDownloadActivity.this);
-                m_translationDownloadAsyncTask.execute(position);
+                TranslationDownloadActivity.this.m_translationDownloadAsyncTask = new TranslationDownloadAsyncTask();
+                TranslationDownloadActivity.this.m_translationDownloadAsyncTask.execute(position);
             }
         });
 
         // gets translation list
-        new TranslationListDownloadAsyncTask(this).execute();
+        new TranslationListDownloadAsyncTask().execute();
     }
 
     public void onPause()
@@ -63,29 +65,27 @@ public class TranslationDownloadActivity extends Activity
             m_translationDownloadAsyncTask.cancel(true);
     }
 
-    private static class TranslationListDownloadAsyncTask extends AsyncTask<Void, Void, Void>
+    private class TranslationListDownloadAsyncTask extends AsyncTask<Void, Void, Void>
     {
-        public TranslationListDownloadAsyncTask(TranslationDownloadActivity activity)
-        {
-            super();
-            m_translationDownloadActivity = activity;
-        }
-
         protected void onPreExecute()
         {
             // running in the main thread
-            m_progressDialog = new ProgressDialog(m_translationDownloadActivity);
+
+            TranslationDownloadActivity.this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
+
+            m_progressDialog = new ProgressDialog(TranslationDownloadActivity.this);
             m_progressDialog.setCancelable(false);
-            m_progressDialog.setMessage(m_translationDownloadActivity.getText(R.string.text_downloading));
+            m_progressDialog.setMessage(TranslationDownloadActivity.this.getText(R.string.text_downloading));
             m_progressDialog.show();
         }
 
         protected Void doInBackground(Void... params)
         {
             // running in the worker thread
+
             try {
-                final long lastUpdated = m_translationDownloadActivity.getSharedPreferences("settings", MODE_PRIVATE)
-                        .getLong("lastUpdated", 0);
+                final long lastUpdated = TranslationDownloadActivity.this
+                        .getSharedPreferences("settings", MODE_PRIVATE).getLong("lastUpdated", 0);
                 final long now = System.currentTimeMillis();
                 if (lastUpdated <= 0 || lastUpdated >= now || ((now - lastUpdated) >= 86400000)) {
                     // no valid local cache, i.e. not fetched before, or last fetched more than 1 day ago
@@ -111,11 +111,11 @@ public class TranslationDownloadActivity extends Activity
                         translationInfo.size = translationObject.getInt("size");
                         allTranslations[i] = translationInfo;
                     }
-                    m_translationDownloadActivity.m_translationManager.addTranslations(allTranslations);
+                    TranslationDownloadActivity.this.m_translationManager.addTranslations(allTranslations);
                 }
 
                 // sets the available translations
-                final TranslationInfo[] allTranslations = m_translationDownloadActivity.m_translationManager
+                final TranslationInfo[] allTranslations = TranslationDownloadActivity.this.m_translationManager
                         .translations();
                 int availableTranslationsCount = 0;
                 for (int i = 0; i < allTranslations.length; ++i) {
@@ -123,9 +123,9 @@ public class TranslationDownloadActivity extends Activity
                         ++availableTranslationsCount;
                 }
                 if (availableTranslationsCount == 0) {
-                    m_translationDownloadActivity.m_availableTranslations = null;
+                    TranslationDownloadActivity.this.m_availableTranslations = null;
                 } else if (availableTranslationsCount == allTranslations.length) {
-                    m_translationDownloadActivity.m_availableTranslations = allTranslations;
+                    TranslationDownloadActivity.this.m_availableTranslations = allTranslations;
                 } else {
                     final TranslationInfo[] availableTranslations = new TranslationInfo[availableTranslationsCount];
                     int index = 0;
@@ -133,20 +133,20 @@ public class TranslationDownloadActivity extends Activity
                         if (!allTranslations[i].installed)
                             availableTranslations[index++] = allTranslations[i];
                     }
-                    m_translationDownloadActivity.m_availableTranslations = availableTranslations;
+                    TranslationDownloadActivity.this.m_availableTranslations = availableTranslations;
                 }
             } catch (Exception e) {
                 e.printStackTrace();
 
                 m_hasError = true;
-                m_translationDownloadActivity.m_availableTranslations = null;
+                TranslationDownloadActivity.this.m_availableTranslations = null;
             } finally {
-                final SharedPreferences.Editor editor = m_translationDownloadActivity.getSharedPreferences("settings",
-                        MODE_PRIVATE).edit();
-                editor.putLong(
-                        "lastUpdated",
-                        m_hasError || m_translationDownloadActivity.m_availableTranslations == null ? 0 : System
-                                .currentTimeMillis());
+                final SharedPreferences.Editor editor = TranslationDownloadActivity.this.getSharedPreferences(
+                        "settings", MODE_PRIVATE).edit();
+                if (m_hasError || TranslationDownloadActivity.this.m_availableTranslations == null)
+                    editor.putLong("lastUpdated", 0);
+                else
+                    editor.putLong("lastUpdated", System.currentTimeMillis());
                 editor.commit();
             }
             return null;
@@ -155,40 +155,37 @@ public class TranslationDownloadActivity extends Activity
         protected void onPostExecute(Void result)
         {
             // running in the main thread
-            if (m_hasError || m_translationDownloadActivity.m_availableTranslations == null
-                    || m_translationDownloadActivity.m_availableTranslations.length == 0) {
-                m_progressDialog.dismiss();
+
+            m_progressDialog.dismiss();
+            TranslationDownloadActivity.this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
+
+            if (m_hasError || TranslationDownloadActivity.this.m_availableTranslations == null
+                    || TranslationDownloadActivity.this.m_availableTranslations.length == 0) {
+                // either error occurs, or no available translations
                 Toast.makeText(
-                        m_translationDownloadActivity,
+                        TranslationDownloadActivity.this,
                         m_hasError ? R.string.text_fail_to_fetch_translations_list
                                 : R.string.text_no_available_translation, Toast.LENGTH_SHORT).show();
-                m_translationDownloadActivity.finish();
+                TranslationDownloadActivity.this.finish();
             } else {
-                final int length = m_translationDownloadActivity.m_availableTranslations.length;
+                // everything fine with available translations
+                final int length = TranslationDownloadActivity.this.m_availableTranslations.length;
                 final String[] texts = new String[length];
                 final int[] sizes = new int[length];
                 for (int i = 0; i < length; ++i) {
-                    texts[i] = m_translationDownloadActivity.m_availableTranslations[i].name;
-                    sizes[i] = m_translationDownloadActivity.m_availableTranslations[i].size;
+                    texts[i] = TranslationDownloadActivity.this.m_availableTranslations[i].name;
+                    sizes[i] = TranslationDownloadActivity.this.m_availableTranslations[i].size;
                 }
-                m_translationDownloadActivity.m_translationListAdapter.setTexts(texts, sizes);
-                m_progressDialog.dismiss();
+                TranslationDownloadActivity.this.m_translationListAdapter.setTexts(texts, sizes);
             }
         }
 
         private boolean m_hasError;
         private ProgressDialog m_progressDialog;
-        private TranslationDownloadActivity m_translationDownloadActivity;
     }
 
-    protected static class TranslationDownloadAsyncTask extends AsyncTask<Integer, Integer, Void>
+    protected class TranslationDownloadAsyncTask extends AsyncTask<Integer, Integer, Void>
     {
-        public TranslationDownloadAsyncTask(TranslationDownloadActivity activity)
-        {
-            super();
-            m_translationDownloadActivity = activity;
-        }
-
         public void updateProgress(int progress)
         {
             publishProgress(progress);
@@ -197,7 +194,10 @@ public class TranslationDownloadActivity extends Activity
         protected void onPreExecute()
         {
             // running in the main thread
-            m_progressDialog = new ProgressDialog(m_translationDownloadActivity);
+
+            TranslationDownloadActivity.this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
+
+            m_progressDialog = new ProgressDialog(TranslationDownloadActivity.this);
             m_progressDialog.setCancelable(true);
             m_progressDialog.setCanceledOnTouchOutside(false);
             m_progressDialog.setOnCancelListener(new DialogInterface.OnCancelListener()
@@ -207,7 +207,7 @@ public class TranslationDownloadActivity extends Activity
                     TranslationDownloadAsyncTask.this.cancel(true);
                 }
             });
-            m_progressDialog.setMessage(m_translationDownloadActivity.getText(R.string.text_downloading));
+            m_progressDialog.setMessage(TranslationDownloadActivity.this.getText(R.string.text_downloading));
             m_progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
             m_progressDialog.setMax(100);
             m_progressDialog.setProgress(0);
@@ -217,8 +217,8 @@ public class TranslationDownloadActivity extends Activity
         protected Void doInBackground(Integer... positions)
         {
             // running in the worker thread
-            final TranslationInfo translationToDownload = m_translationDownloadActivity.m_availableTranslations[positions[0]];
-            m_hasError = !m_translationDownloadActivity.m_translationManager.installTranslation(this,
+            final TranslationInfo translationToDownload = TranslationDownloadActivity.this.m_availableTranslations[positions[0]];
+            m_hasError = !TranslationDownloadActivity.this.m_translationManager.installTranslation(this,
                     translationToDownload);
             return null;
         }
@@ -226,46 +226,49 @@ public class TranslationDownloadActivity extends Activity
         protected void onProgressUpdate(Integer... progress)
         {
             // running in the main thread
+
             m_progressDialog.setProgress(progress[0]);
         }
 
         protected void onCancelled()
         {
             // running in the main thread
+
             m_progressDialog.dismiss();
+            TranslationDownloadActivity.this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
         }
 
         protected void onPostExecute(Void result)
         {
             // running in the main thread
+
+            m_progressDialog.dismiss();
+            TranslationDownloadActivity.this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
+
             if (m_hasError) {
-                m_progressDialog.dismiss();
-                Toast.makeText(m_translationDownloadActivity, R.string.text_fail_to_fetch_translation,
+                Toast.makeText(TranslationDownloadActivity.this, R.string.text_fail_to_fetch_translation,
                         Toast.LENGTH_SHORT).show();
             } else {
-                m_progressDialog.dismiss();
-                m_translationDownloadActivity.finish();
+                TranslationDownloadActivity.this.finish();
             }
         }
 
         private boolean m_hasError;
         private ProgressDialog m_progressDialog;
-        private TranslationDownloadActivity m_translationDownloadActivity;
     }
 
-    private static class TranslationDownloadListAdapter extends ListBaseAdapter
+    private class TranslationListAdapter extends ListBaseAdapter
     {
-        public TranslationDownloadListAdapter(TranslationDownloadActivity activity)
+        public TranslationListAdapter(Context context)
         {
-            super(activity);
-            m_translationDownloadActivity = activity;
+            super(context);
         }
 
         public void setTexts(String[] texts, int[] sizes)
         {
             m_texts = texts;
 
-            final String size = m_translationDownloadActivity.getResources().getText(R.string.text_size).toString();
+            final String size = m_context.getResources().getText(R.string.text_size).toString();
             final int length = sizes.length;
             m_subTexts = new String[length];
             for (int i = 0; i < length; ++i)
@@ -278,11 +281,11 @@ public class TranslationDownloadActivity extends Activity
         {
             LinearLayout linearLayout;
             if (convertView == null) {
-                linearLayout = new LinearLayout(m_translationDownloadActivity);
+                linearLayout = new LinearLayout(m_context);
                 linearLayout.setOrientation(LinearLayout.VERTICAL);
 
                 // first line
-                TextView textView = new TextView(m_translationDownloadActivity);
+                TextView textView = new TextView(m_context);
                 textView.setGravity(Gravity.CENTER_VERTICAL);
                 textView.setTextColor(Color.BLACK);
                 textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 17);
@@ -290,7 +293,7 @@ public class TranslationDownloadActivity extends Activity
                 linearLayout.addView(textView);
 
                 // second line
-                textView = new TextView(m_translationDownloadActivity);
+                textView = new TextView(m_context);
                 textView.setGravity(Gravity.CENTER_VERTICAL);
                 textView.setTextColor(Color.GRAY);
                 textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
@@ -311,14 +314,13 @@ public class TranslationDownloadActivity extends Activity
             return linearLayout;
         }
 
-        private TranslationDownloadActivity m_translationDownloadActivity;
         private String[] m_subTexts;
     }
 
     protected static final String BASE_URL = "http://bible.zionsoft.net/translations/";
 
-    private TranslationDownloadListAdapter m_translationListAdapter;
     private TranslationDownloadAsyncTask m_translationDownloadAsyncTask;
+    private TranslationListAdapter m_translationListAdapter;
     private TranslationManager m_translationManager;
     private TranslationInfo[] m_availableTranslations;
 }
