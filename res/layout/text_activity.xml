@@ -24,7 +24,7 @@
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
             android:background="@drawable/button_background"
-            android:onClick="search"
+            android:onClick="onToolbarButtonClicked"
             android:padding="8dip"
             android:src="@drawable/btn_search" />
 
@@ -35,7 +35,7 @@
             android:layout_centerVertical="true"
             android:layout_toRightOf="@id/searchButton"
             android:background="@drawable/button_background"
-            android:onClick="share"
+            android:onClick="onToolbarButtonClicked"
             android:padding="8dip"
             android:src="@drawable/share_button" />
 
@@ -46,36 +46,36 @@
             android:layout_centerVertical="true"
             android:layout_toRightOf="@id/shareButton"
             android:background="@drawable/button_background"
-            android:onClick="copy"
+            android:onClick="onToolbarButtonClicked"
             android:padding="8dip"
             android:src="@drawable/copy_button" />
 
         <ImageButton
-            android:id="@+id/nextButton"
+            android:id="@+id/nextChapterButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:background="@drawable/button_background"
-            android:onClick="changeChapter"
+            android:onClick="onToolbarButtonClicked"
             android:padding="8dip"
             android:src="@drawable/next_button" />
 
         <ImageButton
-            android:id="@+id/prevButton"
+            android:id="@+id/previousChapterButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_toLeftOf="@id/nextButton"
+            android:layout_toLeftOf="@id/nextChapterButton"
             android:background="@drawable/button_background"
-            android:onClick="changeChapter"
+            android:onClick="onToolbarButtonClicked"
             android:padding="8dip"
             android:src="@drawable/prev_button" />
     </RelativeLayout>
 
     <ListView
         xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/listView"
+        android:id="@+id/verseListView"
         android:layout_width="fill_parent"
         android:layout_height="0dip"
         android:layout_above="@id/toolBar"

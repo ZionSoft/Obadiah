@@ -30,45 +30,46 @@ public class TextActivity extends Activity
 
         m_translationReader = new TranslationReader(this);
 
+        // initializes the title bar
+        m_selectedTranslationTextView = (TextView) findViewById(R.id.textTranslationSelection);
+        m_selectedTranslationTextView.setOnClickListener(new OnClickListener()
+        {
+            public void onClick(View v)
+            {
+                startActivity(new Intent(TextActivity.this, TranslationSelectionActivity.class));
+            }
+        });
+        m_selectedBookTextView = (TextView) findViewById(R.id.textBookName);
+
         // initializes the tool bar buttons
+        m_searchButton = (ImageButton) findViewById(R.id.searchButton);
+
         m_shareButton = (ImageButton) findViewById(R.id.shareButton);
         m_shareButton.setEnabled(false);
 
         m_copyButton = (ImageButton) findViewById(R.id.copyButton);
         m_copyButton.setEnabled(false);
 
-        m_prevButton = (ImageButton) findViewById(R.id.prevButton);
-        m_nextButton = (ImageButton) findViewById(R.id.nextButton);
-        updateButtonState();
+        m_previousChapterButton = (ImageButton) findViewById(R.id.previousChapterButton);
+        m_nextChapterButton = (ImageButton) findViewById(R.id.nextChapterButton);
+        updateChangeChapterButtonState();
 
         // initializes verses list view
-        m_listView = (ListView) findViewById(R.id.listView);
-
-        m_listAdapter = new TextListAdapter(this);
-        m_listView.setAdapter(m_listAdapter);
-
-        m_listView.setOnItemClickListener(new OnItemClickListener()
+        m_verseListView = (ListView) findViewById(R.id.verseListView);
+        m_verseListAdapter = new VerseListAdapter(this);
+        m_verseListView.setAdapter(m_verseListAdapter);
+        m_verseListView.setOnItemClickListener(new OnItemClickListener()
         {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id)
             {
-                m_listAdapter.selectItem(position);
-                if (m_listAdapter.hasItemSelected()) {
-                    m_shareButton.setEnabled(true);
-                    m_copyButton.setEnabled(true);
+                TextActivity.this.m_verseListAdapter.selectItem(position);
+                if (TextActivity.this.m_verseListAdapter.hasItemSelected()) {
+                    TextActivity.this.m_shareButton.setEnabled(true);
+                    TextActivity.this.m_copyButton.setEnabled(true);
                 } else {
-                    m_shareButton.setEnabled(false);
-                    m_copyButton.setEnabled(false);
+                    TextActivity.this.m_shareButton.setEnabled(false);
+                    TextActivity.this.m_copyButton.setEnabled(false);
                 }
-            }
-        });
-
-        // initializes the title bar
-        m_titleTranslationTextView = (TextView) findViewById(R.id.textTranslationSelection);
-        m_titleTranslationTextView.setOnClickListener(new OnClickListener()
-        {
-            public void onClick(View v)
-            {
-                startActivity(new Intent(TextActivity.this, TranslationSelectionActivity.class));
             }
         });
     }
@@ -85,7 +86,7 @@ public class TextActivity extends Activity
         populateUi();
 
         // scrolls to last read verse
-        m_listView.setSelection(getSharedPreferences("settings", MODE_PRIVATE).getInt("currentVerse", 0));
+        m_verseListView.setSelection(preferences.getInt("currentVerse", 0));
     }
 
     protected void onPause()
@@ -94,90 +95,74 @@ public class TextActivity extends Activity
 
         final SharedPreferences.Editor editor = getSharedPreferences("settings", MODE_PRIVATE).edit();
         editor.putInt("currentChapter", m_currentChapter);
-        editor.putInt("currentVerse", m_listView.pointToPosition(0, 0));
+        editor.putInt("currentVerse", m_verseListView.pointToPosition(0, 0));
         editor.commit();
     }
 
-    public void changeChapter(View view)
+    public void onToolbarButtonClicked(View view)
     {
-        if (view != m_prevButton && view != m_nextButton)
-            return;
+        if (view == m_shareButton) {
+            if (m_verseListAdapter.hasItemSelected()) {
+                final Intent intent = new Intent();
+                intent.setAction(Intent.ACTION_SEND);
+                intent.setType("text/plain");
+                intent.putExtra(Intent.EXTRA_TEXT, m_verseListAdapter.selectedText());
+                startActivity(Intent.createChooser(intent, getResources().getText(R.string.text_share_with)));
+            }
+        } else if (view == m_copyButton) {
+            if (m_verseListAdapter.hasItemSelected()) {
+                if (m_clipboardManager == null)
+                    m_clipboardManager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                m_clipboardManager.setText(m_verseListAdapter.selectedText());
+                Toast.makeText(this, R.string.text_copied, Toast.LENGTH_SHORT).show();
+            }
+        } else if (view == m_searchButton) {
+            final Intent intent = new Intent(this, SearchActivity.class);
+            intent.putExtra("fromTextActivity", true);
+            startActivity(intent);
+        } else if (view == m_previousChapterButton || view == m_nextChapterButton) {
+            if (view == m_previousChapterButton) {
+                if (m_currentChapter == 0)
+                    return;
+                --m_currentChapter;
+            } else {
+                if (m_currentChapter == TranslationReader.chapterCount(m_currentBook) - 1)
+                    return;
 
-        if (view == m_prevButton) {
-            if (m_currentChapter == 0)
-                return;
-            --m_currentChapter;
-        } else {
-            if (m_currentChapter == TranslationReader.chapterCount(m_currentBook) - 1)
-                return;
+                ++m_currentChapter;
+            }
 
-            ++m_currentChapter;
-        }
-
-        updateButtonState();
-        populateUi();
-        m_listView.setSelectionAfterHeaderView();
-    }
-
-    public void share(View view)
-    {
-        if (m_listAdapter.hasItemSelected()) {
-            final Intent intent = new Intent();
-            intent.setAction(Intent.ACTION_SEND);
-            intent.setType("text/plain");
-            intent.putExtra(Intent.EXTRA_TEXT, m_listAdapter.selectedText());
-            startActivity(Intent.createChooser(intent, getResources().getText(R.string.text_share_with)));
-        }
-    }
-
-    public void copy(View view)
-    {
-        if (m_listAdapter.hasItemSelected()) {
-            if (m_clipboardManager == null)
-                m_clipboardManager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-            m_clipboardManager.setText(m_listAdapter.selectedText());
-            Toast.makeText(this, R.string.text_copied, Toast.LENGTH_SHORT).show();
+            updateChangeChapterButtonState();
+            populateUi();
+            m_verseListView.setSelectionAfterHeaderView();
         }
     }
 
-    public void search(View view)
-    {
-        final Intent intent = new Intent(this, SearchActivity.class);
-        intent.putExtra("fromTextActivity", true);
-        startActivity(intent);
-    }
-
-    private void updateButtonState()
+    private void updateChangeChapterButtonState()
     {
         if (m_currentChapter == 0)
-            m_prevButton.setEnabled(false);
+            m_previousChapterButton.setEnabled(false);
         else
-            m_prevButton.setEnabled(true);
+            m_previousChapterButton.setEnabled(true);
 
         if (m_currentChapter == TranslationReader.chapterCount(m_currentBook) - 1)
-            m_nextButton.setEnabled(false);
+            m_nextChapterButton.setEnabled(false);
         else
-            m_nextButton.setEnabled(true);
+            m_nextChapterButton.setEnabled(true);
     }
 
     private void populateUi()
     {
-        m_titleTranslationTextView.setText(m_translationReader.selectedTranslationShortName());
-
-        if (m_titleBookNameTextView == null)
-            m_titleBookNameTextView = (TextView) findViewById(R.id.textBookName);
-        m_titleBookNameTextView.setText(m_translationReader.bookNames()[m_currentBook] + ", " + (m_currentChapter + 1));
-
-        // TODO handles if the translation is corrupted
-        m_listAdapter.setTexts(m_translationReader.verses(m_currentBook, m_currentChapter));
+        m_selectedTranslationTextView.setText(m_translationReader.selectedTranslationShortName());
+        m_selectedBookTextView.setText(m_translationReader.bookNames()[m_currentBook] + ", " + (m_currentChapter + 1));
+        m_verseListAdapter.setTexts(m_translationReader.verses(m_currentBook, m_currentChapter));
     }
 
-    private static class TextListAdapter extends ListBaseAdapter
+    private class VerseListAdapter extends ListBaseAdapter
     {
-        public TextListAdapter(TextActivity activity)
+        public VerseListAdapter(Context context)
         {
-            super(activity);
-            m_textActivity = activity;
+            super(context);
         }
 
         public void selectItem(int position)
@@ -204,8 +189,9 @@ public class TextActivity extends Activity
             if (!hasItemSelected())
                 return null;
 
-            final String prefix = m_textActivity.m_translationReader.bookNames()[m_textActivity.m_currentBook] + " "
-                    + Integer.toString(m_textActivity.m_currentChapter + 1) + ":";
+            // format: <book name> <chapter index>:<verse index> <verse text>
+            final String prefix = TextActivity.this.m_translationReader.bookNames()[TextActivity.this.m_currentBook]
+                    + " " + Integer.toString(TextActivity.this.m_currentChapter + 1) + ":";
             String selected = null;
             for (int i = 0; i < m_texts.length; ++i) {
                 if (m_selected[i]) {
@@ -273,19 +259,19 @@ public class TextActivity extends Activity
         private boolean m_selected[];
         private int m_selectedCount;
         private BackgroundColorSpan m_backgroundColorSpan;
-        private TextActivity m_textActivity;
     }
 
     private int m_currentBook;
     private int m_currentChapter;
-    private ClipboardManager m_clipboardManager; // Obsoleted by android.content.ClipboardManager since API level 11.
-    private ImageButton m_prevButton;
-    private ImageButton m_nextButton;
+    private ClipboardManager m_clipboardManager; // obsoleted by android.content.ClipboardManager since API level 11
+    private ImageButton m_previousChapterButton;
+    private ImageButton m_nextChapterButton;
     private ImageButton m_shareButton;
     private ImageButton m_copyButton;
-    private ListView m_listView;
-    private TextListAdapter m_listAdapter;
-    private TextView m_titleBookNameTextView;
-    private TextView m_titleTranslationTextView;
+    private ImageButton m_searchButton;
+    private ListView m_verseListView;
+    private TextView m_selectedBookTextView;
+    private TextView m_selectedTranslationTextView;
     private TranslationReader m_translationReader;
+    private VerseListAdapter m_verseListAdapter;
 }
