@@ -32,8 +32,8 @@ public class TranslationSelectionActivity extends Activity
         setContentView(R.layout.translationselection_activity);
 
         m_translationManager = new TranslationManager(this);
-        m_selectedTranslationShortName = getSharedPreferences("settings", MODE_PRIVATE).getString(
-                "selectedTranslation", null);
+        m_selectedTranslationShortName = getSharedPreferences("settings", MODE_PRIVATE).getString("currentTranslation",
+                null);
 
         // initializes title bar
         final TextView titleBarTextView = (TextView) findViewById(R.id.txtTitle);
@@ -54,7 +54,7 @@ public class TranslationSelectionActivity extends Activity
 
                 final SharedPreferences.Editor editor = TranslationSelectionActivity.this.getSharedPreferences(
                         "settings", MODE_PRIVATE).edit();
-                editor.putString("selectedTranslation", m_installedTranslations[position].shortName);
+                editor.putString("currentTranslation", m_installedTranslations[position].shortName);
                 editor.commit();
 
                 finish();

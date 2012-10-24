@@ -34,7 +34,7 @@ public class BookSelectionActivity extends Activity
         setContentView(R.layout.bookselection_activity);
 
         // convert to new format from old format if needed
-        if (getSharedPreferences("settings", MODE_PRIVATE).getInt("currentApplicationVersion", 0) <= CURRENT_APPLICATION_VERSION) {
+        if (getSharedPreferences("settings", MODE_PRIVATE).getInt("currentApplicationVersion", 0) < CURRENT_APPLICATION_VERSION) {
             m_converting = true;
             new UpgradeAsyncTask().execute();
         }
@@ -281,52 +281,72 @@ public class BookSelectionActivity extends Activity
         {
             // running in the worker thread
 
+            convertSettings();
+            convertTranslations();
+
             // sets the application version
             final SharedPreferences preferences = getSharedPreferences("settings", MODE_PRIVATE);
             final SharedPreferences.Editor editor = preferences.edit();
             editor.putInt("currentApplicationVersion", CURRENT_APPLICATION_VERSION);
+            editor.commit();
 
-            // old translations format is used prior to 1.5.0
-            convertTranslations();
+            return null;
+        }
 
+        protected void onPostExecute(Void result)
+        {
+            // running in the main thread
+
+            BookSelectionActivity.this.populateUi();
+            m_progressDialog.dismiss();
+            BookSelectionActivity.this.m_converting = false;
+        }
+
+        private void convertSettings()
+        {
             // old settings format is used prior to 1.5.0
+
+            final SharedPreferences preferences = getSharedPreferences("settings", MODE_PRIVATE);
+            final SharedPreferences.Editor editor = preferences.edit();
             String selectedTranslation = null;
             try {
                 selectedTranslation = preferences.getString("selectedTranslation", null);
-                if (selectedTranslation.equals("danske-bibel1871"))
-                    selectedTranslation = "DA1871";
-                else if (selectedTranslation.equals("authorized-king-james"))
-                    selectedTranslation = "KJV";
-                else if (selectedTranslation.equals("american-king-james"))
-                    selectedTranslation = "AKJV";
-                else if (selectedTranslation.equals("basic-english"))
-                    selectedTranslation = "BBE";
-                else if (selectedTranslation.equals("esv"))
-                    selectedTranslation = "ESV";
-                else if (selectedTranslation.equals("raamattu1938"))
-                    selectedTranslation = "PR1938";
-                else if (selectedTranslation.equals("fre-segond"))
-                    selectedTranslation = "FreSegond";
-                else if (selectedTranslation.equals("darby-elb1905"))
-                    selectedTranslation = "Elb1905";
-                else if (selectedTranslation.equals("luther-biblia"))
-                    selectedTranslation = "Lut1545";
-                else if (selectedTranslation.equals("italian-diodati-bibbia"))
-                    selectedTranslation = "Dio";
-                else if (selectedTranslation.equals("korean-revised"))
-                    selectedTranslation = "개역성경";
-                else if (selectedTranslation.equals("biblia-almeida-recebida"))
-                    selectedTranslation = "PorAR";
-                else if (selectedTranslation.equals("reina-valera1569"))
-                    selectedTranslation = "RV1569";
-                else if (selectedTranslation.equals("chinese-union-traditional"))
-                    selectedTranslation = "華語和合本";
-                else if (selectedTranslation.equals("chinese-union-simplified"))
-                    selectedTranslation = "中文和合本";
-                else if (selectedTranslation.equals("chinese-new-version-traditional"))
-                    selectedTranslation = "華語新譯本";
-                else if (selectedTranslation.equals("chinese-new-version-simplified"))
-                    selectedTranslation = "中文新译本";
+                if (selectedTranslation != null) {
+                    if (selectedTranslation.equals("danske-bibel1871"))
+                        selectedTranslation = "DA1871";
+                    else if (selectedTranslation.equals("authorized-king-james"))
+                        selectedTranslation = "KJV";
+                    else if (selectedTranslation.equals("american-king-james"))
+                        selectedTranslation = "AKJV";
+                    else if (selectedTranslation.equals("basic-english"))
+                        selectedTranslation = "BBE";
+                    else if (selectedTranslation.equals("esv"))
+                        selectedTranslation = "ESV";
+                    else if (selectedTranslation.equals("raamattu1938"))
+                        selectedTranslation = "PR1938";
+                    else if (selectedTranslation.equals("fre-segond"))
+                        selectedTranslation = "FreSegond";
+                    else if (selectedTranslation.equals("darby-elb1905"))
+                        selectedTranslation = "Elb1905";
+                    else if (selectedTranslation.equals("luther-biblia"))
+                        selectedTranslation = "Lut1545";
+                    else if (selectedTranslation.equals("italian-diodati-bibbia"))
+                        selectedTranslation = "Dio";
+                    else if (selectedTranslation.equals("korean-revised"))
+                        selectedTranslation = "개역성경";
+                    else if (selectedTranslation.equals("biblia-almeida-recebida"))
+                        selectedTranslation = "PorAR";
+                    else if (selectedTranslation.equals("reina-valera1569"))
+                        selectedTranslation = "RV1569";
+                    else if (selectedTranslation.equals("chinese-union-traditional"))
+                        selectedTranslation = "華語和合本";
+                    else if (selectedTranslation.equals("chinese-union-simplified"))
+                        selectedTranslation = "中文和合本";
+                    else if (selectedTranslation.equals("chinese-new-version-traditional"))
+                        selectedTranslation = "華語新譯本";
+                    else if (selectedTranslation.equals("chinese-new-version-simplified"))
+                        selectedTranslation = "中文新译本";
+                }
             } catch (ClassCastException e) {
                 // the value is an integer prior to 1.2.0
                 final int selected = preferences.getInt("selectedTranslation", 0);
@@ -345,21 +365,12 @@ public class BookSelectionActivity extends Activity
             editor.remove("selectedTranslation");
 
             editor.commit();
-
-            return null;
-        }
-
-        protected void onPostExecute(Void result)
-        {
-            // running in the main thread
-
-            BookSelectionActivity.this.populateUi();
-            m_progressDialog.dismiss();
-            BookSelectionActivity.this.m_converting = false;
         }
 
         private void convertTranslations()
         {
+            // old translations format is used prior to 1.5.0
+
             final File rootDir = BookSelectionActivity.this.getFilesDir();
             final BibleReader oldReader = new BibleReader(rootDir);
             final TranslationInfo[] installedTranslations = oldReader.installedTranslations();

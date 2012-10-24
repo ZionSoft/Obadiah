@@ -94,8 +94,8 @@ public class SearchActivity extends Activity
     {
         super.onResume();
 
-        m_selectedTranslationShortName = getSharedPreferences("settings", MODE_PRIVATE).getString(
-                "selectedTranslation", null);
+        m_selectedTranslationShortName = getSharedPreferences("settings", MODE_PRIVATE).getString("currentTranslation",
+                null);
         m_translationReader.selectTranslation(m_selectedTranslationShortName);
 
         final TranslationInfo[] translations = m_translationManager.translations();

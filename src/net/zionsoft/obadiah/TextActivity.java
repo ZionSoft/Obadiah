@@ -81,7 +81,7 @@ public class TextActivity extends Activity
         final SharedPreferences preferences = getSharedPreferences("settings", MODE_PRIVATE);
         m_currentBook = preferences.getInt("currentBook", 0);
         m_currentChapter = preferences.getInt("currentChapter", 0);
-        m_translationReader.selectTranslation(preferences.getString("selectedTranslation", null));
+        m_translationReader.selectTranslation(preferences.getString("currentTranslation", null));
 
         populateUi();
 
