@@ -117,9 +117,7 @@ public class TextActivity extends Activity
                 Toast.makeText(this, R.string.text_copied, Toast.LENGTH_SHORT).show();
             }
         } else if (view == m_searchButton) {
-            final Intent intent = new Intent(this, SearchActivity.class);
-            intent.putExtra("fromTextActivity", true);
-            startActivity(intent);
+            startActivity(new Intent(this, SearchActivity.class).setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
         } else if (view == m_previousChapterButton || view == m_nextChapterButton) {
             if (view == m_previousChapterButton) {
                 if (m_currentChapter == 0)

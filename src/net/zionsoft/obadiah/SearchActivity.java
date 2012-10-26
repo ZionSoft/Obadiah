@@ -80,11 +80,8 @@ public class SearchActivity extends Activity
                 editor.putInt("currentVerse", result.verseIndex);
                 editor.commit();
 
-                final Bundle bundle = getIntent().getExtras();
-                if (bundle != null && bundle.getBoolean("fromTextActivity", false))
-                    SearchActivity.this.finish();
-                else
-                    SearchActivity.this.startActivity(new Intent(SearchActivity.this, TextActivity.class));
+                SearchActivity.this.startActivity(new Intent(SearchActivity.this, TextActivity.class)
+                        .setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
 
             }
         });
