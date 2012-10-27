@@ -52,7 +52,6 @@ public class TextActivity extends Activity
 
         m_previousChapterButton = (ImageButton) findViewById(R.id.previousChapterButton);
         m_nextChapterButton = (ImageButton) findViewById(R.id.nextChapterButton);
-        updateChangeChapterButtonState();
 
         // initializes verses list view
         m_verseListView = (ListView) findViewById(R.id.verseListView);
@@ -130,13 +129,12 @@ public class TextActivity extends Activity
                 ++m_currentChapter;
             }
 
-            updateChangeChapterButtonState();
             populateUi();
             m_verseListView.setSelectionAfterHeaderView();
         }
     }
 
-    private void updateChangeChapterButtonState()
+    private void populateUi()
     {
         if (m_currentChapter == 0)
             m_previousChapterButton.setEnabled(false);
@@ -147,10 +145,7 @@ public class TextActivity extends Activity
             m_nextChapterButton.setEnabled(false);
         else
             m_nextChapterButton.setEnabled(true);
-    }
 
-    private void populateUi()
-    {
         m_selectedTranslationTextView.setText(m_translationReader.selectedTranslationShortName());
         m_selectedBookTextView.setText(m_translationReader.bookNames()[m_currentBook] + ", " + (m_currentChapter + 1));
         m_verseListAdapter.setTexts(m_translationReader.verses(m_currentBook, m_currentChapter));
