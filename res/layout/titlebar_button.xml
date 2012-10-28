@@ -6,6 +6,6 @@
     android:drawablePadding="4dip"
     android:drawableRight="@drawable/btn_corner"
     android:padding="8dip"
-    android:textColor="#ffffff"
+    android:textColor="@android:color/white"
     android:textSize="18dip"
     android:textStyle="bold" />

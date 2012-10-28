@@ -80,8 +80,8 @@
         android:layout_height="0dip"
         android:layout_above="@id/toolBar"
         android:layout_below="@id/titleBar"
-        android:background="#ffffff"
-        android:cacheColorHint="#ffffff"
+        android:background="@android:color/white"
+        android:cacheColorHint="@android:color/white"
         android:divider="@android:color/transparent"
         android:listSelector="@android:color/transparent" />
 

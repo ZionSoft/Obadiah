@@ -34,8 +34,8 @@
         android:layout_height="0dip"
         android:layout_alignParentBottom="true"
         android:layout_below="@id/searchText"
-        android:background="#ffffff"
-        android:cacheColorHint="#ffffff"
+        android:background="@android:color/white"
+        android:cacheColorHint="@android:color/white"
         android:divider="@null"
         android:dividerHeight="7dip" />
 
