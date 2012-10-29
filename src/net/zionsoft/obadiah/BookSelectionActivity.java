@@ -265,7 +265,7 @@ public class BookSelectionActivity extends Activity
         private int m_textViewHeight;
     }
 
-    private class UpgradeAsyncTask extends AsyncTask<Void, Void, Void>
+    private class UpgradeAsyncTask extends AsyncTask<Void, Integer, Void>
     {
         protected void onPreExecute()
         {
@@ -274,6 +274,9 @@ public class BookSelectionActivity extends Activity
             m_progressDialog = new ProgressDialog(BookSelectionActivity.this);
             m_progressDialog.setCancelable(false);
             m_progressDialog.setMessage(BookSelectionActivity.this.getText(R.string.text_initializing));
+            m_progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+            m_progressDialog.setMax(100);
+            m_progressDialog.setProgress(0);
             m_progressDialog.show();
         }
 
@@ -281,8 +284,11 @@ public class BookSelectionActivity extends Activity
         {
             // running in the worker thread
 
-            convertSettings();
             convertTranslations();
+            publishProgress(98);
+
+            convertSettings();
+            publishProgress(99);
 
             // sets the application version
             final SharedPreferences preferences = getSharedPreferences("settings", MODE_PRIVATE);
@@ -290,7 +296,16 @@ public class BookSelectionActivity extends Activity
             editor.putInt("currentApplicationVersion", CURRENT_APPLICATION_VERSION);
             editor.commit();
 
+            publishProgress(100);
+
             return null;
+        }
+
+        protected void onProgressUpdate(Integer... progress)
+        {
+            // running in the main thread
+
+            m_progressDialog.setProgress(progress[0]);
         }
 
         protected void onPostExecute(Void result)
@@ -384,7 +399,12 @@ public class BookSelectionActivity extends Activity
                 final ContentValues bookNamesValues = new ContentValues(3);
                 final ContentValues translationInfoValues = new ContentValues(5);
                 translationInfoValues.put(TranslationsDatabaseHelper.COLUMN_INSTALLED, 1);
+
+                final double progressDelta = 1.36 / installedTranslations.length;
+                double currentProgress = 1.0;
                 for (TranslationInfo translationInfo : installedTranslations) {
+                    publishProgress((int) currentProgress);
+
                     // creates a translation table
                     db.execSQL("CREATE TABLE " + translationInfo.shortName + " ("
                             + TranslationsDatabaseHelper.COLUMN_BOOK_INDEX + " INTEGER NOT NULL, "
@@ -420,6 +440,9 @@ public class BookSelectionActivity extends Activity
                         bookNamesValues.put(TranslationsDatabaseHelper.COLUMN_BOOK_NAME,
                                 translationInfo.bookNames[bookIndex]);
                         db.insert(TranslationsDatabaseHelper.TABLE_BOOK_NAMES, null, bookNamesValues);
+
+                        currentProgress += progressDelta;
+                        publishProgress((int) currentProgress);
                     }
 
                     // adds to the translations table
@@ -483,9 +506,11 @@ public class BookSelectionActivity extends Activity
                     db.insert(TranslationsDatabaseHelper.TABLE_TRANSLATIONS, null, translationInfoValues);
                 }
 
+                publishProgress(91);
                 db.setTransactionSuccessful();
                 Utils.removeDirectory(rootDir);
             } finally {
+                publishProgress(92);
                 db.endTransaction();
                 db.close();
             }
