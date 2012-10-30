@@ -49,40 +49,13 @@
             android:onClick="onToolbarButtonClicked"
             android:padding="8dip"
             android:src="@drawable/copy_button" />
-
-        <ImageButton
-            android:id="@+id/nextChapterButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:background="@drawable/button_background"
-            android:onClick="onToolbarButtonClicked"
-            android:padding="8dip"
-            android:src="@drawable/next_button" />
-
-        <ImageButton
-            android:id="@+id/previousChapterButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_toLeftOf="@id/nextChapterButton"
-            android:background="@drawable/button_background"
-            android:onClick="onToolbarButtonClicked"
-            android:padding="8dip"
-            android:src="@drawable/prev_button" />
     </RelativeLayout>
 
-    <ListView
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/verseListView"
+    <android.support.v4.view.ViewPager
+        android:id="@+id/verseViewPager"
         android:layout_width="fill_parent"
         android:layout_height="0dip"
         android:layout_above="@id/toolBar"
-        android:layout_below="@id/titleBar"
-        android:background="@android:color/white"
-        android:cacheColorHint="@android:color/white"
-        android:divider="@android:color/transparent"
-        android:listSelector="@android:color/transparent" />
+        android:layout_below="@id/titleBar" />
 
 </RelativeLayout>
