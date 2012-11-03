@@ -83,12 +83,11 @@ public class TextActivity extends Activity
         m_currentChapter = preferences.getInt("currentChapter", 0);
         m_translationReader.selectTranslation(preferences.getString("currentTranslation", null));
 
-        populateUi();
-
-        m_versePagerAdapter.notifyDataSetChanged();
         m_verseViewPager.setCurrentItem(m_currentChapter);
         m_versePagerAdapter.setSelection(preferences.getInt("currentVerse", 0));
         m_versePagerAdapter.updateText();
+
+        populateUi();
     }
 
     protected void onPause()
@@ -127,8 +126,10 @@ public class TextActivity extends Activity
     {
         m_selectedTranslationTextView.setText(m_translationReader.selectedTranslationShortName());
         m_selectedBookTextView.setText(m_translationReader.bookNames()[m_currentBook] + ", " + (m_currentChapter + 1));
-        m_shareButton.setEnabled(false);
-        m_copyButton.setEnabled(false);
+
+        final boolean hasItemSelected = m_versePagerAdapter.hasItemSelected();
+        m_shareButton.setEnabled(hasItemSelected);
+        m_copyButton.setEnabled(hasItemSelected);
     }
 
     private class VerseListAdapter extends ListBaseAdapter
@@ -191,6 +192,7 @@ public class TextActivity extends Activity
                 m_selected = new boolean[length];
             for (int i = 0; i < length; ++i)
                 m_selected[i] = false;
+            m_selectedCount = 0;
 
             notifyDataSetChanged();
         }
@@ -336,6 +338,8 @@ public class TextActivity extends Activity
                             TextActivity.this.m_currentBook, page.position));
                 }
             }
+
+            notifyDataSetChanged();
         }
 
         public void setSelection(int selection)
