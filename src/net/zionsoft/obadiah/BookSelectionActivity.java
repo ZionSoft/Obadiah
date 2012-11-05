@@ -102,35 +102,7 @@ public class BookSelectionActivity extends Activity
         if (m_converting)
             return;
 
-        final TranslationInfo[] translations = m_translationManager.translations();
-        if (translations != null) {
-            for (TranslationInfo translationInfo : translations) {
-                if (translationInfo.installed) {
-                    populateUi();
-                    return;
-                }
-            }
-        }
-
-        // no translation is installed
-        final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-        alertDialogBuilder.setMessage(R.string.text_no_translation).setCancelable(false)
-                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener()
-                {
-                    public void onClick(DialogInterface dialog, int id)
-                    {
-                        dialog.dismiss();
-                        BookSelectionActivity.this.startTranslationSelectionActivity();
-                    }
-                }).setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener()
-                {
-                    public void onClick(DialogInterface dialog, int id)
-                    {
-                        dialog.cancel();
-                        BookSelectionActivity.this.finish();
-                    }
-                });
-        alertDialogBuilder.create().show();
+        populateUi();
     }
 
     public void search(View view)
@@ -140,30 +112,62 @@ public class BookSelectionActivity extends Activity
 
     private void populateUi()
     {
-        // loads last used translation
-        final SharedPreferences preferences = getSharedPreferences("settings", MODE_PRIVATE);
-        m_translationReader.selectTranslation(preferences.getString("currentTranslation", null));
+        boolean hasInstalledTranslation = false;
+        final TranslationInfo[] translations = m_translationManager.translations();
+        if (translations != null) {
+            for (TranslationInfo translationInfo : translations) {
+                if (translationInfo.installed) {
+                    hasInstalledTranslation = true;
+                    break;
+                }
+            }
+        }
 
-        // loads the last read book and chapter
-        m_currentBook = preferences.getInt("currentBook", -1);
-        m_currentChapter = preferences.getInt("currentChapter", -1);
+        if (hasInstalledTranslation) {
+            // loads last used translation
+            final SharedPreferences preferences = getSharedPreferences("settings", MODE_PRIVATE);
+            m_translationReader.selectTranslation(preferences.getString("currentTranslation", null));
 
-        // sets the book that is currently selected
-        m_selectedBook = m_currentBook < 0 ? 0 : m_currentBook;
+            // loads the last read book and chapter
+            m_currentBook = preferences.getInt("currentBook", -1);
+            m_currentChapter = preferences.getInt("currentChapter", -1);
 
-        // sets the chapter lists
-        // TODO it's not needed if this activity is resumed from TranslationSelectionActivity
-        updateChapterSelectionListAdapter();
+            // sets the book that is currently selected
+            m_selectedBook = m_currentBook < 0 ? 0 : m_currentBook;
 
-        // updates the title and book names
-        // TODO no need to update if selected translation is not changed
-        m_selectedTranslationTextView.setText(m_translationReader.selectedTranslationShortName());
-        final String[] bookNames = m_translationReader.bookNames();
-        m_selectedBookTextView.setText(bookNames[m_selectedBook]);
-        m_bookListAdapter.setTexts(bookNames);
+            // sets the chapter lists
+            // TODO it's not needed if this activity is resumed from TranslationSelectionActivity
+            updateChapterSelectionListAdapter();
 
-        // scrolls to the currently selected book
-        m_bookListView.setSelection(m_selectedBook);
+            // updates the title and book names
+            // TODO no need to update if selected translation is not changed
+            m_selectedTranslationTextView.setText(m_translationReader.selectedTranslationShortName());
+            final String[] bookNames = m_translationReader.bookNames();
+            m_selectedBookTextView.setText(bookNames[m_selectedBook]);
+            m_bookListAdapter.setTexts(bookNames);
+
+            // scrolls to the currently selected book
+            m_bookListView.setSelection(m_selectedBook);
+        } else {
+            final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+            alertDialogBuilder.setMessage(R.string.text_no_translation).setCancelable(false)
+                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener()
+                    {
+                        public void onClick(DialogInterface dialog, int id)
+                        {
+                            dialog.dismiss();
+                            BookSelectionActivity.this.startTranslationSelectionActivity();
+                        }
+                    }).setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener()
+                    {
+                        public void onClick(DialogInterface dialog, int id)
+                        {
+                            dialog.cancel();
+                            BookSelectionActivity.this.finish();
+                        }
+                    });
+            alertDialogBuilder.create().show();
+        }
     }
 
     private void updateChapterSelectionListAdapter()
