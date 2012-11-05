@@ -156,8 +156,8 @@ public class SearchActivity extends Activity
             final Cursor cursor = db.query(SearchActivity.this.m_selectedTranslationShortName, new String[] {
                     TranslationsDatabaseHelper.COLUMN_BOOK_INDEX, TranslationsDatabaseHelper.COLUMN_CHAPTER_INDEX,
                     TranslationsDatabaseHelper.COLUMN_VERSE_INDEX, TranslationsDatabaseHelper.COLUMN_TEXT },
-                    TranslationsDatabaseHelper.COLUMN_TEXT + " LIKE ?", new String[] { "%" + params[0] + "%" }, null,
-                    null, null);
+                    TranslationsDatabaseHelper.COLUMN_TEXT + " LIKE ?", new String[] { "%"
+                            + params[0].toString().trim().replaceAll("\\s+", "%") + "%" }, null, null, null);
             if (cursor != null) {
                 final int count = cursor.getCount();
                 if (count > 0) {
