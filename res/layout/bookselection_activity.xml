@@ -18,13 +18,24 @@
         android:orientation="horizontal" >
 
         <ImageButton
-            android:id="@+id/searchButton"
+            android:id="@+id/settingsButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:background="@drawable/button_background"
-            android:onClick="search"
+            android:onClick="onToolbarButtonClicked"
+            android:padding="8dip"
+            android:src="@drawable/btn_settings" />
+
+        <ImageButton
+            android:id="@+id/searchButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@id/settingsButton"
+            android:background="@drawable/button_background"
+            android:onClick="onToolbarButtonClicked"
             android:padding="8dip"
             android:src="@drawable/btn_search" />
     </RelativeLayout>
@@ -36,7 +47,6 @@
         android:layout_height="fill_parent"
         android:layout_above="@id/toolBar"
         android:layout_below="@id/titleBar"
-        android:cacheColorHint="@android:color/white"
         android:divider="@null"
         android:dividerHeight="0dip"
         android:listSelector="@null"
@@ -50,7 +60,6 @@
         android:layout_above="@id/toolBar"
         android:layout_below="@id/titleBar"
         android:layout_toRightOf="@id/bookListView"
-        android:cacheColorHint="@android:color/white"
         android:columnWidth="48dip"
         android:gravity="center"
         android:listSelector="@null"

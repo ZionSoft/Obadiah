@@ -4,13 +4,22 @@
     android:background="@color/titlebar_background"
     android:orientation="horizontal" >
 
-    <include
-        android:id="@+id/textTranslationSelection"
+    <TextView
+        android:id="@+id/selectedTranslationTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        layout="@layout/titlebar_button" />
+        android:layout_centerVertical="true"
+        android:background="@drawable/button_background"
+        android:drawablePadding="4dip"
+        android:drawableRight="@drawable/btn_corner"
+        android:padding="8dip"
+        android:textColor="@android:color/white"
+        android:textSize="18dip"
+        android:textStyle="bold" />
 
     <TextView
-        android:id="@+id/textBookName"
+        android:id="@+id/selectedBookNameTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"

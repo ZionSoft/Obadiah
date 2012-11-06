@@ -10,6 +10,7 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.text.ClipboardManager;
@@ -37,7 +38,7 @@ public class TextActivity extends Activity
         m_translationReader = new TranslationReader(this);
 
         // initializes the title bar
-        m_selectedTranslationTextView = (TextView) findViewById(R.id.textTranslationSelection);
+        m_selectedTranslationTextView = (TextView) findViewById(R.id.selectedTranslationTextView);
         m_selectedTranslationTextView.setOnClickListener(new OnClickListener()
         {
             public void onClick(View v)
@@ -45,9 +46,10 @@ public class TextActivity extends Activity
                 startActivity(new Intent(TextActivity.this, TranslationSelectionActivity.class));
             }
         });
-        m_selectedBookTextView = (TextView) findViewById(R.id.textBookName);
+        m_selectedBookTextView = (TextView) findViewById(R.id.selectedBookNameTextView);
 
         // initializes the tool bar buttons
+        m_settingsButton = (ImageButton) findViewById(R.id.settingsButton);
         m_searchButton = (ImageButton) findViewById(R.id.searchButton);
         m_shareButton = (ImageButton) findViewById(R.id.shareButton);
         m_copyButton = (ImageButton) findViewById(R.id.copyButton);
@@ -78,6 +80,17 @@ public class TextActivity extends Activity
     {
         super.onResume();
 
+        final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        if (sharedPreferences.getBoolean(SettingsActivity.PREF_NIGHTMODE, false)) {
+            // night mode
+            m_backgroundColor = Color.BLACK;
+            m_textColor = Color.WHITE;
+        } else {
+            // day mode
+            m_backgroundColor = Color.WHITE;
+            m_textColor = Color.BLACK;
+        }
+
         final SharedPreferences preferences = getSharedPreferences("settings", MODE_PRIVATE);
         m_currentBook = preferences.getInt("currentBook", 0);
         m_currentChapter = preferences.getInt("currentChapter", 0);
@@ -102,7 +115,9 @@ public class TextActivity extends Activity
 
     public void onToolbarButtonClicked(View view)
     {
-        if (view == m_shareButton) {
+        if (view == m_settingsButton) {
+            startActivity(new Intent(this, SettingsActivity.class));
+        } else if (view == m_shareButton) {
             if (m_versePagerAdapter.hasItemSelected()) {
                 final Intent intent = new Intent();
                 intent.setAction(Intent.ACTION_SEND);
@@ -206,26 +221,27 @@ public class TextActivity extends Activity
                     final TextView textView = new TextView(m_context);
                     textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 17);
                     textView.setPadding(10, 10, 10, 10);
-                    textView.setTextColor(Color.BLACK);
                     linearLayout.addView(textView);
                 }
             } else {
                 linearLayout = (LinearLayout) convertView;
             }
 
-            final TextView verseIndex = (TextView) linearLayout.getChildAt(0);
-            verseIndex.setText(Integer.toString(position + 1));
+            final TextView verseIndexTextView = (TextView) linearLayout.getChildAt(0);
+            verseIndexTextView.setTextColor(TextActivity.this.m_textColor);
+            verseIndexTextView.setText(Integer.toString(position + 1));
 
-            final TextView verse = (TextView) linearLayout.getChildAt(1);
+            final TextView verseTextView = (TextView) linearLayout.getChildAt(1);
+            verseTextView.setTextColor(TextActivity.this.m_textColor);
             if (m_selected[position]) {
                 final SpannableString string = new SpannableString(m_texts[position]);
                 if (m_backgroundColorSpan == null)
                     m_backgroundColorSpan = new BackgroundColorSpan(Color.LTGRAY);
                 string.setSpan(m_backgroundColorSpan, 0, m_texts[position].length(),
                         SpannableString.SPAN_INCLUSIVE_INCLUSIVE);
-                verse.setText(string);
+                verseTextView.setText(string);
             } else {
-                verse.setText(m_texts[position]);
+                verseTextView.setText(m_texts[position]);
             }
 
             return linearLayout;
@@ -269,8 +285,8 @@ public class TextActivity extends Activity
 
                 final ListView verseListView = new ListView(TextActivity.this);
                 page.verseListView = verseListView;
-                verseListView.setBackgroundColor(Color.WHITE);
-                verseListView.setCacheColorHint(Color.WHITE);
+                verseListView.setBackgroundColor(TextActivity.this.m_backgroundColor);
+                verseListView.setCacheColorHint(TextActivity.this.m_backgroundColor);
                 verseListView.setDivider(null);
                 verseListView.setSelector(new ColorDrawable(Color.TRANSPARENT));
 
@@ -333,6 +349,8 @@ public class TextActivity extends Activity
             Iterator<Page> iterator = m_pages.iterator();
             while (iterator.hasNext()) {
                 final Page page = iterator.next();
+                page.verseListView.setBackgroundColor(TextActivity.this.m_backgroundColor);
+                page.verseListView.setCacheColorHint(TextActivity.this.m_backgroundColor);
                 if (page.inUse) {
                     page.verseListAdapter.setTexts(TextActivity.this.m_translationReader.verses(
                             TextActivity.this.m_currentBook, page.position));
@@ -394,7 +412,10 @@ public class TextActivity extends Activity
 
     private int m_currentBook = -1;
     private int m_currentChapter = -1;
+    private int m_backgroundColor;
+    private int m_textColor;
     private ClipboardManager m_clipboardManager; // obsoleted by android.content.ClipboardManager since API level 11
+    private ImageButton m_settingsButton;
     private ImageButton m_shareButton;
     private ImageButton m_copyButton;
     private ImageButton m_searchButton;

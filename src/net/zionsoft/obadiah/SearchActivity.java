@@ -39,7 +39,7 @@ public class SearchActivity extends Activity
         m_translationReader = new TranslationReader(this);
 
         // initializes the title bar
-        m_selectedTranslationTextView = (TextView) findViewById(R.id.textTranslationSelection);
+        m_selectedTranslationTextView = (TextView) findViewById(R.id.selectedTranslationTextView);
         m_selectedTranslationTextView.setOnClickListener(new OnClickListener()
         {
             public void onClick(View v)

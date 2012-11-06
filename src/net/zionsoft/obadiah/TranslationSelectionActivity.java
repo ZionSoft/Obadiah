@@ -15,6 +15,7 @@ import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
@@ -37,9 +38,9 @@ public class TranslationSelectionActivity extends Activity
 
         // initializes list view showing installed translations
         m_translationListAdapter = new TranslationSelectionListAdapter(this);
-        final ListView translationListView = (ListView) findViewById(R.id.translationListView);
-        translationListView.setAdapter(m_translationListAdapter);
-        translationListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
+        m_translationListView = (ListView) findViewById(R.id.translationListView);
+        m_translationListView.setAdapter(m_translationListAdapter);
+        m_translationListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
         {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id)
             {
@@ -56,7 +57,7 @@ public class TranslationSelectionActivity extends Activity
                 finish();
             }
         });
-        translationListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener()
+        m_translationListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener()
         {
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id)
             {
@@ -142,6 +143,19 @@ public class TranslationSelectionActivity extends Activity
     {
         super.onResume();
 
+        final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        if (sharedPreferences.getBoolean(SettingsActivity.PREF_NIGHTMODE, false)) {
+            // night mode
+            m_translationListView.setBackgroundColor(Color.BLACK);
+            m_translationListView.setCacheColorHint(Color.BLACK);
+            m_textColor = Color.WHITE;
+        } else {
+            // day mode
+            m_translationListView.setBackgroundColor(Color.WHITE);
+            m_translationListView.setCacheColorHint(Color.WHITE);
+            m_textColor = Color.BLACK;
+        }
+
         populateUi();
     }
 
@@ -225,10 +239,11 @@ public class TranslationSelectionActivity extends Activity
                 textView.setGravity(Gravity.CENTER_VERTICAL);
                 textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 17);
                 textView.setPadding(30, 20, 30, 20);
-                textView.setTextColor(Color.BLACK);
             } else {
                 textView = (TextView) convertView;
             }
+
+            textView.setTextColor(TranslationSelectionActivity.this.m_textColor);
 
             if (m_installedTranslations != null && position < m_installedTranslations.length) {
                 textView.setText(m_installedTranslations[position].name);
@@ -254,6 +269,8 @@ public class TranslationSelectionActivity extends Activity
     }
 
     private boolean m_firstTime = true;
+    private int m_textColor;
+    private ListView m_translationListView;
     private String m_selectedTranslationShortName;
     private TranslationManager m_translationManager;
     private TranslationSelectionListAdapter m_translationListAdapter;

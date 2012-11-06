@@ -15,6 +15,7 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
@@ -23,6 +24,7 @@ import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -39,11 +41,17 @@ public class BookSelectionActivity extends Activity
             new UpgradeAsyncTask().execute();
         }
 
+        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+
         m_translationManager = new TranslationManager(this);
         m_translationReader = new TranslationReader(this);
 
+        // initializes the tool bar
+        m_settingsButton = (ImageButton) findViewById(R.id.settingsButton);
+        m_searchButton = (ImageButton) findViewById(R.id.searchButton);
+
         // initializes the title bar
-        m_selectedTranslationTextView = (TextView) findViewById(R.id.textTranslationSelection);
+        m_selectedTranslationTextView = (TextView) findViewById(R.id.selectedTranslationTextView);
         m_selectedTranslationTextView.setOnClickListener(new OnClickListener()
         {
             public void onClick(View v)
@@ -51,7 +59,7 @@ public class BookSelectionActivity extends Activity
                 BookSelectionActivity.this.startTranslationSelectionActivity();
             }
         });
-        m_selectedBookTextView = (TextView) findViewById(R.id.textBookName);
+        m_selectedBookTextView = (TextView) findViewById(R.id.selectedBookNameTextView);
 
         // initializes the book names list view
         m_bookListView = (ListView) findViewById(R.id.bookListView);
@@ -72,10 +80,10 @@ public class BookSelectionActivity extends Activity
         });
 
         // initializes the chapters selection grid view
-        final GridView chaptersGridView = (GridView) findViewById(R.id.chapterGridView);
+        m_chaptersGridView = (GridView) findViewById(R.id.chapterGridView);
         m_chapterListAdapter = new ChapterListAdapter(this);
-        chaptersGridView.setAdapter(m_chapterListAdapter);
-        chaptersGridView.setOnItemClickListener(new OnItemClickListener()
+        m_chaptersGridView.setAdapter(m_chapterListAdapter);
+        m_chaptersGridView.setOnItemClickListener(new OnItemClickListener()
         {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id)
             {
@@ -99,15 +107,35 @@ public class BookSelectionActivity extends Activity
     {
         super.onResume();
 
+        final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        if (sharedPreferences.getBoolean(SettingsActivity.PREF_NIGHTMODE, false)) {
+            // night mode
+            m_bookListView.setBackgroundColor(Color.BLACK);
+            m_bookListView.setCacheColorHint(Color.BLACK);
+            m_chaptersGridView.setBackgroundColor(Color.BLACK);
+            m_chaptersGridView.setCacheColorHint(Color.BLACK);
+            m_textColor = Color.WHITE;
+        } else {
+            // day mode
+            m_bookListView.setBackgroundColor(Color.WHITE);
+            m_bookListView.setCacheColorHint(Color.WHITE);
+            m_chaptersGridView.setBackgroundColor(Color.WHITE);
+            m_chaptersGridView.setCacheColorHint(Color.WHITE);
+            m_textColor = Color.BLACK;
+        }
+
         if (m_converting)
             return;
 
         populateUi();
     }
 
-    public void search(View view)
+    public void onToolbarButtonClicked(View view)
     {
-        startActivity(new Intent(this, SearchActivity.class));
+        if (view == m_settingsButton)
+            startActivity(new Intent(this, SettingsActivity.class));
+        else if (view == m_searchButton)
+            startActivity(new Intent(this, SearchActivity.class));
     }
 
     private void populateUi()
@@ -209,7 +237,6 @@ public class BookSelectionActivity extends Activity
                 textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 17);
                 textView.setHeight(m_textViewHeight);
                 textView.setBackgroundResource(R.drawable.list_item_background);
-                textView.setTextColor(Color.BLACK);
             } else {
                 textView = (TextView) convertView;
             }
@@ -221,6 +248,7 @@ public class BookSelectionActivity extends Activity
                 textView.setTypeface(null, Typeface.NORMAL);
                 textView.setBackgroundResource(R.drawable.list_item_background);
             }
+            textView.setTextColor(BookSelectionActivity.this.m_textColor);
             textView.setText(m_texts[position]);
             return textView;
         }
@@ -253,7 +281,6 @@ public class BookSelectionActivity extends Activity
                 textView.setGravity(Gravity.CENTER);
                 textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 17);
                 textView.setHeight(m_textViewHeight);
-                textView.setTextColor(Color.BLACK);
             } else {
                 textView = (TextView) convertView;
             }
@@ -262,6 +289,7 @@ public class BookSelectionActivity extends Activity
                 textView.setTypeface(null, Typeface.BOLD);
             else
                 textView.setTypeface(null, Typeface.NORMAL);
+            textView.setTextColor(BookSelectionActivity.this.m_textColor);
             textView.setText(m_texts[position]);
             return textView;
         }
@@ -529,8 +557,12 @@ public class BookSelectionActivity extends Activity
     private int m_currentBook = -1;
     private int m_currentChapter = -1;
     private int m_selectedBook = -1;
+    private int m_textColor;
     private BookListAdapter m_bookListAdapter;
     private ChapterListAdapter m_chapterListAdapter;
+    private ImageButton m_settingsButton;
+    private ImageButton m_searchButton;
+    private GridView m_chaptersGridView;
     private ListView m_bookListView;
     private TextView m_selectedBookTextView;
     private TextView m_selectedTranslationTextView;

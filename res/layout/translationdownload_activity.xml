@@ -52,7 +52,6 @@
         android:layout_height="fill_parent"
         android:layout_above="@id/adView"
         android:layout_below="@id/titleBar"
-        android:cacheColorHint="@android:color/white"
         android:divider="@android:color/darker_gray"
         android:dividerHeight="1dip" />
 

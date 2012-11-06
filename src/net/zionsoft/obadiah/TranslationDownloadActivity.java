@@ -14,6 +14,7 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
@@ -35,10 +36,10 @@ public class TranslationDownloadActivity extends Activity
         m_translationManager = new TranslationManager(this);
 
         // initializes list view showing available translations
-        final ListView translationListView = (ListView) findViewById(R.id.translationListView);
+        m_translationListView = (ListView) findViewById(R.id.translationListView);
         m_translationListAdapter = new TranslationListAdapter(this);
-        translationListView.setAdapter(m_translationListAdapter);
-        translationListView.setOnItemClickListener(new OnItemClickListener()
+        m_translationListView.setAdapter(m_translationListAdapter);
+        m_translationListView.setOnItemClickListener(new OnItemClickListener()
         {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id)
             {
@@ -49,6 +50,24 @@ public class TranslationDownloadActivity extends Activity
 
         // gets translation list
         new TranslationListDownloadAsyncTask().execute(false);
+    }
+
+    protected void onResume()
+    {
+        super.onResume();
+
+        final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        if (sharedPreferences.getBoolean(SettingsActivity.PREF_NIGHTMODE, false)) {
+            // night mode
+            m_translationListView.setBackgroundColor(Color.BLACK);
+            m_translationListView.setCacheColorHint(Color.BLACK);
+            m_textColor = Color.WHITE;
+        } else {
+            // day mode
+            m_translationListView.setBackgroundColor(Color.WHITE);
+            m_translationListView.setCacheColorHint(Color.WHITE);
+            m_textColor = Color.BLACK;
+        }
     }
 
     protected void onPause()
@@ -281,7 +300,6 @@ public class TranslationDownloadActivity extends Activity
                 // first line
                 TextView textView = new TextView(m_context);
                 textView.setGravity(Gravity.CENTER_VERTICAL);
-                textView.setTextColor(Color.BLACK);
                 textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 17);
                 textView.setPadding(30, 20, 30, 0);
                 linearLayout.addView(textView);
@@ -299,6 +317,7 @@ public class TranslationDownloadActivity extends Activity
 
             // first line
             TextView textView = (TextView) linearLayout.getChildAt(0);
+            textView.setTextColor(TranslationDownloadActivity.this.m_textColor);
             textView.setText(m_texts[position]);
 
             // second line
@@ -313,6 +332,8 @@ public class TranslationDownloadActivity extends Activity
 
     protected static final String BASE_URL = "http://bible.zionsoft.net/translations/";
 
+    private int m_textColor;
+    private ListView m_translationListView;
     private TranslationDownloadAsyncTask m_translationDownloadAsyncTask;
     private TranslationListAdapter m_translationListAdapter;
     private TranslationManager m_translationManager;

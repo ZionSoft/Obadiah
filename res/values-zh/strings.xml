@@ -2,6 +2,7 @@
 <resources>
 
     <string name="app_name">圣经</string>
+    <string name="pref_nightmode_title">夜间模式</string>
     <string name="text_download">下载更多译本</string>
     <string name="text_copied">文本已成功复制到剪贴板。</string>
     <string name="text_delete">删除</string>
@@ -19,6 +20,7 @@
     <string name="text_search_result">个条目被找到。</string>
     <string name="text_size">体积：</string>
     <string name="text_share_with">分享到&#8230;</string>
+    <string name="text_settings">设置</string>
     <string name="title_download_translation">请选择要下载的译本</string>
     <string name="title_select_translation">选择译本</string>
 

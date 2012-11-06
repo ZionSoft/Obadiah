@@ -40,11 +40,22 @@
             android:src="@drawable/copy_button" />
 
         <ImageButton
-            android:id="@+id/searchButton"
+            android:id="@+id/settingsButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
+            android:background="@drawable/button_background"
+            android:onClick="onToolbarButtonClicked"
+            android:padding="8dip"
+            android:src="@drawable/btn_settings" />
+
+        <ImageButton
+            android:id="@+id/searchButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@id/settingsButton"
             android:background="@drawable/button_background"
             android:onClick="onToolbarButtonClicked"
             android:padding="8dip"
