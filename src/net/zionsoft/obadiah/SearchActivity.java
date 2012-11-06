@@ -95,8 +95,8 @@ public class SearchActivity extends Activity
                 "currentTranslation", null);
         if (selectedTranslationShortName == null
                 || !selectedTranslationShortName.equals(m_selectedTranslationShortName)) {
-            m_selectedTranslationShortName = selectedTranslationShortName;
-            m_translationReader.selectTranslation(m_selectedTranslationShortName);
+            m_translationReader.selectTranslation(selectedTranslationShortName);
+            m_selectedTranslationShortName = m_translationReader.selectedTranslationShortName();
 
             final TranslationInfo[] translations = m_translationManager.translations();
             for (TranslationInfo translationInfo : translations) {
