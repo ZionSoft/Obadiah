@@ -161,8 +161,15 @@ public class TranslationManager
         final SQLiteDatabase db = m_translationsDatabaseHelper.getWritableDatabase();
         db.beginTransaction();
         try {
+            // deletes the translation table
             db.execSQL("DROP TABLE IF EXISTS " + translationShortName);
 
+            // deletes the book names
+            db.delete(TranslationsDatabaseHelper.TABLE_BOOK_NAMES,
+                    TranslationsDatabaseHelper.COLUMN_TRANSLATION_SHORTNAME + " = ?",
+                    new String[] { translationShortName });
+
+            // sets the translation as "not installed"
             final ContentValues values = new ContentValues(1);
             values.put(TranslationsDatabaseHelper.COLUMN_INSTALLED, 0);
             db.update(TranslationsDatabaseHelper.TABLE_TRANSLATIONS, values,
