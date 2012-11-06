@@ -36,8 +36,8 @@ public class TranslationSelectionActivity extends Activity
                 null);
 
         // initializes title bar
-        final TextView titleBarTextView = (TextView) findViewById(R.id.txtTitle);
-        titleBarTextView.setText(R.string.title_select_translation);
+        final TextView titleTextView = (TextView) findViewById(R.id.titleTextView);
+        titleTextView.setText(R.string.title_select_translation);
 
         // initializes list view showing installed translations
         m_translationListAdapter = new TranslationSelectionListAdapter(this);

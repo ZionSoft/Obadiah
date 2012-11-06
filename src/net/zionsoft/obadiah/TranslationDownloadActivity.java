@@ -27,7 +27,7 @@ import android.widget.AdapterView.OnItemClickListener;
 
 public class TranslationDownloadActivity extends Activity
 {
-    public void onCreate(Bundle savedInstanceState)
+    protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.translationdownload_activity);
@@ -35,8 +35,8 @@ public class TranslationDownloadActivity extends Activity
         m_translationManager = new TranslationManager(this);
 
         // initializes title bar
-        final TextView titleBarTextView = (TextView) findViewById(R.id.txtTitle);
-        titleBarTextView.setText(R.string.title_download_translation);
+        final TextView titleTextView = (TextView) findViewById(R.id.titleTextView);
+        titleTextView.setText(R.string.title_download_translation);
 
         // initializes list view showing available translations
         final ListView translationListView = (ListView) findViewById(R.id.translationListView);
@@ -52,10 +52,10 @@ public class TranslationDownloadActivity extends Activity
         });
 
         // gets translation list
-        new TranslationListDownloadAsyncTask().execute();
+        new TranslationListDownloadAsyncTask().execute(false);
     }
 
-    public void onPause()
+    protected void onPause()
     {
         super.onPause();
 
@@ -64,7 +64,12 @@ public class TranslationDownloadActivity extends Activity
             m_translationDownloadAsyncTask.cancel(true);
     }
 
-    private class TranslationListDownloadAsyncTask extends AsyncTask<Void, Void, Void>
+    public void refresh(View view)
+    {
+        new TranslationListDownloadAsyncTask().execute(true);
+    }
+
+    private class TranslationListDownloadAsyncTask extends AsyncTask<Boolean, Void, Void>
     {
         protected void onPreExecute()
         {
@@ -76,7 +81,7 @@ public class TranslationDownloadActivity extends Activity
             m_progressDialog.show();
         }
 
-        protected Void doInBackground(Void... params)
+        protected Void doInBackground(Boolean... params)
         {
             // running in the worker thread
 
@@ -84,8 +89,9 @@ public class TranslationDownloadActivity extends Activity
                 final long lastUpdated = TranslationDownloadActivity.this
                         .getSharedPreferences("settings", MODE_PRIVATE).getLong("lastUpdated", 0);
                 final long now = System.currentTimeMillis();
-                if (lastUpdated <= 0 || lastUpdated >= now || ((now - lastUpdated) >= 86400000)) {
-                    // no valid local cache, i.e. not fetched before, or last fetched more than 1 day ago
+                if (params[0] || lastUpdated <= 0 || lastUpdated >= now || ((now - lastUpdated) >= 86400000)) {
+                    // force update
+                    // or no valid local cache, i.e. not fetched before, or last fetched more than 1 day ago
 
                     // downloads from Internet
                     final URL url = new URL(BASE_URL + "list.json");

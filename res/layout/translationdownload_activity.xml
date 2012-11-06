@@ -3,10 +3,35 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent" >
 
-    <include
+    <RelativeLayout
         android:id="@+id/titleBar"
-        android:layout_alignParentTop="true"
-        layout="@layout/titlebar_textview_only" />
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/titlebar_background"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:id="@+id/titleTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:padding="8dip"
+            android:textColor="@android:color/white"
+            android:textSize="18dip"
+            android:textStyle="bold" />
+
+        <ImageButton
+            android:id="@+id/refreshButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:background="@drawable/button_background"
+            android:onClick="refresh"
+            android:paddingRight="8dip"
+            android:src="@drawable/btn_refresh" />
+    </RelativeLayout>
 
     <com.google.ads.AdView
         xmlns:googleads="http://schemas.android.com/apk/lib/com.google.ads"
