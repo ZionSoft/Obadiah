@@ -34,10 +34,6 @@ public class TranslationDownloadActivity extends Activity
 
         m_translationManager = new TranslationManager(this);
 
-        // initializes title bar
-        final TextView titleTextView = (TextView) findViewById(R.id.titleTextView);
-        titleTextView.setText(R.string.title_download_translation);
-
         // initializes list view showing available translations
         final ListView translationListView = (ListView) findViewById(R.id.translationListView);
         m_translationListAdapter = new TranslationListAdapter(this);

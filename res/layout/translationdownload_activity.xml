@@ -17,6 +17,7 @@
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
             android:padding="8dip"
+            android:text="@string/title_download_translation"
             android:textColor="@android:color/white"
             android:textSize="18dip"
             android:textStyle="bold" />

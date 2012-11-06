@@ -35,10 +35,6 @@ public class TranslationSelectionActivity extends Activity
         m_selectedTranslationShortName = getSharedPreferences("settings", MODE_PRIVATE).getString("currentTranslation",
                 null);
 
-        // initializes title bar
-        final TextView titleTextView = (TextView) findViewById(R.id.titleTextView);
-        titleTextView.setText(R.string.title_select_translation);
-
         // initializes list view showing installed translations
         m_translationListAdapter = new TranslationSelectionListAdapter(this);
         final ListView translationListView = (ListView) findViewById(R.id.translationListView);
