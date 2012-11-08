@@ -38,7 +38,7 @@ public class TextActivity extends Activity
         m_translationReader = new TranslationReader(this);
 
         // initializes the title bar
-        m_selectedTranslationTextView = (TextView) findViewById(R.id.selectedTranslationTextView);
+        m_selectedTranslationTextView = (TextView) findViewById(R.id.selected_translation_textview);
         m_selectedTranslationTextView.setOnClickListener(new OnClickListener()
         {
             public void onClick(View v)
@@ -46,16 +46,16 @@ public class TextActivity extends Activity
                 startActivity(new Intent(TextActivity.this, TranslationSelectionActivity.class));
             }
         });
-        m_selectedBookTextView = (TextView) findViewById(R.id.selectedBookNameTextView);
+        m_selectedBookTextView = (TextView) findViewById(R.id.selected_book_textview);
 
         // initializes the tool bar buttons
-        m_settingsButton = (ImageButton) findViewById(R.id.settingsButton);
-        m_searchButton = (ImageButton) findViewById(R.id.searchButton);
-        m_shareButton = (ImageButton) findViewById(R.id.shareButton);
-        m_copyButton = (ImageButton) findViewById(R.id.copyButton);
+        m_settingsButton = (ImageButton) findViewById(R.id.settings_button);
+        m_searchButton = (ImageButton) findViewById(R.id.search_button);
+        m_shareButton = (ImageButton) findViewById(R.id.share_button);
+        m_copyButton = (ImageButton) findViewById(R.id.copy_button);
 
         // initializes verses view pager
-        m_verseViewPager = (ViewPager) findViewById(R.id.verseViewPager);
+        m_verseViewPager = (ViewPager) findViewById(R.id.verse_viewpager);
         m_versePagerAdapter = new VersePagerAdapter();
         m_verseViewPager.setAdapter(m_versePagerAdapter);
         m_verseViewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener()

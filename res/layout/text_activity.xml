@@ -4,13 +4,13 @@
     android:layout_height="fill_parent" >
 
     <include
-        android:id="@+id/titleBar"
+        android:id="@+id/titlebar"
         android:layout_alignParentTop="true"
         layout="@layout/titlebar" />
 
     <RelativeLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/toolBar"
+        android:id="@+id/toolbar"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
@@ -18,7 +18,7 @@
         android:orientation="horizontal" >
 
         <ImageButton
-            android:id="@+id/shareButton"
+            android:id="@+id/share_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
@@ -29,18 +29,18 @@
             android:src="@drawable/share_button" />
 
         <ImageButton
-            android:id="@+id/copyButton"
+            android:id="@+id/copy_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_toRightOf="@id/shareButton"
+            android:layout_toRightOf="@id/share_button"
             android:background="@drawable/button_background"
             android:onClick="onToolbarButtonClicked"
             android:padding="8dip"
             android:src="@drawable/copy_button" />
 
         <ImageButton
-            android:id="@+id/settingsButton"
+            android:id="@+id/settings_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
@@ -51,11 +51,11 @@
             android:src="@drawable/btn_settings" />
 
         <ImageButton
-            android:id="@+id/searchButton"
+            android:id="@+id/search_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_toRightOf="@id/settingsButton"
+            android:layout_toLeftOf="@id/settings_button"
             android:background="@drawable/button_background"
             android:onClick="onToolbarButtonClicked"
             android:padding="8dip"
@@ -63,10 +63,10 @@
     </RelativeLayout>
 
     <android.support.v4.view.ViewPager
-        android:id="@+id/verseViewPager"
+        android:id="@+id/verse_viewpager"
         android:layout_width="fill_parent"
         android:layout_height="0dip"
-        android:layout_above="@id/toolBar"
-        android:layout_below="@id/titleBar" />
+        android:layout_above="@id/toolbar"
+        android:layout_below="@id/titlebar" />
 
 </RelativeLayout>

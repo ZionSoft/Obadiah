@@ -38,7 +38,7 @@ public class TranslationSelectionActivity extends Activity
 
         // initializes list view showing installed translations
         m_translationListAdapter = new TranslationSelectionListAdapter(this);
-        m_translationListView = (ListView) findViewById(R.id.translationListView);
+        m_translationListView = (ListView) findViewById(R.id.translation_listview);
         m_translationListView.setAdapter(m_translationListAdapter);
         m_translationListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
         {

@@ -39,7 +39,7 @@ public class SearchActivity extends Activity
         m_translationReader = new TranslationReader(this);
 
         // initializes the title bar
-        m_selectedTranslationTextView = (TextView) findViewById(R.id.selectedTranslationTextView);
+        m_selectedTranslationTextView = (TextView) findViewById(R.id.selected_translation_textview);
         m_selectedTranslationTextView.setOnClickListener(new OnClickListener()
         {
             public void onClick(View v)
@@ -49,7 +49,7 @@ public class SearchActivity extends Activity
         });
 
         // initializes the search bar
-        m_searchText = (EditText) findViewById(R.id.searchText);
+        m_searchText = (EditText) findViewById(R.id.search_edittext);
         m_searchText.setOnEditorActionListener(new OnEditorActionListener()
         {
             public boolean onEditorAction(TextView view, int actionId, KeyEvent event)
@@ -63,7 +63,7 @@ public class SearchActivity extends Activity
         });
 
         // initializes the search results list view
-        m_searchResultListView = (ListView) findViewById(R.id.searchResultListView);
+        m_searchResultListView = (ListView) findViewById(R.id.search_result_listview);
         m_searchResultListAdapter = new SearchResultListAdapter(this);
         m_searchResultListView.setAdapter(m_searchResultListAdapter);
         m_searchResultListView.setOnItemClickListener(new OnItemClickListener()

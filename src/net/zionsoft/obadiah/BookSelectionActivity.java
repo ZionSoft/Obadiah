@@ -47,11 +47,11 @@ public class BookSelectionActivity extends Activity
         m_translationReader = new TranslationReader(this);
 
         // initializes the tool bar
-        m_settingsButton = (ImageButton) findViewById(R.id.settingsButton);
-        m_searchButton = (ImageButton) findViewById(R.id.searchButton);
+        m_settingsButton = (ImageButton) findViewById(R.id.settings_button);
+        m_searchButton = (ImageButton) findViewById(R.id.search_button);
 
         // initializes the title bar
-        m_selectedTranslationTextView = (TextView) findViewById(R.id.selectedTranslationTextView);
+        m_selectedTranslationTextView = (TextView) findViewById(R.id.selected_translation_textview);
         m_selectedTranslationTextView.setOnClickListener(new OnClickListener()
         {
             public void onClick(View v)
@@ -59,10 +59,10 @@ public class BookSelectionActivity extends Activity
                 BookSelectionActivity.this.startTranslationSelectionActivity();
             }
         });
-        m_selectedBookTextView = (TextView) findViewById(R.id.selectedBookNameTextView);
+        m_selectedBookTextView = (TextView) findViewById(R.id.selected_book_textview);
 
         // initializes the book names list view
-        m_bookListView = (ListView) findViewById(R.id.bookListView);
+        m_bookListView = (ListView) findViewById(R.id.book_listview);
         m_bookListAdapter = new BookListAdapter(this);
         m_bookListView.setAdapter(m_bookListAdapter);
         m_bookListView.setOnItemClickListener(new OnItemClickListener()
@@ -80,7 +80,7 @@ public class BookSelectionActivity extends Activity
         });
 
         // initializes the chapters selection grid view
-        m_chaptersGridView = (GridView) findViewById(R.id.chapterGridView);
+        m_chaptersGridView = (GridView) findViewById(R.id.chapter_gridview);
         m_chapterListAdapter = new ChapterListAdapter(this);
         m_chaptersGridView.setAdapter(m_chapterListAdapter);
         m_chaptersGridView.setOnItemClickListener(new OnItemClickListener()

@@ -4,13 +4,13 @@
     android:layout_height="match_parent" >
 
     <include
-        android:id="@+id/titleBar"
+        android:id="@+id/titlebar"
         android:layout_alignParentTop="true"
         layout="@layout/titlebar" />
 
     <RelativeLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/toolBar"
+        android:id="@+id/toolbar"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
@@ -18,7 +18,7 @@
         android:orientation="horizontal" >
 
         <ImageButton
-            android:id="@+id/settingsButton"
+            android:id="@+id/settings_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
@@ -29,11 +29,11 @@
             android:src="@drawable/btn_settings" />
 
         <ImageButton
-            android:id="@+id/searchButton"
+            android:id="@+id/search_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_toLeftOf="@id/settingsButton"
+            android:layout_toLeftOf="@id/settings_button"
             android:background="@drawable/button_background"
             android:onClick="onToolbarButtonClicked"
             android:padding="8dip"
@@ -42,11 +42,11 @@
 
     <ListView
         xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/bookListView"
+        android:id="@+id/book_listview"
         android:layout_width="144dip"
         android:layout_height="fill_parent"
-        android:layout_above="@id/toolBar"
-        android:layout_below="@id/titleBar"
+        android:layout_above="@id/toolbar"
+        android:layout_below="@id/titlebar"
         android:divider="@null"
         android:dividerHeight="0dip"
         android:listSelector="@null"
@@ -54,12 +54,12 @@
 
     <GridView
         xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/chapterGridView"
+        android:id="@+id/chapter_gridview"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:layout_above="@id/toolBar"
-        android:layout_below="@id/titleBar"
-        android:layout_toRightOf="@id/bookListView"
+        android:layout_above="@id/toolbar"
+        android:layout_below="@id/titlebar"
+        android:layout_toRightOf="@id/book_listview"
         android:columnWidth="48dip"
         android:gravity="center"
         android:listSelector="@null"

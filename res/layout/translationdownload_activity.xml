@@ -4,14 +4,14 @@
     android:layout_height="fill_parent" >
 
     <RelativeLayout
-        android:id="@+id/titleBar"
+        android:id="@+id/titlebar"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:background="@color/titlebar_background"
         android:orientation="horizontal" >
 
         <TextView
-            android:id="@+id/titleTextView"
+            android:id="@+id/title_textview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
@@ -23,7 +23,7 @@
             android:textStyle="bold" />
 
         <ImageButton
-            android:id="@+id/refreshButton"
+            android:id="@+id/refresh_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
@@ -36,7 +36,7 @@
 
     <com.google.ads.AdView
         xmlns:googleads="http://schemas.android.com/apk/lib/com.google.ads"
-        android:id="@+id/adView"
+        android:id="@+id/adview"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
@@ -47,11 +47,11 @@
 
     <ListView
         xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/translationListView"
+        android:id="@+id/translation_listview"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:layout_above="@id/adView"
-        android:layout_below="@id/titleBar"
+        android:layout_above="@id/adview"
+        android:layout_below="@id/titlebar"
         android:divider="@android:color/darker_gray"
         android:dividerHeight="1dip" />
 

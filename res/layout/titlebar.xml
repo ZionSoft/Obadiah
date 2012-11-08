@@ -5,7 +5,7 @@
     android:orientation="horizontal" >
 
     <TextView
-        android:id="@+id/selectedTranslationTextView"
+        android:id="@+id/selected_translation_textview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
@@ -19,7 +19,7 @@
         android:textStyle="bold" />
 
     <TextView
-        android:id="@+id/selectedBookNameTextView"
+        android:id="@+id/selected_book_textview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"

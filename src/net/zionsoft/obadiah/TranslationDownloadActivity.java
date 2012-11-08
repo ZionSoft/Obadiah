@@ -43,7 +43,7 @@ public class TranslationDownloadActivity extends Activity
         m_translationManager = new TranslationManager(this);
 
         // initializes list view showing available translations
-        m_translationListView = (ListView) findViewById(R.id.translationListView);
+        m_translationListView = (ListView) findViewById(R.id.translation_listview);
         m_translationListAdapter = new TranslationListAdapter(this);
         m_translationListView.setAdapter(m_translationListAdapter);
         m_translationListView.setOnItemClickListener(new OnItemClickListener()
