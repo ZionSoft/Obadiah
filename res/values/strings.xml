@@ -3,6 +3,7 @@
 
     <string name="app_name">Bible</string>
     <string name="pref_nightmode_title">Night Mode</string>
+    <string name="pref_rateme_title">Rate me on Google Play</string>
     <string name="text_download">Download more translations</string>
     <string name="text_downloading">Downloading, please wait.</string>
     <string name="text_copied">Texts copied to clipboard.</string>

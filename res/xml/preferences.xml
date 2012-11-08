@@ -6,4 +6,10 @@
         android:key="pref_nightmode"
         android:title="@string/pref_nightmode_title" />
 
+    <Preference android:title="@string/pref_rateme_title" >
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="market://details?id=net.zionsoft.obadiah" />
+    </Preference>
+
 </PreferenceScreen>

@@ -3,6 +3,7 @@
 
     <string name="app_name">圣经</string>
     <string name="pref_nightmode_title">夜间模式</string>
+    <string name="pref_rateme_title">在Google Play上给我评分</string>
     <string name="text_download">下载更多译本</string>
     <string name="text_copied">文本已成功复制到剪贴板。</string>
     <string name="text_delete">删除</string>
