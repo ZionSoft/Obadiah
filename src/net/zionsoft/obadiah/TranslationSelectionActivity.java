@@ -237,7 +237,8 @@ public class TranslationSelectionActivity extends Activity
             if (convertView == null) {
                 textView = new TextView(m_context);
                 textView.setGravity(Gravity.CENTER_VERTICAL);
-                textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 17);
+                textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP,
+                        m_context.getResources().getDimension(R.dimen.text_size));
                 textView.setPadding(30, 20, 30, 20);
             } else {
                 textView = (TextView) convertView;

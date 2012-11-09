@@ -16,10 +16,10 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
-            android:padding="8dip"
+            android:padding="@dimen/padding"
             android:text="@string/title_download_translation"
             android:textColor="@android:color/white"
-            android:textSize="18dip"
+            android:textSize="@dimen/titlebar_text_size"
             android:textStyle="bold" />
 
         <ImageButton
@@ -30,7 +30,7 @@
             android:layout_centerVertical="true"
             android:background="@drawable/button_background"
             android:onClick="refresh"
-            android:paddingRight="8dip"
+            android:paddingRight="@dimen/padding"
             android:src="@drawable/btn_refresh" />
     </RelativeLayout>
 

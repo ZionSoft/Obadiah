@@ -227,7 +227,8 @@ public class SearchActivity extends Activity
             TextView textView;
             if (convertView == null) {
                 textView = new TextView(m_context);
-                textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 17);
+                textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP,
+                        m_context.getResources().getDimension(R.dimen.text_size));
                 textView.setTextColor(Color.BLACK);
                 textView.setTypeface(null, Typeface.NORMAL);
             } else {

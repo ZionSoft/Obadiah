@@ -403,7 +403,8 @@ public class TranslationDownloadActivity extends Activity
                 // first line
                 TextView textView = new TextView(m_context);
                 textView.setGravity(Gravity.CENTER_VERTICAL);
-                textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 17);
+                textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP,
+                        m_context.getResources().getDimension(R.dimen.text_size));
                 textView.setPadding(30, 20, 30, 0);
                 linearLayout.addView(textView);
 
@@ -411,7 +412,8 @@ public class TranslationDownloadActivity extends Activity
                 textView = new TextView(m_context);
                 textView.setGravity(Gravity.CENTER_VERTICAL);
                 textView.setTextColor(Color.GRAY);
-                textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
+                textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP,
+                        m_context.getResources().getDimension(R.dimen.smaller_text_size));
                 textView.setPadding(30, 0, 30, 20);
                 linearLayout.addView(textView);
             } else {

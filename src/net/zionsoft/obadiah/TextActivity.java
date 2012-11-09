@@ -219,7 +219,8 @@ public class TextActivity extends Activity
                 linearLayout = new LinearLayout(m_context);
                 for (int i = 0; i < 2; ++i) {
                     final TextView textView = new TextView(m_context);
-                    textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 17);
+                    textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP,
+                            m_context.getResources().getDimension(R.dimen.text_size));
                     textView.setPadding(10, 10, 10, 10);
                     linearLayout.addView(textView);
                 }

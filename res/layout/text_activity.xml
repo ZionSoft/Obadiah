@@ -25,7 +25,7 @@
             android:layout_centerVertical="true"
             android:background="@drawable/button_background"
             android:onClick="onToolbarButtonClicked"
-            android:padding="8dip"
+            android:padding="@dimen/padding"
             android:src="@drawable/share_button" />
 
         <ImageButton
@@ -36,7 +36,7 @@
             android:layout_toRightOf="@id/share_button"
             android:background="@drawable/button_background"
             android:onClick="onToolbarButtonClicked"
-            android:padding="8dip"
+            android:padding="@dimen/padding"
             android:src="@drawable/copy_button" />
 
         <ImageButton
@@ -47,7 +47,7 @@
             android:layout_centerVertical="true"
             android:background="@drawable/button_background"
             android:onClick="onToolbarButtonClicked"
-            android:padding="8dip"
+            android:padding="@dimen/padding"
             android:src="@drawable/btn_settings" />
 
         <ImageButton
@@ -58,7 +58,7 @@
             android:layout_toLeftOf="@id/settings_button"
             android:background="@drawable/button_background"
             android:onClick="onToolbarButtonClicked"
-            android:padding="8dip"
+            android:padding="@dimen/padding"
             android:src="@drawable/btn_search" />
     </RelativeLayout>
 

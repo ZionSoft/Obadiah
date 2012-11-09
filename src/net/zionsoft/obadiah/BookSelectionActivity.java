@@ -218,8 +218,7 @@ public class BookSelectionActivity extends Activity
         {
             super(context);
 
-            m_textViewHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 47, context.getResources()
-                    .getDisplayMetrics());
+            m_textViewHeight = (int) context.getResources().getDimension(R.dimen.booklistview_textview_height);
         }
 
         public void setTexts(String[] texts)
@@ -234,7 +233,8 @@ public class BookSelectionActivity extends Activity
             if (convertView == null) {
                 textView = new TextView(m_context);
                 textView.setGravity(Gravity.CENTER);
-                textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 17);
+                textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP,
+                        m_context.getResources().getDimension(R.dimen.text_size));
                 textView.setHeight(m_textViewHeight);
                 textView.setBackgroundResource(R.drawable.list_item_background);
             } else {
@@ -262,8 +262,7 @@ public class BookSelectionActivity extends Activity
         {
             super(context);
 
-            m_textViewHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 37, context.getResources()
-                    .getDisplayMetrics());
+            m_textViewHeight = (int) context.getResources().getDimension(R.dimen.chaptergridview_column_height);
         }
 
         public void setTexts(String[] texts)
@@ -279,7 +278,8 @@ public class BookSelectionActivity extends Activity
                 textView = new TextView(m_context);
                 textView.setBackgroundResource(R.drawable.list_item_background);
                 textView.setGravity(Gravity.CENTER);
-                textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 17);
+                textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP,
+                        m_context.getResources().getDimension(R.dimen.text_size));
                 textView.setHeight(m_textViewHeight);
             } else {
                 textView = (TextView) convertView;

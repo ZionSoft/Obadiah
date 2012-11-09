@@ -25,7 +25,8 @@
         android:layout_centerVertical="true"
         android:layout_toLeftOf="@id/search_button"
         android:imeOptions="actionSearch"
-        android:inputType="text" />
+        android:inputType="text"
+        android:textSize="@dimen/text_size" />
 
     <ListView
         xmlns:android="http://schemas.android.com/apk/res/android"

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <dimen name="padding">8dip</dimen>
+    <dimen name="text_size">17dip</dimen>
+    <dimen name="smaller_text_size">15dip</dimen>
+    <dimen name="titlebar_text_size">18dip</dimen>
+    <dimen name="booklistview_width">144dip</dimen>
+    <dimen name="booklistview_textview_height">47dip</dimen>
+    <dimen name="chaptergridview_column_height">37dip</dimen>
+    <dimen name="chaptergridview_column_width">48dip</dimen>
+
+</resources>

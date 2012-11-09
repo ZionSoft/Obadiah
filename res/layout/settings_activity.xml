@@ -15,10 +15,10 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
-            android:padding="8dip"
+            android:padding="@dimen/padding"
             android:text="@string/text_settings"
             android:textColor="@android:color/white"
-            android:textSize="18dip"
+            android:textSize="@dimen/titlebar_text_size"
             android:textStyle="bold" />
     </RelativeLayout>
 
