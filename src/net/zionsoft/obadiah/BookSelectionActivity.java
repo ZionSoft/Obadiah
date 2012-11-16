@@ -75,6 +75,7 @@ public class BookSelectionActivity extends Activity
                 BookSelectionActivity.this.m_selectedBookTextView.setText(m_translationReader.bookNames()[m_selectedBook]);
                 BookSelectionActivity.this.m_bookListAdapter.notifyDataSetChanged();
                 BookSelectionActivity.this.updateChapterSelectionListAdapter();
+                BookSelectionActivity.this.m_chaptersGridView.setSelection(0);
             }
         });
 

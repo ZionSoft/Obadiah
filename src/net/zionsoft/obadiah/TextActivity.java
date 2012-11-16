@@ -375,7 +375,7 @@ public class TextActivity extends Activity
             while (iterator.hasNext()) {
                 final Page page = iterator.next();
                 if (page.position == TextActivity.this.m_currentChapter)
-                    return page.verseListView.pointToPosition(0, 0);
+                    return page.verseListView.getFirstVisiblePosition();
             }
             return 0;
         }
