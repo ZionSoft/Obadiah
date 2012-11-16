@@ -11,6 +11,7 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.util.TypedValue;
 import android.view.KeyEvent;
@@ -91,6 +92,20 @@ public class SearchActivity extends Activity
     protected void onResume()
     {
         super.onResume();
+
+        final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        if (sharedPreferences.getBoolean(SettingsActivity.PREF_NIGHTMODE, false)) {
+            // night mode
+            m_searchResultListView.setBackgroundColor(Color.BLACK);
+            m_searchResultListView.setCacheColorHint(Color.BLACK);
+            m_textColor = Color.WHITE;
+        } else {
+            // day mode
+            m_searchResultListView.setBackgroundColor(Color.WHITE);
+            m_searchResultListView.setCacheColorHint(Color.WHITE);
+            m_textColor = Color.BLACK;
+        }
+        m_searchResultListAdapter.notifyDataSetChanged();
 
         final String selectedTranslationShortName = getSharedPreferences(Constants.SETTING_KEY, MODE_PRIVATE)
                 .getString(Constants.CURRENT_TRANSLATION_SETTING_KEY, null);
@@ -230,17 +245,18 @@ public class SearchActivity extends Activity
                 textView = new TextView(m_context);
                 textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP,
                         m_context.getResources().getDimension(R.dimen.text_size));
-                textView.setTextColor(Color.BLACK);
                 textView.setTypeface(null, Typeface.NORMAL);
             } else {
                 textView = (TextView) convertView;
             }
 
+            textView.setTextColor(SearchActivity.this.m_textColor);
             textView.setText(m_texts[position]);
             return textView;
         }
     }
 
+    private int m_textColor;
     private EditText m_searchText;
     private ListView m_searchResultListView;
     private SearchResult[] m_results;
