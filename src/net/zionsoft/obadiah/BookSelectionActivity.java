@@ -1,19 +1,15 @@
 package net.zionsoft.obadiah;
 
-import java.io.File;
+import net.zionsoft.obadiah.support.UpgradeAsyncTask;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.TypedValue;
@@ -36,9 +32,9 @@ public class BookSelectionActivity extends Activity
         setContentView(R.layout.bookselection_activity);
 
         // convert to new format from old format if needed
-        if (getSharedPreferences("settings", MODE_PRIVATE).getInt("currentApplicationVersion", 0) < CURRENT_APPLICATION_VERSION) {
-            m_converting = true;
-            new UpgradeAsyncTask().execute();
+        if (getSharedPreferences("settings", MODE_PRIVATE).getInt("currentApplicationVersion", 0) < Constants.CURRENT_APPLICATION_VERSION) {
+            m_upgrading = true;
+            new UpgradeAsyncTask(this).execute();
         }
 
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
@@ -125,10 +121,16 @@ public class BookSelectionActivity extends Activity
             m_textColor = Color.BLACK;
         }
 
-        if (m_converting)
+        if (m_upgrading)
             return;
 
         populateUi();
+    }
+
+    public void onUpgradeFinished()
+    {
+        populateUi();
+        m_upgrading = false;
     }
 
     public void onToolbarButtonClicked(View view)
@@ -293,263 +295,7 @@ public class BookSelectionActivity extends Activity
         }
     }
 
-    private class UpgradeAsyncTask extends AsyncTask<Void, Integer, Void>
-    {
-        protected void onPreExecute()
-        {
-            // running in the main thread
-
-            m_progressDialog = new ProgressDialog(BookSelectionActivity.this);
-            m_progressDialog.setCancelable(false);
-            m_progressDialog.setMessage(BookSelectionActivity.this.getText(R.string.text_initializing));
-            m_progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-            m_progressDialog.setMax(100);
-            m_progressDialog.setProgress(0);
-            m_progressDialog.show();
-        }
-
-        protected Void doInBackground(Void... params)
-        {
-            // running in the worker thread
-
-            convertTranslations();
-            publishProgress(98);
-
-            convertSettings();
-            publishProgress(99);
-
-            // sets the application version
-            final SharedPreferences preferences = getSharedPreferences("settings", MODE_PRIVATE);
-            final SharedPreferences.Editor editor = preferences.edit();
-            editor.putInt("currentApplicationVersion", CURRENT_APPLICATION_VERSION);
-            editor.commit();
-
-            publishProgress(100);
-
-            return null;
-        }
-
-        protected void onProgressUpdate(Integer... progress)
-        {
-            // running in the main thread
-
-            m_progressDialog.setProgress(progress[0]);
-        }
-
-        protected void onPostExecute(Void result)
-        {
-            // running in the main thread
-
-            BookSelectionActivity.this.populateUi();
-            m_progressDialog.dismiss();
-            BookSelectionActivity.this.m_converting = false;
-        }
-
-        private void convertSettings()
-        {
-            // old settings format is used prior to 1.5.0
-
-            final SharedPreferences preferences = getSharedPreferences("settings", MODE_PRIVATE);
-            final SharedPreferences.Editor editor = preferences.edit();
-            String selectedTranslation = null;
-            try {
-                selectedTranslation = preferences.getString("selectedTranslation", null);
-                if (selectedTranslation != null) {
-                    if (selectedTranslation.equals("danske-bibel1871"))
-                        selectedTranslation = "DA1871";
-                    else if (selectedTranslation.equals("authorized-king-james"))
-                        selectedTranslation = "KJV";
-                    else if (selectedTranslation.equals("american-king-james"))
-                        selectedTranslation = "AKJV";
-                    else if (selectedTranslation.equals("basic-english"))
-                        selectedTranslation = "BBE";
-                    else if (selectedTranslation.equals("esv"))
-                        selectedTranslation = "ESV";
-                    else if (selectedTranslation.equals("raamattu1938"))
-                        selectedTranslation = "PR1938";
-                    else if (selectedTranslation.equals("fre-segond"))
-                        selectedTranslation = "FreSegond";
-                    else if (selectedTranslation.equals("darby-elb1905"))
-                        selectedTranslation = "Elb1905";
-                    else if (selectedTranslation.equals("luther-biblia"))
-                        selectedTranslation = "Lut1545";
-                    else if (selectedTranslation.equals("italian-diodati-bibbia"))
-                        selectedTranslation = "Dio";
-                    else if (selectedTranslation.equals("korean-revised"))
-                        selectedTranslation = "개역성경";
-                    else if (selectedTranslation.equals("biblia-almeida-recebida"))
-                        selectedTranslation = "PorAR";
-                    else if (selectedTranslation.equals("reina-valera1569"))
-                        selectedTranslation = "RV1569";
-                    else if (selectedTranslation.equals("chinese-union-traditional"))
-                        selectedTranslation = "華語和合本";
-                    else if (selectedTranslation.equals("chinese-union-simplified"))
-                        selectedTranslation = "中文和合本";
-                    else if (selectedTranslation.equals("chinese-new-version-traditional"))
-                        selectedTranslation = "華語新譯本";
-                    else if (selectedTranslation.equals("chinese-new-version-simplified"))
-                        selectedTranslation = "中文新译本";
-                }
-            } catch (ClassCastException e) {
-                // the value is an integer prior to 1.2.0
-                final int selected = preferences.getInt("selectedTranslation", 0);
-                if (selected == 1)
-                    selectedTranslation = "中文和合本";
-                else
-                    selectedTranslation = "KJV";
-            }
-            final TranslationInfo[] translations = BookSelectionActivity.this.m_translationManager.translations();
-            if (translations != null) {
-                for (TranslationInfo translation : translations) {
-                    if (translation.shortName.equals(selectedTranslation))
-                        editor.putString("currentTranslation", selectedTranslation);
-                }
-            }
-            editor.remove("selectedTranslation");
-
-            editor.commit();
-        }
-
-        private void convertTranslations()
-        {
-            // old translations format is used prior to 1.5.0
-
-            final File rootDir = BookSelectionActivity.this.getFilesDir();
-            final BibleReader oldReader = new BibleReader(rootDir);
-            final TranslationInfo[] installedTranslations = oldReader.installedTranslations();
-            if (installedTranslations == null || installedTranslations.length == 0)
-                return;
-
-            final SQLiteDatabase db = new TranslationsDatabaseHelper(BookSelectionActivity.this).getWritableDatabase();
-            db.beginTransaction();
-            try {
-                final ContentValues versesValues = new ContentValues(4);
-                final ContentValues bookNamesValues = new ContentValues(3);
-                final ContentValues translationInfoValues = new ContentValues(5);
-                translationInfoValues.put(TranslationsDatabaseHelper.COLUMN_INSTALLED, 1);
-
-                final double progressDelta = 1.36 / installedTranslations.length;
-                double currentProgress = 1.0;
-                for (TranslationInfo translationInfo : installedTranslations) {
-                    publishProgress((int) currentProgress);
-
-                    // creates a translation table
-                    db.execSQL("CREATE TABLE " + translationInfo.shortName + " ("
-                            + TranslationsDatabaseHelper.COLUMN_BOOK_INDEX + " INTEGER NOT NULL, "
-                            + TranslationsDatabaseHelper.COLUMN_CHAPTER_INDEX + " INTEGER NOT NULL, "
-                            + TranslationsDatabaseHelper.COLUMN_VERSE_INDEX + " INTEGER NOT NULL, "
-                            + TranslationsDatabaseHelper.COLUMN_TEXT + " TEXT NOT NULL);");
-                    db.execSQL("CREATE INDEX INDEX_" + translationInfo.shortName + " ON " + translationInfo.shortName
-                            + " (" + TranslationsDatabaseHelper.COLUMN_BOOK_INDEX + ", "
-                            + TranslationsDatabaseHelper.COLUMN_CHAPTER_INDEX + ", "
-                            + TranslationsDatabaseHelper.COLUMN_VERSE_INDEX + ");");
-
-                    bookNamesValues.put(TranslationsDatabaseHelper.COLUMN_TRANSLATION_SHORTNAME,
-                            translationInfo.shortName);
-
-                    oldReader.selectTranslation(translationInfo.path);
-                    for (int bookIndex = 0; bookIndex < 66; ++bookIndex) {
-                        // writes verses
-                        final int chapterCount = TranslationReader.chapterCount(bookIndex);
-                        for (int chapterIndex = 0; chapterIndex < chapterCount; ++chapterIndex) {
-                            String[] texts = oldReader.verses(bookIndex, chapterIndex);
-                            int verseIndex = 0;
-                            for (String text : texts) {
-                                versesValues.put(TranslationsDatabaseHelper.COLUMN_BOOK_INDEX, bookIndex);
-                                versesValues.put(TranslationsDatabaseHelper.COLUMN_CHAPTER_INDEX, chapterIndex);
-                                versesValues.put(TranslationsDatabaseHelper.COLUMN_VERSE_INDEX, verseIndex++);
-                                versesValues.put(TranslationsDatabaseHelper.COLUMN_TEXT, text);
-                                db.insert(translationInfo.shortName, null, versesValues);
-                            }
-                        }
-
-                        // writes book name
-                        bookNamesValues.put(TranslationsDatabaseHelper.COLUMN_BOOK_INDEX, bookIndex);
-                        bookNamesValues.put(TranslationsDatabaseHelper.COLUMN_BOOK_NAME,
-                                translationInfo.bookNames[bookIndex]);
-                        db.insert(TranslationsDatabaseHelper.TABLE_BOOK_NAMES, null, bookNamesValues);
-
-                        currentProgress += progressDelta;
-                        publishProgress((int) currentProgress);
-                    }
-
-                    // adds to the translations table
-                    translationInfoValues.put(TranslationsDatabaseHelper.COLUMN_TRANSLATION_NAME, translationInfo.name);
-                    translationInfoValues.put(TranslationsDatabaseHelper.COLUMN_TRANSLATION_SHORTNAME,
-                            translationInfo.shortName);
-
-                    if (translationInfo.shortName.equals("DA1871")) {
-                        translationInfoValues.put(TranslationsDatabaseHelper.COLUMN_DOWNLOAD_SIZE, 1843);
-                        translationInfoValues.put(TranslationsDatabaseHelper.COLUMN_LANGUAGE, "Dansk");
-                    } else if (translationInfo.shortName.equals("KJV")) {
-                        translationInfoValues.put(TranslationsDatabaseHelper.COLUMN_DOWNLOAD_SIZE, 1817);
-                        translationInfoValues.put(TranslationsDatabaseHelper.COLUMN_LANGUAGE, "English");
-                    } else if (translationInfo.shortName.equals("AKJV")) {
-                        translationInfoValues.put(TranslationsDatabaseHelper.COLUMN_DOWNLOAD_SIZE, 1799);
-                        translationInfoValues.put(TranslationsDatabaseHelper.COLUMN_LANGUAGE, "English");
-                    } else if (translationInfo.shortName.equals("BBE")) {
-                        translationInfoValues.put(TranslationsDatabaseHelper.COLUMN_DOWNLOAD_SIZE, 1826);
-                        translationInfoValues.put(TranslationsDatabaseHelper.COLUMN_LANGUAGE, "English");
-                    } else if (translationInfo.shortName.equals("ESV")) {
-                        translationInfoValues.put(TranslationsDatabaseHelper.COLUMN_DOWNLOAD_SIZE, 1780);
-                        translationInfoValues.put(TranslationsDatabaseHelper.COLUMN_LANGUAGE, "English");
-                    } else if (translationInfo.shortName.equals("PR1938")) {
-                        translationInfoValues.put(TranslationsDatabaseHelper.COLUMN_DOWNLOAD_SIZE, 1950);
-                        translationInfoValues.put(TranslationsDatabaseHelper.COLUMN_LANGUAGE, "Suomi");
-                    } else if (translationInfo.shortName.equals("FreSegond")) {
-                        translationInfoValues.put(TranslationsDatabaseHelper.COLUMN_DOWNLOAD_SIZE, 1972);
-                        translationInfoValues.put(TranslationsDatabaseHelper.COLUMN_LANGUAGE, "Français");
-                    } else if (translationInfo.shortName.equals("Elb1905")) {
-                        translationInfoValues.put(TranslationsDatabaseHelper.COLUMN_DOWNLOAD_SIZE, 1990);
-                        translationInfoValues.put(TranslationsDatabaseHelper.COLUMN_LANGUAGE, "Deutsche");
-                    } else if (translationInfo.shortName.equals("Lut1545")) {
-                        translationInfoValues.put(TranslationsDatabaseHelper.COLUMN_DOWNLOAD_SIZE, 1880);
-                        translationInfoValues.put(TranslationsDatabaseHelper.COLUMN_LANGUAGE, "Deutsche");
-                    } else if (translationInfo.shortName.equals("Dio")) {
-                        translationInfoValues.put(TranslationsDatabaseHelper.COLUMN_DOWNLOAD_SIZE, "Italiano");
-                        translationInfoValues.put(TranslationsDatabaseHelper.COLUMN_LANGUAGE, 1843);
-                    } else if (translationInfo.shortName.equals("개역성경")) {
-                        translationInfoValues.put(TranslationsDatabaseHelper.COLUMN_DOWNLOAD_SIZE, 1923);
-                        translationInfoValues.put(TranslationsDatabaseHelper.COLUMN_LANGUAGE, "한국인");
-                    } else if (translationInfo.shortName.equals("PorAR")) {
-                        translationInfoValues.put(TranslationsDatabaseHelper.COLUMN_DOWNLOAD_SIZE, 1950);
-                        translationInfoValues.put(TranslationsDatabaseHelper.COLUMN_LANGUAGE, "Português");
-                    } else if (translationInfo.shortName.equals("RV1569")) {
-                        translationInfoValues.put(TranslationsDatabaseHelper.COLUMN_DOWNLOAD_SIZE, 1855);
-                        translationInfoValues.put(TranslationsDatabaseHelper.COLUMN_LANGUAGE, "Español");
-                    } else if (translationInfo.shortName.equals("華語和合本")) {
-                        translationInfoValues.put(TranslationsDatabaseHelper.COLUMN_DOWNLOAD_SIZE, 1772);
-                        translationInfoValues.put(TranslationsDatabaseHelper.COLUMN_LANGUAGE, "正體中文");
-                    } else if (translationInfo.shortName.equals("中文和合本")) {
-                        translationInfoValues.put(TranslationsDatabaseHelper.COLUMN_DOWNLOAD_SIZE, 1739);
-                        translationInfoValues.put(TranslationsDatabaseHelper.COLUMN_LANGUAGE, "简体中文");
-                    } else if (translationInfo.shortName.equals("華語新譯本")) {
-                        translationInfoValues.put(TranslationsDatabaseHelper.COLUMN_DOWNLOAD_SIZE, 1874);
-                        translationInfoValues.put(TranslationsDatabaseHelper.COLUMN_LANGUAGE, "正體中文");
-                    } else if (translationInfo.shortName.equals("中文新译本")) {
-                        translationInfoValues.put(TranslationsDatabaseHelper.COLUMN_DOWNLOAD_SIZE, 1877);
-                        translationInfoValues.put(TranslationsDatabaseHelper.COLUMN_LANGUAGE, "简体中文");
-                    }
-
-                    db.insert(TranslationsDatabaseHelper.TABLE_TRANSLATIONS, null, translationInfoValues);
-                }
-
-                publishProgress(91);
-                db.setTransactionSuccessful();
-                Utils.removeDirectory(rootDir);
-            } finally {
-                publishProgress(92);
-                db.endTransaction();
-                db.close();
-            }
-        }
-
-        private ProgressDialog m_progressDialog;
-    }
-
-    private static int CURRENT_APPLICATION_VERSION = 10500;
-
-    private boolean m_converting = false;
+    private boolean m_upgrading = false;
     private int m_currentBook = -1;
     private int m_currentChapter = -1;
     private int m_selectedBook = -1;

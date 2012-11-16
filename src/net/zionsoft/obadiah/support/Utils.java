@@ -1,4 +1,4 @@
-package net.zionsoft.obadiah;
+package net.zionsoft.obadiah.support;
 
 import java.io.File;
 

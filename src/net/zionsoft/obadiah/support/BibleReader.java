@@ -1,11 +1,14 @@
-package net.zionsoft.obadiah;
+package net.zionsoft.obadiah.support;
 
 import java.io.File;
 import java.io.FileInputStream;
 
+import net.zionsoft.obadiah.TranslationInfo;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+// old format is used prior to 1.5.0
 public class BibleReader
 {
     public BibleReader(File rootDir)
@@ -125,8 +128,6 @@ public class BibleReader
     public String[] verses(int book, int chapter)
     {
         try {
-            // TODO handles if the selected chapter is invalid
-
             final String path = m_selectedTranslation + "/" + book + "-" + chapter + ".json";
             final File file = new File(path);
             final FileInputStream fis = new FileInputStream(file);
