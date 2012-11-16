@@ -33,8 +33,8 @@ public class TranslationSelectionActivity extends Activity
         setContentView(R.layout.translationselection_activity);
 
         m_translationManager = new TranslationManager(this);
-        m_selectedTranslationShortName = getSharedPreferences("settings", MODE_PRIVATE).getString("currentTranslation",
-                null);
+        m_selectedTranslationShortName = getSharedPreferences(Constants.SETTING_KEY, MODE_PRIVATE).getString(
+                Constants.CURRENT_TRANSLATION_SETTING_KEY, null);
 
         // initializes list view showing installed translations
         m_translationListAdapter = new TranslationSelectionListAdapter(this);
@@ -50,8 +50,8 @@ public class TranslationSelectionActivity extends Activity
                 }
 
                 final SharedPreferences.Editor editor = TranslationSelectionActivity.this.getSharedPreferences(
-                        "settings", MODE_PRIVATE).edit();
-                editor.putString("currentTranslation", m_installedTranslations[position].shortName);
+                        Constants.SETTING_KEY, MODE_PRIVATE).edit();
+                editor.putString(Constants.CURRENT_TRANSLATION_SETTING_KEY, m_installedTranslations[position].shortName);
                 editor.commit();
 
                 finish();

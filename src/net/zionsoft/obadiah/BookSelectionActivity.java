@@ -32,7 +32,9 @@ public class BookSelectionActivity extends Activity
         setContentView(R.layout.bookselection_activity);
 
         // convert to new format from old format if needed
-        if (getSharedPreferences("settings", MODE_PRIVATE).getInt("currentApplicationVersion", 0) < Constants.CURRENT_APPLICATION_VERSION) {
+        final int currentApplicationVersion = getSharedPreferences(Constants.SETTING_KEY, MODE_PRIVATE).getInt(
+                Constants.CURRENT_APPLICATION_VERSION_SETTING_KEY, 0);
+        if (currentApplicationVersion < Constants.CURRENT_APPLICATION_VERSION) {
             m_upgrading = true;
             new UpgradeAsyncTask(this).execute();
         }
@@ -84,14 +86,14 @@ public class BookSelectionActivity extends Activity
         {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id)
             {
-                final SharedPreferences preferences = BookSelectionActivity.this.getSharedPreferences("settings",
-                        MODE_PRIVATE);
-                if (preferences.getInt("currentBook", -1) != m_selectedBook
-                        || preferences.getInt("currentChapter", -1) != position) {
+                final SharedPreferences preferences = BookSelectionActivity.this.getSharedPreferences(
+                        Constants.SETTING_KEY, MODE_PRIVATE);
+                if (preferences.getInt(Constants.CURRENT_BOOK_SETTING_KEY, -1) != m_selectedBook
+                        || preferences.getInt(Constants.CURRENT_CHAPTER_SETTING_KEY, -1) != position) {
                     final SharedPreferences.Editor editor = preferences.edit();
-                    editor.putInt("currentBook", m_selectedBook);
-                    editor.putInt("currentChapter", position);
-                    editor.putInt("currentVerse", 0);
+                    editor.putInt(Constants.CURRENT_BOOK_SETTING_KEY, m_selectedBook);
+                    editor.putInt(Constants.CURRENT_CHAPTER_SETTING_KEY, position);
+                    editor.putInt(Constants.CURRENT_VERSE_SETTING_KEY, 0);
                     editor.commit();
                 }
 
@@ -156,12 +158,13 @@ public class BookSelectionActivity extends Activity
 
         if (hasInstalledTranslation) {
             // loads last used translation
-            final SharedPreferences preferences = getSharedPreferences("settings", MODE_PRIVATE);
-            m_translationReader.selectTranslation(preferences.getString("currentTranslation", null));
+            final SharedPreferences preferences = getSharedPreferences(Constants.SETTING_KEY, MODE_PRIVATE);
+            m_translationReader.selectTranslation(preferences
+                    .getString(Constants.CURRENT_TRANSLATION_SETTING_KEY, null));
 
             // loads the last read book and chapter
-            m_currentBook = preferences.getInt("currentBook", -1);
-            m_currentChapter = preferences.getInt("currentChapter", -1);
+            m_currentBook = preferences.getInt(Constants.CURRENT_BOOK_SETTING_KEY, -1);
+            m_currentChapter = preferences.getInt(Constants.CURRENT_CHAPTER_SETTING_KEY, -1);
 
             // sets the book that is currently selected
             m_selectedBook = m_currentBook < 0 ? 0 : m_currentBook;

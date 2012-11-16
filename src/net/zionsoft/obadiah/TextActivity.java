@@ -91,13 +91,13 @@ public class TextActivity extends Activity
             m_textColor = Color.BLACK;
         }
 
-        final SharedPreferences preferences = getSharedPreferences("settings", MODE_PRIVATE);
-        m_currentBook = preferences.getInt("currentBook", 0);
-        m_currentChapter = preferences.getInt("currentChapter", 0);
-        m_translationReader.selectTranslation(preferences.getString("currentTranslation", null));
+        final SharedPreferences preferences = getSharedPreferences(Constants.SETTING_KEY, MODE_PRIVATE);
+        m_currentBook = preferences.getInt(Constants.CURRENT_BOOK_SETTING_KEY, 0);
+        m_currentChapter = preferences.getInt(Constants.CURRENT_CHAPTER_SETTING_KEY, 0);
+        m_translationReader.selectTranslation(preferences.getString(Constants.CURRENT_TRANSLATION_SETTING_KEY, null));
 
         m_verseViewPager.setCurrentItem(m_currentChapter);
-        m_versePagerAdapter.setSelection(preferences.getInt("currentVerse", 0));
+        m_versePagerAdapter.setSelection(preferences.getInt(Constants.CURRENT_VERSE_SETTING_KEY, 0));
         m_versePagerAdapter.updateText();
 
         populateUi();
@@ -107,9 +107,9 @@ public class TextActivity extends Activity
     {
         super.onPause();
 
-        final SharedPreferences.Editor editor = getSharedPreferences("settings", MODE_PRIVATE).edit();
-        editor.putInt("currentChapter", m_currentChapter);
-        editor.putInt("currentVerse", m_versePagerAdapter.currentVerse());
+        final SharedPreferences.Editor editor = getSharedPreferences(Constants.SETTING_KEY, MODE_PRIVATE).edit();
+        editor.putInt(Constants.CURRENT_CHAPTER_SETTING_KEY, m_currentChapter);
+        editor.putInt(Constants.CURRENT_VERSE_SETTING_KEY, m_versePagerAdapter.currentVerse());
         editor.commit();
     }
 

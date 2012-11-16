@@ -48,10 +48,10 @@ public class UpgradeAsyncTask extends AsyncTask<Void, Integer, Void>
         publishProgress(99);
 
         // sets the application version
-        final SharedPreferences preferences = m_bookSelectionActivity.getSharedPreferences("settings",
+        final SharedPreferences preferences = m_bookSelectionActivity.getSharedPreferences(Constants.SETTING_KEY,
                 Context.MODE_PRIVATE);
         final SharedPreferences.Editor editor = preferences.edit();
-        editor.putInt("currentApplicationVersion", Constants.CURRENT_APPLICATION_VERSION);
+        editor.putInt(Constants.CURRENT_APPLICATION_VERSION_SETTING_KEY, Constants.CURRENT_APPLICATION_VERSION);
         editor.commit();
 
         publishProgress(100);
@@ -211,7 +211,7 @@ public class UpgradeAsyncTask extends AsyncTask<Void, Integer, Void>
     {
         // old settings format is used prior to 1.5.0
 
-        final SharedPreferences preferences = m_bookSelectionActivity.getSharedPreferences("settings",
+        final SharedPreferences preferences = m_bookSelectionActivity.getSharedPreferences(Constants.SETTING_KEY,
                 Context.MODE_PRIVATE);
         final SharedPreferences.Editor editor = preferences.edit();
         String selectedTranslation = null;
@@ -265,7 +265,7 @@ public class UpgradeAsyncTask extends AsyncTask<Void, Integer, Void>
         if (translations != null) {
             for (TranslationInfo translation : translations) {
                 if (translation.shortName.equals(selectedTranslation))
-                    editor.putString("currentTranslation", selectedTranslation);
+                    editor.putString(Constants.CURRENT_TRANSLATION_SETTING_KEY, selectedTranslation);
             }
         }
         editor.remove("selectedTranslation");
