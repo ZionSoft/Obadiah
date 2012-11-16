@@ -2,10 +2,10 @@
 <resources>
 
     <dimen name="padding">8dip</dimen>
-    <dimen name="text_size">17dip</dimen>
-    <dimen name="smaller_text_size">15dip</dimen>
+    <dimen name="text_size">16dip</dimen>
+    <dimen name="smaller_text_size">14dip</dimen>
     <dimen name="titlebar_text_size">18dip</dimen>
-    <dimen name="booklistview_width">144dip</dimen>
+    <dimen name="booklistview_width">160dip</dimen>
     <dimen name="chaptergridview_column_width">48dip</dimen>
 
 </resources>
