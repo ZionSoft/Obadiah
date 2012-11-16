@@ -152,6 +152,8 @@ public class TextActivity extends Activity
         public VerseListAdapter(Context context)
         {
             super(context);
+
+            m_padding = (int) context.getResources().getDimension(R.dimen.padding);
         }
 
         public void selectItem(int position)
@@ -219,9 +221,9 @@ public class TextActivity extends Activity
                 linearLayout = new LinearLayout(m_context);
                 for (int i = 0; i < 2; ++i) {
                     final TextView textView = new TextView(m_context);
-                    textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP,
+                    textView.setTextSize(TypedValue.COMPLEX_UNIT_PX,
                             m_context.getResources().getDimension(R.dimen.text_size));
-                    textView.setPadding(10, 10, 10, 10);
+                    textView.setPadding(m_padding, m_padding, m_padding, m_padding);
                     linearLayout.addView(textView);
                 }
             } else {
@@ -249,6 +251,7 @@ public class TextActivity extends Activity
         }
 
         private boolean m_selected[];
+        private int m_padding;
         private int m_selectedCount;
         private BackgroundColorSpan m_backgroundColorSpan;
     }

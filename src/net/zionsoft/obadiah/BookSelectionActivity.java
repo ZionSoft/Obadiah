@@ -42,6 +42,7 @@ public class BookSelectionActivity extends Activity
         }
 
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+        m_padding = (int) getResources().getDimension(R.dimen.padding);
 
         m_translationManager = new TranslationManager(this);
         m_translationReader = new TranslationReader(this);
@@ -217,8 +218,6 @@ public class BookSelectionActivity extends Activity
         public BookListAdapter(Context context)
         {
             super(context);
-
-            m_textViewHeight = (int) context.getResources().getDimension(R.dimen.booklistview_textview_height);
         }
 
         public void setTexts(String[] texts)
@@ -233,9 +232,11 @@ public class BookSelectionActivity extends Activity
             if (convertView == null) {
                 textView = new TextView(m_context);
                 textView.setGravity(Gravity.CENTER);
-                textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP,
+                textView.setTextSize(TypedValue.COMPLEX_UNIT_PX,
                         m_context.getResources().getDimension(R.dimen.text_size));
-                textView.setHeight(m_textViewHeight);
+                textView.setPadding(BookSelectionActivity.this.m_padding, BookSelectionActivity.this.m_padding,
+                        BookSelectionActivity.this.m_padding, BookSelectionActivity.this.m_padding);
+                // textView.setHeight(m_textViewHeight);
                 textView.setBackgroundResource(R.drawable.list_item_background);
             } else {
                 textView = (TextView) convertView;
@@ -252,8 +253,6 @@ public class BookSelectionActivity extends Activity
             textView.setText(m_texts[position]);
             return textView;
         }
-
-        private int m_textViewHeight;
     }
 
     public class ChapterListAdapter extends ListBaseAdapter
@@ -261,8 +260,6 @@ public class BookSelectionActivity extends Activity
         public ChapterListAdapter(Context context)
         {
             super(context);
-
-            m_textViewHeight = (int) context.getResources().getDimension(R.dimen.chaptergridview_column_height);
         }
 
         public void setTexts(String[] texts)
@@ -278,9 +275,10 @@ public class BookSelectionActivity extends Activity
                 textView = new TextView(m_context);
                 textView.setBackgroundResource(R.drawable.list_item_background);
                 textView.setGravity(Gravity.CENTER);
-                textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP,
+                textView.setTextSize(TypedValue.COMPLEX_UNIT_PX,
                         m_context.getResources().getDimension(R.dimen.text_size));
-                textView.setHeight(m_textViewHeight);
+                textView.setPadding(BookSelectionActivity.this.m_padding, BookSelectionActivity.this.m_padding,
+                        BookSelectionActivity.this.m_padding, BookSelectionActivity.this.m_padding);
             } else {
                 textView = (TextView) convertView;
             }
@@ -293,8 +291,6 @@ public class BookSelectionActivity extends Activity
             textView.setText(m_texts[position]);
             return textView;
         }
-
-        private int m_textViewHeight;
     }
 
     private class UpgradeAsyncTask extends AsyncTask<Void, Integer, Void>
@@ -557,6 +553,7 @@ public class BookSelectionActivity extends Activity
     private int m_currentBook = -1;
     private int m_currentChapter = -1;
     private int m_selectedBook = -1;
+    private int m_padding;
     private int m_textColor;
     private BookListAdapter m_bookListAdapter;
     private ChapterListAdapter m_chapterListAdapter;
