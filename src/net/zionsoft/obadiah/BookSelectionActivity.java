@@ -33,14 +33,14 @@ public class BookSelectionActivity extends Activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.bookselection_activity);
 
+        m_translationManager = new TranslationManager(this);
+        m_translationReader = new TranslationReader(this);
+
         // convert to new format from old format if needed
         if (getSharedPreferences("settings", MODE_PRIVATE).getInt("currentApplicationVersion", 0) < CURRENT_APPLICATION_VERSION) {
             m_converting = true;
             new UpgradeAsyncTask().execute();
         }
-
-        m_translationManager = new TranslationManager(this);
-        m_translationReader = new TranslationReader(this);
 
         // initializes the title bar
         m_selectedTranslationTextView = (TextView) findViewById(R.id.textTranslationSelection);
