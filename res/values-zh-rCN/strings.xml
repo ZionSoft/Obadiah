@@ -3,6 +3,8 @@
 
     <string name="app_name">圣经</string>
     <string name="pref_nightmode_title">夜间模式</string>
+    <string name="pref_fontsize_title">字体大小</string>
+    <string name="pref_fontsize_dialog_title">请选择字体大小：</string>
     <string name="pref_rateme_title">在Google Play上给我评分</string>
     <string name="text_download">下载更多译本</string>
     <string name="text_copied">文本已成功复制到剪贴板。</string>
@@ -24,5 +26,13 @@
     <string name="text_settings">设置</string>
     <string name="title_download_translation">请选择要下载的译本</string>
     <string name="title_select_translation">选择译本</string>
+    
+    <string-array name="array_fontsize_name">
+        <item>超小号</item>
+        <item>小号</item>
+        <item>中号</item>
+        <item>大号</item>
+        <item>超大号</item>
+    </string-array>
 
 </resources>

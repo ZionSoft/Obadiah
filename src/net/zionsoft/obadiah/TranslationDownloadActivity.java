@@ -75,6 +75,24 @@ public class TranslationDownloadActivity extends Activity
             m_translationListView.setCacheColorHint(Color.WHITE);
             m_textColor = Color.BLACK;
         }
+        final String fontSize = sharedPreferences.getString(SettingsActivity.PREF_FONTSIZE,
+                SettingsActivity.PREF_FONTSIZE_DEFAULT);
+        if (fontSize.equals(SettingsActivity.PREF_FONTSIZE_VERYSMALL)) {
+            m_textSize = getResources().getDimension(R.dimen.text_size_verysmall);
+            m_smallerTextSize = getResources().getDimension(R.dimen.smaller_text_size_verysmall);
+        } else if (fontSize.equals(SettingsActivity.PREF_FONTSIZE_SMALL)) {
+            m_textSize = getResources().getDimension(R.dimen.text_size_small);
+            m_smallerTextSize = getResources().getDimension(R.dimen.smaller_text_size_small);
+        } else if (fontSize.equals(SettingsActivity.PREF_FONTSIZE_LARGE)) {
+            m_textSize = getResources().getDimension(R.dimen.text_size_large);
+            m_smallerTextSize = getResources().getDimension(R.dimen.smaller_text_size_medium);
+        } else if (fontSize.equals(SettingsActivity.PREF_FONTSIZE_VERYLARGE)) {
+            m_textSize = getResources().getDimension(R.dimen.text_size_verylarge);
+            m_smallerTextSize = getResources().getDimension(R.dimen.smaller_text_size_large);
+        } else {
+            m_textSize = getResources().getDimension(R.dimen.text_size_medium);
+            m_smallerTextSize = getResources().getDimension(R.dimen.smaller_text_size_verylarge);
+        }
     }
 
     protected void onPause()
@@ -403,8 +421,6 @@ public class TranslationDownloadActivity extends Activity
                 // first line
                 TextView textView = new TextView(m_context);
                 textView.setGravity(Gravity.CENTER_VERTICAL);
-                textView.setTextSize(TypedValue.COMPLEX_UNIT_PX,
-                        m_context.getResources().getDimension(R.dimen.text_size));
                 textView.setPadding(30, 20, 30, 0);
                 linearLayout.addView(textView);
 
@@ -412,8 +428,6 @@ public class TranslationDownloadActivity extends Activity
                 textView = new TextView(m_context);
                 textView.setGravity(Gravity.CENTER_VERTICAL);
                 textView.setTextColor(Color.GRAY);
-                textView.setTextSize(TypedValue.COMPLEX_UNIT_PX,
-                        m_context.getResources().getDimension(R.dimen.smaller_text_size));
                 textView.setPadding(30, 0, 30, 20);
                 linearLayout.addView(textView);
             } else {
@@ -422,11 +436,13 @@ public class TranslationDownloadActivity extends Activity
 
             // first line
             TextView textView = (TextView) linearLayout.getChildAt(0);
+            textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, TranslationDownloadActivity.this.m_textSize);
             textView.setTextColor(TranslationDownloadActivity.this.m_textColor);
             textView.setText(m_texts[position]);
 
             // second line
             textView = (TextView) linearLayout.getChildAt(1);
+            textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, TranslationDownloadActivity.this.m_smallerTextSize);
             textView.setText(m_subTexts[position]);
 
             return linearLayout;
@@ -438,6 +454,8 @@ public class TranslationDownloadActivity extends Activity
     protected static final String BASE_URL = "http://bible.zionsoft.net/translations/";
 
     private int m_textColor;
+    private float m_textSize;
+    private float m_smallerTextSize;
     private ListView m_translationListView;
     private TranslationDownloadAsyncTask m_translationDownloadAsyncTask;
     private TranslationListAdapter m_translationListAdapter;

@@ -91,6 +91,19 @@ public class TextActivity extends Activity
             m_textColor = Color.BLACK;
         }
 
+        final String fontSize = sharedPreferences.getString(SettingsActivity.PREF_FONTSIZE,
+                SettingsActivity.PREF_FONTSIZE_DEFAULT);
+        if (fontSize.equals(SettingsActivity.PREF_FONTSIZE_VERYSMALL))
+            m_textSize = getResources().getDimension(R.dimen.text_size_verysmall);
+        else if (fontSize.equals(SettingsActivity.PREF_FONTSIZE_SMALL))
+            m_textSize = getResources().getDimension(R.dimen.text_size_small);
+        else if (fontSize.equals(SettingsActivity.PREF_FONTSIZE_LARGE))
+            m_textSize = getResources().getDimension(R.dimen.text_size_large);
+        else if (fontSize.equals(SettingsActivity.PREF_FONTSIZE_VERYLARGE))
+            m_textSize = getResources().getDimension(R.dimen.text_size_verylarge);
+        else
+            m_textSize = getResources().getDimension(R.dimen.text_size_medium);
+
         final SharedPreferences preferences = getSharedPreferences(Constants.SETTING_KEY, MODE_PRIVATE);
         m_currentBook = preferences.getInt(Constants.CURRENT_BOOK_SETTING_KEY, 0);
         m_currentChapter = preferences.getInt(Constants.CURRENT_CHAPTER_SETTING_KEY, 0);
@@ -221,8 +234,6 @@ public class TextActivity extends Activity
                 linearLayout = new LinearLayout(m_context);
                 for (int i = 0; i < 2; ++i) {
                     final TextView textView = new TextView(m_context);
-                    textView.setTextSize(TypedValue.COMPLEX_UNIT_PX,
-                            m_context.getResources().getDimension(R.dimen.text_size));
                     textView.setPadding(m_padding, m_padding, m_padding, m_padding);
                     linearLayout.addView(textView);
                 }
@@ -231,10 +242,12 @@ public class TextActivity extends Activity
             }
 
             final TextView verseIndexTextView = (TextView) linearLayout.getChildAt(0);
+            verseIndexTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, TextActivity.this.m_textSize);
             verseIndexTextView.setTextColor(TextActivity.this.m_textColor);
             verseIndexTextView.setText(Integer.toString(position + 1));
 
             final TextView verseTextView = (TextView) linearLayout.getChildAt(1);
+            verseTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, TextActivity.this.m_textSize);
             verseTextView.setTextColor(TextActivity.this.m_textColor);
             if (m_selected[position]) {
                 final SpannableString string = new SpannableString(m_texts[position]);
@@ -418,6 +431,7 @@ public class TextActivity extends Activity
     private int m_currentChapter = -1;
     private int m_backgroundColor;
     private int m_textColor;
+    private float m_textSize;
     private ClipboardManager m_clipboardManager; // obsoleted by android.content.ClipboardManager since API level 11
     private ImageButton m_settingsButton;
     private ImageButton m_shareButton;

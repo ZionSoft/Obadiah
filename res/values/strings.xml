@@ -3,6 +3,9 @@
 
     <string name="app_name">Bible</string>
     <string name="pref_nightmode_title">Night Mode</string>
+    <string name="pref_fontsize_title">Font size</string>
+    <string name="pref_fontsize_default">medium</string>
+    <string name="pref_fontsize_dialog_title">Select font size:</string>
     <string name="pref_rateme_title">Rate me on Google Play</string>
     <string name="text_download">Download more translations</string>
     <string name="text_downloading">Downloading, please wait.</string>
@@ -24,5 +27,13 @@
     <string name="text_settings">Settings</string>
     <string name="title_download_translation">Available translations</string>
     <string name="title_select_translation">Select a translation</string>
+
+    <string-array name="array_fontsize_name">
+        <item>Very Small</item>
+        <item>Small</item>
+        <item>Medium</item>
+        <item>Large</item>
+        <item>Very Large</item>
+    </string-array>
 
 </resources>

@@ -105,6 +105,18 @@ public class SearchActivity extends Activity
             m_searchResultListView.setCacheColorHint(Color.WHITE);
             m_textColor = Color.BLACK;
         }
+        final String fontSize = sharedPreferences.getString(SettingsActivity.PREF_FONTSIZE,
+                SettingsActivity.PREF_FONTSIZE_DEFAULT);
+        if (fontSize.equals(SettingsActivity.PREF_FONTSIZE_VERYSMALL))
+            m_textSize = getResources().getDimension(R.dimen.text_size_verysmall);
+        else if (fontSize.equals(SettingsActivity.PREF_FONTSIZE_SMALL))
+            m_textSize = getResources().getDimension(R.dimen.text_size_small);
+        else if (fontSize.equals(SettingsActivity.PREF_FONTSIZE_LARGE))
+            m_textSize = getResources().getDimension(R.dimen.text_size_large);
+        else if (fontSize.equals(SettingsActivity.PREF_FONTSIZE_VERYLARGE))
+            m_textSize = getResources().getDimension(R.dimen.text_size_verylarge);
+        else
+            m_textSize = getResources().getDimension(R.dimen.text_size_medium);
         m_searchResultListAdapter.notifyDataSetChanged();
 
         final String selectedTranslationShortName = getSharedPreferences(Constants.SETTING_KEY, MODE_PRIVATE)
@@ -243,13 +255,12 @@ public class SearchActivity extends Activity
             TextView textView;
             if (convertView == null) {
                 textView = new TextView(m_context);
-                textView.setTextSize(TypedValue.COMPLEX_UNIT_PX,
-                        m_context.getResources().getDimension(R.dimen.text_size));
                 textView.setTypeface(null, Typeface.NORMAL);
             } else {
                 textView = (TextView) convertView;
             }
 
+            textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, SearchActivity.this.m_textSize);
             textView.setTextColor(SearchActivity.this.m_textColor);
             textView.setText(m_texts[position]);
             return textView;
@@ -257,6 +268,7 @@ public class SearchActivity extends Activity
     }
 
     private int m_textColor;
+    private float m_textSize;
     private EditText m_searchText;
     private ListView m_searchResultListView;
     private SearchResult[] m_results;

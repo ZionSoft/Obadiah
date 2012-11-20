@@ -124,6 +124,19 @@ public class BookSelectionActivity extends Activity
             m_textColor = Color.BLACK;
         }
 
+        final String fontSize = sharedPreferences.getString(SettingsActivity.PREF_FONTSIZE,
+                SettingsActivity.PREF_FONTSIZE_DEFAULT);
+        if (fontSize.equals(SettingsActivity.PREF_FONTSIZE_VERYSMALL))
+            m_textSize = getResources().getDimension(R.dimen.text_size_verysmall);
+        else if (fontSize.equals(SettingsActivity.PREF_FONTSIZE_SMALL))
+            m_textSize = getResources().getDimension(R.dimen.text_size_small);
+        else if (fontSize.equals(SettingsActivity.PREF_FONTSIZE_LARGE))
+            m_textSize = getResources().getDimension(R.dimen.text_size_large);
+        else if (fontSize.equals(SettingsActivity.PREF_FONTSIZE_VERYLARGE))
+            m_textSize = getResources().getDimension(R.dimen.text_size_verylarge);
+        else
+            m_textSize = getResources().getDimension(R.dimen.text_size_medium);
+
         if (m_upgrading)
             return;
 
@@ -238,8 +251,6 @@ public class BookSelectionActivity extends Activity
             if (convertView == null) {
                 textView = new TextView(m_context);
                 textView.setGravity(Gravity.CENTER);
-                textView.setTextSize(TypedValue.COMPLEX_UNIT_PX,
-                        m_context.getResources().getDimension(R.dimen.text_size));
                 textView.setPadding(BookSelectionActivity.this.m_padding, BookSelectionActivity.this.m_padding,
                         BookSelectionActivity.this.m_padding, BookSelectionActivity.this.m_padding);
                 // textView.setHeight(m_textViewHeight);
@@ -255,6 +266,7 @@ public class BookSelectionActivity extends Activity
                 textView.setTypeface(null, Typeface.NORMAL);
                 textView.setBackgroundResource(R.drawable.list_item_background);
             }
+            textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, BookSelectionActivity.this.m_textSize);
             textView.setTextColor(BookSelectionActivity.this.m_textColor);
             textView.setText(m_texts[position]);
             return textView;
@@ -281,8 +293,6 @@ public class BookSelectionActivity extends Activity
                 textView = new TextView(m_context);
                 textView.setBackgroundResource(R.drawable.list_item_background);
                 textView.setGravity(Gravity.CENTER);
-                textView.setTextSize(TypedValue.COMPLEX_UNIT_PX,
-                        m_context.getResources().getDimension(R.dimen.text_size));
                 textView.setPadding(BookSelectionActivity.this.m_padding, BookSelectionActivity.this.m_padding,
                         BookSelectionActivity.this.m_padding, BookSelectionActivity.this.m_padding);
             } else {
@@ -293,6 +303,7 @@ public class BookSelectionActivity extends Activity
                 textView.setTypeface(null, Typeface.BOLD);
             else
                 textView.setTypeface(null, Typeface.NORMAL);
+            textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, BookSelectionActivity.this.m_textSize);
             textView.setTextColor(BookSelectionActivity.this.m_textColor);
             textView.setText(m_texts[position]);
             return textView;
@@ -305,6 +316,7 @@ public class BookSelectionActivity extends Activity
     private int m_selectedBook = -1;
     private int m_padding;
     private int m_textColor;
+    private float m_textSize;
     private BookListAdapter m_bookListAdapter;
     private ChapterListAdapter m_chapterListAdapter;
     private ImageButton m_settingsButton;

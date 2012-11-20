@@ -156,6 +156,19 @@ public class TranslationSelectionActivity extends Activity
             m_textColor = Color.BLACK;
         }
 
+        final String fontSize = sharedPreferences.getString(SettingsActivity.PREF_FONTSIZE,
+                SettingsActivity.PREF_FONTSIZE_DEFAULT);
+        if (fontSize.equals(SettingsActivity.PREF_FONTSIZE_VERYSMALL))
+            m_textSize = getResources().getDimension(R.dimen.text_size_verysmall);
+        else if (fontSize.equals(SettingsActivity.PREF_FONTSIZE_SMALL))
+            m_textSize = getResources().getDimension(R.dimen.text_size_small);
+        else if (fontSize.equals(SettingsActivity.PREF_FONTSIZE_LARGE))
+            m_textSize = getResources().getDimension(R.dimen.text_size_large);
+        else if (fontSize.equals(SettingsActivity.PREF_FONTSIZE_VERYLARGE))
+            m_textSize = getResources().getDimension(R.dimen.text_size_verylarge);
+        else
+            m_textSize = getResources().getDimension(R.dimen.text_size_medium);
+
         populateUi();
     }
 
@@ -237,13 +250,12 @@ public class TranslationSelectionActivity extends Activity
             if (convertView == null) {
                 textView = new TextView(m_context);
                 textView.setGravity(Gravity.CENTER_VERTICAL);
-                textView.setTextSize(TypedValue.COMPLEX_UNIT_PX,
-                        m_context.getResources().getDimension(R.dimen.text_size));
                 textView.setPadding(30, 20, 30, 20);
             } else {
                 textView = (TextView) convertView;
             }
 
+            textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, TranslationSelectionActivity.this.m_textSize);
             textView.setTextColor(TranslationSelectionActivity.this.m_textColor);
 
             if (m_installedTranslations != null && position < m_installedTranslations.length) {
@@ -271,6 +283,7 @@ public class TranslationSelectionActivity extends Activity
 
     private boolean m_firstTime = true;
     private int m_textColor;
+    private float m_textSize;
     private ListView m_translationListView;
     private String m_selectedTranslationShortName;
     private TranslationManager m_translationManager;
