@@ -30,7 +30,6 @@
             android:layout_centerVertical="true"
             android:background="@drawable/button_background"
             android:onClick="refresh"
-            android:paddingRight="@dimen/padding"
             android:src="@drawable/btn_refresh" />
     </RelativeLayout>
 
