@@ -7,11 +7,9 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.util.TypedValue;
 import android.view.KeyEvent;
@@ -35,6 +33,7 @@ public class SearchActivity extends Activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.search_activity);
 
+        m_settingsManager = new SettingsManager(this);
         m_translationsDatabaseHelper = new TranslationsDatabaseHelper(this);
         m_translationManager = new TranslationManager(this);
         m_translationReader = new TranslationReader(this);
@@ -93,30 +92,13 @@ public class SearchActivity extends Activity
     {
         super.onResume();
 
-        final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        if (sharedPreferences.getBoolean(SettingsActivity.PREF_NIGHTMODE, false)) {
-            // night mode
-            m_searchResultListView.setBackgroundColor(Color.BLACK);
-            m_searchResultListView.setCacheColorHint(Color.BLACK);
-            m_textColor = Color.WHITE;
-        } else {
-            // day mode
-            m_searchResultListView.setBackgroundColor(Color.WHITE);
-            m_searchResultListView.setCacheColorHint(Color.WHITE);
-            m_textColor = Color.BLACK;
-        }
-        final String fontSize = sharedPreferences.getString(SettingsActivity.PREF_FONTSIZE,
-                SettingsActivity.PREF_FONTSIZE_DEFAULT);
-        if (fontSize.equals(SettingsActivity.PREF_FONTSIZE_VERYSMALL))
-            m_textSize = getResources().getDimension(R.dimen.text_size_verysmall);
-        else if (fontSize.equals(SettingsActivity.PREF_FONTSIZE_SMALL))
-            m_textSize = getResources().getDimension(R.dimen.text_size_small);
-        else if (fontSize.equals(SettingsActivity.PREF_FONTSIZE_LARGE))
-            m_textSize = getResources().getDimension(R.dimen.text_size_large);
-        else if (fontSize.equals(SettingsActivity.PREF_FONTSIZE_VERYLARGE))
-            m_textSize = getResources().getDimension(R.dimen.text_size_verylarge);
-        else
-            m_textSize = getResources().getDimension(R.dimen.text_size_medium);
+        m_settingsManager.refresh();
+        final int backgroundColor = m_settingsManager.backgroundColor();
+        m_searchResultListView.setBackgroundColor(backgroundColor);
+        m_searchResultListView.setCacheColorHint(backgroundColor);
+        m_textColor = m_settingsManager.textColor();
+        m_textSize = m_settingsManager.textSize();
+
         m_searchResultListAdapter.notifyDataSetChanged();
 
         final String selectedTranslationShortName = getSharedPreferences(Constants.SETTING_KEY, MODE_PRIVATE)
@@ -273,6 +255,7 @@ public class SearchActivity extends Activity
     private ListView m_searchResultListView;
     private SearchResult[] m_results;
     private SearchResultListAdapter m_searchResultListAdapter;
+    private SettingsManager m_settingsManager;
     private String m_selectedTranslationShortName;
     private TextView m_selectedTranslationTextView;
     private TranslationsDatabaseHelper m_translationsDatabaseHelper;

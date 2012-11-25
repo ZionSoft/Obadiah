@@ -10,7 +10,6 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.text.ClipboardManager;
@@ -35,6 +34,7 @@ public class TextActivity extends Activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.text_activity);
 
+        m_settingsManager = new SettingsManager(this);
         m_translationReader = new TranslationReader(this);
 
         // initializes the title bar
@@ -80,29 +80,10 @@ public class TextActivity extends Activity
     {
         super.onResume();
 
-        final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        if (sharedPreferences.getBoolean(SettingsActivity.PREF_NIGHTMODE, false)) {
-            // night mode
-            m_backgroundColor = Color.BLACK;
-            m_textColor = Color.WHITE;
-        } else {
-            // day mode
-            m_backgroundColor = Color.WHITE;
-            m_textColor = Color.BLACK;
-        }
-
-        final String fontSize = sharedPreferences.getString(SettingsActivity.PREF_FONTSIZE,
-                SettingsActivity.PREF_FONTSIZE_DEFAULT);
-        if (fontSize.equals(SettingsActivity.PREF_FONTSIZE_VERYSMALL))
-            m_textSize = getResources().getDimension(R.dimen.text_size_verysmall);
-        else if (fontSize.equals(SettingsActivity.PREF_FONTSIZE_SMALL))
-            m_textSize = getResources().getDimension(R.dimen.text_size_small);
-        else if (fontSize.equals(SettingsActivity.PREF_FONTSIZE_LARGE))
-            m_textSize = getResources().getDimension(R.dimen.text_size_large);
-        else if (fontSize.equals(SettingsActivity.PREF_FONTSIZE_VERYLARGE))
-            m_textSize = getResources().getDimension(R.dimen.text_size_verylarge);
-        else
-            m_textSize = getResources().getDimension(R.dimen.text_size_medium);
+        m_settingsManager.refresh();
+        m_backgroundColor = m_settingsManager.backgroundColor();
+        m_textColor = m_settingsManager.textColor();
+        m_textSize = m_settingsManager.textSize();
 
         final SharedPreferences preferences = getSharedPreferences(Constants.SETTING_KEY, MODE_PRIVATE);
         m_currentBook = preferences.getInt(Constants.CURRENT_BOOK_SETTING_KEY, 0);
@@ -437,6 +418,7 @@ public class TextActivity extends Activity
     private ImageButton m_shareButton;
     private ImageButton m_copyButton;
     private ImageButton m_searchButton;
+    private SettingsManager m_settingsManager;
     private TextView m_selectedBookTextView;
     private TextView m_selectedTranslationTextView;
     private TranslationReader m_translationReader;

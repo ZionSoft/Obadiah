@@ -32,6 +32,7 @@ public class TranslationSelectionActivity extends Activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.translationselection_activity);
 
+        m_settingsManager = new SettingsManager(this);
         m_translationManager = new TranslationManager(this);
         m_selectedTranslationShortName = getSharedPreferences(Constants.SETTING_KEY, MODE_PRIVATE).getString(
                 Constants.CURRENT_TRANSLATION_SETTING_KEY, null);
@@ -143,31 +144,12 @@ public class TranslationSelectionActivity extends Activity
     {
         super.onResume();
 
-        final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        if (sharedPreferences.getBoolean(SettingsActivity.PREF_NIGHTMODE, false)) {
-            // night mode
-            m_translationListView.setBackgroundColor(Color.BLACK);
-            m_translationListView.setCacheColorHint(Color.BLACK);
-            m_textColor = Color.WHITE;
-        } else {
-            // day mode
-            m_translationListView.setBackgroundColor(Color.WHITE);
-            m_translationListView.setCacheColorHint(Color.WHITE);
-            m_textColor = Color.BLACK;
-        }
-
-        final String fontSize = sharedPreferences.getString(SettingsActivity.PREF_FONTSIZE,
-                SettingsActivity.PREF_FONTSIZE_DEFAULT);
-        if (fontSize.equals(SettingsActivity.PREF_FONTSIZE_VERYSMALL))
-            m_textSize = getResources().getDimension(R.dimen.text_size_verysmall);
-        else if (fontSize.equals(SettingsActivity.PREF_FONTSIZE_SMALL))
-            m_textSize = getResources().getDimension(R.dimen.text_size_small);
-        else if (fontSize.equals(SettingsActivity.PREF_FONTSIZE_LARGE))
-            m_textSize = getResources().getDimension(R.dimen.text_size_large);
-        else if (fontSize.equals(SettingsActivity.PREF_FONTSIZE_VERYLARGE))
-            m_textSize = getResources().getDimension(R.dimen.text_size_verylarge);
-        else
-            m_textSize = getResources().getDimension(R.dimen.text_size_medium);
+        m_settingsManager.refresh();
+        final int backgroundColor = m_settingsManager.backgroundColor();
+        m_translationListView.setBackgroundColor(backgroundColor);
+        m_translationListView.setCacheColorHint(backgroundColor);
+        m_textColor = m_settingsManager.textColor();
+        m_textSize = m_settingsManager.textSize();
 
         populateUi();
     }
@@ -285,6 +267,7 @@ public class TranslationSelectionActivity extends Activity
     private int m_textColor;
     private float m_textSize;
     private ListView m_translationListView;
+    private SettingsManager m_settingsManager;
     private String m_selectedTranslationShortName;
     private TranslationManager m_translationManager;
     private TranslationSelectionListAdapter m_translationListAdapter;
