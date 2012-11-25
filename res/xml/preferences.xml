@@ -9,8 +9,8 @@
     <ListPreference
         android:defaultValue="@string/pref_fontsize_default"
         android:dialogTitle="@string/pref_fontsize_dialog_title"
-        android:entries="@array/array_fontsize_name"
-        android:entryValues="@array/array_fontsize_value"
+        android:entries="@array/pref_fontsize_name"
+        android:entryValues="@array/pref_fontsize_value"
         android:key="pref_fontsize"
         android:title="@string/pref_fontsize_title" />
 

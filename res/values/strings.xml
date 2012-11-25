@@ -28,12 +28,19 @@
     <string name="title_download_translation">Available translations</string>
     <string name="title_select_translation">Select a translation</string>
 
-    <string-array name="array_fontsize_name">
+    <string-array name="pref_fontsize_name">
         <item>Very Small</item>
         <item>Small</item>
         <item>Medium</item>
         <item>Large</item>
         <item>Very Large</item>
+    </string-array>
+    <string-array name="pref_fontsize_value">
+        <item>verysmall</item>
+        <item>small</item>
+        <item>medium</item>
+        <item>large</item>
+        <item>verylarge</item>
     </string-array>
 
 </resources>
