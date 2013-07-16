@@ -15,13 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah;
+package net.zionsoft.obadiah.util;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.preference.PreferenceManager;
+
+import net.zionsoft.obadiah.R;
+import net.zionsoft.obadiah.SettingsActivity;
 
 public class SettingsManager {
     public SettingsManager(Context context) {

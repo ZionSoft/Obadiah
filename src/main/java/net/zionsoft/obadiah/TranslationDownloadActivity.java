@@ -52,6 +52,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import net.zionsoft.obadiah.bible.TranslationInfo;
 import net.zionsoft.obadiah.bible.TranslationManager;
 import net.zionsoft.obadiah.bible.TranslationsDatabaseHelper;
+import net.zionsoft.obadiah.util.SettingsManager;
 
 public class TranslationDownloadActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {

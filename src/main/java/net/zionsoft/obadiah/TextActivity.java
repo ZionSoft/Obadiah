@@ -45,6 +45,7 @@ import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 
 import net.zionsoft.obadiah.bible.TranslationReader;
+import net.zionsoft.obadiah.util.SettingsManager;
 
 public class TextActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {

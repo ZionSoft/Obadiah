@@ -42,6 +42,7 @@ import android.widget.Toast;
 
 import net.zionsoft.obadiah.bible.TranslationInfo;
 import net.zionsoft.obadiah.bible.TranslationManager;
+import net.zionsoft.obadiah.util.SettingsManager;
 
 public class TranslationSelectionActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {

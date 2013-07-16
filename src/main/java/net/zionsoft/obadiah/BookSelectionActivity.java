@@ -21,6 +21,7 @@ import net.zionsoft.obadiah.bible.TranslationInfo;
 import net.zionsoft.obadiah.bible.TranslationManager;
 import net.zionsoft.obadiah.bible.TranslationReader;
 import net.zionsoft.obadiah.support.UpgradeAsyncTask;
+import net.zionsoft.obadiah.util.SettingsManager;
 
 import android.app.Activity;
 import android.app.AlertDialog;
