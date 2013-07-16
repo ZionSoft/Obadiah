@@ -20,7 +20,7 @@ package net.zionsoft.obadiah.support;
 import java.io.File;
 import java.io.FileInputStream;
 
-import net.zionsoft.obadiah.TranslationInfo;
+import net.zionsoft.obadiah.bible.TranslationInfo;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

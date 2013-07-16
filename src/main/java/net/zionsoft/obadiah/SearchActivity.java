@@ -43,6 +43,11 @@ import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.TextView.OnEditorActionListener;
 
+import net.zionsoft.obadiah.bible.TranslationInfo;
+import net.zionsoft.obadiah.bible.TranslationManager;
+import net.zionsoft.obadiah.bible.TranslationReader;
+import net.zionsoft.obadiah.bible.TranslationsDatabaseHelper;
+
 public class SearchActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

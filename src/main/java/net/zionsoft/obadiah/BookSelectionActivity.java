@@ -17,6 +17,9 @@
 
 package net.zionsoft.obadiah;
 
+import net.zionsoft.obadiah.bible.TranslationInfo;
+import net.zionsoft.obadiah.bible.TranslationManager;
+import net.zionsoft.obadiah.bible.TranslationReader;
 import net.zionsoft.obadiah.support.UpgradeAsyncTask;
 
 import android.app.Activity;

@@ -22,10 +22,10 @@ import java.io.File;
 import net.zionsoft.obadiah.BookSelectionActivity;
 import net.zionsoft.obadiah.Constants;
 import net.zionsoft.obadiah.R;
-import net.zionsoft.obadiah.TranslationInfo;
-import net.zionsoft.obadiah.TranslationManager;
-import net.zionsoft.obadiah.TranslationReader;
-import net.zionsoft.obadiah.TranslationsDatabaseHelper;
+import net.zionsoft.obadiah.bible.TranslationInfo;
+import net.zionsoft.obadiah.bible.TranslationManager;
+import net.zionsoft.obadiah.bible.TranslationReader;
+import net.zionsoft.obadiah.bible.TranslationsDatabaseHelper;
 
 import android.app.ProgressDialog;
 import android.content.ContentValues;

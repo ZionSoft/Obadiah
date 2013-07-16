@@ -25,14 +25,12 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
-import android.graphics.Color;
 import android.graphics.Typeface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
@@ -41,6 +39,9 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import net.zionsoft.obadiah.bible.TranslationInfo;
+import net.zionsoft.obadiah.bible.TranslationManager;
 
 public class TranslationSelectionActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
