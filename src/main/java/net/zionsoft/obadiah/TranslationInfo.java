@@ -1,7 +1,6 @@
 package net.zionsoft.obadiah;
 
-public class TranslationInfo
-{
+public class TranslationInfo {
     public boolean installed;
     public int size;
     public String language;

@@ -27,10 +27,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 
-public class TextActivity extends Activity
-{
-    protected void onCreate(Bundle savedInstanceState)
-    {
+public class TextActivity extends Activity {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.text_activity);
 
@@ -39,10 +37,8 @@ public class TextActivity extends Activity
 
         // initializes the title bar
         m_selectedTranslationTextView = (TextView) findViewById(R.id.selected_translation_textview);
-        m_selectedTranslationTextView.setOnClickListener(new OnClickListener()
-        {
-            public void onClick(View v)
-            {
+        m_selectedTranslationTextView.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
                 startActivity(new Intent(TextActivity.this, TranslationSelectionActivity.class));
             }
         });
@@ -58,26 +54,21 @@ public class TextActivity extends Activity
         m_verseViewPager = (ViewPager) findViewById(R.id.verse_viewpager);
         m_versePagerAdapter = new VersePagerAdapter();
         m_verseViewPager.setAdapter(m_versePagerAdapter);
-        m_verseViewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener()
-        {
-            public void onPageScrollStateChanged(int state)
-            {
+        m_verseViewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            public void onPageScrollStateChanged(int state) {
             }
 
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels)
-            {
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
             }
 
-            public void onPageSelected(int position)
-            {
+            public void onPageSelected(int position) {
                 m_currentChapter = position;
                 populateUi();
             }
         });
     }
 
-    protected void onResume()
-    {
+    protected void onResume() {
         super.onResume();
 
         m_settingsManager.refresh();
@@ -97,8 +88,7 @@ public class TextActivity extends Activity
         populateUi();
     }
 
-    protected void onPause()
-    {
+    protected void onPause() {
         super.onPause();
 
         final SharedPreferences.Editor editor = getSharedPreferences(Constants.SETTING_KEY, MODE_PRIVATE).edit();
@@ -107,8 +97,7 @@ public class TextActivity extends Activity
         editor.commit();
     }
 
-    public void onToolbarButtonClicked(View view)
-    {
+    public void onToolbarButtonClicked(View view) {
         if (view == m_settingsButton) {
             startActivity(new Intent(this, SettingsActivity.class));
         } else if (view == m_shareButton) {
@@ -131,8 +120,7 @@ public class TextActivity extends Activity
         }
     }
 
-    private void populateUi()
-    {
+    private void populateUi() {
         m_selectedTranslationTextView.setText(m_translationReader.selectedTranslationShortName());
         m_selectedBookTextView.setText(m_translationReader.bookNames()[m_currentBook] + ", " + (m_currentChapter + 1));
 
@@ -141,17 +129,14 @@ public class TextActivity extends Activity
         m_copyButton.setEnabled(hasItemSelected);
     }
 
-    private class VerseListAdapter extends ListBaseAdapter
-    {
-        public VerseListAdapter(Context context)
-        {
+    private class VerseListAdapter extends ListBaseAdapter {
+        public VerseListAdapter(Context context) {
             super(context);
 
             m_padding = (int) context.getResources().getDimension(R.dimen.padding);
         }
 
-        public void selectItem(int position)
-        {
+        public void selectItem(int position) {
             if (position < 0 || position >= m_texts.length)
                 return;
 
@@ -164,13 +149,11 @@ public class TextActivity extends Activity
             notifyDataSetChanged();
         }
 
-        public boolean hasItemSelected()
-        {
+        public boolean hasItemSelected() {
             return (m_selectedCount > 0);
         }
 
-        public String selectedText()
-        {
+        public String selectedText() {
             if (!hasItemSelected())
                 return null;
 
@@ -194,8 +177,7 @@ public class TextActivity extends Activity
             return selected;
         }
 
-        public void setTexts(String[] texts)
-        {
+        public void setTexts(String[] texts) {
             m_texts = texts;
 
             final int length = texts.length;
@@ -208,8 +190,7 @@ public class TextActivity extends Activity
             notifyDataSetChanged();
         }
 
-        public View getView(int position, View convertView, ViewGroup parent)
-        {
+        public View getView(int position, View convertView, ViewGroup parent) {
             LinearLayout linearLayout;
             if (convertView == null) {
                 linearLayout = new LinearLayout(m_context);
@@ -250,22 +231,18 @@ public class TextActivity extends Activity
         private BackgroundColorSpan m_backgroundColorSpan;
     }
 
-    private class VersePagerAdapter extends PagerAdapter
-    {
-        public VersePagerAdapter()
-        {
+    private class VersePagerAdapter extends PagerAdapter {
+        public VersePagerAdapter() {
             super();
             m_pages = new LinkedList<Page>();
         }
 
-        public int getCount()
-        {
+        public int getCount() {
             return (TextActivity.this.m_currentBook < 0) ? 0 : TranslationReader
                     .chapterCount(TextActivity.this.m_currentBook);
         }
 
-        public Object instantiateItem(ViewGroup container, int position)
-        {
+        public Object instantiateItem(ViewGroup container, int position) {
             Iterator<Page> iterator = m_pages.iterator();
             Page page = null;
             while (iterator.hasNext()) {
@@ -291,10 +268,8 @@ public class TextActivity extends Activity
                 final VerseListAdapter verseListAdapter = new VerseListAdapter(TextActivity.this);
                 page.verseListAdapter = verseListAdapter;
                 verseListView.setAdapter(verseListAdapter);
-                verseListView.setOnItemClickListener(new OnItemClickListener()
-                {
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id)
-                    {
+                verseListView.setOnItemClickListener(new OnItemClickListener() {
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         verseListAdapter.selectItem(position);
                         if (verseListAdapter.hasItemSelected()) {
                             TextActivity.this.m_shareButton.setEnabled(true);
@@ -324,8 +299,7 @@ public class TextActivity extends Activity
             return page;
         }
 
-        public void destroyItem(ViewGroup container, int position, Object object)
-        {
+        public void destroyItem(ViewGroup container, int position, Object object) {
             for (Page page : m_pages) {
                 if (page.position == position) {
                     page.inUse = false;
@@ -335,13 +309,11 @@ public class TextActivity extends Activity
             }
         }
 
-        public boolean isViewFromObject(View view, Object object)
-        {
+        public boolean isViewFromObject(View view, Object object) {
             return view == ((Page) object).verseListView;
         }
 
-        public void updateText()
-        {
+        public void updateText() {
             for (Page page : m_pages) {
                 page.verseListView.setBackgroundColor(TextActivity.this.m_backgroundColor);
                 page.verseListView.setCacheColorHint(TextActivity.this.m_backgroundColor);
@@ -354,13 +326,11 @@ public class TextActivity extends Activity
             notifyDataSetChanged();
         }
 
-        public void setSelection(int selection)
-        {
+        public void setSelection(int selection) {
             m_selection = selection;
         }
 
-        public int currentVerse()
-        {
+        public int currentVerse() {
             for (Page page : m_pages) {
                 if (page.position == TextActivity.this.m_currentChapter)
                     return page.verseListView.getFirstVisiblePosition();
@@ -368,8 +338,7 @@ public class TextActivity extends Activity
             return 0;
         }
 
-        public boolean hasItemSelected()
-        {
+        public boolean hasItemSelected() {
             for (Page page : m_pages) {
                 if (page.position == TextActivity.this.m_currentChapter)
                     return page.verseListAdapter.hasItemSelected();
@@ -377,8 +346,7 @@ public class TextActivity extends Activity
             return false;
         }
 
-        public String selectedText()
-        {
+        public String selectedText() {
             for (Page page : m_pages) {
                 if (page.position == TextActivity.this.m_currentChapter)
                     return page.verseListAdapter.selectedText();
@@ -386,8 +354,7 @@ public class TextActivity extends Activity
             return null;
         }
 
-        private class Page
-        {
+        private class Page {
             public boolean inUse;
             public int position;
             public ListView verseListView;

@@ -32,10 +32,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 
-public class TranslationDownloadActivity extends Activity
-{
-    protected void onCreate(Bundle savedInstanceState)
-    {
+public class TranslationDownloadActivity extends Activity {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.translationdownload_activity);
 
@@ -46,10 +44,8 @@ public class TranslationDownloadActivity extends Activity
         m_translationListView = (ListView) findViewById(R.id.translation_listview);
         m_translationListAdapter = new TranslationListAdapter(this);
         m_translationListView.setAdapter(m_translationListAdapter);
-        m_translationListView.setOnItemClickListener(new OnItemClickListener()
-        {
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id)
-            {
+        m_translationListView.setOnItemClickListener(new OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 TranslationDownloadActivity.this.m_translationDownloadAsyncTask = new TranslationDownloadAsyncTask();
                 TranslationDownloadActivity.this.m_translationDownloadAsyncTask.execute(position);
             }
@@ -59,8 +55,7 @@ public class TranslationDownloadActivity extends Activity
         new TranslationListDownloadAsyncTask().execute(false);
     }
 
-    protected void onResume()
-    {
+    protected void onResume() {
         super.onResume();
 
         m_settingsManager.refresh();
@@ -72,8 +67,7 @@ public class TranslationDownloadActivity extends Activity
         m_smallerTextSize = m_settingsManager.smallerTextSize();
     }
 
-    protected void onPause()
-    {
+    protected void onPause() {
         super.onPause();
 
         // cancel existing download async tasks
@@ -81,15 +75,12 @@ public class TranslationDownloadActivity extends Activity
             m_translationDownloadAsyncTask.cancel(true);
     }
 
-    public void refresh(View view)
-    {
+    public void refresh(View view) {
         new TranslationListDownloadAsyncTask().execute(true);
     }
 
-    private class TranslationListDownloadAsyncTask extends AsyncTask<Boolean, Void, Void>
-    {
-        protected void onPreExecute()
-        {
+    private class TranslationListDownloadAsyncTask extends AsyncTask<Boolean, Void, Void> {
+        protected void onPreExecute() {
             // running in the main thread
 
             m_progressDialog = new ProgressDialog(TranslationDownloadActivity.this);
@@ -98,8 +89,7 @@ public class TranslationDownloadActivity extends Activity
             m_progressDialog.show();
         }
 
-        protected Void doInBackground(Boolean... params)
-        {
+        protected Void doInBackground(Boolean... params) {
             // running in the worker thread
 
             try {
@@ -172,8 +162,7 @@ public class TranslationDownloadActivity extends Activity
             return null;
         }
 
-        protected void onPostExecute(Void result)
-        {
+        protected void onPostExecute(Void result) {
             // running in the main thread
 
             m_progressDialog.dismiss();
@@ -203,24 +192,19 @@ public class TranslationDownloadActivity extends Activity
         private ProgressDialog m_progressDialog;
     }
 
-    protected class TranslationDownloadAsyncTask extends AsyncTask<Integer, Integer, Void>
-    {
-        public void updateProgress(int progress)
-        {
+    protected class TranslationDownloadAsyncTask extends AsyncTask<Integer, Integer, Void> {
+        public void updateProgress(int progress) {
             publishProgress(progress);
         }
 
-        protected void onPreExecute()
-        {
+        protected void onPreExecute() {
             // running in the main thread
 
             m_progressDialog = new ProgressDialog(TranslationDownloadActivity.this);
             m_progressDialog.setCancelable(true);
             m_progressDialog.setCanceledOnTouchOutside(false);
-            m_progressDialog.setOnCancelListener(new DialogInterface.OnCancelListener()
-            {
-                public void onCancel(DialogInterface dialog)
-                {
+            m_progressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                public void onCancel(DialogInterface dialog) {
                     TranslationDownloadAsyncTask.this.cancel(true);
                 }
             });
@@ -231,8 +215,7 @@ public class TranslationDownloadActivity extends Activity
             m_progressDialog.show();
         }
 
-        protected Void doInBackground(Integer... positions)
-        {
+        protected Void doInBackground(Integer... positions) {
             // running in the worker thread
 
             // the logic should be in TranslationManager
@@ -320,7 +303,7 @@ public class TranslationDownloadActivity extends Activity
                 translationInfoValues.put(TranslationsDatabaseHelper.COLUMN_INSTALLED, 1);
                 db.update(TranslationsDatabaseHelper.TABLE_TRANSLATIONS, translationInfoValues,
                         TranslationsDatabaseHelper.COLUMN_TRANSLATION_SHORTNAME + " = ?",
-                        new String[] { translationToDownload.shortName });
+                        new String[]{translationToDownload.shortName});
 
                 m_hasError = false;
                 db.setTransactionSuccessful();
@@ -334,22 +317,19 @@ public class TranslationDownloadActivity extends Activity
             return null;
         }
 
-        protected void onProgressUpdate(Integer... progress)
-        {
+        protected void onProgressUpdate(Integer... progress) {
             // running in the main thread
 
             m_progressDialog.setProgress(progress[0]);
         }
 
-        protected void onCancelled()
-        {
+        protected void onCancelled() {
             // running in the main thread
 
             m_progressDialog.dismiss();
         }
 
-        protected void onPostExecute(Void result)
-        {
+        protected void onPostExecute(Void result) {
             // running in the main thread
 
             m_progressDialog.dismiss();
@@ -368,15 +348,12 @@ public class TranslationDownloadActivity extends Activity
         private ProgressDialog m_progressDialog;
     }
 
-    private class TranslationListAdapter extends ListBaseAdapter
-    {
-        public TranslationListAdapter(Context context)
-        {
+    private class TranslationListAdapter extends ListBaseAdapter {
+        public TranslationListAdapter(Context context) {
             super(context);
         }
 
-        public void setTexts(String[] texts, int[] sizes)
-        {
+        public void setTexts(String[] texts, int[] sizes) {
             m_texts = texts;
 
             final String size = m_context.getResources().getText(R.string.text_size).toString();
@@ -388,8 +365,7 @@ public class TranslationDownloadActivity extends Activity
             notifyDataSetChanged();
         }
 
-        public View getView(int position, View convertView, ViewGroup parent)
-        {
+        public View getView(int position, View convertView, ViewGroup parent) {
             LinearLayout linearLayout;
             if (convertView == null) {
                 linearLayout = new LinearLayout(m_context);

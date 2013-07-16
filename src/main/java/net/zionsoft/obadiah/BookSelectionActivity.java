@@ -23,10 +23,8 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 
-public class BookSelectionActivity extends Activity
-{
-    protected void onCreate(Bundle savedInstanceState)
-    {
+public class BookSelectionActivity extends Activity {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.bookselection_activity);
 
@@ -51,10 +49,8 @@ public class BookSelectionActivity extends Activity
 
         // initializes the title bar
         m_selectedTranslationTextView = (TextView) findViewById(R.id.selected_translation_textview);
-        m_selectedTranslationTextView.setOnClickListener(new OnClickListener()
-        {
-            public void onClick(View v)
-            {
+        m_selectedTranslationTextView.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
                 BookSelectionActivity.this.startTranslationSelectionActivity();
             }
         });
@@ -64,10 +60,8 @@ public class BookSelectionActivity extends Activity
         m_bookListView = (ListView) findViewById(R.id.book_listview);
         m_bookListAdapter = new BookListAdapter(this);
         m_bookListView.setAdapter(m_bookListAdapter);
-        m_bookListView.setOnItemClickListener(new OnItemClickListener()
-        {
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id)
-            {
+        m_bookListView.setOnItemClickListener(new OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if (BookSelectionActivity.this.m_selectedBook == position)
                     return;
 
@@ -83,10 +77,8 @@ public class BookSelectionActivity extends Activity
         m_chaptersGridView = (GridView) findViewById(R.id.chapter_gridview);
         m_chapterListAdapter = new ChapterListAdapter(this);
         m_chaptersGridView.setAdapter(m_chapterListAdapter);
-        m_chaptersGridView.setOnItemClickListener(new OnItemClickListener()
-        {
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id)
-            {
+        m_chaptersGridView.setOnItemClickListener(new OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 final SharedPreferences preferences = BookSelectionActivity.this.getSharedPreferences(
                         Constants.SETTING_KEY, MODE_PRIVATE);
                 if (preferences.getInt(Constants.CURRENT_BOOK_SETTING_KEY, -1) != m_selectedBook
@@ -103,8 +95,7 @@ public class BookSelectionActivity extends Activity
         });
     }
 
-    protected void onResume()
-    {
+    protected void onResume() {
         super.onResume();
 
         m_settingsManager.refresh();
@@ -122,22 +113,19 @@ public class BookSelectionActivity extends Activity
         populateUi();
     }
 
-    public void onUpgradeFinished()
-    {
+    public void onUpgradeFinished() {
         populateUi();
         m_upgrading = false;
     }
 
-    public void onToolbarButtonClicked(View view)
-    {
+    public void onToolbarButtonClicked(View view) {
         if (view == m_settingsButton)
             startActivity(new Intent(this, SettingsActivity.class));
         else if (view == m_searchButton)
             startActivity(new Intent(this, SearchActivity.class));
     }
 
-    private void populateUi()
-    {
+    private void populateUi() {
         boolean hasInstalledTranslation = false;
         final TranslationInfo[] translations = m_translationManager.translations();
         if (translations != null) {
@@ -178,27 +166,22 @@ public class BookSelectionActivity extends Activity
         } else {
             final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
             alertDialogBuilder.setMessage(R.string.text_no_translation).setCancelable(false)
-                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener()
-                    {
-                        public void onClick(DialogInterface dialog, int id)
-                        {
+                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
                             dialog.dismiss();
                             BookSelectionActivity.this.startTranslationSelectionActivity();
                         }
-                    }).setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener()
-                    {
-                        public void onClick(DialogInterface dialog, int id)
-                        {
-                            dialog.cancel();
-                            BookSelectionActivity.this.finish();
-                        }
-                    });
+                    }).setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    dialog.cancel();
+                    BookSelectionActivity.this.finish();
+                }
+            });
             alertDialogBuilder.create().show();
         }
     }
 
-    private void updateChapterSelectionListAdapter()
-    {
+    private void updateChapterSelectionListAdapter() {
         final int chapterCount = TranslationReader.chapterCount(m_selectedBook);
         final String[] chapters = new String[chapterCount];
         for (int i = 0; i < chapterCount; ++i)
@@ -206,26 +189,21 @@ public class BookSelectionActivity extends Activity
         m_chapterListAdapter.setTexts(chapters);
     }
 
-    private void startTranslationSelectionActivity()
-    {
+    private void startTranslationSelectionActivity() {
         startActivity(new Intent(this, TranslationSelectionActivity.class));
     }
 
-    private class BookListAdapter extends ListBaseAdapter
-    {
-        public BookListAdapter(Context context)
-        {
+    private class BookListAdapter extends ListBaseAdapter {
+        public BookListAdapter(Context context) {
             super(context);
         }
 
-        public void setTexts(String[] texts)
-        {
+        public void setTexts(String[] texts) {
             m_texts = texts;
             notifyDataSetChanged();
         }
 
-        public View getView(int position, View convertView, ViewGroup parent)
-        {
+        public View getView(int position, View convertView, ViewGroup parent) {
             TextView textView;
             if (convertView == null) {
                 textView = new TextView(m_context);
@@ -252,21 +230,17 @@ public class BookSelectionActivity extends Activity
         }
     }
 
-    public class ChapterListAdapter extends ListBaseAdapter
-    {
-        public ChapterListAdapter(Context context)
-        {
+    public class ChapterListAdapter extends ListBaseAdapter {
+        public ChapterListAdapter(Context context) {
             super(context);
         }
 
-        public void setTexts(String[] texts)
-        {
+        public void setTexts(String[] texts) {
             m_texts = texts;
             notifyDataSetChanged();
         }
 
-        public View getView(int position, View convertView, ViewGroup parent)
-        {
+        public View getView(int position, View convertView, ViewGroup parent) {
             TextView textView;
             if (convertView == null) {
                 textView = new TextView(m_context);

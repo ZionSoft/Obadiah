@@ -5,16 +5,13 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-public class TranslationManager
-{
-    public TranslationManager(Context context)
-    {
+public class TranslationManager {
+    public TranslationManager(Context context) {
         super();
         m_translationsDatabaseHelper = new TranslationsDatabaseHelper(context);
     }
 
-    public void addTranslations(TranslationInfo[] translations)
-    {
+    public void addTranslations(TranslationInfo[] translations) {
         if (translations == null || translations.length == 0)
             throw new IllegalArgumentException();
 
@@ -49,8 +46,7 @@ public class TranslationManager
         }
     }
 
-    public void removeTranslation(String translationShortName)
-    {
+    public void removeTranslation(String translationShortName) {
         if (translationShortName == null)
             throw new IllegalArgumentException();
 
@@ -63,14 +59,14 @@ public class TranslationManager
             // deletes the book names
             db.delete(TranslationsDatabaseHelper.TABLE_BOOK_NAMES,
                     TranslationsDatabaseHelper.COLUMN_TRANSLATION_SHORTNAME + " = ?",
-                    new String[] { translationShortName });
+                    new String[]{translationShortName});
 
             // sets the translation as "not installed"
             final ContentValues values = new ContentValues(1);
             values.put(TranslationsDatabaseHelper.COLUMN_INSTALLED, 0);
             db.update(TranslationsDatabaseHelper.TABLE_TRANSLATIONS, values,
                     TranslationsDatabaseHelper.COLUMN_TRANSLATION_SHORTNAME + " = ?",
-                    new String[] { translationShortName });
+                    new String[]{translationShortName});
 
             db.setTransactionSuccessful();
         } finally {
@@ -79,12 +75,11 @@ public class TranslationManager
         }
     }
 
-    public TranslationInfo[] translations()
-    {
+    public TranslationInfo[] translations() {
         final SQLiteDatabase db = m_translationsDatabaseHelper.getReadableDatabase();
-        final String[] columns = new String[] { TranslationsDatabaseHelper.COLUMN_TRANSLATION_NAME,
+        final String[] columns = new String[]{TranslationsDatabaseHelper.COLUMN_TRANSLATION_NAME,
                 TranslationsDatabaseHelper.COLUMN_TRANSLATION_SHORTNAME, TranslationsDatabaseHelper.COLUMN_LANGUAGE,
-                TranslationsDatabaseHelper.COLUMN_DOWNLOAD_SIZE, TranslationsDatabaseHelper.COLUMN_INSTALLED };
+                TranslationsDatabaseHelper.COLUMN_DOWNLOAD_SIZE, TranslationsDatabaseHelper.COLUMN_INSTALLED};
         final Cursor cursor = db.query(TranslationsDatabaseHelper.TABLE_TRANSLATIONS, columns, null, null, null, null,
                 null);
         if (cursor != null) {

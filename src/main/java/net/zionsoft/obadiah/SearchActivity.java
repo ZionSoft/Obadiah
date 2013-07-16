@@ -26,10 +26,8 @@ import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.TextView.OnEditorActionListener;
 
-public class SearchActivity extends Activity
-{
-    protected void onCreate(Bundle savedInstanceState)
-    {
+public class SearchActivity extends Activity {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.search_activity);
 
@@ -40,20 +38,16 @@ public class SearchActivity extends Activity
 
         // initializes the title bar
         m_selectedTranslationTextView = (TextView) findViewById(R.id.selected_translation_textview);
-        m_selectedTranslationTextView.setOnClickListener(new OnClickListener()
-        {
-            public void onClick(View v)
-            {
+        m_selectedTranslationTextView.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
                 startActivity(new Intent(SearchActivity.this, TranslationSelectionActivity.class));
             }
         });
 
         // initializes the search bar
         m_searchText = (EditText) findViewById(R.id.search_edittext);
-        m_searchText.setOnEditorActionListener(new OnEditorActionListener()
-        {
-            public boolean onEditorAction(TextView view, int actionId, KeyEvent event)
-            {
+        m_searchText.setOnEditorActionListener(new OnEditorActionListener() {
+            public boolean onEditorAction(TextView view, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                     SearchActivity.this.search(null);
                     return true;
@@ -66,10 +60,8 @@ public class SearchActivity extends Activity
         m_searchResultListView = (ListView) findViewById(R.id.search_result_listview);
         m_searchResultListAdapter = new SearchResultListAdapter(this);
         m_searchResultListView.setAdapter(m_searchResultListAdapter);
-        m_searchResultListView.setOnItemClickListener(new OnItemClickListener()
-        {
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id)
-            {
+        m_searchResultListView.setOnItemClickListener(new OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if (position < 0 || position >= SearchActivity.this.m_results.length)
                     return;
 
@@ -88,8 +80,7 @@ public class SearchActivity extends Activity
         });
     }
 
-    protected void onResume()
-    {
+    protected void onResume() {
         super.onResume();
 
         m_settingsManager.refresh();
@@ -120,8 +111,7 @@ public class SearchActivity extends Activity
         }
     }
 
-    public void search(View view)
-    {
+    public void search(View view) {
         final Editable searchToken = m_searchText.getText();
         if (searchToken.length() == 0)
             return;
@@ -130,17 +120,14 @@ public class SearchActivity extends Activity
         new SearchAsyncTask().execute(searchToken);
     }
 
-    private static class SearchResult
-    {
+    private static class SearchResult {
         public int bookIndex;
         public int chapterIndex;
         public int verseIndex;
     }
 
-    private class SearchAsyncTask extends AsyncTask<Editable, Void, Void>
-    {
-        protected void onPreExecute()
-        {
+    private class SearchAsyncTask extends AsyncTask<Editable, Void, Void> {
+        protected void onPreExecute() {
             // running in the main thread
 
             SearchActivity.this.m_searchResultListAdapter.setTexts(null);
@@ -158,16 +145,15 @@ public class SearchActivity extends Activity
             m_progressDialog.show();
         }
 
-        protected Void doInBackground(Editable... params)
-        {
+        protected Void doInBackground(Editable... params) {
             // running in the worker thread
 
             final SQLiteDatabase db = SearchActivity.this.m_translationsDatabaseHelper.getReadableDatabase();
-            final Cursor cursor = db.query(SearchActivity.this.m_selectedTranslationShortName, new String[] {
+            final Cursor cursor = db.query(SearchActivity.this.m_selectedTranslationShortName, new String[]{
                     TranslationsDatabaseHelper.COLUMN_BOOK_INDEX, TranslationsDatabaseHelper.COLUMN_CHAPTER_INDEX,
-                    TranslationsDatabaseHelper.COLUMN_VERSE_INDEX, TranslationsDatabaseHelper.COLUMN_TEXT },
-                    TranslationsDatabaseHelper.COLUMN_TEXT + " LIKE ?", new String[] { "%"
-                            + params[0].toString().trim().replaceAll("\\s+", "%") + "%" }, null, null, null);
+                    TranslationsDatabaseHelper.COLUMN_VERSE_INDEX, TranslationsDatabaseHelper.COLUMN_TEXT},
+                    TranslationsDatabaseHelper.COLUMN_TEXT + " LIKE ?", new String[]{"%"
+                    + params[0].toString().trim().replaceAll("\\s+", "%") + "%"}, null, null, null);
             if (cursor != null) {
                 final int count = cursor.getCount();
                 if (count > 0) {
@@ -203,8 +189,7 @@ public class SearchActivity extends Activity
             return null;
         }
 
-        protected void onPostExecute(Void result)
-        {
+        protected void onPostExecute(Void result) {
             // running in the main thread
 
             SearchActivity.this.m_searchResultListAdapter.setTexts(m_texts);
@@ -219,21 +204,17 @@ public class SearchActivity extends Activity
         private String[] m_texts;
     }
 
-    private class SearchResultListAdapter extends ListBaseAdapter
-    {
-        public SearchResultListAdapter(Context context)
-        {
+    private class SearchResultListAdapter extends ListBaseAdapter {
+        public SearchResultListAdapter(Context context) {
             super(context);
         }
 
-        public void setTexts(String[] texts)
-        {
+        public void setTexts(String[] texts) {
             m_texts = texts;
             notifyDataSetChanged();
         }
 
-        public View getView(int position, View convertView, ViewGroup parent)
-        {
+        public View getView(int position, View convertView, ViewGroup parent) {
             TextView textView;
             if (convertView == null) {
                 textView = new TextView(m_context);

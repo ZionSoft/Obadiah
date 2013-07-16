@@ -6,16 +6,13 @@ import android.content.res.Resources;
 import android.graphics.Color;
 import android.preference.PreferenceManager;
 
-public class SettingsManager
-{
-    public SettingsManager(Context context)
-    {
+public class SettingsManager {
+    public SettingsManager(Context context) {
         super();
         m_context = context;
     }
 
-    public void refresh()
-    {
+    public void refresh() {
         final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(m_context);
 
         if (sharedPreferences.getBoolean(SettingsActivity.PREF_NIGHTMODE, false)) {
@@ -50,23 +47,19 @@ public class SettingsManager
         }
     }
 
-    public float textSize()
-    {
+    public float textSize() {
         return m_textSize;
     }
 
-    public float smallerTextSize()
-    {
+    public float smallerTextSize() {
         return m_smallerTextSize;
     }
 
-    public int backgroundColor()
-    {
+    public int backgroundColor() {
         return m_backgroundColor;
     }
 
-    public int textColor()
-    {
+    public int textColor() {
         return m_textColor;
     }
 

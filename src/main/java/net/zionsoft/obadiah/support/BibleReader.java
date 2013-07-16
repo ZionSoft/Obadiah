@@ -9,10 +9,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 // old format is used prior to 1.5.0
-public class BibleReader
-{
-    public BibleReader(File rootDir)
-    {
+public class BibleReader {
+    public BibleReader(File rootDir) {
         try {
             final File[] directories = rootDir.listFiles();
             final int length = directories.length;
@@ -59,7 +57,7 @@ public class BibleReader
                         translations[i].shortName = "PR1938";
                     else if (name.equals("Luther's Biblia"))
                         translations[i].shortName = "Lut1545";
-                    // typo released over the web
+                        // typo released over the web
                     else if (name.equals("Italian Deodati Bibbia") || name.equals("Italian Diodati Bibbia"))
                         translations[i].shortName = "Dio";
                     else if (name.equals("Korean Revised (개역성경)"))
@@ -92,13 +90,11 @@ public class BibleReader
         }
     }
 
-    public TranslationInfo[] installedTranslations()
-    {
+    public TranslationInfo[] installedTranslations() {
         return m_installedTranslations;
     }
 
-    public void selectTranslation(String translation)
-    {
+    public void selectTranslation(String translation) {
         if (m_installedTranslations == null || m_installedTranslations.length == 0) {
             m_selectedTranslation = null;
             return;
@@ -123,8 +119,7 @@ public class BibleReader
             m_selectedTranslation = m_installedTranslations[0].path;
     }
 
-    public String[] verses(int book, int chapter)
-    {
+    public String[] verses(int book, int chapter) {
         try {
             final String path = m_selectedTranslation + "/" + book + "-" + chapter + ".json";
             final File file = new File(path);

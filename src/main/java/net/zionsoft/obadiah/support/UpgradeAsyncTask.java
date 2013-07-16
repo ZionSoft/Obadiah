@@ -9,6 +9,7 @@ import net.zionsoft.obadiah.TranslationInfo;
 import net.zionsoft.obadiah.TranslationManager;
 import net.zionsoft.obadiah.TranslationReader;
 import net.zionsoft.obadiah.TranslationsDatabaseHelper;
+
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
@@ -16,16 +17,13 @@ import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 
-public class UpgradeAsyncTask extends AsyncTask<Void, Integer, Void>
-{
-    public UpgradeAsyncTask(BookSelectionActivity bookSelectionActivity)
-    {
+public class UpgradeAsyncTask extends AsyncTask<Void, Integer, Void> {
+    public UpgradeAsyncTask(BookSelectionActivity bookSelectionActivity) {
         super();
         m_bookSelectionActivity = bookSelectionActivity;
     }
 
-    protected void onPreExecute()
-    {
+    protected void onPreExecute() {
         // running in the main thread
 
         m_progressDialog = new ProgressDialog(m_bookSelectionActivity);
@@ -37,8 +35,7 @@ public class UpgradeAsyncTask extends AsyncTask<Void, Integer, Void>
         m_progressDialog.show();
     }
 
-    protected Void doInBackground(Void... params)
-    {
+    protected Void doInBackground(Void... params) {
         // running in the worker thread
 
         convertTranslations();
@@ -59,23 +56,20 @@ public class UpgradeAsyncTask extends AsyncTask<Void, Integer, Void>
         return null;
     }
 
-    protected void onProgressUpdate(Integer... progress)
-    {
+    protected void onProgressUpdate(Integer... progress) {
         // running in the main thread
 
         m_progressDialog.setProgress(progress[0]);
     }
 
-    protected void onPostExecute(Void result)
-    {
+    protected void onPostExecute(Void result) {
         // running in the main thread
 
         m_bookSelectionActivity.onUpgradeFinished();
         m_progressDialog.dismiss();
     }
 
-    private void convertTranslations()
-    {
+    private void convertTranslations() {
         // old translations format is used prior to 1.5.0
 
         final File rootDir = m_bookSelectionActivity.getFilesDir();
@@ -207,8 +201,7 @@ public class UpgradeAsyncTask extends AsyncTask<Void, Integer, Void>
         }
     }
 
-    private void convertSettings()
-    {
+    private void convertSettings() {
         // old settings format is used prior to 1.5.0
 
         final SharedPreferences preferences = m_bookSelectionActivity.getSharedPreferences(Constants.SETTING_KEY,
