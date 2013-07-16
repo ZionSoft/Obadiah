@@ -1,0 +1,34 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:0.5.+'
+    }
+}
+apply plugin: 'android'
+
+dependencies {
+    compile "com.android.support:support-v4:18.0.+"
+    compile files('libs/GoogleAdMobAdsSdk.jar')
+}
+
+android {
+    compileSdkVersion 18
+    buildToolsVersion "18.0.1"
+
+    signingConfigs {
+        release {
+            storeFile file("zionsoft.keystore")
+            storePassword "TODO"
+            keyAlias "zionsoft"
+            keyPassword "TODO"
+        }
+    }
+
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+        }
+    }
+}

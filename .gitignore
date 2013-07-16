@@ -1,10 +1,22 @@
-bin
-gen
-*.apk
-*.ap_
-*.dex
-*.class
+# IntelliJ
+.idea
+*.iml
 
-.classpath
-.project
-.settings
+# Gradle
+.gradle
+gradle
+
+# Android Studio
+local.properties
+gradlew*
+
+# Build Artifacts
+build
+gen
+out
+
+# Referenced Libraries
+libs
+
+# Mac
+.DS_Store
