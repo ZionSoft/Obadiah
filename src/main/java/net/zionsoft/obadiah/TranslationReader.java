@@ -17,7 +17,7 @@ public class TranslationReader
     public void selectTranslation(String translationShortName)
     {
         final SQLiteDatabase db = m_translationsDatabaseHelper.getReadableDatabase();
-        Cursor cursor = null;
+        Cursor cursor;
         if (translationShortName != null) {
             cursor = db.query(TranslationsDatabaseHelper.TABLE_TRANSLATIONS,
                     new String[] { TranslationsDatabaseHelper.COLUMN_TRANSLATION_SHORTNAME },

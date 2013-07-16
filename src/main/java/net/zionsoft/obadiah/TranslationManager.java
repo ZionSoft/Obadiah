@@ -102,7 +102,7 @@ public class TranslationManager
                 int i = 0;
                 while (cursor.moveToNext()) {
                     final TranslationInfo translationinfo = new TranslationInfo();
-                    translationinfo.installed = (cursor.getInt(installedColumnIndex) == 1) ? true : false;
+                    translationinfo.installed = (cursor.getInt(installedColumnIndex) == 1);
                     translationinfo.size = cursor.getInt(downloadSizeColumnIndex);
                     translationinfo.shortName = cursor.getString(translationShortNameColumnIndex);
                     translationinfo.name = cursor.getString(translationNameColumnIndex);

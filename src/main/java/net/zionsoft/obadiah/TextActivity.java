@@ -307,7 +307,7 @@ public class TextActivity extends Activity
                 });
             }
 
-            ((ViewPager) container).addView(page.verseListView, 0);
+            container.addView(page.verseListView, 0);
             page.inUse = true;
             page.position = position;
             page.verseListAdapter.setTexts(TextActivity.this.m_translationReader.verses(
@@ -326,12 +326,10 @@ public class TextActivity extends Activity
 
         public void destroyItem(ViewGroup container, int position, Object object)
         {
-            Iterator<Page> iterator = m_pages.iterator();
-            while (iterator.hasNext()) {
-                final Page page = iterator.next();
+            for (Page page : m_pages) {
                 if (page.position == position) {
                     page.inUse = false;
-                    ((ViewPager) container).removeView(page.verseListView);
+                    container.removeView(page.verseListView);
                     return;
                 }
             }
@@ -344,9 +342,7 @@ public class TextActivity extends Activity
 
         public void updateText()
         {
-            Iterator<Page> iterator = m_pages.iterator();
-            while (iterator.hasNext()) {
-                final Page page = iterator.next();
+            for (Page page : m_pages) {
                 page.verseListView.setBackgroundColor(TextActivity.this.m_backgroundColor);
                 page.verseListView.setCacheColorHint(TextActivity.this.m_backgroundColor);
                 if (page.inUse) {
@@ -365,9 +361,7 @@ public class TextActivity extends Activity
 
         public int currentVerse()
         {
-            Iterator<Page> iterator = m_pages.iterator();
-            while (iterator.hasNext()) {
-                final Page page = iterator.next();
+            for (Page page : m_pages) {
                 if (page.position == TextActivity.this.m_currentChapter)
                     return page.verseListView.getFirstVisiblePosition();
             }
@@ -376,9 +370,7 @@ public class TextActivity extends Activity
 
         public boolean hasItemSelected()
         {
-            Iterator<Page> iterator = m_pages.iterator();
-            while (iterator.hasNext()) {
-                final Page page = iterator.next();
+            for (Page page : m_pages) {
                 if (page.position == TextActivity.this.m_currentChapter)
                     return page.verseListAdapter.hasItemSelected();
             }
@@ -387,9 +379,7 @@ public class TextActivity extends Activity
 
         public String selectedText()
         {
-            Iterator<Page> iterator = m_pages.iterator();
-            while (iterator.hasNext()) {
-                final Page page = iterator.next();
+            for (Page page : m_pages) {
                 if (page.position == TextActivity.this.m_currentChapter)
                     return page.verseListAdapter.selectedText();
             }

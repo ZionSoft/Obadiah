@@ -138,8 +138,8 @@ public class TranslationDownloadActivity extends Activity
                 final TranslationInfo[] allTranslations = TranslationDownloadActivity.this.m_translationManager
                         .translations();
                 int availableTranslationsCount = 0;
-                for (int i = 0; i < allTranslations.length; ++i) {
-                    if (!allTranslations[i].installed)
+                for (TranslationInfo translationInfo : allTranslations) {
+                    if (!translationInfo.installed)
                         ++availableTranslationsCount;
                 }
                 if (availableTranslationsCount == 0) {
@@ -149,9 +149,9 @@ public class TranslationDownloadActivity extends Activity
                 } else {
                     final TranslationInfo[] availableTranslations = new TranslationInfo[availableTranslationsCount];
                     int index = 0;
-                    for (int i = 0; i < allTranslations.length; ++i) {
-                        if (!allTranslations[i].installed)
-                            availableTranslations[index++] = allTranslations[i];
+                    for (TranslationInfo translationInfo : allTranslations) {
+                        if (!translationInfo.installed)
+                            availableTranslations[index++] = translationInfo;
                     }
                     TranslationDownloadActivity.this.m_availableTranslations = availableTranslations;
                 }
@@ -261,7 +261,7 @@ public class TranslationDownloadActivity extends Activity
 
                 final byte buffer[] = new byte[BUFFER_LENGTH];
                 final ContentValues versesValues = new ContentValues(4);
-                int read = -1;
+                int read;
                 int downloaded = 0;
                 ZipEntry entry;
                 while ((entry = zis.getNextEntry()) != null) {

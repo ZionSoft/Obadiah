@@ -111,11 +111,9 @@ public class BibleReader
         }
 
         // tries to find the translation
-        final int length = m_installedTranslations.length;
-        for (int i = 0; i < length; ++i) {
-            final String path = m_installedTranslations[i].path;
-            if (m_installedTranslations[i].path.endsWith(translation)) {
-                m_selectedTranslation = path;
+        for (TranslationInfo installedTranslation : m_installedTranslations) {
+            if (installedTranslation.path.endsWith(translation)) {
+                m_selectedTranslation = installedTranslation.path;
                 return;
             }
         }

@@ -214,7 +214,7 @@ public class UpgradeAsyncTask extends AsyncTask<Void, Integer, Void>
         final SharedPreferences preferences = m_bookSelectionActivity.getSharedPreferences(Constants.SETTING_KEY,
                 Context.MODE_PRIVATE);
         final SharedPreferences.Editor editor = preferences.edit();
-        String selectedTranslation = null;
+        String selectedTranslation;
         try {
             selectedTranslation = preferences.getString("selectedTranslation", null);
             if (selectedTranslation != null) {
