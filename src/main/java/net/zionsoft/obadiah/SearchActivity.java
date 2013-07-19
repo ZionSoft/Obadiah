@@ -30,9 +30,10 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.util.TypedValue;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
@@ -58,14 +59,6 @@ public class SearchActivity extends Activity {
         m_translationsDatabaseHelper = new TranslationsDatabaseHelper(this);
         m_translationManager = new TranslationManager(this);
         m_translationReader = new TranslationReader(this);
-
-        // initializes the title bar
-        m_selectedTranslationTextView = (TextView) findViewById(R.id.selected_translation_textview);
-        m_selectedTranslationTextView.setOnClickListener(new OnClickListener() {
-            public void onClick(View v) {
-                startActivity(new Intent(SearchActivity.this, TranslationSelectionActivity.class));
-            }
-        });
 
         // initializes the search bar
         m_searchText = (EditText) findViewById(R.id.search_edittext);
@@ -125,12 +118,29 @@ public class SearchActivity extends Activity {
             final TranslationInfo[] translations = m_translationManager.translations();
             for (TranslationInfo translationInfo : translations) {
                 if (translationInfo.installed && translationInfo.shortName.equals(m_selectedTranslationShortName)) {
-                    m_selectedTranslationTextView.setText(translationInfo.name);
+                    setTitle(translationInfo.name);
                     break;
                 }
             }
 
             search(null);
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_search, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_select_translation:
+                startActivity(new Intent(SearchActivity.this, TranslationSelectionActivity.class));
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
     }
 
@@ -261,7 +271,6 @@ public class SearchActivity extends Activity {
     private SearchResultListAdapter m_searchResultListAdapter;
     private SettingsManager m_settingsManager;
     private String m_selectedTranslationShortName;
-    private TextView m_selectedTranslationTextView;
     private TranslationsDatabaseHelper m_translationsDatabaseHelper;
     private TranslationManager m_translationManager;
     private TranslationReader m_translationReader;

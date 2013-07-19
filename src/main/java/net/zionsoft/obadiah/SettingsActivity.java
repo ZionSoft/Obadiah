@@ -33,7 +33,6 @@ public class SettingsActivity extends PreferenceActivity {
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.settings_activity);
 
         // noinspection deprecation
         addPreferencesFromResource(R.xml.preferences);

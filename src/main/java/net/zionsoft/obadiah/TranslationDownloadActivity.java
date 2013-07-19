@@ -40,6 +40,8 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -97,8 +99,21 @@ public class TranslationDownloadActivity extends Activity {
             m_translationDownloadAsyncTask.cancel(true);
     }
 
-    public void refresh(View view) {
-        new TranslationListDownloadAsyncTask().execute(true);
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_translationdownload, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_refresh:
+                new TranslationListDownloadAsyncTask().execute(true);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     private class TranslationListDownloadAsyncTask extends AsyncTask<Boolean, Void, Void> {

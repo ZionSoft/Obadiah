@@ -33,9 +33,10 @@ import android.text.ClipboardManager;
 import android.text.SpannableString;
 import android.text.style.BackgroundColorSpan;
 import android.util.TypedValue;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -55,18 +56,7 @@ public class TextActivity extends Activity {
         m_settingsManager = new SettingsManager(this);
         m_translationReader = new TranslationReader(this);
 
-        // initializes the title bar
-        m_selectedTranslationTextView = (TextView) findViewById(R.id.selected_translation_textview);
-        m_selectedTranslationTextView.setOnClickListener(new OnClickListener() {
-            public void onClick(View v) {
-                startActivity(new Intent(TextActivity.this, TranslationSelectionActivity.class));
-            }
-        });
-        m_selectedBookTextView = (TextView) findViewById(R.id.selected_book_textview);
-
         // initializes the tool bar buttons
-        m_settingsButton = (ImageButton) findViewById(R.id.settings_button);
-        m_searchButton = (ImageButton) findViewById(R.id.search_button);
         m_shareButton = (ImageButton) findViewById(R.id.share_button);
         m_copyButton = (ImageButton) findViewById(R.id.copy_button);
 
@@ -101,9 +91,9 @@ public class TextActivity extends Activity {
         m_currentChapter = preferences.getInt(Constants.CURRENT_CHAPTER_SETTING_KEY, 0);
         m_translationReader.selectTranslation(preferences.getString(Constants.CURRENT_TRANSLATION_SETTING_KEY, null));
 
-        m_verseViewPager.setCurrentItem(m_currentChapter);
         m_versePagerAdapter.setSelection(preferences.getInt(Constants.CURRENT_VERSE_SETTING_KEY, 0));
         m_versePagerAdapter.updateText();
+        m_verseViewPager.setCurrentItem(m_currentChapter);
 
         populateUi();
     }
@@ -117,10 +107,31 @@ public class TextActivity extends Activity {
         editor.commit();
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_text, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_search:
+                startActivity(new Intent(this, SearchActivity.class).setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
+                return true;
+            case R.id.action_settings:
+                startActivity(new Intent(this, SettingsActivity.class));
+                return true;
+            case R.id.action_select_translation:
+                startActivity(new Intent(TextActivity.this, TranslationSelectionActivity.class));
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
     public void onToolbarButtonClicked(View view) {
-        if (view == m_settingsButton) {
-            startActivity(new Intent(this, SettingsActivity.class));
-        } else if (view == m_shareButton) {
+        if (view == m_shareButton) {
             if (m_versePagerAdapter.hasItemSelected()) {
                 final Intent intent = new Intent();
                 intent.setAction(Intent.ACTION_SEND);
@@ -135,14 +146,11 @@ public class TextActivity extends Activity {
                 m_clipboardManager.setText(m_versePagerAdapter.selectedText());
                 Toast.makeText(this, R.string.text_copied, Toast.LENGTH_SHORT).show();
             }
-        } else if (view == m_searchButton) {
-            startActivity(new Intent(this, SearchActivity.class).setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
         }
     }
 
     private void populateUi() {
-        m_selectedTranslationTextView.setText(m_translationReader.selectedTranslationShortName());
-        m_selectedBookTextView.setText(m_translationReader.bookNames()[m_currentBook] + ", " + (m_currentChapter + 1));
+        setTitle(m_translationReader.bookNames()[m_currentBook] + ", " + (m_currentChapter + 1));
 
         final boolean hasItemSelected = m_versePagerAdapter.hasItemSelected();
         m_shareButton.setEnabled(hasItemSelected);
@@ -391,13 +399,9 @@ public class TextActivity extends Activity {
     private int m_textColor;
     private float m_textSize;
     private ClipboardManager m_clipboardManager; // obsoleted by android.content.ClipboardManager since API level 11
-    private ImageButton m_settingsButton;
     private ImageButton m_shareButton;
     private ImageButton m_copyButton;
-    private ImageButton m_searchButton;
     private SettingsManager m_settingsManager;
-    private TextView m_selectedBookTextView;
-    private TextView m_selectedTranslationTextView;
     private TranslationReader m_translationReader;
     private VersePagerAdapter m_versePagerAdapter;
     private ViewPager m_verseViewPager;

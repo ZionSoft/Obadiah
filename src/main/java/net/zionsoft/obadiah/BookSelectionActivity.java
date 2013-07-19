@@ -34,13 +34,13 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.TypedValue;
 import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -64,19 +64,6 @@ public class BookSelectionActivity extends Activity {
         m_translationManager = new TranslationManager(this);
         m_translationReader = new TranslationReader(this);
 
-        // initializes the tool bar
-        m_settingsButton = (ImageButton) findViewById(R.id.settings_button);
-        m_searchButton = (ImageButton) findViewById(R.id.search_button);
-
-        // initializes the title bar
-        m_selectedTranslationTextView = (TextView) findViewById(R.id.selected_translation_textview);
-        m_selectedTranslationTextView.setOnClickListener(new OnClickListener() {
-            public void onClick(View v) {
-                BookSelectionActivity.this.startTranslationSelectionActivity();
-            }
-        });
-        m_selectedBookTextView = (TextView) findViewById(R.id.selected_book_textview);
-
         // initializes the book names list view
         m_bookListView = (ListView) findViewById(R.id.book_listview);
         m_bookListAdapter = new BookListAdapter(this);
@@ -87,7 +74,7 @@ public class BookSelectionActivity extends Activity {
                     return;
 
                 BookSelectionActivity.this.m_selectedBook = position;
-                BookSelectionActivity.this.m_selectedBookTextView.setText(m_translationReader.bookNames()[m_selectedBook]);
+                BookSelectionActivity.this.setTitle(String.format("%s - %s", m_translationReader.selectedTranslationShortName(), m_translationReader.bookNames()[m_selectedBook]));
                 BookSelectionActivity.this.m_bookListAdapter.notifyDataSetChanged();
                 BookSelectionActivity.this.updateChapterSelectionListAdapter();
                 BookSelectionActivity.this.m_chaptersGridView.setSelection(0);
@@ -134,16 +121,32 @@ public class BookSelectionActivity extends Activity {
         populateUi();
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_bookselection, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_search:
+                startActivity(new Intent(this, SearchActivity.class));
+                return true;
+            case R.id.action_settings:
+                startActivity(new Intent(this, SettingsActivity.class));
+                return true;
+            case R.id.action_select_translation:
+                startTranslationSelectionActivity();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
     public void onUpgradeFinished() {
         populateUi();
         m_upgrading = false;
-    }
-
-    public void onToolbarButtonClicked(View view) {
-        if (view == m_settingsButton)
-            startActivity(new Intent(this, SettingsActivity.class));
-        else if (view == m_searchButton)
-            startActivity(new Intent(this, SearchActivity.class));
     }
 
     private void populateUi() {
@@ -175,11 +178,10 @@ public class BookSelectionActivity extends Activity {
             // TODO it's not needed if this activity is resumed from TranslationSelectionActivity
             updateChapterSelectionListAdapter();
 
-            // updates the title and book names
+            // updates the window title to contain selected translation and book name
             // TODO no need to update if selected translation is not changed
-            m_selectedTranslationTextView.setText(m_translationReader.selectedTranslationShortName());
             final String[] bookNames = m_translationReader.bookNames();
-            m_selectedBookTextView.setText(bookNames[m_selectedBook]);
+            setTitle(String.format("%s - %s", m_translationReader.selectedTranslationShortName(), bookNames[m_selectedBook]));
             m_bookListAdapter.setTexts(bookNames);
 
             // scrolls to the currently selected book
@@ -293,13 +295,9 @@ public class BookSelectionActivity extends Activity {
     private float m_textSize;
     private BookListAdapter m_bookListAdapter;
     private ChapterListAdapter m_chapterListAdapter;
-    private ImageButton m_settingsButton;
-    private ImageButton m_searchButton;
     private GridView m_chaptersGridView;
     private ListView m_bookListView;
     private SettingsManager m_settingsManager;
-    private TextView m_selectedBookTextView;
-    private TextView m_selectedTranslationTextView;
     private TranslationManager m_translationManager;
     private TranslationReader m_translationReader;
 }

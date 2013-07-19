@@ -13,7 +13,6 @@
     <dimen name="smaller_text_size_medium">16dip</dimen>
     <dimen name="smaller_text_size_large">18dip</dimen>
     <dimen name="smaller_text_size_verylarge">20dip</dimen>
-    <dimen name="titlebar_text_size">18dip</dimen>
     <dimen name="booklistview_width">160dip</dimen>
     <dimen name="chaptergridview_column_width">48dip</dimen>
 
