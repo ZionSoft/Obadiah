@@ -20,12 +20,14 @@ package net.zionsoft.obadiah;
 import java.util.Iterator;
 import java.util.LinkedList;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -76,6 +78,7 @@ public class TextActivity extends Activity {
                 populateUi();
             }
         });
+        m_verseViewPager.setPageTransformer(true, new DepthPageTransformer());
     }
 
     protected void onResume() {
@@ -155,6 +158,31 @@ public class TextActivity extends Activity {
         final boolean hasItemSelected = m_versePagerAdapter.hasItemSelected();
         m_shareButton.setEnabled(hasItemSelected);
         m_copyButton.setEnabled(hasItemSelected);
+    }
+
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    private static class DepthPageTransformer implements ViewPager.PageTransformer {
+        @Override
+        public void transformPage(View view, float position) {
+            int pageWidth = view.getWidth();
+            if (position < -1) {
+                view.setAlpha(0);
+            } else if (position <= 0) {
+                view.setAlpha(1);
+                view.setTranslationX(0);
+                view.setScaleX(1);
+                view.setScaleY(1);
+            } else if (position <= 1) {
+                view.setAlpha(1 - position);
+                view.setTranslationX(pageWidth * -position);
+
+                float scaleFactor = 0.7f + 0.3f * (1 - Math.abs(position));
+                view.setScaleX(scaleFactor);
+                view.setScaleY(scaleFactor);
+            } else {
+                view.setAlpha(0);
+            }
+        }
     }
 
     private class VerseListAdapter extends ListBaseAdapter {
