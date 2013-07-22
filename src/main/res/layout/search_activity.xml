@@ -1,36 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical">
 
-    <ImageButton
-            android:id="@+id/search_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:onClick="search"
-            android:src="@drawable/btn_search"/>
-
-    <EditText
-            android:id="@+id/search_edittext"
+    <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_toLeftOf="@id/search_button"
-            android:imeOptions="actionSearch"
-            android:inputType="text"
-            android:singleLine="true"
-            android:textSize="@dimen/text_size"/>
+            android:layout_height="wrap_content">
+
+        <ImageButton
+                android:id="@+id/search_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:onClick="search"
+                android:src="@drawable/btn_search"/>
+
+        <EditText
+                android:id="@+id/search_edittext"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_alignParentLeft="true"
+                android:layout_toLeftOf="@id/search_button"
+                android:imeOptions="actionSearch"
+                android:inputType="text"
+                android:singleLine="true"
+                android:textSize="@dimen/text_size"/>
+    </RelativeLayout>
 
     <ListView
             xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/search_result_listview"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_alignParentBottom="true"
-            android:layout_below="@id/search_edittext"
             android:background="@android:color/white"
             android:cacheColorHint="@android:color/white"
             android:divider="@null"
-            android:dividerHeight="7dip"/>
-
-</RelativeLayout>
+            android:dividerHeight="7dip"
+            android:paddingLeft="@dimen/padding"
+            android:paddingRight="@dimen/padding"/>
+</LinearLayout>
