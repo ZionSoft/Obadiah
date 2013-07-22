@@ -26,8 +26,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 // old format is used prior to 1.5.0
-public class BibleReader {
-    public BibleReader(File rootDir) {
+class BibleReader {
+    BibleReader(File rootDir) {
         try {
             final File[] directories = rootDir.listFiles();
             final int length = directories.length;
@@ -107,11 +107,11 @@ public class BibleReader {
         }
     }
 
-    public TranslationInfo[] installedTranslations() {
+    TranslationInfo[] installedTranslations() {
         return m_installedTranslations;
     }
 
-    public void selectTranslation(String translation) {
+    void selectTranslation(String translation) {
         if (m_installedTranslations == null || m_installedTranslations.length == 0) {
             m_selectedTranslation = null;
             return;
@@ -136,7 +136,7 @@ public class BibleReader {
             m_selectedTranslation = m_installedTranslations[0].path;
     }
 
-    public String[] verses(int book, int chapter) {
+    String[] verses(int book, int chapter) {
         try {
             final String path = m_selectedTranslation + "/" + book + "-" + chapter + ".json";
             final File file = new File(path);

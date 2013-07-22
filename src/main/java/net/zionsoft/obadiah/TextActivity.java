@@ -144,8 +144,10 @@ public class TextActivity extends Activity {
             }
         } else if (view == m_copyButton) {
             if (m_versePagerAdapter.hasItemSelected()) {
-                if (m_clipboardManager == null)
+                if (m_clipboardManager == null) {
+                    // noinspection deprecation
                     m_clipboardManager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                }
                 m_clipboardManager.setText(m_versePagerAdapter.selectedText());
                 Toast.makeText(this, R.string.text_copied, Toast.LENGTH_SHORT).show();
             }
@@ -426,11 +428,13 @@ public class TextActivity extends Activity {
     private int m_backgroundColor;
     private int m_textColor;
     private float m_textSize;
-    private ClipboardManager m_clipboardManager; // obsoleted by android.content.ClipboardManager since API level 11
     private ImageButton m_shareButton;
     private ImageButton m_copyButton;
     private SettingsManager m_settingsManager;
     private TranslationReader m_translationReader;
     private VersePagerAdapter m_versePagerAdapter;
     private ViewPager m_verseViewPager;
+
+    @SuppressWarnings("deprecation")
+    private ClipboardManager m_clipboardManager;
 }
