@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:obadiah="http://schemas.android.com/apk/res-auto">
     <item
             android:id="@+id/action_refresh"
             android:icon="@drawable/btn_refresh"
             android:title="@string/action_refresh"
-            android:showAsAction="ifRoom"/>
+            obadiah:showAsAction="ifRoom"/>
 </menu>

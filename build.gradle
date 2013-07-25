@@ -9,7 +9,7 @@ buildscript {
 apply plugin: 'android'
 
 dependencies {
-    compile files('libs/android-support-v4.jar')
+    compile "com.android.support:appcompat-v7:18.0.+"
     compile files('libs/GoogleAdMobAdsSdk.jar')
 }
 

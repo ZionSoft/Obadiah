@@ -17,7 +17,6 @@
 
 package net.zionsoft.obadiah;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -27,6 +26,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.text.Editable;
 import android.util.TypedValue;
 import android.view.KeyEvent;
@@ -50,7 +50,7 @@ import net.zionsoft.obadiah.bible.TranslationReader;
 import net.zionsoft.obadiah.bible.TranslationsDatabaseHelper;
 import net.zionsoft.obadiah.util.SettingsManager;
 
-public class SearchActivity extends Activity {
+public class SearchActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.search_activity);

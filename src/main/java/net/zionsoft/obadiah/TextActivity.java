@@ -21,7 +21,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -31,6 +30,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.view.ActionMode;
 import android.text.ClipboardManager;
 import android.text.SpannableString;
 import android.text.style.BackgroundColorSpan;
@@ -40,7 +41,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -50,17 +50,13 @@ import android.widget.AdapterView.OnItemClickListener;
 import net.zionsoft.obadiah.bible.TranslationReader;
 import net.zionsoft.obadiah.util.SettingsManager;
 
-public class TextActivity extends Activity {
+public class TextActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.text_activity);
 
         m_settingsManager = new SettingsManager(this);
         m_translationReader = new TranslationReader(this);
-
-        // initializes the tool bar buttons
-        m_shareButton = (ImageButton) findViewById(R.id.share_button);
-        m_copyButton = (ImageButton) findViewById(R.id.copy_button);
 
         // initializes verses view pager
         m_verseViewPager = (ViewPager) findViewById(R.id.verse_viewpager);
@@ -75,6 +71,8 @@ public class TextActivity extends Activity {
 
             public void onPageSelected(int position) {
                 m_currentChapter = position;
+                if (m_actionMode != null)
+                    m_actionMode.finish();
                 populateUi();
             }
         });
@@ -101,8 +99,12 @@ public class TextActivity extends Activity {
         populateUi();
     }
 
+    @Override
     protected void onPause() {
         super.onPause();
+
+        if (m_actionMode != null)
+            m_actionMode.finish();
 
         final SharedPreferences.Editor editor = getSharedPreferences(Constants.SETTING_KEY, MODE_PRIVATE).edit();
         editor.putInt(Constants.CURRENT_CHAPTER_SETTING_KEY, m_currentChapter);
@@ -133,33 +135,9 @@ public class TextActivity extends Activity {
         }
     }
 
-    public void onToolbarButtonClicked(View view) {
-        if (view == m_shareButton) {
-            if (m_versePagerAdapter.hasItemSelected()) {
-                final Intent intent = new Intent();
-                intent.setAction(Intent.ACTION_SEND);
-                intent.setType("text/plain");
-                intent.putExtra(Intent.EXTRA_TEXT, m_versePagerAdapter.selectedText());
-                startActivity(Intent.createChooser(intent, getResources().getText(R.string.text_share_with)));
-            }
-        } else if (view == m_copyButton) {
-            if (m_versePagerAdapter.hasItemSelected()) {
-                if (m_clipboardManager == null) {
-                    // noinspection deprecation
-                    m_clipboardManager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-                }
-                m_clipboardManager.setText(m_versePagerAdapter.selectedText());
-                Toast.makeText(this, R.string.text_copied, Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
-
     private void populateUi() {
-        setTitle(m_translationReader.bookNames()[m_currentBook] + ", " + (m_currentChapter + 1));
-
-        final boolean hasItemSelected = m_versePagerAdapter.hasItemSelected();
-        m_shareButton.setEnabled(hasItemSelected);
-        m_copyButton.setEnabled(hasItemSelected);
+        setTitle(String.format("%s - %s, %d", m_translationReader.selectedTranslationShortName(),
+                m_translationReader.bookNames()[m_currentBook], (m_currentChapter + 1)));
     }
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
@@ -209,6 +187,15 @@ public class TextActivity extends Activity {
 
         public boolean hasItemSelected() {
             return (m_selectedCount > 0);
+        }
+
+        public void deselect() {
+            int length = m_selected.length;
+            for (int i = 0; i < length; ++i)
+                m_selected[i] = false;
+            m_selectedCount = 0;
+
+            notifyDataSetChanged();
         }
 
         public String selectedText() {
@@ -330,11 +317,56 @@ public class TextActivity extends Activity {
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         verseListAdapter.selectItem(position);
                         if (verseListAdapter.hasItemSelected()) {
-                            TextActivity.this.m_shareButton.setEnabled(true);
-                            TextActivity.this.m_copyButton.setEnabled(true);
+                            if (m_actionMode == null) {
+                                m_actionMode = TextActivity.this.startSupportActionMode(new ActionMode.Callback() {
+                                    @Override
+                                    public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
+                                        actionMode.getMenuInflater().inflate(R.menu.menu_text_context, menu);
+                                        return true;
+                                    }
+
+                                    @Override
+                                    public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
+                                        return false;
+                                    }
+
+                                    @Override
+                                    public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
+                                        switch (menuItem.getItemId()) {
+                                            case R.id.action_copy:
+                                                if (m_clipboardManager == null) {
+                                                    // noinspection deprecation
+                                                    m_clipboardManager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                                                }
+                                                m_clipboardManager.setText(m_versePagerAdapter.selectedText());
+                                                Toast.makeText(TextActivity.this, R.string.text_copied, Toast.LENGTH_SHORT).show();
+                                                actionMode.finish();
+                                                return true;
+                                            case R.id.action_share:
+                                                final Intent intent = new Intent();
+                                                intent.setAction(Intent.ACTION_SEND);
+                                                intent.setType("text/plain");
+                                                intent.putExtra(Intent.EXTRA_TEXT, m_versePagerAdapter.selectedText());
+                                                startActivity(Intent.createChooser(intent, getResources().getText(R.string.text_share_with)));
+                                                actionMode.finish();
+                                                return true;
+                                            default:
+                                                return false;
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onDestroyActionMode(ActionMode actionMode) {
+                                        if (actionMode != m_actionMode)
+                                            return;
+                                        verseListAdapter.deselect();
+                                        m_actionMode = null;
+                                    }
+                                });
+                            }
                         } else {
-                            TextActivity.this.m_shareButton.setEnabled(false);
-                            TextActivity.this.m_copyButton.setEnabled(false);
+                            if (m_actionMode != null)
+                                m_actionMode.finish();
                         }
                     }
                 });
@@ -396,14 +428,6 @@ public class TextActivity extends Activity {
             return 0;
         }
 
-        public boolean hasItemSelected() {
-            for (Page page : m_pages) {
-                if (page.position == TextActivity.this.m_currentChapter)
-                    return page.verseListAdapter.hasItemSelected();
-            }
-            return false;
-        }
-
         public String selectedText() {
             for (Page page : m_pages) {
                 if (page.position == TextActivity.this.m_currentChapter)
@@ -428,8 +452,7 @@ public class TextActivity extends Activity {
     private int m_backgroundColor;
     private int m_textColor;
     private float m_textSize;
-    private ImageButton m_shareButton;
-    private ImageButton m_copyButton;
+    private ActionMode m_actionMode;
     private SettingsManager m_settingsManager;
     private TranslationReader m_translationReader;
     private VersePagerAdapter m_versePagerAdapter;
