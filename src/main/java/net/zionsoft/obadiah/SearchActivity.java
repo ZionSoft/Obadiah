@@ -37,12 +37,12 @@ import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.TextView.OnEditorActionListener;
+import android.widget.Toast;
 
 import net.zionsoft.obadiah.bible.TranslationInfo;
 import net.zionsoft.obadiah.bible.TranslationManager;
@@ -55,14 +55,14 @@ public class SearchActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.search_activity);
 
-        m_settingsManager = new SettingsManager(this);
-        m_translationsDatabaseHelper = new TranslationsDatabaseHelper(this);
-        m_translationManager = new TranslationManager(this);
-        m_translationReader = new TranslationReader(this);
+        mSettingsManager = new SettingsManager(this);
+        mTranslationsDatabaseHelper = new TranslationsDatabaseHelper(this);
+        mTranslationManager = new TranslationManager(this);
+        mTranslationReader = new TranslationReader(this);
 
         // initializes the search bar
-        m_searchText = (EditText) findViewById(R.id.search_edittext);
-        m_searchText.setOnEditorActionListener(new OnEditorActionListener() {
+        mSearchText = (EditText) findViewById(R.id.search_edittext);
+        mSearchText.setOnEditorActionListener(new OnEditorActionListener() {
             public boolean onEditorAction(TextView view, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                     SearchActivity.this.search(null);
@@ -73,15 +73,15 @@ public class SearchActivity extends ActionBarActivity {
         });
 
         // initializes the search results list view
-        m_searchResultListView = (ListView) findViewById(R.id.search_result_listview);
-        m_searchResultListAdapter = new SearchResultListAdapter(this);
-        m_searchResultListView.setAdapter(m_searchResultListAdapter);
-        m_searchResultListView.setOnItemClickListener(new OnItemClickListener() {
+        mSearchResultListView = (ListView) findViewById(R.id.search_result_listview);
+        mSearchResultListAdapter = new SearchResultListAdapter(this);
+        mSearchResultListView.setAdapter(mSearchResultListAdapter);
+        mSearchResultListView.setOnItemClickListener(new OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (position < 0 || position >= SearchActivity.this.m_results.length)
+                if (position < 0 || position >= SearchActivity.this.mResults.length)
                     return;
 
-                final SearchResult result = SearchActivity.this.m_results[position];
+                final SearchResult result = SearchActivity.this.mResults[position];
                 final SharedPreferences.Editor editor = getSharedPreferences(Constants.SETTING_KEY, MODE_PRIVATE)
                         .edit();
                 editor.putInt(Constants.CURRENT_BOOK_SETTING_KEY, result.bookIndex);
@@ -99,25 +99,25 @@ public class SearchActivity extends ActionBarActivity {
     protected void onResume() {
         super.onResume();
 
-        m_settingsManager.refresh();
-        final int backgroundColor = m_settingsManager.backgroundColor();
-        m_searchResultListView.setBackgroundColor(backgroundColor);
-        m_searchResultListView.setCacheColorHint(backgroundColor);
-        m_textColor = m_settingsManager.textColor();
-        m_textSize = m_settingsManager.textSize();
+        mSettingsManager.refresh();
+        final int backgroundColor = mSettingsManager.backgroundColor();
+        mSearchResultListView.setBackgroundColor(backgroundColor);
+        mSearchResultListView.setCacheColorHint(backgroundColor);
+        mTextColor = mSettingsManager.textColor();
+        mTextSize = mSettingsManager.textSize();
 
-        m_searchResultListAdapter.notifyDataSetChanged();
+        mSearchResultListAdapter.notifyDataSetChanged();
 
         final String selectedTranslationShortName = getSharedPreferences(Constants.SETTING_KEY, MODE_PRIVATE)
                 .getString(Constants.CURRENT_TRANSLATION_SETTING_KEY, null);
         if (selectedTranslationShortName == null
-                || !selectedTranslationShortName.equals(m_selectedTranslationShortName)) {
-            m_translationReader.selectTranslation(selectedTranslationShortName);
-            m_selectedTranslationShortName = m_translationReader.selectedTranslationShortName();
+                || !selectedTranslationShortName.equals(mSelectedTranslationShortName)) {
+            mTranslationReader.selectTranslation(selectedTranslationShortName);
+            mSelectedTranslationShortName = mTranslationReader.selectedTranslationShortName();
 
-            final TranslationInfo[] translations = m_translationManager.translations();
+            final TranslationInfo[] translations = mTranslationManager.translations();
             for (TranslationInfo translationInfo : translations) {
-                if (translationInfo.installed && translationInfo.shortName.equals(m_selectedTranslationShortName)) {
+                if (translationInfo.installed && translationInfo.shortName.equals(mSelectedTranslationShortName)) {
                     setTitle(translationInfo.name);
                     break;
                 }
@@ -145,7 +145,7 @@ public class SearchActivity extends ActionBarActivity {
     }
 
     public void search(View view) {
-        final Editable searchToken = m_searchText.getText();
+        final Editable searchToken = mSearchText.getText();
         if (searchToken.length() == 0)
             return;
 
@@ -163,7 +163,7 @@ public class SearchActivity extends ActionBarActivity {
         protected void onPreExecute() {
             // running in the main thread
 
-            SearchActivity.this.m_searchResultListAdapter.setTexts(null);
+            SearchActivity.this.mSearchResultListAdapter.setTexts(null);
 
             InputMethodManager inputManager = (InputMethodManager) SearchActivity.this
                     .getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -181,8 +181,8 @@ public class SearchActivity extends ActionBarActivity {
         protected Void doInBackground(Editable... params) {
             // running in the worker thread
 
-            final SQLiteDatabase db = SearchActivity.this.m_translationsDatabaseHelper.getReadableDatabase();
-            final Cursor cursor = db.query(SearchActivity.this.m_selectedTranslationShortName, new String[]{
+            final SQLiteDatabase db = SearchActivity.this.mTranslationsDatabaseHelper.getReadableDatabase();
+            final Cursor cursor = db.query(SearchActivity.this.mSelectedTranslationShortName, new String[]{
                     TranslationsDatabaseHelper.COLUMN_BOOK_INDEX, TranslationsDatabaseHelper.COLUMN_CHAPTER_INDEX,
                     TranslationsDatabaseHelper.COLUMN_VERSE_INDEX, TranslationsDatabaseHelper.COLUMN_TEXT},
                     TranslationsDatabaseHelper.COLUMN_TEXT + " LIKE ?", new String[]{"%"
@@ -198,16 +198,16 @@ public class SearchActivity extends ActionBarActivity {
                             .getColumnIndex(TranslationsDatabaseHelper.COLUMN_VERSE_INDEX);
                     final int textColumnIndex = cursor.getColumnIndex(TranslationsDatabaseHelper.COLUMN_TEXT);
                     m_texts = new String[count];
-                    SearchActivity.this.m_results = new SearchResult[count];
+                    SearchActivity.this.mResults = new SearchResult[count];
                     int i = 0;
                     while (cursor.moveToNext()) {
                         final SearchResult result = new SearchResult();
                         result.bookIndex = cursor.getInt(bookIndexColumnIndex);
                         result.chapterIndex = cursor.getInt(chapterIndexColumnIndex);
                         result.verseIndex = cursor.getInt(verseIndexColumnIndex);
-                        SearchActivity.this.m_results[i] = result;
+                        SearchActivity.this.mResults[i] = result;
 
-                        String text = SearchActivity.this.m_translationReader.bookNames()[result.bookIndex];
+                        String text = SearchActivity.this.mTranslationReader.bookNames()[result.bookIndex];
                         text += " ";
                         text += Integer.toString(result.chapterIndex + 1);
                         text += ":";
@@ -225,7 +225,7 @@ public class SearchActivity extends ActionBarActivity {
         protected void onPostExecute(Void result) {
             // running in the main thread
 
-            SearchActivity.this.m_searchResultListAdapter.setTexts(m_texts);
+            SearchActivity.this.mSearchResultListAdapter.setTexts(m_texts);
             m_progressDialog.dismiss();
 
             final CharSequence text = (m_texts == null ? "0" : Integer.toString(m_texts.length))
@@ -243,35 +243,35 @@ public class SearchActivity extends ActionBarActivity {
         }
 
         public void setTexts(String[] texts) {
-            m_texts = texts;
+            mTexts = texts;
             notifyDataSetChanged();
         }
 
         public View getView(int position, View convertView, ViewGroup parent) {
             TextView textView;
             if (convertView == null) {
-                textView = new TextView(m_context);
+                textView = new TextView(mContext);
                 textView.setTypeface(null, Typeface.NORMAL);
             } else {
                 textView = (TextView) convertView;
             }
 
-            textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, SearchActivity.this.m_textSize);
-            textView.setTextColor(SearchActivity.this.m_textColor);
-            textView.setText(m_texts[position]);
+            textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, SearchActivity.this.mTextSize);
+            textView.setTextColor(SearchActivity.this.mTextColor);
+            textView.setText(mTexts[position]);
             return textView;
         }
     }
 
-    private int m_textColor;
-    private float m_textSize;
-    private EditText m_searchText;
-    private ListView m_searchResultListView;
-    private SearchResult[] m_results;
-    private SearchResultListAdapter m_searchResultListAdapter;
-    private SettingsManager m_settingsManager;
-    private String m_selectedTranslationShortName;
-    private TranslationsDatabaseHelper m_translationsDatabaseHelper;
-    private TranslationManager m_translationManager;
-    private TranslationReader m_translationReader;
+    private int mTextColor;
+    private float mTextSize;
+    private EditText mSearchText;
+    private ListView mSearchResultListView;
+    private SearchResult[] mResults;
+    private SearchResultListAdapter mSearchResultListAdapter;
+    private SettingsManager mSettingsManager;
+    private String mSelectedTranslationShortName;
+    private TranslationsDatabaseHelper mTranslationsDatabaseHelper;
+    private TranslationManager mTranslationManager;
+    private TranslationReader mTranslationReader;
 }

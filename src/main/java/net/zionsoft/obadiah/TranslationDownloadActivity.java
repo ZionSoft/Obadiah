@@ -17,17 +17,6 @@
 
 package net.zionsoft.obadiah;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayOutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
@@ -45,33 +34,44 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.AdapterView.OnItemClickListener;
 
 import net.zionsoft.obadiah.bible.TranslationInfo;
 import net.zionsoft.obadiah.bible.TranslationManager;
 import net.zionsoft.obadiah.bible.TranslationsDatabaseHelper;
 import net.zionsoft.obadiah.util.SettingsManager;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+
 public class TranslationDownloadActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.translationdownload_activity);
 
-        m_settingsManager = new SettingsManager(this);
-        m_translationManager = new TranslationManager(this);
+        mSettingsManager = new SettingsManager(this);
+        mTranslationManager = new TranslationManager(this);
 
         // initializes list view showing available translations
-        m_translationListView = (ListView) findViewById(R.id.translation_listview);
-        m_translationListAdapter = new TranslationListAdapter(this);
-        m_translationListView.setAdapter(m_translationListAdapter);
-        m_translationListView.setOnItemClickListener(new OnItemClickListener() {
+        mTranslationListView = (ListView) findViewById(R.id.translation_listview);
+        mTranslationListAdapter = new TranslationListAdapter(this);
+        mTranslationListView.setAdapter(mTranslationListAdapter);
+        mTranslationListView.setOnItemClickListener(new OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                TranslationDownloadActivity.this.m_translationDownloadAsyncTask = new TranslationDownloadAsyncTask();
-                TranslationDownloadActivity.this.m_translationDownloadAsyncTask.execute(position);
+                TranslationDownloadActivity.this.mTranslationDownloadAsyncTask = new TranslationDownloadAsyncTask();
+                TranslationDownloadActivity.this.mTranslationDownloadAsyncTask.execute(position);
             }
         });
 
@@ -82,21 +82,21 @@ public class TranslationDownloadActivity extends ActionBarActivity {
     protected void onResume() {
         super.onResume();
 
-        m_settingsManager.refresh();
-        final int backgroundColor = m_settingsManager.backgroundColor();
-        m_translationListView.setBackgroundColor(backgroundColor);
-        m_translationListView.setCacheColorHint(backgroundColor);
-        m_textColor = m_settingsManager.textColor();
-        m_textSize = m_settingsManager.textSize();
-        m_smallerTextSize = m_settingsManager.smallerTextSize();
+        mSettingsManager.refresh();
+        final int backgroundColor = mSettingsManager.backgroundColor();
+        mTranslationListView.setBackgroundColor(backgroundColor);
+        mTranslationListView.setCacheColorHint(backgroundColor);
+        mTextColor = mSettingsManager.textColor();
+        mTextSize = mSettingsManager.textSize();
+        mSmallerTextSize = mSettingsManager.smallerTextSize();
     }
 
     protected void onPause() {
         super.onPause();
 
         // cancel existing download async tasks
-        if (m_translationDownloadAsyncTask != null)
-            m_translationDownloadAsyncTask.cancel(true);
+        if (mTranslationDownloadAsyncTask != null)
+            mTranslationDownloadAsyncTask.cancel(true);
     }
 
     @Override
@@ -158,11 +158,11 @@ public class TranslationDownloadActivity extends ActionBarActivity {
                         translationInfo.size = translationObject.getInt("size");
                         allTranslations[i] = translationInfo;
                     }
-                    TranslationDownloadActivity.this.m_translationManager.addTranslations(allTranslations);
+                    TranslationDownloadActivity.this.mTranslationManager.addTranslations(allTranslations);
                 }
 
                 // sets the available translations
-                final TranslationInfo[] allTranslations = TranslationDownloadActivity.this.m_translationManager
+                final TranslationInfo[] allTranslations = TranslationDownloadActivity.this.mTranslationManager
                         .translations();
                 int availableTranslationsCount = 0;
                 for (TranslationInfo translationInfo : allTranslations) {
@@ -170,9 +170,9 @@ public class TranslationDownloadActivity extends ActionBarActivity {
                         ++availableTranslationsCount;
                 }
                 if (availableTranslationsCount == 0) {
-                    TranslationDownloadActivity.this.m_availableTranslations = null;
+                    TranslationDownloadActivity.this.mAvailableTranslations = null;
                 } else if (availableTranslationsCount == allTranslations.length) {
-                    TranslationDownloadActivity.this.m_availableTranslations = allTranslations;
+                    TranslationDownloadActivity.this.mAvailableTranslations = allTranslations;
                 } else {
                     final TranslationInfo[] availableTranslations = new TranslationInfo[availableTranslationsCount];
                     int index = 0;
@@ -180,17 +180,17 @@ public class TranslationDownloadActivity extends ActionBarActivity {
                         if (!translationInfo.installed)
                             availableTranslations[index++] = translationInfo;
                     }
-                    TranslationDownloadActivity.this.m_availableTranslations = availableTranslations;
+                    TranslationDownloadActivity.this.mAvailableTranslations = availableTranslations;
                 }
             } catch (Exception e) {
                 e.printStackTrace();
 
                 m_hasError = true;
-                TranslationDownloadActivity.this.m_availableTranslations = null;
+                TranslationDownloadActivity.this.mAvailableTranslations = null;
             } finally {
                 final SharedPreferences.Editor editor = TranslationDownloadActivity.this.getSharedPreferences(
                         Constants.SETTING_KEY, MODE_PRIVATE).edit();
-                if (m_hasError || TranslationDownloadActivity.this.m_availableTranslations == null)
+                if (m_hasError || TranslationDownloadActivity.this.mAvailableTranslations == null)
                     editor.putLong(Constants.LAST_UPDATED_SETTING_KEY, 0);
                 else
                     editor.putLong(Constants.LAST_UPDATED_SETTING_KEY, System.currentTimeMillis());
@@ -204,8 +204,8 @@ public class TranslationDownloadActivity extends ActionBarActivity {
 
             m_progressDialog.dismiss();
 
-            if (m_hasError || TranslationDownloadActivity.this.m_availableTranslations == null
-                    || TranslationDownloadActivity.this.m_availableTranslations.length == 0) {
+            if (m_hasError || TranslationDownloadActivity.this.mAvailableTranslations == null
+                    || TranslationDownloadActivity.this.mAvailableTranslations.length == 0) {
                 // either error occurs, or no available translations
                 Toast.makeText(
                         TranslationDownloadActivity.this,
@@ -214,14 +214,14 @@ public class TranslationDownloadActivity extends ActionBarActivity {
                 TranslationDownloadActivity.this.finish();
             } else {
                 // everything fine with available translations
-                final int length = TranslationDownloadActivity.this.m_availableTranslations.length;
+                final int length = TranslationDownloadActivity.this.mAvailableTranslations.length;
                 final String[] texts = new String[length];
                 final int[] sizes = new int[length];
                 for (int i = 0; i < length; ++i) {
-                    texts[i] = TranslationDownloadActivity.this.m_availableTranslations[i].name;
-                    sizes[i] = TranslationDownloadActivity.this.m_availableTranslations[i].size;
+                    texts[i] = TranslationDownloadActivity.this.mAvailableTranslations[i].name;
+                    sizes[i] = TranslationDownloadActivity.this.mAvailableTranslations[i].size;
                 }
-                TranslationDownloadActivity.this.m_translationListAdapter.setTexts(texts, sizes);
+                TranslationDownloadActivity.this.mTranslationListAdapter.setTexts(texts, sizes);
             }
         }
 
@@ -257,7 +257,7 @@ public class TranslationDownloadActivity extends ActionBarActivity {
 
             // the logic should be in TranslationManager
 
-            final TranslationInfo translationToDownload = TranslationDownloadActivity.this.m_availableTranslations[positions[0]];
+            final TranslationInfo translationToDownload = TranslationDownloadActivity.this.mAvailableTranslations[positions[0]];
             final SQLiteDatabase db = new TranslationsDatabaseHelper(TranslationDownloadActivity.this)
                     .getWritableDatabase();
             db.beginTransaction();
@@ -391,9 +391,9 @@ public class TranslationDownloadActivity extends ActionBarActivity {
         }
 
         public void setTexts(String[] texts, int[] sizes) {
-            m_texts = texts;
+            mTexts = texts;
 
-            final String size = m_context.getResources().getText(R.string.text_size).toString();
+            final String size = mContext.getResources().getText(R.string.text_size).toString();
             final int length = sizes.length;
             m_subTexts = new String[length];
             for (int i = 0; i < length; ++i)
@@ -405,17 +405,17 @@ public class TranslationDownloadActivity extends ActionBarActivity {
         public View getView(int position, View convertView, ViewGroup parent) {
             LinearLayout linearLayout;
             if (convertView == null) {
-                linearLayout = new LinearLayout(m_context);
+                linearLayout = new LinearLayout(mContext);
                 linearLayout.setOrientation(LinearLayout.VERTICAL);
 
                 // first line
-                TextView textView = new TextView(m_context);
+                TextView textView = new TextView(mContext);
                 textView.setGravity(Gravity.CENTER_VERTICAL);
                 textView.setPadding(30, 20, 30, 0);
                 linearLayout.addView(textView);
 
                 // second line
-                textView = new TextView(m_context);
+                textView = new TextView(mContext);
                 textView.setGravity(Gravity.CENTER_VERTICAL);
                 textView.setTextColor(Color.GRAY);
                 textView.setPadding(30, 0, 30, 20);
@@ -426,13 +426,13 @@ public class TranslationDownloadActivity extends ActionBarActivity {
 
             // first line
             TextView textView = (TextView) linearLayout.getChildAt(0);
-            textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, TranslationDownloadActivity.this.m_textSize);
-            textView.setTextColor(TranslationDownloadActivity.this.m_textColor);
-            textView.setText(m_texts[position]);
+            textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, TranslationDownloadActivity.this.mTextSize);
+            textView.setTextColor(TranslationDownloadActivity.this.mTextColor);
+            textView.setText(mTexts[position]);
 
             // second line
             textView = (TextView) linearLayout.getChildAt(1);
-            textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, TranslationDownloadActivity.this.m_smallerTextSize);
+            textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, TranslationDownloadActivity.this.mSmallerTextSize);
             textView.setText(m_subTexts[position]);
 
             return linearLayout;
@@ -443,13 +443,13 @@ public class TranslationDownloadActivity extends ActionBarActivity {
 
     protected static final String BASE_URL = "http://bible.zionsoft.net/translations/";
 
-    private int m_textColor;
-    private float m_textSize;
-    private float m_smallerTextSize;
-    private ListView m_translationListView;
-    private SettingsManager m_settingsManager;
-    private TranslationDownloadAsyncTask m_translationDownloadAsyncTask;
-    private TranslationListAdapter m_translationListAdapter;
-    private TranslationManager m_translationManager;
-    private TranslationInfo[] m_availableTranslations;
+    private int mTextColor;
+    private float mTextSize;
+    private float mSmallerTextSize;
+    private ListView mTranslationListView;
+    private SettingsManager mSettingsManager;
+    private TranslationDownloadAsyncTask mTranslationDownloadAsyncTask;
+    private TranslationListAdapter mTranslationListAdapter;
+    private TranslationManager mTranslationManager;
+    private TranslationInfo[] mAvailableTranslations;
 }

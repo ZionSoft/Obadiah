@@ -25,7 +25,7 @@ import android.database.sqlite.SQLiteDatabase;
 public class TranslationManager {
     public TranslationManager(Context context) {
         super();
-        m_translationsDatabaseHelper = new TranslationsDatabaseHelper(context);
+        mTranslationsDatabaseHelper = new TranslationsDatabaseHelper(context);
     }
 
     public void addTranslations(TranslationInfo[] translations) {
@@ -34,7 +34,7 @@ public class TranslationManager {
 
         final TranslationInfo[] existingTranslations = translations();
         final ContentValues values = new ContentValues(5);
-        final SQLiteDatabase db = m_translationsDatabaseHelper.getWritableDatabase();
+        final SQLiteDatabase db = mTranslationsDatabaseHelper.getWritableDatabase();
         db.beginTransaction();
         try {
             for (TranslationInfo translationInfo : translations) {
@@ -49,8 +49,10 @@ public class TranslationManager {
                 }
 
                 values.put(TranslationsDatabaseHelper.COLUMN_INSTALLED, 0);
-                values.put(TranslationsDatabaseHelper.COLUMN_TRANSLATION_NAME, translationInfo.name);
-                values.put(TranslationsDatabaseHelper.COLUMN_TRANSLATION_SHORTNAME, translationInfo.shortName);
+                values.put(TranslationsDatabaseHelper.COLUMN_TRANSLATION_NAME,
+                        translationInfo.name);
+                values.put(TranslationsDatabaseHelper.COLUMN_TRANSLATION_SHORTNAME,
+                        translationInfo.shortName);
                 values.put(TranslationsDatabaseHelper.COLUMN_LANGUAGE, translationInfo.language);
                 values.put(TranslationsDatabaseHelper.COLUMN_DOWNLOAD_SIZE, translationInfo.size);
                 db.insert(TranslationsDatabaseHelper.TABLE_TRANSLATIONS, null, values);
@@ -67,7 +69,7 @@ public class TranslationManager {
         if (translationShortName == null)
             throw new IllegalArgumentException();
 
-        final SQLiteDatabase db = m_translationsDatabaseHelper.getWritableDatabase();
+        final SQLiteDatabase db = mTranslationsDatabaseHelper.getWritableDatabase();
         db.beginTransaction();
         try {
             // deletes the translation table
@@ -93,23 +95,27 @@ public class TranslationManager {
     }
 
     public TranslationInfo[] translations() {
-        final SQLiteDatabase db = m_translationsDatabaseHelper.getReadableDatabase();
+        final SQLiteDatabase db = mTranslationsDatabaseHelper.getReadableDatabase();
         final String[] columns = new String[]{TranslationsDatabaseHelper.COLUMN_TRANSLATION_NAME,
-                TranslationsDatabaseHelper.COLUMN_TRANSLATION_SHORTNAME, TranslationsDatabaseHelper.COLUMN_LANGUAGE,
-                TranslationsDatabaseHelper.COLUMN_DOWNLOAD_SIZE, TranslationsDatabaseHelper.COLUMN_INSTALLED};
-        final Cursor cursor = db.query(TranslationsDatabaseHelper.TABLE_TRANSLATIONS, columns, null, null, null, null,
-                null);
+                TranslationsDatabaseHelper.COLUMN_TRANSLATION_SHORTNAME,
+                TranslationsDatabaseHelper.COLUMN_LANGUAGE,
+                TranslationsDatabaseHelper.COLUMN_DOWNLOAD_SIZE,
+                TranslationsDatabaseHelper.COLUMN_INSTALLED};
+        final Cursor cursor = db.query(TranslationsDatabaseHelper.TABLE_TRANSLATIONS,
+                columns, null, null, null, null, null);
         if (cursor != null) {
             final int count = cursor.getCount();
             if (count > 0) {
-                final int languageColumnIndex = cursor.getColumnIndex(TranslationsDatabaseHelper.COLUMN_LANGUAGE);
+                final int languageColumnIndex
+                        = cursor.getColumnIndex(TranslationsDatabaseHelper.COLUMN_LANGUAGE);
                 final int translationNameColumnIndex = cursor
                         .getColumnIndex(TranslationsDatabaseHelper.COLUMN_TRANSLATION_NAME);
                 final int translationShortNameColumnIndex = cursor
                         .getColumnIndex(TranslationsDatabaseHelper.COLUMN_TRANSLATION_SHORTNAME);
                 final int downloadSizeColumnIndex = cursor
                         .getColumnIndex(TranslationsDatabaseHelper.COLUMN_DOWNLOAD_SIZE);
-                final int installedColumnIndex = cursor.getColumnIndex(TranslationsDatabaseHelper.COLUMN_INSTALLED);
+                final int installedColumnIndex
+                        = cursor.getColumnIndex(TranslationsDatabaseHelper.COLUMN_INSTALLED);
                 final TranslationInfo[] translations = new TranslationInfo[count];
                 int i = 0;
                 while (cursor.moveToNext()) {
@@ -130,5 +136,5 @@ public class TranslationManager {
         return null;
     }
 
-    private TranslationsDatabaseHelper m_translationsDatabaseHelper;
+    private final TranslationsDatabaseHelper mTranslationsDatabaseHelper;
 }

@@ -17,7 +17,12 @@
 
 package net.zionsoft.obadiah.support;
 
-import java.io.File;
+import android.app.ProgressDialog;
+import android.content.ContentValues;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
+import android.os.AsyncTask;
 
 import net.zionsoft.obadiah.BookSelectionActivity;
 import net.zionsoft.obadiah.Constants;
@@ -27,29 +32,24 @@ import net.zionsoft.obadiah.bible.TranslationManager;
 import net.zionsoft.obadiah.bible.TranslationReader;
 import net.zionsoft.obadiah.bible.TranslationsDatabaseHelper;
 
-import android.app.ProgressDialog;
-import android.content.ContentValues;
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.database.sqlite.SQLiteDatabase;
-import android.os.AsyncTask;
+import java.io.File;
 
 public class UpgradeAsyncTask extends AsyncTask<Void, Integer, Void> {
     public UpgradeAsyncTask(BookSelectionActivity bookSelectionActivity) {
         super();
-        m_bookSelectionActivity = bookSelectionActivity;
+        mBookSelectionActivity = bookSelectionActivity;
     }
 
     protected void onPreExecute() {
         // running in the main thread
 
-        m_progressDialog = new ProgressDialog(m_bookSelectionActivity);
-        m_progressDialog.setCancelable(false);
-        m_progressDialog.setMessage(m_bookSelectionActivity.getText(R.string.text_initializing));
-        m_progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-        m_progressDialog.setMax(100);
-        m_progressDialog.setProgress(0);
-        m_progressDialog.show();
+        mProgressDialog = new ProgressDialog(mBookSelectionActivity);
+        mProgressDialog.setCancelable(false);
+        mProgressDialog.setMessage(mBookSelectionActivity.getText(R.string.text_initializing));
+        mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        mProgressDialog.setMax(100);
+        mProgressDialog.setProgress(0);
+        mProgressDialog.show();
     }
 
     protected Void doInBackground(Void... params) {
@@ -62,10 +62,12 @@ public class UpgradeAsyncTask extends AsyncTask<Void, Integer, Void> {
         publishProgress(99);
 
         // sets the application version
-        final SharedPreferences preferences = m_bookSelectionActivity.getSharedPreferences(Constants.SETTING_KEY,
+        final SharedPreferences preferences
+                = mBookSelectionActivity.getSharedPreferences(Constants.SETTING_KEY,
                 Context.MODE_PRIVATE);
         final SharedPreferences.Editor editor = preferences.edit();
-        editor.putInt(Constants.CURRENT_APPLICATION_VERSION_SETTING_KEY, Constants.CURRENT_APPLICATION_VERSION);
+        editor.putInt(Constants.CURRENT_APPLICATION_VERSION_SETTING_KEY,
+                Constants.CURRENT_APPLICATION_VERSION);
         editor.commit();
 
         publishProgress(100);
@@ -76,26 +78,27 @@ public class UpgradeAsyncTask extends AsyncTask<Void, Integer, Void> {
     protected void onProgressUpdate(Integer... progress) {
         // running in the main thread
 
-        m_progressDialog.setProgress(progress[0]);
+        mProgressDialog.setProgress(progress[0]);
     }
 
     protected void onPostExecute(Void result) {
         // running in the main thread
 
-        m_bookSelectionActivity.onUpgradeFinished();
-        m_progressDialog.dismiss();
+        mBookSelectionActivity.onUpgradeFinished();
+        mProgressDialog.dismiss();
     }
 
     private void convertTranslations() {
         // old translations format is used prior to 1.5.0
 
-        final File rootDir = m_bookSelectionActivity.getFilesDir();
+        final File rootDir = mBookSelectionActivity.getFilesDir();
         final BibleReader oldReader = new BibleReader(rootDir);
         final TranslationInfo[] installedTranslations = oldReader.installedTranslations();
         if (installedTranslations == null || installedTranslations.length == 0)
             return;
 
-        final SQLiteDatabase db = new TranslationsDatabaseHelper(m_bookSelectionActivity).getWritableDatabase();
+        final SQLiteDatabase db
+                = new TranslationsDatabaseHelper(mBookSelectionActivity).getWritableDatabase();
         db.beginTransaction();
         try {
             final ContentValues versesValues = new ContentValues(4);
@@ -114,12 +117,14 @@ public class UpgradeAsyncTask extends AsyncTask<Void, Integer, Void> {
                         + TranslationsDatabaseHelper.COLUMN_CHAPTER_INDEX + " INTEGER NOT NULL, "
                         + TranslationsDatabaseHelper.COLUMN_VERSE_INDEX + " INTEGER NOT NULL, "
                         + TranslationsDatabaseHelper.COLUMN_TEXT + " TEXT NOT NULL);");
-                db.execSQL("CREATE INDEX INDEX_" + translationInfo.shortName + " ON " + translationInfo.shortName
-                        + " (" + TranslationsDatabaseHelper.COLUMN_BOOK_INDEX + ", "
+                db.execSQL("CREATE INDEX INDEX_" + translationInfo.shortName + " ON "
+                        + translationInfo.shortName + " ("
+                        + TranslationsDatabaseHelper.COLUMN_BOOK_INDEX + ", "
                         + TranslationsDatabaseHelper.COLUMN_CHAPTER_INDEX + ", "
                         + TranslationsDatabaseHelper.COLUMN_VERSE_INDEX + ");");
 
-                bookNamesValues.put(TranslationsDatabaseHelper.COLUMN_TRANSLATION_SHORTNAME, translationInfo.shortName);
+                bookNamesValues.put(TranslationsDatabaseHelper.COLUMN_TRANSLATION_SHORTNAME,
+                        translationInfo.shortName);
 
                 oldReader.selectTranslation(translationInfo.path);
                 for (int bookIndex = 0; bookIndex < 66; ++bookIndex) {
@@ -129,9 +134,12 @@ public class UpgradeAsyncTask extends AsyncTask<Void, Integer, Void> {
                         String[] texts = oldReader.verses(bookIndex, chapterIndex);
                         int verseIndex = 0;
                         for (String text : texts) {
-                            versesValues.put(TranslationsDatabaseHelper.COLUMN_BOOK_INDEX, bookIndex);
-                            versesValues.put(TranslationsDatabaseHelper.COLUMN_CHAPTER_INDEX, chapterIndex);
-                            versesValues.put(TranslationsDatabaseHelper.COLUMN_VERSE_INDEX, verseIndex++);
+                            versesValues.put(TranslationsDatabaseHelper.COLUMN_BOOK_INDEX,
+                                    bookIndex);
+                            versesValues.put(TranslationsDatabaseHelper.COLUMN_CHAPTER_INDEX,
+                                    chapterIndex);
+                            versesValues.put(TranslationsDatabaseHelper.COLUMN_VERSE_INDEX,
+                                    verseIndex++);
                             versesValues.put(TranslationsDatabaseHelper.COLUMN_TEXT, text);
                             db.insert(translationInfo.shortName, null, versesValues);
                         }
@@ -148,7 +156,8 @@ public class UpgradeAsyncTask extends AsyncTask<Void, Integer, Void> {
                 }
 
                 // adds to the translations table
-                translationInfoValues.put(TranslationsDatabaseHelper.COLUMN_TRANSLATION_NAME, translationInfo.name);
+                translationInfoValues.put(TranslationsDatabaseHelper.COLUMN_TRANSLATION_NAME,
+                        translationInfo.name);
                 translationInfoValues.put(TranslationsDatabaseHelper.COLUMN_TRANSLATION_SHORTNAME,
                         translationInfo.shortName);
 
@@ -221,7 +230,8 @@ public class UpgradeAsyncTask extends AsyncTask<Void, Integer, Void> {
     private void convertSettings() {
         // old settings format is used prior to 1.5.0
 
-        final SharedPreferences preferences = m_bookSelectionActivity.getSharedPreferences(Constants.SETTING_KEY,
+        final SharedPreferences preferences
+                = mBookSelectionActivity.getSharedPreferences(Constants.SETTING_KEY,
                 Context.MODE_PRIVATE);
         final SharedPreferences.Editor editor = preferences.edit();
         String selectedTranslation;
@@ -271,7 +281,8 @@ public class UpgradeAsyncTask extends AsyncTask<Void, Integer, Void> {
             else
                 selectedTranslation = "KJV";
         }
-        final TranslationInfo[] translations = new TranslationManager(m_bookSelectionActivity).translations();
+        final TranslationInfo[] translations
+                = new TranslationManager(mBookSelectionActivity).translations();
         if (translations != null) {
             for (TranslationInfo translation : translations) {
                 if (translation.shortName.equals(selectedTranslation))
@@ -283,6 +294,6 @@ public class UpgradeAsyncTask extends AsyncTask<Void, Integer, Void> {
         editor.commit();
     }
 
-    private BookSelectionActivity m_bookSelectionActivity;
-    private ProgressDialog m_progressDialog;
+    private BookSelectionActivity mBookSelectionActivity;
+    private ProgressDialog mProgressDialog;
 }

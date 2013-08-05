@@ -17,9 +17,6 @@
 
 package net.zionsoft.obadiah;
 
-import java.util.Iterator;
-import java.util.LinkedList;
-
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
@@ -41,28 +38,31 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.AdapterView.OnItemClickListener;
 
 import net.zionsoft.obadiah.bible.TranslationReader;
 import net.zionsoft.obadiah.util.SettingsManager;
+
+import java.util.Iterator;
+import java.util.LinkedList;
 
 public class TextActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.text_activity);
 
-        m_settingsManager = new SettingsManager(this);
-        m_translationReader = new TranslationReader(this);
+        mSettingsManager = new SettingsManager(this);
+        mTranslationReader = new TranslationReader(this);
 
         // initializes verses view pager
-        m_verseViewPager = (ViewPager) findViewById(R.id.verse_viewpager);
-        m_versePagerAdapter = new VersePagerAdapter();
-        m_verseViewPager.setAdapter(m_versePagerAdapter);
-        m_verseViewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+        mVerseViewPager = (ViewPager) findViewById(R.id.verse_viewpager);
+        mVersePagerAdapter = new VersePagerAdapter();
+        mVerseViewPager.setAdapter(mVersePagerAdapter);
+        mVerseViewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             public void onPageScrollStateChanged(int state) {
             }
 
@@ -70,31 +70,31 @@ public class TextActivity extends ActionBarActivity {
             }
 
             public void onPageSelected(int position) {
-                m_currentChapter = position;
-                if (m_actionMode != null)
-                    m_actionMode.finish();
+                mCurrentChapter = position;
+                if (mActionMode != null)
+                    mActionMode.finish();
                 populateUi();
             }
         });
-        m_verseViewPager.setPageTransformer(true, new DepthPageTransformer());
+        mVerseViewPager.setPageTransformer(true, new DepthPageTransformer());
     }
 
     protected void onResume() {
         super.onResume();
 
-        m_settingsManager.refresh();
-        m_backgroundColor = m_settingsManager.backgroundColor();
-        m_textColor = m_settingsManager.textColor();
-        m_textSize = m_settingsManager.textSize();
+        mSettingsManager.refresh();
+        mBackgroundColor = mSettingsManager.backgroundColor();
+        mTextColor = mSettingsManager.textColor();
+        mTextSize = mSettingsManager.textSize();
 
         final SharedPreferences preferences = getSharedPreferences(Constants.SETTING_KEY, MODE_PRIVATE);
-        m_currentBook = preferences.getInt(Constants.CURRENT_BOOK_SETTING_KEY, 0);
-        m_currentChapter = preferences.getInt(Constants.CURRENT_CHAPTER_SETTING_KEY, 0);
-        m_translationReader.selectTranslation(preferences.getString(Constants.CURRENT_TRANSLATION_SETTING_KEY, null));
+        mCurrentBook = preferences.getInt(Constants.CURRENT_BOOK_SETTING_KEY, 0);
+        mCurrentChapter = preferences.getInt(Constants.CURRENT_CHAPTER_SETTING_KEY, 0);
+        mTranslationReader.selectTranslation(preferences.getString(Constants.CURRENT_TRANSLATION_SETTING_KEY, null));
 
-        m_versePagerAdapter.setSelection(preferences.getInt(Constants.CURRENT_VERSE_SETTING_KEY, 0));
-        m_versePagerAdapter.updateText();
-        m_verseViewPager.setCurrentItem(m_currentChapter);
+        mVersePagerAdapter.setSelection(preferences.getInt(Constants.CURRENT_VERSE_SETTING_KEY, 0));
+        mVersePagerAdapter.updateText();
+        mVerseViewPager.setCurrentItem(mCurrentChapter);
 
         populateUi();
     }
@@ -103,12 +103,12 @@ public class TextActivity extends ActionBarActivity {
     protected void onPause() {
         super.onPause();
 
-        if (m_actionMode != null)
-            m_actionMode.finish();
+        if (mActionMode != null)
+            mActionMode.finish();
 
         final SharedPreferences.Editor editor = getSharedPreferences(Constants.SETTING_KEY, MODE_PRIVATE).edit();
-        editor.putInt(Constants.CURRENT_CHAPTER_SETTING_KEY, m_currentChapter);
-        editor.putInt(Constants.CURRENT_VERSE_SETTING_KEY, m_versePagerAdapter.currentVerse());
+        editor.putInt(Constants.CURRENT_CHAPTER_SETTING_KEY, mCurrentChapter);
+        editor.putInt(Constants.CURRENT_VERSE_SETTING_KEY, mVersePagerAdapter.currentVerse());
         editor.commit();
     }
 
@@ -136,8 +136,8 @@ public class TextActivity extends ActionBarActivity {
     }
 
     private void populateUi() {
-        setTitle(String.format("%s - %s, %d", m_translationReader.selectedTranslationShortName(),
-                m_translationReader.bookNames()[m_currentBook], (m_currentChapter + 1)));
+        setTitle(String.format("%s - %s, %d", mTranslationReader.selectedTranslationShortName(),
+                mTranslationReader.bookNames()[mCurrentBook], (mCurrentChapter + 1)));
     }
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
@@ -173,7 +173,7 @@ public class TextActivity extends ActionBarActivity {
         }
 
         public void selectItem(int position) {
-            if (position < 0 || position >= m_texts.length)
+            if (position < 0 || position >= mTexts.length)
                 return;
 
             m_selected[position] ^= true;
@@ -203,10 +203,10 @@ public class TextActivity extends ActionBarActivity {
                 return null;
 
             // format: <book name> <chapter index>:<verse index> <verse text>
-            final String prefix = TextActivity.this.m_translationReader.bookNames()[TextActivity.this.m_currentBook]
-                    + " " + Integer.toString(TextActivity.this.m_currentChapter + 1) + ":";
+            final String prefix = TextActivity.this.mTranslationReader.bookNames()[TextActivity.this.mCurrentBook]
+                    + " " + Integer.toString(TextActivity.this.mCurrentChapter + 1) + ":";
             String selected = null;
-            for (int i = 0; i < m_texts.length; ++i) {
+            for (int i = 0; i < mTexts.length; ++i) {
                 if (m_selected[i]) {
                     if (selected != null) {
                         selected += "\n";
@@ -216,14 +216,14 @@ public class TextActivity extends ActionBarActivity {
                     }
                     selected += Integer.toString(i + 1);
                     selected += " ";
-                    selected += m_texts[i];
+                    selected += mTexts[i];
                 }
             }
             return selected;
         }
 
         public void setTexts(String[] texts) {
-            m_texts = texts;
+            mTexts = texts;
 
             final int length = texts.length;
             if (m_selected == null || length > m_selected.length)
@@ -238,9 +238,9 @@ public class TextActivity extends ActionBarActivity {
         public View getView(int position, View convertView, ViewGroup parent) {
             LinearLayout linearLayout;
             if (convertView == null) {
-                linearLayout = new LinearLayout(m_context);
+                linearLayout = new LinearLayout(mContext);
                 for (int i = 0; i < 2; ++i) {
-                    final TextView textView = new TextView(m_context);
+                    final TextView textView = new TextView(mContext);
                     textView.setPadding(m_padding, m_padding, m_padding, m_padding);
                     linearLayout.addView(textView);
                 }
@@ -249,22 +249,22 @@ public class TextActivity extends ActionBarActivity {
             }
 
             final TextView verseIndexTextView = (TextView) linearLayout.getChildAt(0);
-            verseIndexTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, TextActivity.this.m_textSize);
-            verseIndexTextView.setTextColor(TextActivity.this.m_textColor);
+            verseIndexTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, TextActivity.this.mTextSize);
+            verseIndexTextView.setTextColor(TextActivity.this.mTextColor);
             verseIndexTextView.setText(Integer.toString(position + 1));
 
             final TextView verseTextView = (TextView) linearLayout.getChildAt(1);
-            verseTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, TextActivity.this.m_textSize);
-            verseTextView.setTextColor(TextActivity.this.m_textColor);
+            verseTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, TextActivity.this.mTextSize);
+            verseTextView.setTextColor(TextActivity.this.mTextColor);
             if (m_selected[position]) {
-                final SpannableString string = new SpannableString(m_texts[position]);
+                final SpannableString string = new SpannableString(mTexts[position]);
                 if (m_backgroundColorSpan == null)
                     m_backgroundColorSpan = new BackgroundColorSpan(Color.LTGRAY);
-                string.setSpan(m_backgroundColorSpan, 0, m_texts[position].length(),
+                string.setSpan(m_backgroundColorSpan, 0, mTexts[position].length(),
                         SpannableString.SPAN_INCLUSIVE_INCLUSIVE);
                 verseTextView.setText(string);
             } else {
-                verseTextView.setText(m_texts[position]);
+                verseTextView.setText(mTexts[position]);
             }
 
             return linearLayout;
@@ -283,8 +283,8 @@ public class TextActivity extends ActionBarActivity {
         }
 
         public int getCount() {
-            return (TextActivity.this.m_currentBook < 0) ? 0 : TranslationReader
-                    .chapterCount(TextActivity.this.m_currentBook);
+            return (TextActivity.this.mCurrentBook < 0) ? 0 : TranslationReader
+                    .chapterCount(TextActivity.this.mCurrentBook);
         }
 
         public Object instantiateItem(ViewGroup container, int position) {
@@ -305,8 +305,8 @@ public class TextActivity extends ActionBarActivity {
 
                 final ListView verseListView = new ListView(TextActivity.this);
                 page.verseListView = verseListView;
-                verseListView.setBackgroundColor(TextActivity.this.m_backgroundColor);
-                verseListView.setCacheColorHint(TextActivity.this.m_backgroundColor);
+                verseListView.setBackgroundColor(TextActivity.this.mBackgroundColor);
+                verseListView.setCacheColorHint(TextActivity.this.mBackgroundColor);
                 verseListView.setDivider(null);
                 verseListView.setSelector(new ColorDrawable(Color.TRANSPARENT));
 
@@ -317,8 +317,8 @@ public class TextActivity extends ActionBarActivity {
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         verseListAdapter.selectItem(position);
                         if (verseListAdapter.hasItemSelected()) {
-                            if (m_actionMode == null) {
-                                m_actionMode = TextActivity.this.startSupportActionMode(new ActionMode.Callback() {
+                            if (mActionMode == null) {
+                                mActionMode = TextActivity.this.startSupportActionMode(new ActionMode.Callback() {
                                     @Override
                                     public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
                                         actionMode.getMenuInflater().inflate(R.menu.menu_text_context, menu);
@@ -334,11 +334,11 @@ public class TextActivity extends ActionBarActivity {
                                     public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
                                         switch (menuItem.getItemId()) {
                                             case R.id.action_copy:
-                                                if (m_clipboardManager == null) {
+                                                if (mClipboardManager == null) {
                                                     // noinspection deprecation
-                                                    m_clipboardManager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                                                    mClipboardManager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
                                                 }
-                                                m_clipboardManager.setText(m_versePagerAdapter.selectedText());
+                                                mClipboardManager.setText(mVersePagerAdapter.selectedText());
                                                 Toast.makeText(TextActivity.this, R.string.text_copied, Toast.LENGTH_SHORT).show();
                                                 actionMode.finish();
                                                 return true;
@@ -346,7 +346,7 @@ public class TextActivity extends ActionBarActivity {
                                                 final Intent intent = new Intent();
                                                 intent.setAction(Intent.ACTION_SEND);
                                                 intent.setType("text/plain");
-                                                intent.putExtra(Intent.EXTRA_TEXT, m_versePagerAdapter.selectedText());
+                                                intent.putExtra(Intent.EXTRA_TEXT, mVersePagerAdapter.selectedText());
                                                 startActivity(Intent.createChooser(intent, getResources().getText(R.string.text_share_with)));
                                                 actionMode.finish();
                                                 return true;
@@ -357,16 +357,16 @@ public class TextActivity extends ActionBarActivity {
 
                                     @Override
                                     public void onDestroyActionMode(ActionMode actionMode) {
-                                        if (actionMode != m_actionMode)
+                                        if (actionMode != mActionMode)
                                             return;
                                         verseListAdapter.deselect();
-                                        m_actionMode = null;
+                                        mActionMode = null;
                                     }
                                 });
                             }
                         } else {
-                            if (m_actionMode != null)
-                                m_actionMode.finish();
+                            if (mActionMode != null)
+                                mActionMode.finish();
                         }
                     }
                 });
@@ -375,11 +375,11 @@ public class TextActivity extends ActionBarActivity {
             container.addView(page.verseListView, 0);
             page.inUse = true;
             page.position = position;
-            page.verseListAdapter.setTexts(TextActivity.this.m_translationReader.verses(
-                    TextActivity.this.m_currentBook, position));
+            page.verseListAdapter.setTexts(TextActivity.this.mTranslationReader.verses(
+                    TextActivity.this.mCurrentBook, position));
 
             // scroll to the correct position
-            if (m_selection > 0 && position == TextActivity.this.m_currentChapter) {
+            if (m_selection > 0 && position == TextActivity.this.mCurrentChapter) {
                 page.verseListView.setSelection(m_selection);
                 m_selection = 0;
             } else {
@@ -405,11 +405,11 @@ public class TextActivity extends ActionBarActivity {
 
         public void updateText() {
             for (Page page : m_pages) {
-                page.verseListView.setBackgroundColor(TextActivity.this.m_backgroundColor);
-                page.verseListView.setCacheColorHint(TextActivity.this.m_backgroundColor);
+                page.verseListView.setBackgroundColor(TextActivity.this.mBackgroundColor);
+                page.verseListView.setCacheColorHint(TextActivity.this.mBackgroundColor);
                 if (page.inUse) {
-                    page.verseListAdapter.setTexts(TextActivity.this.m_translationReader.verses(
-                            TextActivity.this.m_currentBook, page.position));
+                    page.verseListAdapter.setTexts(TextActivity.this.mTranslationReader.verses(
+                            TextActivity.this.mCurrentBook, page.position));
                 }
             }
 
@@ -422,7 +422,7 @@ public class TextActivity extends ActionBarActivity {
 
         public int currentVerse() {
             for (Page page : m_pages) {
-                if (page.position == TextActivity.this.m_currentChapter)
+                if (page.position == TextActivity.this.mCurrentChapter)
                     return page.verseListView.getFirstVisiblePosition();
             }
             return 0;
@@ -430,7 +430,7 @@ public class TextActivity extends ActionBarActivity {
 
         public String selectedText() {
             for (Page page : m_pages) {
-                if (page.position == TextActivity.this.m_currentChapter)
+                if (page.position == TextActivity.this.mCurrentChapter)
                     return page.verseListAdapter.selectedText();
             }
             return null;
@@ -447,17 +447,17 @@ public class TextActivity extends ActionBarActivity {
         private LinkedList<Page> m_pages;
     }
 
-    private int m_currentBook = -1;
-    private int m_currentChapter = -1;
-    private int m_backgroundColor;
-    private int m_textColor;
-    private float m_textSize;
-    private ActionMode m_actionMode;
-    private SettingsManager m_settingsManager;
-    private TranslationReader m_translationReader;
-    private VersePagerAdapter m_versePagerAdapter;
-    private ViewPager m_verseViewPager;
+    private int mCurrentBook = -1;
+    private int mCurrentChapter = -1;
+    private int mBackgroundColor;
+    private int mTextColor;
+    private float mTextSize;
+    private ActionMode mActionMode;
+    private SettingsManager mSettingsManager;
+    private TranslationReader mTranslationReader;
+    private VersePagerAdapter mVersePagerAdapter;
+    private ViewPager mVerseViewPager;
 
     @SuppressWarnings("deprecation")
-    private ClipboardManager m_clipboardManager;
+    private ClipboardManager mClipboardManager;
 }

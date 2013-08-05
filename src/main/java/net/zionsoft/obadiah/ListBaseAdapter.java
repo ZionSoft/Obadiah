@@ -23,11 +23,11 @@ import android.widget.BaseAdapter;
 public abstract class ListBaseAdapter extends BaseAdapter {
     public ListBaseAdapter(Context context) {
         super();
-        m_context = context;
+        mContext = context;
     }
 
     public int getCount() {
-        return (m_texts == null) ? 0 : m_texts.length;
+        return (mTexts == null) ? 0 : mTexts.length;
     }
 
     public Object getItem(int position) {
@@ -38,6 +38,6 @@ public abstract class ListBaseAdapter extends BaseAdapter {
         return position;
     }
 
-    protected Context m_context;
-    protected String[] m_texts;
+    protected final Context mContext;
+    protected String[] mTexts;
 }
