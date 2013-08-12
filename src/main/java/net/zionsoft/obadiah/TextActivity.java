@@ -263,7 +263,7 @@ public class TextActivity extends ActionBarActivity {
     private class VersePagerAdapter extends PagerAdapter {
         public VersePagerAdapter() {
             super();
-            m_pages = new LinkedList<Page>();
+            mPages = new LinkedList<Page>();
         }
 
         public int getCount() {
@@ -272,7 +272,7 @@ public class TextActivity extends ActionBarActivity {
         }
 
         public Object instantiateItem(ViewGroup container, int position) {
-            Iterator<Page> iterator = m_pages.iterator();
+            Iterator<Page> iterator = mPages.iterator();
             Page page = null;
             while (iterator.hasNext()) {
                 page = iterator.next();
@@ -285,7 +285,7 @@ public class TextActivity extends ActionBarActivity {
 
             if (page == null) {
                 page = new Page();
-                m_pages.add(page);
+                mPages.add(page);
 
                 final ListView verseListView = new ListView(TextActivity.this);
                 page.verseListView = verseListView;
@@ -363,9 +363,9 @@ public class TextActivity extends ActionBarActivity {
                     TextActivity.this.mCurrentBook, position));
 
             // scroll to the correct position
-            if (m_selection > 0 && position == TextActivity.this.mCurrentChapter) {
-                page.verseListView.setSelection(m_selection);
-                m_selection = 0;
+            if (mSelection > 0 && position == TextActivity.this.mCurrentChapter) {
+                page.verseListView.setSelection(mSelection);
+                mSelection = 0;
             } else {
                 page.verseListView.setSelectionAfterHeaderView();
             }
@@ -374,7 +374,7 @@ public class TextActivity extends ActionBarActivity {
         }
 
         public void destroyItem(ViewGroup container, int position, Object object) {
-            for (Page page : m_pages) {
+            for (Page page : mPages) {
                 if (page.position == position) {
                     page.inUse = false;
                     container.removeView(page.verseListView);
@@ -388,7 +388,7 @@ public class TextActivity extends ActionBarActivity {
         }
 
         public void updateText() {
-            for (Page page : m_pages) {
+            for (Page page : mPages) {
                 page.verseListView.setBackgroundColor(TextActivity.this.mBackgroundColor);
                 page.verseListView.setCacheColorHint(TextActivity.this.mBackgroundColor);
                 if (page.inUse) {
@@ -401,11 +401,11 @@ public class TextActivity extends ActionBarActivity {
         }
 
         public void setSelection(int selection) {
-            m_selection = selection;
+            mSelection = selection;
         }
 
         public int currentVerse() {
-            for (Page page : m_pages) {
+            for (Page page : mPages) {
                 if (page.position == TextActivity.this.mCurrentChapter)
                     return page.verseListView.getFirstVisiblePosition();
             }
@@ -413,7 +413,7 @@ public class TextActivity extends ActionBarActivity {
         }
 
         public String selectedText() {
-            for (Page page : m_pages) {
+            for (Page page : mPages) {
                 if (page.position == TextActivity.this.mCurrentChapter)
                     return page.verseListAdapter.selectedText();
             }
@@ -427,8 +427,8 @@ public class TextActivity extends ActionBarActivity {
             public VerseListAdapter verseListAdapter;
         }
 
-        private int m_selection;
-        private LinkedList<Page> m_pages;
+        private int mSelection;
+        private LinkedList<Page> mPages;
     }
 
     private int mCurrentBook = -1;

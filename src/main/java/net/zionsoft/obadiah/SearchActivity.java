@@ -174,10 +174,10 @@ public class SearchActivity extends ActionBarActivity {
                         InputMethodManager.HIDE_NOT_ALWAYS);
             }
 
-            m_progressDialog = new ProgressDialog(SearchActivity.this);
-            m_progressDialog.setCancelable(false);
-            m_progressDialog.setMessage(SearchActivity.this.getText(R.string.text_searching));
-            m_progressDialog.show();
+            mProgressDialog = new ProgressDialog(SearchActivity.this);
+            mProgressDialog.setCancelable(false);
+            mProgressDialog.setMessage(SearchActivity.this.getText(R.string.text_searching));
+            mProgressDialog.show();
         }
 
         protected Void doInBackground(Editable... params) {
@@ -200,7 +200,7 @@ public class SearchActivity extends ActionBarActivity {
                     final int verseIndexColumnIndex = cursor
                             .getColumnIndex(TranslationsDatabaseHelper.COLUMN_VERSE_INDEX);
                     final int textColumnIndex = cursor.getColumnIndex(TranslationsDatabaseHelper.COLUMN_TEXT);
-                    m_texts = new String[count];
+                    mTexts = new String[count];
                     SearchActivity.this.mResults = new SearchResult[count];
                     int i = 0;
                     while (cursor.moveToNext()) {
@@ -211,7 +211,7 @@ public class SearchActivity extends ActionBarActivity {
                         SearchActivity.this.mResults[i] = result;
 
                         // format: <book name> <chapter index>:<verse index>\n<text>
-                        m_texts[i++] = String.format("%s %d:%d\n%s",
+                        mTexts[i++] = String.format("%s %d:%d\n%s",
                                 SearchActivity.this.mTranslationReader.bookNames()[result.bookIndex],
                                 result.chapterIndex + 1, result.verseIndex + 1,
                                 cursor.getString(textColumnIndex));
@@ -225,16 +225,16 @@ public class SearchActivity extends ActionBarActivity {
         protected void onPostExecute(Void result) {
             // running in the main thread
 
-            SearchActivity.this.mSearchResultListAdapter.setTexts(m_texts);
-            m_progressDialog.dismiss();
+            SearchActivity.this.mSearchResultListAdapter.setTexts(mTexts);
+            mProgressDialog.dismiss();
 
             String text = SearchActivity.this.getResources().getString(R.string.text_search_result,
-                    m_texts == null ? 0 : m_texts.length);
+                    mTexts == null ? 0 : mTexts.length);
             Toast.makeText(SearchActivity.this, text, Toast.LENGTH_SHORT).show();
         }
 
-        private ProgressDialog m_progressDialog;
-        private String[] m_texts;
+        private ProgressDialog mProgressDialog;
+        private String[] mTexts;
     }
 
     private class SearchResultListAdapter extends ListBaseAdapter {

@@ -116,10 +116,10 @@ public class TranslationSelectionActivity extends ActionBarActivity {
                 protected void onPreExecute() {
                     // running in the main thread
 
-                    m_progressDialog = new ProgressDialog(TranslationSelectionActivity.this);
-                    m_progressDialog.setCancelable(false);
-                    m_progressDialog.setMessage(getText(R.string.text_deleting));
-                    m_progressDialog.show();
+                    mProgressDialog = new ProgressDialog(TranslationSelectionActivity.this);
+                    mProgressDialog.setCancelable(false);
+                    mProgressDialog.setMessage(getText(R.string.text_deleting));
+                    mProgressDialog.show();
                 }
 
                 protected Void doInBackground(String... params) {
@@ -133,11 +133,11 @@ public class TranslationSelectionActivity extends ActionBarActivity {
                     // running in the main thread
 
                     TranslationSelectionActivity.this.populateUi();
-                    m_progressDialog.cancel();
+                    mProgressDialog.cancel();
                     Toast.makeText(TranslationSelectionActivity.this, R.string.text_deleted, Toast.LENGTH_SHORT).show();
                 }
 
-                private ProgressDialog m_progressDialog;
+                private ProgressDialog mProgressDialog;
             }
         });
     }
@@ -209,16 +209,16 @@ public class TranslationSelectionActivity extends ActionBarActivity {
     private class TranslationSelectionListAdapter extends ListBaseAdapter {
         public TranslationSelectionListAdapter(Context context) {
             super(context);
-            m_footerText = context.getResources().getString(R.string.text_download);
+            mFooterText = context.getResources().getString(R.string.text_download);
         }
 
         public void setInstalledTranslations(TranslationInfo[] translations) {
-            m_installedTranslations = translations;
+            mInstalledTranslations = translations;
             notifyDataSetChanged();
         }
 
         public int getCount() {
-            return (m_installedTranslations == null) ? 1 : m_installedTranslations.length + 1;
+            return (mInstalledTranslations == null) ? 1 : mInstalledTranslations.length + 1;
         }
 
         public View getView(int position, View convertView, ViewGroup parent) {
@@ -232,10 +232,10 @@ public class TranslationSelectionActivity extends ActionBarActivity {
 
             textView.setTextColor(TranslationSelectionActivity.this.mTextColor);
 
-            if (m_installedTranslations != null && position < m_installedTranslations.length) {
-                textView.setText(m_installedTranslations[position].name);
+            if (mInstalledTranslations != null && position < mInstalledTranslations.length) {
+                textView.setText(mInstalledTranslations[position].name);
                 if (TranslationSelectionActivity.this.mSelectedTranslationShortName
-                        .equals(m_installedTranslations[position].shortName)) {
+                        .equals(mInstalledTranslations[position].shortName)) {
                     textView.setTypeface(null, Typeface.BOLD);
                     textView.setBackgroundResource(R.drawable.list_item_background_selected);
                 } else {
@@ -243,7 +243,7 @@ public class TranslationSelectionActivity extends ActionBarActivity {
                     textView.setBackgroundResource(R.drawable.list_item_background);
                 }
             } else {
-                textView.setText(m_footerText);
+                textView.setText(mFooterText);
                 textView.setTypeface(null, Typeface.NORMAL);
                 textView.setBackgroundResource(R.drawable.list_item_background);
             }
@@ -251,8 +251,8 @@ public class TranslationSelectionActivity extends ActionBarActivity {
             return textView;
         }
 
-        private String m_footerText;
-        private TranslationInfo[] m_installedTranslations;
+        private String mFooterText;
+        private TranslationInfo[] mInstalledTranslations;
     }
 
     private boolean mFirstTime = true;

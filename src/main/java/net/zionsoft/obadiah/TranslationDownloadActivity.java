@@ -119,10 +119,10 @@ public class TranslationDownloadActivity extends ActionBarActivity {
         protected void onPreExecute() {
             // running in the main thread
 
-            m_progressDialog = new ProgressDialog(TranslationDownloadActivity.this);
-            m_progressDialog.setCancelable(false);
-            m_progressDialog.setMessage(TranslationDownloadActivity.this.getText(R.string.text_downloading));
-            m_progressDialog.show();
+            mProgressDialog = new ProgressDialog(TranslationDownloadActivity.this);
+            mProgressDialog.setCancelable(false);
+            mProgressDialog.setMessage(TranslationDownloadActivity.this.getText(R.string.text_downloading));
+            mProgressDialog.show();
         }
 
         protected Void doInBackground(Boolean... params) {
@@ -184,12 +184,12 @@ public class TranslationDownloadActivity extends ActionBarActivity {
             } catch (Exception e) {
                 e.printStackTrace();
 
-                m_hasError = true;
+                mHasError = true;
                 TranslationDownloadActivity.this.mAvailableTranslations = null;
             } finally {
                 final SharedPreferences.Editor editor = TranslationDownloadActivity.this.getSharedPreferences(
                         Constants.SETTING_KEY, MODE_PRIVATE).edit();
-                if (m_hasError || TranslationDownloadActivity.this.mAvailableTranslations == null)
+                if (mHasError || TranslationDownloadActivity.this.mAvailableTranslations == null)
                     editor.putLong(Constants.LAST_UPDATED_SETTING_KEY, 0);
                 else
                     editor.putLong(Constants.LAST_UPDATED_SETTING_KEY, System.currentTimeMillis());
@@ -201,14 +201,14 @@ public class TranslationDownloadActivity extends ActionBarActivity {
         protected void onPostExecute(Void result) {
             // running in the main thread
 
-            m_progressDialog.dismiss();
+            mProgressDialog.dismiss();
 
-            if (m_hasError || TranslationDownloadActivity.this.mAvailableTranslations == null
+            if (mHasError || TranslationDownloadActivity.this.mAvailableTranslations == null
                     || TranslationDownloadActivity.this.mAvailableTranslations.length == 0) {
                 // either error occurs, or no available translations
                 Toast.makeText(
                         TranslationDownloadActivity.this,
-                        m_hasError ? R.string.text_fail_to_fetch_translations_list
+                        mHasError ? R.string.text_fail_to_fetch_translations_list
                                 : R.string.text_no_available_translation, Toast.LENGTH_SHORT).show();
                 TranslationDownloadActivity.this.finish();
             } else {
@@ -224,8 +224,8 @@ public class TranslationDownloadActivity extends ActionBarActivity {
             }
         }
 
-        private boolean m_hasError;
-        private ProgressDialog m_progressDialog;
+        private boolean mHasError;
+        private ProgressDialog mProgressDialog;
     }
 
     protected class TranslationDownloadAsyncTask extends AsyncTask<Integer, Integer, Void> {
@@ -236,19 +236,19 @@ public class TranslationDownloadActivity extends ActionBarActivity {
         protected void onPreExecute() {
             // running in the main thread
 
-            m_progressDialog = new ProgressDialog(TranslationDownloadActivity.this);
-            m_progressDialog.setCancelable(true);
-            m_progressDialog.setCanceledOnTouchOutside(false);
-            m_progressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            mProgressDialog = new ProgressDialog(TranslationDownloadActivity.this);
+            mProgressDialog.setCancelable(true);
+            mProgressDialog.setCanceledOnTouchOutside(false);
+            mProgressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
                 public void onCancel(DialogInterface dialog) {
                     TranslationDownloadAsyncTask.this.cancel(true);
                 }
             });
-            m_progressDialog.setMessage(TranslationDownloadActivity.this.getText(R.string.text_downloading));
-            m_progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-            m_progressDialog.setMax(100);
-            m_progressDialog.setProgress(0);
-            m_progressDialog.show();
+            mProgressDialog.setMessage(TranslationDownloadActivity.this.getText(R.string.text_downloading));
+            mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+            mProgressDialog.setMax(100);
+            mProgressDialog.setProgress(0);
+            mProgressDialog.show();
         }
 
         protected Void doInBackground(Integer... positions) {
@@ -288,7 +288,7 @@ public class TranslationDownloadActivity extends ActionBarActivity {
                 ZipEntry entry;
                 while ((entry = zis.getNextEntry()) != null) {
                     if (isCancelled()) {
-                        m_hasError = false;
+                        mHasError = false;
                         db.endTransaction();
                         db.close();
                     }
@@ -345,11 +345,11 @@ public class TranslationDownloadActivity extends ActionBarActivity {
                                 TranslationsDatabaseHelper.COLUMN_TRANSLATION_SHORTNAME),
                         new String[]{translationToDownload.shortName});
 
-                m_hasError = false;
+                mHasError = false;
                 db.setTransactionSuccessful();
             } catch (Exception e) {
                 e.printStackTrace();
-                m_hasError = true;
+                mHasError = true;
             } finally {
                 db.endTransaction();
                 db.close();
@@ -360,21 +360,21 @@ public class TranslationDownloadActivity extends ActionBarActivity {
         protected void onProgressUpdate(Integer... progress) {
             // running in the main thread
 
-            m_progressDialog.setProgress(progress[0]);
+            mProgressDialog.setProgress(progress[0]);
         }
 
         protected void onCancelled() {
             // running in the main thread
 
-            m_progressDialog.dismiss();
+            mProgressDialog.dismiss();
         }
 
         protected void onPostExecute(Void result) {
             // running in the main thread
 
-            m_progressDialog.dismiss();
+            mProgressDialog.dismiss();
 
-            if (m_hasError) {
+            if (mHasError) {
                 Toast.makeText(TranslationDownloadActivity.this, R.string.text_fail_to_fetch_translation,
                         Toast.LENGTH_SHORT).show();
             } else {
@@ -384,16 +384,16 @@ public class TranslationDownloadActivity extends ActionBarActivity {
 
         private static final int BUFFER_LENGTH = 2048;
 
-        private boolean m_hasError;
-        private ProgressDialog m_progressDialog;
+        private boolean mHasError;
+        private ProgressDialog mProgressDialog;
     }
 
     private class TranslationListAdapter extends ListBaseAdapter {
         public TranslationListAdapter(Context context) {
             super(context);
             Resources resources = mContext.getResources();
-            m_mediumSizeSpan = new AbsoluteSizeSpan(resources.getDimensionPixelSize(R.dimen.text_size_medium));
-            m_smallSizeSpan = new AbsoluteSizeSpan(resources.getDimensionPixelSize(R.dimen.text_size_small));
+            mMediumSizeSpan = new AbsoluteSizeSpan(resources.getDimensionPixelSize(R.dimen.text_size_medium));
+            mSmallSizeSpan = new AbsoluteSizeSpan(resources.getDimensionPixelSize(R.dimen.text_size_small));
         }
 
         public void setTexts(String[] texts, int[] sizes) {
@@ -416,15 +416,15 @@ public class TranslationDownloadActivity extends ActionBarActivity {
                     = mContext.getResources().getString(R.string.text_available_translation_info,
                     mTexts[position], mSizes[position]);
             SpannableStringBuilder spannable = new SpannableStringBuilder(string);
-            spannable.setSpan(m_mediumSizeSpan, 0, mTexts[position].length(), 0);
-            spannable.setSpan(m_smallSizeSpan, mTexts[position].length(), spannable.length(), 0);
+            spannable.setSpan(mMediumSizeSpan, 0, mTexts[position].length(), 0);
+            spannable.setSpan(mSmallSizeSpan, mTexts[position].length(), spannable.length(), 0);
             textView.setText(spannable);
 
             return textView;
         }
 
-        private AbsoluteSizeSpan m_mediumSizeSpan;
-        private AbsoluteSizeSpan m_smallSizeSpan;
+        private AbsoluteSizeSpan mMediumSizeSpan;
+        private AbsoluteSizeSpan mSmallSizeSpan;
         private int[] mSizes;
     }
 
