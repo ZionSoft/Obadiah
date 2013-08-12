@@ -11,6 +11,7 @@
     <string name="action_share">分享</string>
 
     <string name="text_available_translation_info">%1$s\n体积%2$d KB</string>
+    <string name="text_search_result">共找到%1$d个条目。</string>
 
     <string name="pref_nightmode_title">夜间模式</string>
     <string name="pref_rateme_title">在Google Play上给我评分</string>
@@ -28,7 +29,6 @@
     <string name="text_no_network">没有可用的网络连接，请检查后重试！</string>
     <string name="text_no_translation">没有已安装的译本，请从互联网下载。</string>
     <string name="text_searching">搜索中&#8230;</string>
-    <string name="text_search_result">个条目被找到。</string>
     <string name="text_share_with">分享到&#8230;</string>
     <string name="text_settings">设置</string>
     <string name="title_download_translation">请选择要下载的译本</string>

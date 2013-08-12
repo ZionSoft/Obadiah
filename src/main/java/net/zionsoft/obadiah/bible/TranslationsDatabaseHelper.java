@@ -30,17 +30,16 @@ public class TranslationsDatabaseHelper extends SQLiteOpenHelper {
         db.beginTransaction();
         try {
             // creates the translations table
-            db.execSQL("CREATE TABLE " + TABLE_TRANSLATIONS + " (" + COLUMN_TRANSLATION_NAME
-                    + " TEXT NOT NULL, " + COLUMN_TRANSLATION_SHORTNAME + " TEXT UNIQUE NOT NULL, "
-                    + COLUMN_LANGUAGE + " TEXT NOT NULL, " + COLUMN_DOWNLOAD_SIZE
-                    + " INTEGER NOT NULL, " + COLUMN_INSTALLED + " INTEGER NOT NULL);");
+            db.execSQL(String.format("CREATE TABLE %s (%s TEXT NOT NULL, %s TEXT UNIQUE NOT NULL, %s TEXT NOT NULL, %s INTEGER NOT NULL, %s INTEGER NOT NULL);",
+                    TABLE_TRANSLATIONS, COLUMN_TRANSLATION_NAME, COLUMN_TRANSLATION_SHORTNAME,
+                    COLUMN_LANGUAGE, COLUMN_DOWNLOAD_SIZE, COLUMN_INSTALLED));
 
             // creates the books name table
-            db.execSQL("CREATE TABLE " + TABLE_BOOK_NAMES + " (" + COLUMN_TRANSLATION_SHORTNAME
-                    + " TEXT NOT NULL, " + COLUMN_BOOK_INDEX + " INTEGER NOT NULL, "
-                    + COLUMN_BOOK_NAME + " TEXT NOT NULL);");
-            db.execSQL("CREATE INDEX " + INDEX_TABLE_BOOK_NAMES + " ON " + TABLE_BOOK_NAMES + " ("
-                    + COLUMN_TRANSLATION_SHORTNAME + ");");
+            db.execSQL(String.format("CREATE TABLE %s (%s TEXT NOT NULL, %s INTEGER NOT NULL, %s TEXT NOT NULL);",
+                    TABLE_BOOK_NAMES, COLUMN_TRANSLATION_SHORTNAME,
+                    COLUMN_BOOK_INDEX, COLUMN_BOOK_NAME));
+            db.execSQL(String.format("CREATE INDEX %s ON %s (%s);",
+                    INDEX_TABLE_BOOK_NAMES, TABLE_BOOK_NAMES, COLUMN_TRANSLATION_SHORTNAME));
 
             db.setTransactionSuccessful();
         } finally {

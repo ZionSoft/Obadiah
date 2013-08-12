@@ -35,14 +35,15 @@ public class TranslationReader {
         if (translationShortName != null) {
             cursor = db.query(TranslationsDatabaseHelper.TABLE_TRANSLATIONS,
                     new String[]{TranslationsDatabaseHelper.COLUMN_TRANSLATION_SHORTNAME},
-                    TranslationsDatabaseHelper.COLUMN_TRANSLATION_SHORTNAME + " = ? AND "
-                            + TranslationsDatabaseHelper.COLUMN_INSTALLED + " = ?", new String[]{
-                    translationShortName, "1"}, null, null, null);
+                    String.format("%s = ? AND %s = ?",
+                            TranslationsDatabaseHelper.COLUMN_TRANSLATION_SHORTNAME,
+                            TranslationsDatabaseHelper.COLUMN_INSTALLED),
+                    new String[]{translationShortName, "1"}, null, null, null);
         } else {
             // if the given name is null, choose the first installed translation
             cursor = db.query(TranslationsDatabaseHelper.TABLE_TRANSLATIONS,
                     new String[]{TranslationsDatabaseHelper.COLUMN_TRANSLATION_SHORTNAME},
-                    TranslationsDatabaseHelper.COLUMN_INSTALLED + " = ?",
+                    String.format("%s = ?", TranslationsDatabaseHelper.COLUMN_INSTALLED),
                     new String[]{"1"}, null, null, null, "1");
         }
 
@@ -87,9 +88,9 @@ public class TranslationReader {
         final SQLiteDatabase db = mTranslationsDatabaseHelper.getReadableDatabase();
         final Cursor cursor = db.query(TranslationsDatabaseHelper.TABLE_BOOK_NAMES,
                 new String[]{TranslationsDatabaseHelper.COLUMN_BOOK_NAME},
-                TranslationsDatabaseHelper.COLUMN_TRANSLATION_SHORTNAME + " = ?",
+                String.format("%s = ?", TranslationsDatabaseHelper.COLUMN_TRANSLATION_SHORTNAME),
                 new String[]{mSelectedTranslationShortName}, null, null,
-                TranslationsDatabaseHelper.COLUMN_BOOK_INDEX + " ASC");
+                String.format("%s ASC", TranslationsDatabaseHelper.COLUMN_BOOK_INDEX));
         if (cursor == null) {
             db.close();
             return null;
@@ -117,10 +118,11 @@ public class TranslationReader {
         final SQLiteDatabase db = mTranslationsDatabaseHelper.getReadableDatabase();
         final Cursor cursor = db.query(mSelectedTranslationShortName,
                 new String[]{TranslationsDatabaseHelper.COLUMN_TEXT},
-                TranslationsDatabaseHelper.COLUMN_BOOK_INDEX + " = ? AND "
-                        + TranslationsDatabaseHelper.COLUMN_CHAPTER_INDEX + " = ?",
+                String.format("%s = ? AND %s = ?",
+                        TranslationsDatabaseHelper.COLUMN_BOOK_INDEX,
+                        TranslationsDatabaseHelper.COLUMN_CHAPTER_INDEX),
                 new String[]{Integer.toString(bookIndex), Integer.toString(chapterIndex)},
-                null, null, TranslationsDatabaseHelper.COLUMN_VERSE_INDEX + " ASC");
+                null, null, String.format("%s ASC", TranslationsDatabaseHelper.COLUMN_VERSE_INDEX));
         if (cursor == null) {
             db.close();
             return null;

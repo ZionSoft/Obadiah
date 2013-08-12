@@ -187,8 +187,9 @@ public class SearchActivity extends ActionBarActivity {
             final Cursor cursor = db.query(SearchActivity.this.mSelectedTranslationShortName, new String[]{
                     TranslationsDatabaseHelper.COLUMN_BOOK_INDEX, TranslationsDatabaseHelper.COLUMN_CHAPTER_INDEX,
                     TranslationsDatabaseHelper.COLUMN_VERSE_INDEX, TranslationsDatabaseHelper.COLUMN_TEXT},
-                    TranslationsDatabaseHelper.COLUMN_TEXT + " LIKE ?", new String[]{"%"
-                    + params[0].toString().trim().replaceAll("\\s+", "%") + "%"}, null, null, null);
+                    String.format("%s LIKE ?", TranslationsDatabaseHelper.COLUMN_TEXT),
+                    new String[]{String.format("%%%s%%", params[0].toString().trim().replaceAll("\\s+", "%"))},
+                    null, null, null);
             if (cursor != null) {
                 final int count = cursor.getCount();
                 if (count > 0) {
@@ -209,14 +210,11 @@ public class SearchActivity extends ActionBarActivity {
                         result.verseIndex = cursor.getInt(verseIndexColumnIndex);
                         SearchActivity.this.mResults[i] = result;
 
-                        String text = SearchActivity.this.mTranslationReader.bookNames()[result.bookIndex];
-                        text += " ";
-                        text += Integer.toString(result.chapterIndex + 1);
-                        text += ":";
-                        text += Integer.toString(result.verseIndex + 1);
-                        text += "\n";
-                        text += cursor.getString(textColumnIndex);
-                        m_texts[i++] = text;
+                        // format: <book name> <chapter index>:<verse index>\n<text>
+                        m_texts[i++] = String.format("%s %d:%d\n%s",
+                                SearchActivity.this.mTranslationReader.bookNames()[result.bookIndex],
+                                result.chapterIndex + 1, result.verseIndex + 1,
+                                cursor.getString(textColumnIndex));
                     }
                 }
             }
@@ -230,8 +228,8 @@ public class SearchActivity extends ActionBarActivity {
             SearchActivity.this.mSearchResultListAdapter.setTexts(m_texts);
             m_progressDialog.dismiss();
 
-            final CharSequence text = (m_texts == null ? "0" : Integer.toString(m_texts.length))
-                    + SearchActivity.this.getResources().getText(R.string.text_search_result);
+            String text = SearchActivity.this.getResources().getString(R.string.text_search_result,
+                    m_texts == null ? 0 : m_texts.length);
             Toast.makeText(SearchActivity.this, text, Toast.LENGTH_SHORT).show();
         }
 

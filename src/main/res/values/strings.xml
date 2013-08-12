@@ -11,6 +11,7 @@
     <string name="action_share">Share</string>
 
     <string name="text_available_translation_info">%1$s\nSize: %2$d KB</string>
+    <string name="text_search_result">%1$d result(s) found.</string>
 
     <string name="pref_nightmode_title">Night Mode</string>
     <string name="pref_rateme_title">Rate me on Google Play</string>
@@ -35,7 +36,6 @@
         Internet.
     </string>
     <string name="text_searching">Searching&#8230;</string>
-    <string name="text_search_result">\u0020result(s) found.</string>
     <string name="text_share_with">Share with&#8230;</string>
     <string name="text_settings">Settings</string>
     <string name="title_download_translation">Available translations</string>

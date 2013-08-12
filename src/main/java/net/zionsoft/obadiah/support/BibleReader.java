@@ -140,7 +140,7 @@ class BibleReader {
 
     String[] verses(int book, int chapter) {
         try {
-            final String path = mSelectedTranslation + "/" + book + "-" + chapter + ".json";
+            final String path = String.format("%s/%d-%d.json", mSelectedTranslation, book, chapter);
             final File file = new File(path);
             final FileInputStream fis = new FileInputStream(file);
             final byte[] buffer = new byte[(int) file.length()];

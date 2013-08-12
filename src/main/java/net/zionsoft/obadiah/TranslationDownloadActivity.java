@@ -137,7 +137,7 @@ public class TranslationDownloadActivity extends ActionBarActivity {
                     // or no valid local cache, i.e. not fetched before, or last fetched more than 1 day ago
 
                     // downloads from Internet
-                    final URL url = new URL(BASE_URL + "list.json");
+                    final URL url = new URL(String.format("%slist.json", BASE_URL));
                     final BufferedInputStream bis = new BufferedInputStream(url.openConnection().getInputStream());
                     final byte[] buffer = new byte[bis.available()];
                     bis.read(buffer);
@@ -262,19 +262,22 @@ public class TranslationDownloadActivity extends ActionBarActivity {
             db.beginTransaction();
             try {
                 // creates a translation table
-                db.execSQL("CREATE TABLE " + translationToDownload.shortName + " ("
-                        + TranslationsDatabaseHelper.COLUMN_BOOK_INDEX + " INTEGER NOT NULL, "
-                        + TranslationsDatabaseHelper.COLUMN_CHAPTER_INDEX + " INTEGER NOT NULL, "
-                        + TranslationsDatabaseHelper.COLUMN_VERSE_INDEX + " INTEGER NOT NULL, "
-                        + TranslationsDatabaseHelper.COLUMN_TEXT + " TEXT NOT NULL);");
-                db.execSQL("CREATE INDEX INDEX_" + translationToDownload.shortName + " ON "
-                        + translationToDownload.shortName + " (" + TranslationsDatabaseHelper.COLUMN_BOOK_INDEX + ", "
-                        + TranslationsDatabaseHelper.COLUMN_CHAPTER_INDEX + ", "
-                        + TranslationsDatabaseHelper.COLUMN_VERSE_INDEX + ");");
+                db.execSQL(String.format("CREATE TABLE %s (%s INTEGER NOT NULL, %s INTEGER NOT NULL, %s INTEGER NOT NULL, %s TEXT NOT NULL);",
+                        translationToDownload.shortName,
+                        TranslationsDatabaseHelper.COLUMN_BOOK_INDEX,
+                        TranslationsDatabaseHelper.COLUMN_CHAPTER_INDEX,
+                        TranslationsDatabaseHelper.COLUMN_VERSE_INDEX,
+                        TranslationsDatabaseHelper.COLUMN_TEXT));
+                db.execSQL(String.format("CREATE INDEX INDEX_%s ON %s (%s, %s, %s);",
+                        translationToDownload.shortName, translationToDownload.shortName,
+                        TranslationsDatabaseHelper.COLUMN_BOOK_INDEX,
+                        TranslationsDatabaseHelper.COLUMN_CHAPTER_INDEX,
+                        TranslationsDatabaseHelper.COLUMN_VERSE_INDEX));
 
                 // gets the data and writes to table
-                final URL url = new URL(TranslationDownloadActivity.BASE_URL
-                        + URLEncoder.encode(translationToDownload.shortName, "UTF-8") + ".zip");
+                final URL url = new URL(String.format("%s%s.zip",
+                        TranslationDownloadActivity.BASE_URL,
+                        URLEncoder.encode(translationToDownload.shortName, "UTF-8")));
                 final HttpURLConnection httpConnection = (HttpURLConnection) url.openConnection();
                 final ZipInputStream zis = new ZipInputStream(new BufferedInputStream(httpConnection.getInputStream()));
 
@@ -338,7 +341,8 @@ public class TranslationDownloadActivity extends ActionBarActivity {
                 final ContentValues translationInfoValues = new ContentValues(1);
                 translationInfoValues.put(TranslationsDatabaseHelper.COLUMN_INSTALLED, 1);
                 db.update(TranslationsDatabaseHelper.TABLE_TRANSLATIONS, translationInfoValues,
-                        TranslationsDatabaseHelper.COLUMN_TRANSLATION_SHORTNAME + " = ?",
+                        String.format("%s = ?",
+                                TranslationsDatabaseHelper.COLUMN_TRANSLATION_SHORTNAME),
                         new String[]{translationToDownload.shortName});
 
                 m_hasError = false;

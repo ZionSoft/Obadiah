@@ -112,16 +112,17 @@ public class UpgradeAsyncTask extends AsyncTask<Void, Integer, Void> {
                 publishProgress((int) currentProgress);
 
                 // creates a translation table
-                db.execSQL("CREATE TABLE " + translationInfo.shortName + " ("
-                        + TranslationsDatabaseHelper.COLUMN_BOOK_INDEX + " INTEGER NOT NULL, "
-                        + TranslationsDatabaseHelper.COLUMN_CHAPTER_INDEX + " INTEGER NOT NULL, "
-                        + TranslationsDatabaseHelper.COLUMN_VERSE_INDEX + " INTEGER NOT NULL, "
-                        + TranslationsDatabaseHelper.COLUMN_TEXT + " TEXT NOT NULL);");
-                db.execSQL("CREATE INDEX INDEX_" + translationInfo.shortName + " ON "
-                        + translationInfo.shortName + " ("
-                        + TranslationsDatabaseHelper.COLUMN_BOOK_INDEX + ", "
-                        + TranslationsDatabaseHelper.COLUMN_CHAPTER_INDEX + ", "
-                        + TranslationsDatabaseHelper.COLUMN_VERSE_INDEX + ");");
+                db.execSQL(String.format("CREATE TABLE %s (%s INTEGER NOT NULL, %s INTEGER NOT NULL, %s INTEGER NOT NULL, %s TEXT NOT NULL);",
+                        translationInfo.shortName,
+                        TranslationsDatabaseHelper.COLUMN_BOOK_INDEX,
+                        TranslationsDatabaseHelper.COLUMN_CHAPTER_INDEX,
+                        TranslationsDatabaseHelper.COLUMN_VERSE_INDEX,
+                        TranslationsDatabaseHelper.COLUMN_TEXT));
+                db.execSQL(String.format("CREATE INDEX INDEX_%s ON %s (%s, %s, %s);",
+                        translationInfo.shortName, translationInfo.shortName,
+                        TranslationsDatabaseHelper.COLUMN_BOOK_INDEX,
+                        TranslationsDatabaseHelper.COLUMN_CHAPTER_INDEX,
+                        TranslationsDatabaseHelper.COLUMN_VERSE_INDEX));
 
                 bookNamesValues.put(TranslationsDatabaseHelper.COLUMN_TRANSLATION_SHORTNAME,
                         translationInfo.shortName);

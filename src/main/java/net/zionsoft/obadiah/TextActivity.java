@@ -174,24 +174,24 @@ public class TextActivity extends ActionBarActivity {
             if (position < 0 || position >= mTexts.length)
                 return;
 
-            m_selected[position] ^= true;
-            if (m_selected[position])
-                ++m_selectedCount;
+            mSelected[position] ^= true;
+            if (mSelected[position])
+                ++mSelectedCount;
             else
-                --m_selectedCount;
+                --mSelectedCount;
 
             notifyDataSetChanged();
         }
 
         public boolean hasItemSelected() {
-            return (m_selectedCount > 0);
+            return (mSelectedCount > 0);
         }
 
         public void deselect() {
-            int length = m_selected.length;
+            int length = mSelected.length;
             for (int i = 0; i < length; ++i)
-                m_selected[i] = false;
-            m_selectedCount = 0;
+                mSelected[i] = false;
+            mSelectedCount = 0;
 
             notifyDataSetChanged();
         }
@@ -201,34 +201,29 @@ public class TextActivity extends ActionBarActivity {
                 return null;
 
             // format: <book name> <chapter index>:<verse index> <verse text>
-            final String prefix = TextActivity.this.mTranslationReader.bookNames()[TextActivity.this.mCurrentBook]
-                    + " " + Integer.toString(TextActivity.this.mCurrentChapter + 1) + ":";
-            String selected = null;
+            final String template = String.format("%s %d:%d %s",
+                    TextActivity.this.mTranslationReader.bookNames()[TextActivity.this.mCurrentBook],
+                    TextActivity.this.mCurrentChapter + 1);
+            StringBuilder selected = new StringBuilder();
             for (int i = 0; i < mTexts.length; ++i) {
-                if (m_selected[i]) {
-                    if (selected != null) {
-                        selected += "\n";
-                        selected += prefix;
-                    } else {
-                        selected = prefix;
-                    }
-                    selected += Integer.toString(i + 1);
-                    selected += " ";
-                    selected += mTexts[i];
+                if (mSelected[i]) {
+                    if (selected.length() != 0)
+                        selected.append("\n");
+                    selected.append(String.format(template, i + 1, mTexts[i]));
                 }
             }
-            return selected;
+            return selected.toString();
         }
 
         public void setTexts(String[] texts) {
             mTexts = texts;
 
             final int length = texts.length;
-            if (m_selected == null || length > m_selected.length)
-                m_selected = new boolean[length];
+            if (mSelected == null || length > mSelected.length)
+                mSelected = new boolean[length];
             for (int i = 0; i < length; ++i)
-                m_selected[i] = false;
-            m_selectedCount = 0;
+                mSelected[i] = false;
+            mSelectedCount = 0;
 
             notifyDataSetChanged();
         }
@@ -246,11 +241,11 @@ public class TextActivity extends ActionBarActivity {
 
             textView = (TextView) linearLayout.getChildAt(1);
             textView.setTextColor(TextActivity.this.mTextColor);
-            if (m_selected[position]) {
+            if (mSelected[position]) {
                 final SpannableString string = new SpannableString(mTexts[position]);
-                if (m_backgroundColorSpan == null)
-                    m_backgroundColorSpan = new BackgroundColorSpan(Color.LTGRAY);
-                string.setSpan(m_backgroundColorSpan, 0, mTexts[position].length(),
+                if (mBackgroundColorSpan == null)
+                    mBackgroundColorSpan = new BackgroundColorSpan(Color.LTGRAY);
+                string.setSpan(mBackgroundColorSpan, 0, mTexts[position].length(),
                         SpannableString.SPAN_INCLUSIVE_INCLUSIVE);
                 textView.setText(string);
             } else {
@@ -260,9 +255,9 @@ public class TextActivity extends ActionBarActivity {
             return linearLayout;
         }
 
-        private boolean m_selected[];
-        private int m_selectedCount;
-        private BackgroundColorSpan m_backgroundColorSpan;
+        private boolean mSelected[];
+        private int mSelectedCount;
+        private BackgroundColorSpan mBackgroundColorSpan;
     }
 
     private class VersePagerAdapter extends PagerAdapter {

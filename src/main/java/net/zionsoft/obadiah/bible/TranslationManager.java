@@ -73,18 +73,18 @@ public class TranslationManager {
         db.beginTransaction();
         try {
             // deletes the translation table
-            db.execSQL("DROP TABLE IF EXISTS " + translationShortName);
+            db.execSQL(String.format("DROP TABLE IF EXISTS %s", translationShortName));
 
             // deletes the book names
             db.delete(TranslationsDatabaseHelper.TABLE_BOOK_NAMES,
-                    TranslationsDatabaseHelper.COLUMN_TRANSLATION_SHORTNAME + " = ?",
+                    String.format("%s = ?", TranslationsDatabaseHelper.COLUMN_TRANSLATION_SHORTNAME),
                     new String[]{translationShortName});
 
             // sets the translation as "not installed"
             final ContentValues values = new ContentValues(1);
             values.put(TranslationsDatabaseHelper.COLUMN_INSTALLED, 0);
             db.update(TranslationsDatabaseHelper.TABLE_TRANSLATIONS, values,
-                    TranslationsDatabaseHelper.COLUMN_TRANSLATION_SHORTNAME + " = ?",
+                    String.format("%s = ?", TranslationsDatabaseHelper.COLUMN_TRANSLATION_SHORTNAME),
                     new String[]{translationShortName});
 
             db.setTransactionSuccessful();
