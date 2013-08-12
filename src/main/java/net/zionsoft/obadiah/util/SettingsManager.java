@@ -27,15 +27,12 @@ import net.zionsoft.obadiah.SettingsActivity;
 public class SettingsManager {
     public SettingsManager(Context context) {
         super();
-        mContext = context;
+        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
     }
 
     public void refresh() {
-        final SharedPreferences sharedPreferences
-                = PreferenceManager.getDefaultSharedPreferences(mContext);
-
         // night / day mode
-        if (sharedPreferences.getBoolean(SettingsActivity.PREF_NIGHTMODE, false)) {
+        if (mSharedPreferences.getBoolean(SettingsActivity.PREF_NIGHTMODE, false)) {
             mBackgroundColor = Color.BLACK;
             mTextColor = Color.WHITE;
         } else {
@@ -52,7 +49,7 @@ public class SettingsManager {
         return mTextColor;
     }
 
-    private final Context mContext;
+    private final SharedPreferences mSharedPreferences;
     private int mBackgroundColor;
     private int mTextColor;
 }

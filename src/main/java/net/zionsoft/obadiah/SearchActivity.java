@@ -254,6 +254,11 @@ public class SearchActivity extends ActionBarActivity {
             textView.setText(mTexts[position]);
             return textView;
         }
+
+        public void setTexts(String[] texts) {
+            mTexts = texts;
+            notifyDataSetChanged();
+        }
     }
 
     private int mTextColor;
