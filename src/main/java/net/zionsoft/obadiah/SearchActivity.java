@@ -139,6 +139,9 @@ public class SearchActivity extends ActionBarActivity {
             case R.id.action_select_translation:
                 startActivity(new Intent(SearchActivity.this, TranslationSelectionActivity.class));
                 return true;
+            case R.id.action_settings:
+                startActivity(new Intent(this, SettingsActivity.class));
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
