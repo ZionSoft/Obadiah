@@ -403,6 +403,7 @@ public class TranslationDownloadActivity extends ActionBarActivity {
             notifyDataSetChanged();
         }
 
+        @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             TextView textView;
             if (convertView == null) {

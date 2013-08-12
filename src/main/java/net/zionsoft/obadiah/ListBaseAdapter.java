@@ -26,16 +26,24 @@ public abstract class ListBaseAdapter extends BaseAdapter {
         mContext = context;
     }
 
+    @Override
     public int getCount() {
         return (mTexts == null) ? 0 : mTexts.length;
     }
 
-    public Object getItem(int position) {
+    @Override
+    public String getItem(int position) {
+        return (mTexts == null) ? null : mTexts[position];
+    }
+
+    @Override
+    public long getItemId(int position) {
         return position;
     }
 
-    public long getItemId(int position) {
-        return position;
+    public void setTexts(String[] texts) {
+        mTexts = texts;
+        notifyDataSetChanged();
     }
 
     protected final Context mContext;

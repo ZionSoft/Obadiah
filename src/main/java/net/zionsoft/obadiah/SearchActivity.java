@@ -242,11 +242,7 @@ public class SearchActivity extends ActionBarActivity {
             super(context);
         }
 
-        public void setTexts(String[] texts) {
-            mTexts = texts;
-            notifyDataSetChanged();
-        }
-
+        @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             TextView textView;
             if (convertView == null)

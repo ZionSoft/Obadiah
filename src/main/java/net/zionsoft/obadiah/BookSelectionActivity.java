@@ -223,11 +223,6 @@ public class BookSelectionActivity extends ActionBarActivity {
             super(context);
         }
 
-        public void setTexts(String[] texts) {
-            mTexts = texts;
-            notifyDataSetChanged();
-        }
-
         public View getView(int position, View convertView, ViewGroup parent) {
             TextView textView;
             if (convertView == null)
@@ -253,11 +248,7 @@ public class BookSelectionActivity extends ActionBarActivity {
             super(context);
         }
 
-        public void setTexts(String[] texts) {
-            mTexts = texts;
-            notifyDataSetChanged();
-        }
-
+        @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             TextView textView;
             if (convertView == null)

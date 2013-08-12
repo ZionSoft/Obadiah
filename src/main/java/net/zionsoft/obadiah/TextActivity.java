@@ -228,6 +228,7 @@ public class TextActivity extends ActionBarActivity {
             notifyDataSetChanged();
         }
 
+        @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             LinearLayout linearLayout;
             if (convertView == null)
