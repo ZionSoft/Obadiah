@@ -22,20 +22,19 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
-import android.util.TypedValue;
-import android.view.Gravity;
+import android.text.SpannableStringBuilder;
+import android.text.style.AbsoluteSizeSpan;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -57,6 +56,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 public class TranslationDownloadActivity extends ActionBarActivity {
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.translationdownload_activity);
@@ -79,6 +79,7 @@ public class TranslationDownloadActivity extends ActionBarActivity {
         new TranslationListDownloadAsyncTask().execute(false);
     }
 
+    @Override
     protected void onResume() {
         super.onResume();
 
@@ -86,11 +87,9 @@ public class TranslationDownloadActivity extends ActionBarActivity {
         final int backgroundColor = mSettingsManager.backgroundColor();
         mTranslationListView.setBackgroundColor(backgroundColor);
         mTranslationListView.setCacheColorHint(backgroundColor);
-        mTextColor = mSettingsManager.textColor();
-        mTextSize = mSettingsManager.textSize();
-        mSmallerTextSize = mSettingsManager.smallerTextSize();
     }
 
+    @Override
     protected void onPause() {
         super.onPause();
 
@@ -388,64 +387,45 @@ public class TranslationDownloadActivity extends ActionBarActivity {
     private class TranslationListAdapter extends ListBaseAdapter {
         public TranslationListAdapter(Context context) {
             super(context);
+            Resources resources = mContext.getResources();
+            m_mediumSizeSpan = new AbsoluteSizeSpan(resources.getDimensionPixelSize(R.dimen.text_size_medium));
+            m_smallSizeSpan = new AbsoluteSizeSpan(resources.getDimensionPixelSize(R.dimen.text_size_small));
         }
 
         public void setTexts(String[] texts, int[] sizes) {
             mTexts = texts;
-
-            final String size = mContext.getResources().getText(R.string.text_size).toString();
-            final int length = sizes.length;
-            m_subTexts = new String[length];
-            for (int i = 0; i < length; ++i)
-                m_subTexts[i] = size + sizes[i] + "KB";
+            mSizes = sizes;
 
             notifyDataSetChanged();
         }
 
         public View getView(int position, View convertView, ViewGroup parent) {
-            LinearLayout linearLayout;
+            TextView textView;
             if (convertView == null) {
-                linearLayout = new LinearLayout(mContext);
-                linearLayout.setOrientation(LinearLayout.VERTICAL);
-
-                // first line
-                TextView textView = new TextView(mContext);
-                textView.setGravity(Gravity.CENTER_VERTICAL);
-                textView.setPadding(30, 20, 30, 0);
-                linearLayout.addView(textView);
-
-                // second line
-                textView = new TextView(mContext);
-                textView.setGravity(Gravity.CENTER_VERTICAL);
-                textView.setTextColor(Color.GRAY);
-                textView.setPadding(30, 0, 30, 20);
-                linearLayout.addView(textView);
+                textView = (TextView) View.inflate(mContext,
+                        R.layout.translation_download_list_item, null);
             } else {
-                linearLayout = (LinearLayout) convertView;
+                textView = (TextView) convertView;
             }
 
-            // first line
-            TextView textView = (TextView) linearLayout.getChildAt(0);
-            textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, TranslationDownloadActivity.this.mTextSize);
-            textView.setTextColor(TranslationDownloadActivity.this.mTextColor);
-            textView.setText(mTexts[position]);
+            String string
+                    = mContext.getResources().getString(R.string.text_available_translation_info,
+                    mTexts[position], mSizes[position]);
+            SpannableStringBuilder spannable = new SpannableStringBuilder(string);
+            spannable.setSpan(m_mediumSizeSpan, 0, mTexts[position].length(), 0);
+            spannable.setSpan(m_smallSizeSpan, mTexts[position].length(), spannable.length(), 0);
+            textView.setText(spannable);
 
-            // second line
-            textView = (TextView) linearLayout.getChildAt(1);
-            textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, TranslationDownloadActivity.this.mSmallerTextSize);
-            textView.setText(m_subTexts[position]);
-
-            return linearLayout;
+            return textView;
         }
 
-        private String[] m_subTexts;
+        private AbsoluteSizeSpan m_mediumSizeSpan;
+        private AbsoluteSizeSpan m_smallSizeSpan;
+        private int[] mSizes;
     }
 
     protected static final String BASE_URL = "http://bible.zionsoft.net/translations/";
 
-    private int mTextColor;
-    private float mTextSize;
-    private float mSmallerTextSize;
     private ListView mTranslationListView;
     private SettingsManager mSettingsManager;
     private TranslationDownloadAsyncTask mTranslationDownloadAsyncTask;

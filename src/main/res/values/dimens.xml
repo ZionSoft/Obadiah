@@ -2,17 +2,8 @@
 <resources>
 
     <dimen name="padding">8dip</dimen>
-    <dimen name="text_size">16dip</dimen>
-    <dimen name="text_size_verysmall">14dip</dimen>
-    <dimen name="text_size_small">16dip</dimen>
-    <dimen name="text_size_medium">18dip</dimen>
-    <dimen name="text_size_large">20dip</dimen>
-    <dimen name="text_size_verylarge">22dip</dimen>
-    <dimen name="smaller_text_size_verysmall">12dip</dimen>
-    <dimen name="smaller_text_size_small">14dip</dimen>
-    <dimen name="smaller_text_size_medium">16dip</dimen>
-    <dimen name="smaller_text_size_large">18dip</dimen>
-    <dimen name="smaller_text_size_verylarge">20dip</dimen>
+    <dimen name="text_size_small">14sp</dimen>
+    <dimen name="text_size_medium">18sp</dimen>
     <dimen name="booklistview_width">160dip</dimen>
     <dimen name="chaptergridview_column_width">48dip</dimen>
 

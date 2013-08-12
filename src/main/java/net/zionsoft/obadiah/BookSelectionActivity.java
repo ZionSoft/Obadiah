@@ -26,8 +26,6 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
-import android.util.TypedValue;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -45,6 +43,7 @@ import net.zionsoft.obadiah.support.UpgradeAsyncTask;
 import net.zionsoft.obadiah.util.SettingsManager;
 
 public class BookSelectionActivity extends ActionBarActivity {
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.bookselection_activity);
@@ -59,7 +58,6 @@ public class BookSelectionActivity extends ActionBarActivity {
         }
 
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
-        mPadding = (int) getResources().getDimension(R.dimen.padding);
 
         mSettingsManager = new SettingsManager(this);
         mTranslationManager = new TranslationManager(this);
@@ -106,6 +104,7 @@ public class BookSelectionActivity extends ActionBarActivity {
         });
     }
 
+    @Override
     protected void onResume() {
         super.onResume();
 
@@ -116,7 +115,6 @@ public class BookSelectionActivity extends ActionBarActivity {
         mChaptersGridView.setBackgroundColor(backgroundColor);
         mChaptersGridView.setCacheColorHint(backgroundColor);
         mTextColor = mSettingsManager.textColor();
-        mTextSize = mSettingsManager.textSize();
 
         if (mUpgrading)
             return;
@@ -232,16 +230,10 @@ public class BookSelectionActivity extends ActionBarActivity {
 
         public View getView(int position, View convertView, ViewGroup parent) {
             TextView textView;
-            if (convertView == null) {
-                textView = new TextView(mContext);
-                textView.setGravity(Gravity.CENTER);
-                textView.setPadding(BookSelectionActivity.this.mPadding,
-                        BookSelectionActivity.this.mPadding, BookSelectionActivity.this.mPadding,
-                        BookSelectionActivity.this.mPadding);
-                textView.setBackgroundResource(R.drawable.list_item_background);
-            } else {
+            if (convertView == null)
+                textView = (TextView) View.inflate(mContext, R.layout.list_item, null);
+            else
                 textView = (TextView) convertView;
-            }
 
             if (BookSelectionActivity.this.mSelectedBook == position) {
                 textView.setTypeface(null, Typeface.BOLD);
@@ -250,7 +242,6 @@ public class BookSelectionActivity extends ActionBarActivity {
                 textView.setTypeface(null, Typeface.NORMAL);
                 textView.setBackgroundResource(R.drawable.list_item_background);
             }
-            textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, BookSelectionActivity.this.mTextSize);
             textView.setTextColor(BookSelectionActivity.this.mTextColor);
             textView.setText(mTexts[position]);
             return textView;
@@ -269,22 +260,15 @@ public class BookSelectionActivity extends ActionBarActivity {
 
         public View getView(int position, View convertView, ViewGroup parent) {
             TextView textView;
-            if (convertView == null) {
-                textView = new TextView(mContext);
-                textView.setBackgroundResource(R.drawable.list_item_background);
-                textView.setGravity(Gravity.CENTER);
-                textView.setPadding(BookSelectionActivity.this.mPadding,
-                        BookSelectionActivity.this.mPadding, BookSelectionActivity.this.mPadding,
-                        BookSelectionActivity.this.mPadding);
-            } else {
+            if (convertView == null)
+                textView = (TextView) View.inflate(mContext, R.layout.list_item, null);
+            else
                 textView = (TextView) convertView;
-            }
 
             if (mCurrentBook == mSelectedBook && mCurrentChapter == position)
                 textView.setTypeface(null, Typeface.BOLD);
             else
                 textView.setTypeface(null, Typeface.NORMAL);
-            textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, BookSelectionActivity.this.mTextSize);
             textView.setTextColor(BookSelectionActivity.this.mTextColor);
             textView.setText(mTexts[position]);
             return textView;
@@ -295,9 +279,7 @@ public class BookSelectionActivity extends ActionBarActivity {
     private int mCurrentBook = -1;
     private int mCurrentChapter = -1;
     private int mSelectedBook = -1;
-    private int mPadding;
     private int mTextColor;
-    private float mTextSize;
     private BookListAdapter mBookListAdapter;
     private ChapterListAdapter mChapterListAdapter;
     private GridView mChaptersGridView;

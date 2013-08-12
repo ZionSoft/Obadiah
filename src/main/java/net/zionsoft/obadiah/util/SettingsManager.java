@@ -19,11 +19,9 @@ package net.zionsoft.obadiah.util;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.graphics.Color;
 import android.preference.PreferenceManager;
 
-import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.SettingsActivity;
 
 public class SettingsManager {
@@ -44,35 +42,6 @@ public class SettingsManager {
             mBackgroundColor = Color.WHITE;
             mTextColor = Color.BLACK;
         }
-
-        // text size
-        final String fontSize = sharedPreferences.getString(SettingsActivity.PREF_FONTSIZE,
-                SettingsActivity.PREF_FONTSIZE_DEFAULT);
-        final Resources resources = mContext.getResources();
-        if (fontSize.equals(SettingsActivity.PREF_FONTSIZE_VERYSMALL)) {
-            mTextSize = resources.getDimension(R.dimen.text_size_verysmall);
-            mSmallerTextSize = resources.getDimension(R.dimen.smaller_text_size_verysmall);
-        } else if (fontSize.equals(SettingsActivity.PREF_FONTSIZE_SMALL)) {
-            mTextSize = resources.getDimension(R.dimen.text_size_small);
-            mSmallerTextSize = resources.getDimension(R.dimen.smaller_text_size_small);
-        } else if (fontSize.equals(SettingsActivity.PREF_FONTSIZE_LARGE)) {
-            mTextSize = resources.getDimension(R.dimen.text_size_large);
-            mSmallerTextSize = resources.getDimension(R.dimen.smaller_text_size_large);
-        } else if (fontSize.equals(SettingsActivity.PREF_FONTSIZE_VERYLARGE)) {
-            mTextSize = resources.getDimension(R.dimen.text_size_verylarge);
-            mSmallerTextSize = resources.getDimension(R.dimen.smaller_text_size_verylarge);
-        } else {
-            mTextSize = resources.getDimension(R.dimen.text_size_medium);
-            mSmallerTextSize = resources.getDimension(R.dimen.smaller_text_size_medium);
-        }
-    }
-
-    public float textSize() {
-        return mTextSize;
-    }
-
-    public float smallerTextSize() {
-        return mSmallerTextSize;
     }
 
     public int backgroundColor() {
@@ -84,8 +53,6 @@ public class SettingsManager {
     }
 
     private final Context mContext;
-    private float mTextSize;
-    private float mSmallerTextSize;
     private int mBackgroundColor;
     private int mTextColor;
 }

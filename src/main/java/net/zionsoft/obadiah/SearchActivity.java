@@ -23,12 +23,10 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.text.Editable;
-import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -51,6 +49,7 @@ import net.zionsoft.obadiah.bible.TranslationsDatabaseHelper;
 import net.zionsoft.obadiah.util.SettingsManager;
 
 public class SearchActivity extends ActionBarActivity {
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.search_activity);
@@ -96,6 +95,7 @@ public class SearchActivity extends ActionBarActivity {
         });
     }
 
+    @Override
     protected void onResume() {
         super.onResume();
 
@@ -104,7 +104,6 @@ public class SearchActivity extends ActionBarActivity {
         mSearchResultListView.setBackgroundColor(backgroundColor);
         mSearchResultListView.setCacheColorHint(backgroundColor);
         mTextColor = mSettingsManager.textColor();
-        mTextSize = mSettingsManager.textSize();
 
         mSearchResultListAdapter.notifyDataSetChanged();
 
@@ -252,14 +251,11 @@ public class SearchActivity extends ActionBarActivity {
 
         public View getView(int position, View convertView, ViewGroup parent) {
             TextView textView;
-            if (convertView == null) {
-                textView = new TextView(mContext);
-                textView.setTypeface(null, Typeface.NORMAL);
-            } else {
+            if (convertView == null)
+                textView = (TextView) View.inflate(mContext, R.layout.search_result_list_item, null);
+            else
                 textView = (TextView) convertView;
-            }
 
-            textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, SearchActivity.this.mTextSize);
             textView.setTextColor(SearchActivity.this.mTextColor);
             textView.setText(mTexts[position]);
             return textView;
@@ -267,7 +263,6 @@ public class SearchActivity extends ActionBarActivity {
     }
 
     private int mTextColor;
-    private float mTextSize;
     private EditText mSearchText;
     private ListView mSearchResultListView;
     private SearchResult[] mResults;

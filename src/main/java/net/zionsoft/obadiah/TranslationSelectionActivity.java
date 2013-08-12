@@ -31,8 +31,6 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
-import android.util.TypedValue;
-import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -45,6 +43,7 @@ import net.zionsoft.obadiah.bible.TranslationManager;
 import net.zionsoft.obadiah.util.SettingsManager;
 
 public class TranslationSelectionActivity extends ActionBarActivity {
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.translationselection_activity);
@@ -143,6 +142,7 @@ public class TranslationSelectionActivity extends ActionBarActivity {
         });
     }
 
+    @Override
     protected void onResume() {
         super.onResume();
 
@@ -151,7 +151,6 @@ public class TranslationSelectionActivity extends ActionBarActivity {
         mTranslationListView.setBackgroundColor(backgroundColor);
         mTranslationListView.setCacheColorHint(backgroundColor);
         mTextColor = mSettingsManager.textColor();
-        mTextSize = mSettingsManager.textSize();
 
         populateUi();
     }
@@ -225,14 +224,12 @@ public class TranslationSelectionActivity extends ActionBarActivity {
         public View getView(int position, View convertView, ViewGroup parent) {
             TextView textView;
             if (convertView == null) {
-                textView = new TextView(mContext);
-                textView.setGravity(Gravity.CENTER_VERTICAL);
-                textView.setPadding(30, 20, 30, 20);
+                textView = (TextView) View.inflate(mContext,
+                        R.layout.translation_selection_list_item, null);
             } else {
                 textView = (TextView) convertView;
             }
 
-            textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, TranslationSelectionActivity.this.mTextSize);
             textView.setTextColor(TranslationSelectionActivity.this.mTextColor);
 
             if (m_installedTranslations != null && position < m_installedTranslations.length) {
@@ -260,7 +257,6 @@ public class TranslationSelectionActivity extends ActionBarActivity {
 
     private boolean mFirstTime = true;
     private int mTextColor;
-    private float mTextSize;
     private ListView mTranslationListView;
     private SettingsManager mSettingsManager;
     private String mSelectedTranslationShortName;

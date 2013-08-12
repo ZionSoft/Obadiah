@@ -32,7 +32,6 @@ import android.support.v7.view.ActionMode;
 import android.text.ClipboardManager;
 import android.text.SpannableString;
 import android.text.style.BackgroundColorSpan;
-import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -51,6 +50,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 public class TextActivity extends ActionBarActivity {
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.text_activity);
@@ -79,13 +79,13 @@ public class TextActivity extends ActionBarActivity {
         mVerseViewPager.setPageTransformer(true, new DepthPageTransformer());
     }
 
+    @Override
     protected void onResume() {
         super.onResume();
 
         mSettingsManager.refresh();
         mBackgroundColor = mSettingsManager.backgroundColor();
         mTextColor = mSettingsManager.textColor();
-        mTextSize = mSettingsManager.textSize();
 
         final SharedPreferences preferences = getSharedPreferences(Constants.SETTING_KEY, MODE_PRIVATE);
         mCurrentBook = preferences.getInt(Constants.CURRENT_BOOK_SETTING_KEY, 0);
@@ -168,8 +168,6 @@ public class TextActivity extends ActionBarActivity {
     private class VerseListAdapter extends ListBaseAdapter {
         public VerseListAdapter(Context context) {
             super(context);
-
-            m_padding = (int) context.getResources().getDimension(R.dimen.padding);
         }
 
         public void selectItem(int position) {
@@ -237,41 +235,32 @@ public class TextActivity extends ActionBarActivity {
 
         public View getView(int position, View convertView, ViewGroup parent) {
             LinearLayout linearLayout;
-            if (convertView == null) {
-                linearLayout = new LinearLayout(mContext);
-                for (int i = 0; i < 2; ++i) {
-                    final TextView textView = new TextView(mContext);
-                    textView.setPadding(m_padding, m_padding, m_padding, m_padding);
-                    linearLayout.addView(textView);
-                }
-            } else {
+            if (convertView == null)
+                linearLayout = (LinearLayout) View.inflate(mContext, R.layout.text_list_item, null);
+            else
                 linearLayout = (LinearLayout) convertView;
-            }
 
-            final TextView verseIndexTextView = (TextView) linearLayout.getChildAt(0);
-            verseIndexTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, TextActivity.this.mTextSize);
-            verseIndexTextView.setTextColor(TextActivity.this.mTextColor);
-            verseIndexTextView.setText(Integer.toString(position + 1));
+            TextView textView = (TextView) linearLayout.getChildAt(0);
+            textView.setTextColor(TextActivity.this.mTextColor);
+            textView.setText(Integer.toString(position + 1));
 
-            final TextView verseTextView = (TextView) linearLayout.getChildAt(1);
-            verseTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, TextActivity.this.mTextSize);
-            verseTextView.setTextColor(TextActivity.this.mTextColor);
+            textView = (TextView) linearLayout.getChildAt(1);
+            textView.setTextColor(TextActivity.this.mTextColor);
             if (m_selected[position]) {
                 final SpannableString string = new SpannableString(mTexts[position]);
                 if (m_backgroundColorSpan == null)
                     m_backgroundColorSpan = new BackgroundColorSpan(Color.LTGRAY);
                 string.setSpan(m_backgroundColorSpan, 0, mTexts[position].length(),
                         SpannableString.SPAN_INCLUSIVE_INCLUSIVE);
-                verseTextView.setText(string);
+                textView.setText(string);
             } else {
-                verseTextView.setText(mTexts[position]);
+                textView.setText(mTexts[position]);
             }
 
             return linearLayout;
         }
 
         private boolean m_selected[];
-        private int m_padding;
         private int m_selectedCount;
         private BackgroundColorSpan m_backgroundColorSpan;
     }
@@ -451,7 +440,6 @@ public class TextActivity extends ActionBarActivity {
     private int mCurrentChapter = -1;
     private int mBackgroundColor;
     private int mTextColor;
-    private float mTextSize;
     private ActionMode mActionMode;
     private SettingsManager mSettingsManager;
     private TranslationReader mTranslationReader;

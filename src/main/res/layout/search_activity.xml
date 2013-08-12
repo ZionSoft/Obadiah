@@ -28,7 +28,7 @@
                 android:imeOptions="actionSearch"
                 android:inputType="text"
                 android:singleLine="true"
-                android:textSize="@dimen/text_size"/>
+                android:textSize="@dimen/text_size_medium"/>
     </RelativeLayout>
 
     <ListView
