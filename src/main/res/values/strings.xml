@@ -4,6 +4,7 @@
     <string name="app_name">Bible</string>
 
     <string name="action_copy">Copy</string>
+    <string name="action_download">Download More</string>
     <string name="action_refresh">Refresh</string>
     <string name="action_search">Search</string>
     <string name="action_settings">Settings</string>
@@ -15,7 +16,6 @@
 
     <string name="pref_nightmode_title">Night Mode</string>
     <string name="pref_rateme_title">Rate me on Google Play</string>
-    <string name="text_download">Download more translations</string>
     <string name="text_downloading">Downloading, please wait.</string>
     <string name="text_copied">Texts copied to clipboard.</string>
     <string name="text_delete">Delete</string>

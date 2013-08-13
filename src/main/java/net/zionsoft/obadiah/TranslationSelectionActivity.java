@@ -31,6 +31,8 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -59,11 +61,6 @@ public class TranslationSelectionActivity extends ActionBarActivity {
         mTranslationListView.setAdapter(mTranslationListAdapter);
         mTranslationListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (position == TranslationSelectionActivity.this.mTranslationListAdapter.getCount() - 1) {
-                    TranslationSelectionActivity.this.startTranslationDownloadActivity();
-                    return;
-                }
-
                 final SharedPreferences.Editor editor = TranslationSelectionActivity.this.getSharedPreferences(
                         Constants.SETTING_KEY, MODE_PRIVATE).edit();
                 editor.putString(Constants.CURRENT_TRANSLATION_SETTING_KEY, mInstalledTranslations[position].shortName);
@@ -155,6 +152,23 @@ public class TranslationSelectionActivity extends ActionBarActivity {
         populateUi();
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_translation_selection, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_download:
+                startTranslationDownloadActivity();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
     private void populateUi() {
         final TranslationInfo[] translations = mTranslationManager.translations();
         int installedTranslationCount = translations == null ? 0 : translations.length;
@@ -209,16 +223,16 @@ public class TranslationSelectionActivity extends ActionBarActivity {
     private class TranslationSelectionListAdapter extends ListBaseAdapter {
         public TranslationSelectionListAdapter(Context context) {
             super(context);
-            mFooterText = context.getResources().getString(R.string.text_download);
+        }
+
+        @Override
+        public int getCount() {
+            return (mInstalledTranslations == null) ? 0 : mInstalledTranslations.length;
         }
 
         public void setInstalledTranslations(TranslationInfo[] translations) {
             mInstalledTranslations = translations;
             notifyDataSetChanged();
-        }
-
-        public int getCount() {
-            return (mInstalledTranslations == null) ? 1 : mInstalledTranslations.length + 1;
         }
 
         public View getView(int position, View convertView, ViewGroup parent) {
@@ -231,27 +245,18 @@ public class TranslationSelectionActivity extends ActionBarActivity {
             }
 
             textView.setTextColor(TranslationSelectionActivity.this.mTextColor);
-
-            if (mInstalledTranslations != null && position < mInstalledTranslations.length) {
-                textView.setText(mInstalledTranslations[position].name);
-                if (TranslationSelectionActivity.this.mSelectedTranslationShortName
-                        .equals(mInstalledTranslations[position].shortName)) {
-                    textView.setTypeface(null, Typeface.BOLD);
-                    textView.setBackgroundResource(R.drawable.list_item_background_selected);
-                } else {
-                    textView.setTypeface(null, Typeface.NORMAL);
-                    textView.setBackgroundResource(R.drawable.list_item_background);
-                }
+            textView.setText(mInstalledTranslations[position].name);
+            if (TranslationSelectionActivity.this.mSelectedTranslationShortName
+                    .equals(mInstalledTranslations[position].shortName)) {
+                textView.setTypeface(null, Typeface.BOLD);
+                textView.setBackgroundResource(R.drawable.list_item_background_selected);
             } else {
-                textView.setText(mFooterText);
                 textView.setTypeface(null, Typeface.NORMAL);
                 textView.setBackgroundResource(R.drawable.list_item_background);
             }
-
             return textView;
         }
 
-        private String mFooterText;
         private TranslationInfo[] mInstalledTranslations;
     }
 
