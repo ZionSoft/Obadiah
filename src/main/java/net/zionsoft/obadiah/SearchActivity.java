@@ -41,8 +41,6 @@ import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 
-import net.zionsoft.obadiah.bible.TranslationInfo;
-import net.zionsoft.obadiah.bible.TranslationManager;
 import net.zionsoft.obadiah.bible.TranslationReader;
 import net.zionsoft.obadiah.bible.TranslationsDatabaseHelper;
 import net.zionsoft.obadiah.util.SettingsManager;
@@ -55,7 +53,6 @@ public class SearchActivity extends ActionBarActivity {
 
         mSettingsManager = new SettingsManager(this);
         mTranslationsDatabaseHelper = new TranslationsDatabaseHelper(this);
-        mTranslationManager = new TranslationManager(this);
         mTranslationReader = new TranslationReader(this);
 
         // initializes the search bar
@@ -111,15 +108,7 @@ public class SearchActivity extends ActionBarActivity {
                 || !selectedTranslationShortName.equals(mSelectedTranslationShortName)) {
             mTranslationReader.selectTranslation(selectedTranslationShortName);
             mSelectedTranslationShortName = mTranslationReader.selectedTranslationShortName();
-
-            final TranslationInfo[] translations = mTranslationManager.translations();
-            for (TranslationInfo translationInfo : translations) {
-                if (translationInfo.installed && translationInfo.shortName.equals(mSelectedTranslationShortName)) {
-                    setTitle(translationInfo.name);
-                    break;
-                }
-            }
-
+            setTitle(mSelectedTranslationShortName);
             search(null);
         }
     }
@@ -242,6 +231,5 @@ public class SearchActivity extends ActionBarActivity {
     private SettingsManager mSettingsManager;
     private String mSelectedTranslationShortName;
     private TranslationsDatabaseHelper mTranslationsDatabaseHelper;
-    private TranslationManager mTranslationManager;
     private TranslationReader mTranslationReader;
 }
