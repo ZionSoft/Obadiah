@@ -21,6 +21,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
@@ -180,7 +181,10 @@ public class BookSelectionActivity extends ActionBarActivity {
                     mTranslationReader.bookNames()[mSelectedBook]));
 
             // scrolls to the currently selected book
-            mBookListView.setSelection(mSelectedBook);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.FROYO)
+                mBookListView.smoothScrollToPosition(mSelectedBook);
+            else
+                mBookListView.setSelection(mSelectedBook);
         } else {
             final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
             alertDialogBuilder.setMessage(R.string.text_no_translation).setCancelable(false)
