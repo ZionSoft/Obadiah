@@ -34,8 +34,6 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
 import android.widget.ListView;
 
-import net.zionsoft.obadiah.bible.TranslationInfo;
-import net.zionsoft.obadiah.bible.TranslationManager;
 import net.zionsoft.obadiah.bible.TranslationReader;
 import net.zionsoft.obadiah.support.UpgradeAsyncTask;
 import net.zionsoft.obadiah.util.SettingsManager;
@@ -58,7 +56,6 @@ public class BookSelectionActivity extends ActionBarActivity {
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 
         mSettingsManager = new SettingsManager(this);
-        mTranslationManager = new TranslationManager(this);
         mTranslationReader = new TranslationReader(this);
 
         // initializes views
@@ -143,17 +140,8 @@ public class BookSelectionActivity extends ActionBarActivity {
     }
 
     private void populateUi() {
-        boolean hasInstalledTranslation = false;
-        final TranslationInfo[] translations = mTranslationManager.translations();
-        if (translations != null) {
-            for (TranslationInfo translationInfo : translations) {
-                if (translationInfo.installed) {
-                    hasInstalledTranslation = true;
-                    break;
-                }
-            }
-        }
-
+        boolean hasInstalledTranslation = getSharedPreferences(Constants.SETTING_KEY, MODE_PRIVATE)
+                .getString(Constants.CURRENT_TRANSLATION_SETTING_KEY, null) != null;
         if (hasInstalledTranslation) {
             loadLastReadTranslation();
         } else {
@@ -244,6 +232,5 @@ public class BookSelectionActivity extends ActionBarActivity {
     private View mMainView;
 
     private SettingsManager mSettingsManager;
-    private TranslationManager mTranslationManager;
     private TranslationReader mTranslationReader;
 }

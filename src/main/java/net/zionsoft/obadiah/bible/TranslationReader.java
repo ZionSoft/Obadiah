@@ -30,23 +30,16 @@ public class TranslationReader {
     }
 
     public void selectTranslation(String translationShortName) {
-        final SQLiteDatabase db = mTranslationsDatabaseHelper.getReadableDatabase();
-        Cursor cursor;
-        if (translationShortName != null) {
-            cursor = db.query(TranslationsDatabaseHelper.TABLE_TRANSLATIONS,
-                    new String[]{TranslationsDatabaseHelper.COLUMN_TRANSLATION_SHORTNAME},
-                    String.format("%s = ? AND %s = ?",
-                            TranslationsDatabaseHelper.COLUMN_TRANSLATION_SHORTNAME,
-                            TranslationsDatabaseHelper.COLUMN_INSTALLED),
-                    new String[]{translationShortName, "1"}, null, null, null);
-        } else {
-            // if the given name is null, choose the first installed translation
-            cursor = db.query(TranslationsDatabaseHelper.TABLE_TRANSLATIONS,
-                    new String[]{TranslationsDatabaseHelper.COLUMN_TRANSLATION_SHORTNAME},
-                    String.format("%s = ?", TranslationsDatabaseHelper.COLUMN_INSTALLED),
-                    new String[]{"1"}, null, null, null, "1");
-        }
+        if (translationShortName == null)
+            throw new IllegalArgumentException();
 
+        final SQLiteDatabase db = mTranslationsDatabaseHelper.getReadableDatabase();
+        final Cursor cursor = db.query(TranslationsDatabaseHelper.TABLE_TRANSLATIONS,
+                new String[]{TranslationsDatabaseHelper.COLUMN_TRANSLATION_SHORTNAME},
+                String.format("%s = ? AND %s = ?",
+                        TranslationsDatabaseHelper.COLUMN_TRANSLATION_SHORTNAME,
+                        TranslationsDatabaseHelper.COLUMN_INSTALLED),
+                new String[]{translationShortName, "1"}, null, null, null);
         if (cursor == null || cursor.getCount() != 1) {
             db.close();
             throw new IllegalArgumentException();

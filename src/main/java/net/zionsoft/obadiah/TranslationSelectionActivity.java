@@ -22,7 +22,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Typeface;
 import android.net.ConnectivityManager;
@@ -61,11 +60,7 @@ public class TranslationSelectionActivity extends ActionBarActivity {
         mTranslationListView.setAdapter(mTranslationListAdapter);
         mTranslationListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                final SharedPreferences.Editor editor = TranslationSelectionActivity.this.getSharedPreferences(
-                        Constants.SETTING_KEY, MODE_PRIVATE).edit();
-                editor.putString(Constants.CURRENT_TRANSLATION_SETTING_KEY, mInstalledTranslations[position].shortName);
-                editor.commit();
-
+                mSelectedTranslationShortName = mInstalledTranslations[position].shortName;
                 finish();
             }
         });
@@ -150,6 +145,14 @@ public class TranslationSelectionActivity extends ActionBarActivity {
         mTextColor = mSettingsManager.textColor();
 
         populateUi();
+    }
+
+    @Override
+    protected void onPause() {
+        getSharedPreferences(Constants.SETTING_KEY, MODE_PRIVATE).edit()
+                .putString(Constants.CURRENT_TRANSLATION_SETTING_KEY, mSelectedTranslationShortName)
+                .commit();
+        super.onPause();
     }
 
     @Override
