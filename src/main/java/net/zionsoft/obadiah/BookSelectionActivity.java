@@ -71,16 +71,10 @@ public class BookSelectionActivity extends ActionBarActivity {
         mBookListView.setAdapter(mBookListAdapter);
         mBookListView.setOnItemClickListener(new OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (BookSelectionActivity.this.mSelectedBook == position)
+                if (mSelectedBook == position)
                     return;
-
-                BookSelectionActivity.this.mSelectedBook = position;
-                BookSelectionActivity.this.setTitle(String.format("%s - %s",
-                        mTranslationReader.selectedTranslationShortName(),
-                        mTranslationReader.bookNames()[mSelectedBook]));
-                BookSelectionActivity.this.mBookListAdapter.selectBook(position);
-                BookSelectionActivity.this.mChapterListAdapter.selectBook(position);
-                BookSelectionActivity.this.mChaptersGridView.setSelection(0);
+                mSelectedBook = position;
+                updateUi();
             }
         });
 
@@ -90,15 +84,12 @@ public class BookSelectionActivity extends ActionBarActivity {
         mChaptersGridView.setAdapter(mChapterListAdapter);
         mChaptersGridView.setOnItemClickListener(new OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                final SharedPreferences preferences = BookSelectionActivity.this
-                        .getSharedPreferences(Constants.SETTING_KEY, MODE_PRIVATE);
-                if (preferences.getInt(Constants.CURRENT_BOOK_SETTING_KEY, -1) != mSelectedBook
-                        || preferences.getInt(Constants.CURRENT_CHAPTER_SETTING_KEY, -1) != position) {
-                    final SharedPreferences.Editor editor = preferences.edit();
-                    editor.putInt(Constants.CURRENT_BOOK_SETTING_KEY, mSelectedBook);
-                    editor.putInt(Constants.CURRENT_CHAPTER_SETTING_KEY, position);
-                    editor.putInt(Constants.CURRENT_VERSE_SETTING_KEY, 0);
-                    editor.commit();
+                if (mLastReadBook != mSelectedBook || mLastReadChapter != position) {
+                    getSharedPreferences(Constants.SETTING_KEY, MODE_PRIVATE).edit()
+                            .putInt(Constants.CURRENT_BOOK_SETTING_KEY, mSelectedBook)
+                            .putInt(Constants.CURRENT_CHAPTER_SETTING_KEY, position)
+                            .putInt(Constants.CURRENT_VERSE_SETTING_KEY, 0)
+                            .commit();
                 }
 
                 startActivity(new Intent(BookSelectionActivity.this, TextActivity.class));
@@ -203,7 +194,6 @@ public class BookSelectionActivity extends ActionBarActivity {
                 mLastReadChapter
                         = preferences.getInt(Constants.CURRENT_CHAPTER_SETTING_KEY, -1);
 
-                // sets the book that is currently selected
                 mSelectedBook = mLastReadBook < 0 ? 0 : mLastReadBook;
 
                 return mTranslationReader.bookNames();
@@ -216,16 +206,9 @@ public class BookSelectionActivity extends ActionBarActivity {
 
                 // updates book list adapter and chapter list adapter
                 mBookListAdapter.setTexts(bookNames);
-                mBookListAdapter.selectBook(mSelectedBook);
-
                 mChapterListAdapter.setLastReadChapter(mLastReadBook, mLastReadChapter);
-                mChapterListAdapter.selectBook(mSelectedBook);
 
-                // updates the window title
-                // format: <translation short name> - <book name>
-                setTitle(String.format("%s - %s",
-                        mTranslationReader.selectedTranslationShortName(),
-                        mTranslationReader.bookNames()[mSelectedBook]));
+                updateUi();
 
                 // scrolls to the currently selected book
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.FROYO)
@@ -234,6 +217,16 @@ public class BookSelectionActivity extends ActionBarActivity {
                     mBookListView.setSelection(mSelectedBook);
             }
         }.execute();
+    }
+
+    private void updateUi() {
+        // format: <translation short name> - <book name>
+        setTitle(String.format("%s - %s", mTranslationReader.selectedTranslationShortName(),
+                mTranslationReader.bookNames()[mSelectedBook]));
+
+        mBookListAdapter.selectBook(mSelectedBook);
+        mChapterListAdapter.selectBook(mSelectedBook);
+        mChaptersGridView.setSelection(0);
     }
 
     private boolean mUpgrading = false;
