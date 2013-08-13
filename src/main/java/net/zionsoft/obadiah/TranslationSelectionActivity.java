@@ -71,9 +71,8 @@ public class TranslationSelectionActivity extends ActionBarActivity {
         mTranslationListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 final String selected = mTranslationListAdapter.getItem(position).shortName;
-                if (selected.equals(mSelectedTranslationShortName)) {
+                if (selected.equals(mSelectedTranslationShortName))
                     return false;
-                }
 
                 final Resources resources = TranslationSelectionActivity.this.getResources();
                 final CharSequence[] items = {resources.getText(R.string.text_delete)};
@@ -89,7 +88,7 @@ public class TranslationSelectionActivity extends ActionBarActivity {
                                         .setPositiveButton(android.R.string.ok,
                                                 new DialogInterface.OnClickListener() {
                                                     public void onClick(DialogInterface dialog, int id) {
-                                                        new TranslationDeleteAsyncTask().execute(selected);
+                                                        removeTranslation(selected);
                                                     }
                                                 })
                                         .setNegativeButton(android.R.string.cancel, null)
@@ -101,35 +100,6 @@ public class TranslationSelectionActivity extends ActionBarActivity {
                 contextMenuDialogBuilder.create().show();
 
                 return true;
-            }
-
-            class TranslationDeleteAsyncTask extends AsyncTask<String, Void, Void> {
-                protected void onPreExecute() {
-                    // running in the main thread
-
-                    mProgressDialog = new ProgressDialog(TranslationSelectionActivity.this);
-                    mProgressDialog.setCancelable(false);
-                    mProgressDialog.setMessage(getText(R.string.text_deleting));
-                    mProgressDialog.show();
-                }
-
-                protected Void doInBackground(String... params) {
-                    // running in the worker thread
-
-                    mTranslationManager.removeTranslation(params[0]);
-                    return null;
-                }
-
-                protected void onPostExecute(Void result) {
-                    // running in the main thread
-
-                    populateUi();
-                    mProgressDialog.cancel();
-                    Toast.makeText(TranslationSelectionActivity.this,
-                            R.string.text_deleted, Toast.LENGTH_SHORT).show();
-                }
-
-                private ProgressDialog mProgressDialog;
             }
         });
     }
@@ -221,6 +191,37 @@ public class TranslationSelectionActivity extends ActionBarActivity {
                 mTranslationListAdapter.setTranslations(translations);
             }
         }.execute();
+    }
+
+    private void removeTranslation(String translationShortName) {
+        new AsyncTask<String, Void, Void>() {
+            protected void onPreExecute() {
+                // running in the main thread
+
+                mProgressDialog = new ProgressDialog(TranslationSelectionActivity.this);
+                mProgressDialog.setCancelable(false);
+                mProgressDialog.setMessage(getText(R.string.text_deleting));
+                mProgressDialog.show();
+            }
+
+            protected Void doInBackground(String... params) {
+                // running in the worker thread
+
+                mTranslationManager.removeTranslation(params[0]);
+                return null;
+            }
+
+            protected void onPostExecute(Void result) {
+                // running in the main thread
+
+                populateUi();
+                mProgressDialog.cancel();
+                Toast.makeText(TranslationSelectionActivity.this,
+                        R.string.text_deleted, Toast.LENGTH_SHORT).show();
+            }
+
+            private ProgressDialog mProgressDialog;
+        }.execute(translationShortName);
     }
 
     private void startTranslationDownloadActivity() {
