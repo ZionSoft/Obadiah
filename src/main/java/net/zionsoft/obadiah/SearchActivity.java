@@ -31,7 +31,6 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
@@ -73,7 +72,7 @@ public class SearchActivity extends ActionBarActivity {
 
         // initializes the search results list view
         mSearchResultListView = (ListView) findViewById(R.id.search_result_listview);
-        mSearchResultListAdapter = new SearchResultListAdapter(this);
+        mSearchResultListAdapter = new SearchResultListAdapter(this, mSettingsManager);
         mSearchResultListView.setAdapter(mSearchResultListAdapter);
         mSearchResultListView.setOnItemClickListener(new OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -103,7 +102,6 @@ public class SearchActivity extends ActionBarActivity {
         final int backgroundColor = mSettingsManager.backgroundColor();
         mSearchResultListView.setBackgroundColor(backgroundColor);
         mSearchResultListView.setCacheColorHint(backgroundColor);
-        mTextColor = mSettingsManager.textColor();
 
         mSearchResultListAdapter.notifyDataSetChanged();
 
@@ -237,26 +235,6 @@ public class SearchActivity extends ActionBarActivity {
         private String[] mTexts;
     }
 
-    private class SearchResultListAdapter extends ListBaseAdapter {
-        public SearchResultListAdapter(Context context) {
-            super(context);
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            TextView textView;
-            if (convertView == null)
-                textView = (TextView) View.inflate(mContext, R.layout.search_result_list_item, null);
-            else
-                textView = (TextView) convertView;
-
-            textView.setTextColor(SearchActivity.this.mTextColor);
-            textView.setText(mTexts[position]);
-            return textView;
-        }
-    }
-
-    private int mTextColor;
     private EditText mSearchText;
     private ListView mSearchResultListView;
     private SearchResult[] mResults;
