@@ -19,24 +19,18 @@ package net.zionsoft.obadiah;
 
 import android.app.ProgressDialog;
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
-import android.text.SpannableStringBuilder;
-import android.text.style.AbsoluteSizeSpan;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import net.zionsoft.obadiah.bible.TranslationInfo;
@@ -66,7 +60,7 @@ public class TranslationDownloadActivity extends ActionBarActivity {
 
         // initializes list view showing available translations
         mTranslationListView = (ListView) findViewById(R.id.translation_listview);
-        mTranslationListAdapter = new TranslationListAdapter(this);
+        mTranslationListAdapter = new TranslationDownloadListAdapter(this, mSettingsManager);
         mTranslationListView.setAdapter(mTranslationListAdapter);
         mTranslationListView.setOnItemClickListener(new OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -388,53 +382,12 @@ public class TranslationDownloadActivity extends ActionBarActivity {
         private ProgressDialog mProgressDialog;
     }
 
-    private class TranslationListAdapter extends ListBaseAdapter {
-        public TranslationListAdapter(Context context) {
-            super(context);
-            Resources resources = mContext.getResources();
-            mMediumSizeSpan = new AbsoluteSizeSpan(resources.getDimensionPixelSize(R.dimen.text_size_medium));
-            mSmallSizeSpan = new AbsoluteSizeSpan(resources.getDimensionPixelSize(R.dimen.text_size_small));
-        }
-
-        public void setTexts(String[] texts, int[] sizes) {
-            mTexts = texts;
-            mSizes = sizes;
-
-            notifyDataSetChanged();
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            TextView textView;
-            if (convertView == null) {
-                textView = (TextView) View.inflate(mContext,
-                        R.layout.translation_download_list_item, null);
-            } else {
-                textView = (TextView) convertView;
-            }
-
-            String string
-                    = mContext.getResources().getString(R.string.text_available_translation_info,
-                    mTexts[position], mSizes[position]);
-            SpannableStringBuilder spannable = new SpannableStringBuilder(string);
-            spannable.setSpan(mMediumSizeSpan, 0, mTexts[position].length(), 0);
-            spannable.setSpan(mSmallSizeSpan, mTexts[position].length(), spannable.length(), 0);
-            textView.setText(spannable);
-
-            return textView;
-        }
-
-        private AbsoluteSizeSpan mMediumSizeSpan;
-        private AbsoluteSizeSpan mSmallSizeSpan;
-        private int[] mSizes;
-    }
-
     protected static final String BASE_URL = "http://bible.zionsoft.net/translations/";
 
     private ListView mTranslationListView;
     private SettingsManager mSettingsManager;
     private TranslationDownloadAsyncTask mTranslationDownloadAsyncTask;
-    private TranslationListAdapter mTranslationListAdapter;
+    private TranslationDownloadListAdapter mTranslationListAdapter;
     private TranslationManager mTranslationManager;
     private TranslationInfo[] mAvailableTranslations;
 }
