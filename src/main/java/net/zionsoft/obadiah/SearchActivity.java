@@ -20,7 +20,6 @@ package net.zionsoft.obadiah;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
@@ -58,7 +57,7 @@ public class SearchActivity extends ActionBarActivity {
         mSearchText.setOnEditorActionListener(new OnEditorActionListener() {
             public boolean onEditorAction(TextView view, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                    SearchActivity.this.search(null);
+                    search(null);
                     return true;
                 }
                 return false;
@@ -71,20 +70,15 @@ public class SearchActivity extends ActionBarActivity {
         mSearchResultListView.setAdapter(mSearchResultListAdapter);
         mSearchResultListView.setOnItemClickListener(new OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (position < 0 || position >= mResults.size())
-                    return;
-
                 final TranslationReader.SearchResult result = mResults.get(position);
-                final SharedPreferences.Editor editor = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE)
-                        .edit();
-                editor.putInt(Constants.PREF_KEY_LAST_READ_BOOK, result.bookIndex);
-                editor.putInt(Constants.PREF_KEY_LAST_READ_CHAPTER, result.chapterIndex);
-                editor.putInt(Constants.PREF_KEY_LAST_READ_VERSE, result.verseIndex);
-                editor.commit();
+                getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE).edit()
+                        .putInt(Constants.PREF_KEY_LAST_READ_BOOK, result.bookIndex)
+                        .putInt(Constants.PREF_KEY_LAST_READ_CHAPTER, result.chapterIndex)
+                        .putInt(Constants.PREF_KEY_LAST_READ_VERSE, result.verseIndex)
+                        .commit();
 
-                SearchActivity.this.startActivity(new Intent(SearchActivity.this, TextActivity.class)
+                startActivity(new Intent(SearchActivity.this, TextActivity.class)
                         .setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
-
             }
         });
     }
@@ -98,16 +92,15 @@ public class SearchActivity extends ActionBarActivity {
         mSearchResultListView.setBackgroundColor(backgroundColor);
         mSearchResultListView.setCacheColorHint(backgroundColor);
 
-        mSearchResultListAdapter.notifyDataSetChanged();
-
-        final String selectedTranslationShortName = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE)
+        final String selected = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE)
                 .getString(Constants.PREF_KEY_LAST_READ_TRANSLATION, null);
-        if (selectedTranslationShortName == null
-                || !selectedTranslationShortName.equals(mSelectedTranslationShortName)) {
-            mTranslationReader.selectTranslation(selectedTranslationShortName);
+        if (!selected.equals(mSelectedTranslationShortName)) {
+            setTitle(selected);
+            mTranslationReader.selectTranslation(selected);
             mSelectedTranslationShortName = mTranslationReader.selectedTranslationShortName();
-            setTitle(mSelectedTranslationShortName);
-            search(null);
+
+            mSearchText.setText(null);
+            mSearchResultListAdapter.setSearchResults(null);
         }
     }
 
@@ -135,47 +128,46 @@ public class SearchActivity extends ActionBarActivity {
         final Editable searchToken = mSearchText.getText();
         if (searchToken.length() == 0)
             return;
-        new SearchAsyncTask().execute(searchToken.toString());
-    }
 
-    private class SearchAsyncTask extends AsyncTask<String, Void, List<TranslationReader.SearchResult>> {
-        protected void onPreExecute() {
-            // running in the main thread
+        new AsyncTask<String, Void, List<TranslationReader.SearchResult>>() {
+            protected void onPreExecute() {
+                // running in the main thread
 
-            mSearchResultListAdapter.setSearchResults(null);
+                mSearchResultListAdapter.setSearchResults(null);
 
-            InputMethodManager inputManager = (InputMethodManager) SearchActivity.this
-                    .getSystemService(Context.INPUT_METHOD_SERVICE);
-            if (inputManager != null) {
-                inputManager.hideSoftInputFromWindow(SearchActivity.this.getCurrentFocus().getWindowToken(),
-                        InputMethodManager.HIDE_NOT_ALWAYS);
+                InputMethodManager inputManager
+                        = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                if (inputManager != null) {
+                    inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
+                            InputMethodManager.HIDE_NOT_ALWAYS);
+                }
+
+                mProgressDialog = new ProgressDialog(SearchActivity.this);
+                mProgressDialog.setCancelable(false);
+                mProgressDialog.setMessage(getText(R.string.text_searching));
+                mProgressDialog.show();
             }
 
-            mProgressDialog = new ProgressDialog(SearchActivity.this);
-            mProgressDialog.setCancelable(false);
-            mProgressDialog.setMessage(SearchActivity.this.getText(R.string.text_searching));
-            mProgressDialog.show();
-        }
+            protected List<TranslationReader.SearchResult> doInBackground(String... params) {
+                // running in the worker thread
 
-        protected List<TranslationReader.SearchResult> doInBackground(String... params) {
-            // running in the worker thread
+                return mTranslationReader.search(params[0]);
+            }
 
-            return mTranslationReader.search(params[0]);
-        }
+            protected void onPostExecute(List<TranslationReader.SearchResult> results) {
+                // running in the main thread
 
-        protected void onPostExecute(List<TranslationReader.SearchResult> results) {
-            // running in the main thread
+                mResults = results;
+                mSearchResultListAdapter.setSearchResults(results);
+                mProgressDialog.dismiss();
 
-            mResults = results;
-            mSearchResultListAdapter.setSearchResults(results);
-            mProgressDialog.dismiss();
+                String text = getResources().getString(R.string.text_search_result,
+                        results == null ? 0 : results.size());
+                Toast.makeText(SearchActivity.this, text, Toast.LENGTH_SHORT).show();
+            }
 
-            String text = getResources().getString(R.string.text_search_result,
-                    results == null ? 0 : results.size());
-            Toast.makeText(SearchActivity.this, text, Toast.LENGTH_SHORT).show();
-        }
-
-        private ProgressDialog mProgressDialog;
+            private ProgressDialog mProgressDialog;
+        }.execute(searchToken.toString());
     }
 
     private EditText mSearchText;
