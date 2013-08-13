@@ -26,6 +26,7 @@ public class TranslationsDatabaseHelper extends SQLiteOpenHelper {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
+    @Override
     public void onCreate(SQLiteDatabase db) {
         db.beginTransaction();
         try {
@@ -47,6 +48,7 @@ public class TranslationsDatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
+    @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // does nothing
     }
