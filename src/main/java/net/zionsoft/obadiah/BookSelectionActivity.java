@@ -140,67 +140,75 @@ public class BookSelectionActivity extends ActionBarActivity {
     }
 
     private void populateUi() {
-        boolean hasInstalledTranslation = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE)
-                .getString(Constants.PREF_KEY_LAST_READ_TRANSLATION, null) != null;
-        if (hasInstalledTranslation) {
-            new AsyncTask<Void, Void, String[]>() {
-                @Override
-                protected void onPreExecute() {
-                    mLoadingSpinner.setVisibility(View.VISIBLE);
-                    mMainView.setVisibility(View.GONE);
-                }
-
-                @Override
-                protected String[] doInBackground(Void... params) {
-                    // loads last read translation, book, and chapter
-                    final SharedPreferences preferences
-                            = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE);
-                    mTranslationReader.selectTranslation(preferences
-                            .getString(Constants.PREF_KEY_LAST_READ_TRANSLATION, null));
-                    mLastReadBook = preferences.getInt(Constants.PREF_KEY_LAST_READ_BOOK, -1);
-                    mLastReadChapter
-                            = preferences.getInt(Constants.PREF_KEY_LAST_READ_CHAPTER, -1);
-
-                    mSelectedBook = mLastReadBook < 0 ? 0 : mLastReadBook;
-
-                    return mTranslationReader.bookNames();
-                }
-
-                @Override
-                protected void onPostExecute(String[] bookNames) {
-                    Animator.fadeOut(mLoadingSpinner);
-                    Animator.fadeIn(mMainView);
-
-                    // updates book list adapter and chapter list adapter
-                    mBookListAdapter.setTexts(bookNames);
-                    mChapterListAdapter.setLastReadChapter(mLastReadBook, mLastReadChapter);
-
-                    updateUi();
-
-                    // scrolls to the currently selected book
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.FROYO)
-                        mBookListView.smoothScrollToPosition(mSelectedBook);
-                    else
-                        mBookListView.setSelection(mSelectedBook);
-                }
-            }.execute();
-        } else {
-            final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-            alertDialogBuilder.setMessage(R.string.text_no_translation).setCancelable(false)
-                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            dialog.dismiss();
-                            startActivity(new Intent(BookSelectionActivity.this,
-                                    TranslationSelectionActivity.class));
-                        }
-                    }).setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int id) {
-                    dialog.cancel();
-                    BookSelectionActivity.this.finish();
-                }
-            });
-            alertDialogBuilder.create().show();
+        String lastReadTranslation = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE)
+                .getString(Constants.PREF_KEY_LAST_READ_TRANSLATION, null);
+        if (lastReadTranslation == null) {
+            // no translation installed
+            new AlertDialog.Builder(this).setMessage(R.string.text_no_translation)
+                    .setCancelable(false)
+                    .setPositiveButton(android.R.string.ok,
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    dialog.dismiss();
+                                    startActivity(new Intent(BookSelectionActivity.this,
+                                            TranslationSelectionActivity.class));
+                                }
+                            })
+                    .setNegativeButton(android.R.string.cancel,
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    dialog.cancel();
+                                    BookSelectionActivity.this.finish();
+                                }
+                            })
+                    .create().show();
+            return;
         }
+
+        if (lastReadTranslation.equals(mLastReadTranslation))
+            return;
+
+        mLastReadTranslation = lastReadTranslation;
+        new AsyncTask<Void, Void, String[]>() {
+            @Override
+            protected void onPreExecute() {
+                mLoadingSpinner.setVisibility(View.VISIBLE);
+                mMainView.setVisibility(View.GONE);
+            }
+
+            @Override
+            protected String[] doInBackground(Void... params) {
+                // loads last read translation, book, and chapter
+                final SharedPreferences preferences
+                        = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE);
+                mTranslationReader.selectTranslation(preferences
+                        .getString(Constants.PREF_KEY_LAST_READ_TRANSLATION, null));
+                mLastReadBook = preferences.getInt(Constants.PREF_KEY_LAST_READ_BOOK, -1);
+                mLastReadChapter = preferences.getInt(Constants.PREF_KEY_LAST_READ_CHAPTER, -1);
+
+                mSelectedBook = mLastReadBook < 0 ? 0 : mLastReadBook;
+
+                return mTranslationReader.bookNames();
+            }
+
+            @Override
+            protected void onPostExecute(String[] bookNames) {
+                Animator.fadeOut(mLoadingSpinner);
+                Animator.fadeIn(mMainView);
+
+                // updates book list adapter and chapter list adapter
+                mBookListAdapter.setTexts(bookNames);
+                mChapterListAdapter.setLastReadChapter(mLastReadBook, mLastReadChapter);
+
+                updateUi();
+
+                // scrolls to the currently selected book
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.FROYO)
+                    mBookListView.smoothScrollToPosition(mSelectedBook);
+                else
+                    mBookListView.setSelection(mSelectedBook);
+            }
+        }.execute();
     }
 
     private void updateUi() {
@@ -215,6 +223,7 @@ public class BookSelectionActivity extends ActionBarActivity {
 
     private boolean mUpgrading = false;
 
+    private String mLastReadTranslation;
     private int mLastReadBook;
     private int mLastReadChapter;
     private int mSelectedBook = -1;
