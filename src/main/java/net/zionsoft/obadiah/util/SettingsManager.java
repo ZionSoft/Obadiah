@@ -22,8 +22,6 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.preference.PreferenceManager;
 
-import net.zionsoft.obadiah.SettingsActivity;
-
 public class SettingsManager {
     public SettingsManager(Context context) {
         super();
@@ -32,7 +30,7 @@ public class SettingsManager {
 
     public void refresh() {
         // night / day mode
-        if (mSharedPreferences.getBoolean(SettingsActivity.PREF_NIGHTMODE, false)) {
+        if (mSharedPreferences.getBoolean(SETTING_KEY_NIGHTMODE, false)) {
             mBackgroundColor = Color.BLACK;
             mTextColor = Color.WHITE;
         } else {
@@ -49,7 +47,10 @@ public class SettingsManager {
         return mTextColor;
     }
 
+    private static final String SETTING_KEY_NIGHTMODE = "pref_nightmode";
+
     private final SharedPreferences mSharedPreferences;
+
     private int mBackgroundColor;
     private int mTextColor;
 }
