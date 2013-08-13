@@ -23,7 +23,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
-import android.graphics.Typeface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -33,15 +32,16 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import net.zionsoft.obadiah.bible.TranslationInfo;
 import net.zionsoft.obadiah.bible.TranslationManager;
 import net.zionsoft.obadiah.util.SettingsManager;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class TranslationSelectionActivity extends ActionBarActivity {
     @Override
@@ -51,28 +51,27 @@ public class TranslationSelectionActivity extends ActionBarActivity {
 
         mSettingsManager = new SettingsManager(this);
         mTranslationManager = new TranslationManager(this);
-        mSelectedTranslationShortName = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE).getString(
-                Constants.PREF_KEY_LAST_READ_TRANSLATION, null);
+        mSelectedTranslationShortName = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE)
+                .getString(Constants.PREF_KEY_LAST_READ_TRANSLATION, null);
 
         // initializes list view showing installed translations
-        mTranslationListAdapter = new TranslationSelectionListAdapter(this);
+        mTranslationListAdapter = new TranslationSelectionListAdapter(this, mSettingsManager);
+        mTranslationListAdapter.setSelectedTranslation(mSelectedTranslationShortName);
         mTranslationListView = (ListView) findViewById(R.id.translation_listview);
         mTranslationListView.setAdapter(mTranslationListAdapter);
         mTranslationListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                mSelectedTranslationShortName = mInstalledTranslations[position].shortName;
+                mSelectedTranslationShortName = mTranslationListAdapter.getItem(position).shortName;
                 finish();
             }
         });
         mTranslationListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                if (position == TranslationSelectionActivity.this.mTranslationListAdapter.getCount() - 1
-                        || TranslationSelectionActivity.this.mInstalledTranslations[position].shortName
-                        .equals(TranslationSelectionActivity.this.mSelectedTranslationShortName)) {
+                final String selected = mTranslationListAdapter.getItem(position).shortName;
+                if (selected.equals(mSelectedTranslationShortName)) {
                     return false;
                 }
 
-                final int selectedIndex = position;
                 final Resources resources = TranslationSelectionActivity.this.getResources();
                 final CharSequence[] items = {resources.getText(R.string.text_delete)};
                 final AlertDialog.Builder contextMenuDialogBuilder = new AlertDialog.Builder(
@@ -81,20 +80,17 @@ public class TranslationSelectionActivity extends ActionBarActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         switch (which) {
                             case 0: // delete
-                                final AlertDialog.Builder deleteConfirmDialogBuilder = new AlertDialog.Builder(
-                                        TranslationSelectionActivity.this);
-                                deleteConfirmDialogBuilder.setMessage(resources.getText(R.string.text_delete_confirm))
+                                new AlertDialog.Builder(TranslationSelectionActivity.this)
+                                        .setMessage(resources.getText(R.string.text_delete_confirm))
                                         .setCancelable(true)
-                                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                                            public void onClick(DialogInterface dialog, int id) {
-                                                new TranslationDeleteAsyncTask()
-                                                        .execute(TranslationSelectionActivity.this.mInstalledTranslations[selectedIndex].shortName);
-                                            }
-                                        }).setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id) {
-                                    }
-                                });
-                                deleteConfirmDialogBuilder.create().show();
+                                        .setPositiveButton(android.R.string.ok,
+                                                new DialogInterface.OnClickListener() {
+                                                    public void onClick(DialogInterface dialog, int id) {
+                                                        new TranslationDeleteAsyncTask().execute(selected);
+                                                    }
+                                                })
+                                        .setNegativeButton(android.R.string.cancel, null)
+                                        .create().show();
                                 break;
                         }
                     }
@@ -117,16 +113,17 @@ public class TranslationSelectionActivity extends ActionBarActivity {
                 protected Void doInBackground(String... params) {
                     // running in the worker thread
 
-                    TranslationSelectionActivity.this.mTranslationManager.removeTranslation(params[0]);
+                    mTranslationManager.removeTranslation(params[0]);
                     return null;
                 }
 
                 protected void onPostExecute(Void result) {
                     // running in the main thread
 
-                    TranslationSelectionActivity.this.populateUi();
+                    populateUi();
                     mProgressDialog.cancel();
-                    Toast.makeText(TranslationSelectionActivity.this, R.string.text_deleted, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(TranslationSelectionActivity.this,
+                            R.string.text_deleted, Toast.LENGTH_SHORT).show();
                 }
 
                 private ProgressDialog mProgressDialog;
@@ -142,7 +139,6 @@ public class TranslationSelectionActivity extends ActionBarActivity {
         final int backgroundColor = mSettingsManager.backgroundColor();
         mTranslationListView.setBackgroundColor(backgroundColor);
         mTranslationListView.setCacheColorHint(backgroundColor);
-        mTextColor = mSettingsManager.textColor();
 
         populateUi();
     }
@@ -188,23 +184,22 @@ public class TranslationSelectionActivity extends ActionBarActivity {
                 startTranslationDownloadActivity();
                 mFirstTime = false;
             }
-            mTranslationListAdapter.setInstalledTranslations(null);
+            mTranslationListAdapter.setTranslations(null);
             return;
         }
 
-        final TranslationInfo[] installedTranslations = new TranslationInfo[installedTranslationCount];
-        int index = 0;
+        final List<TranslationInfo> installedTranslations
+                = new ArrayList<TranslationInfo>(installedTranslationCount);
         for (TranslationInfo translationInfo : translations) {
             if (translationInfo.installed)
-                installedTranslations[index++] = translationInfo;
+                installedTranslations.add(translationInfo);
         }
 
         // 1st time resumed from TranslationDownloadActivity with installed translation
         if (mSelectedTranslationShortName == null)
-            mSelectedTranslationShortName = installedTranslations[0].shortName;
+            mSelectedTranslationShortName = installedTranslations.get(0).shortName;
 
-        mTranslationListAdapter.setInstalledTranslations(installedTranslations);
-        mInstalledTranslations = installedTranslations;
+        mTranslationListAdapter.setTranslations(installedTranslations);
     }
 
     private void startTranslationDownloadActivity() {
@@ -223,52 +218,10 @@ public class TranslationSelectionActivity extends ActionBarActivity {
         startActivity(new Intent(TranslationSelectionActivity.this, TranslationDownloadActivity.class));
     }
 
-    private class TranslationSelectionListAdapter extends ListBaseAdapter {
-        public TranslationSelectionListAdapter(Context context) {
-            super(context);
-        }
-
-        @Override
-        public int getCount() {
-            return (mInstalledTranslations == null) ? 0 : mInstalledTranslations.length;
-        }
-
-        public void setInstalledTranslations(TranslationInfo[] translations) {
-            mInstalledTranslations = translations;
-            notifyDataSetChanged();
-        }
-
-        public View getView(int position, View convertView, ViewGroup parent) {
-            TextView textView;
-            if (convertView == null) {
-                textView = (TextView) View.inflate(mContext,
-                        R.layout.translation_selection_list_item, null);
-            } else {
-                textView = (TextView) convertView;
-            }
-
-            textView.setTextColor(TranslationSelectionActivity.this.mTextColor);
-            textView.setText(mInstalledTranslations[position].name);
-            if (TranslationSelectionActivity.this.mSelectedTranslationShortName
-                    .equals(mInstalledTranslations[position].shortName)) {
-                textView.setTypeface(null, Typeface.BOLD);
-                textView.setBackgroundResource(R.drawable.list_item_background_selected);
-            } else {
-                textView.setTypeface(null, Typeface.NORMAL);
-                textView.setBackgroundResource(R.drawable.list_item_background);
-            }
-            return textView;
-        }
-
-        private TranslationInfo[] mInstalledTranslations;
-    }
-
     private boolean mFirstTime = true;
-    private int mTextColor;
     private ListView mTranslationListView;
     private SettingsManager mSettingsManager;
     private String mSelectedTranslationShortName;
     private TranslationManager mTranslationManager;
     private TranslationSelectionListAdapter mTranslationListAdapter;
-    private TranslationInfo[] mInstalledTranslations;
 }
