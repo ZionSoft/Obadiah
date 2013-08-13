@@ -20,14 +20,34 @@ package net.zionsoft.obadiah;
 import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import net.zionsoft.obadiah.bible.TranslationReader;
 import net.zionsoft.obadiah.util.SettingsManager;
 
-public class SearchResultListAdapter extends ListBaseAdapter {
+import java.util.List;
+
+public class SearchResultListAdapter extends BaseAdapter {
     public SearchResultListAdapter(Context context, SettingsManager settingsManager) {
-        super(context);
+        super();
+        mContext = context;
         mSettingsManager = settingsManager;
+    }
+
+    @Override
+    public int getCount() {
+        return (mResults == null) ? 0 : mResults.size();
+    }
+
+    @Override
+    public TranslationReader.SearchResult getItem(int position) {
+        return (mResults == null) ? null : mResults.get(position);
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return position;
     }
 
     @Override
@@ -39,9 +59,17 @@ public class SearchResultListAdapter extends ListBaseAdapter {
             textView = (TextView) convertView;
 
         textView.setTextColor(mSettingsManager.textColor());
-        textView.setText(mTexts[position]);
+        textView.setText(mResults.get(position).verse);
         return textView;
     }
 
+    public void setSearchResults(List<TranslationReader.SearchResult> results) {
+        mResults = results;
+        notifyDataSetChanged();
+    }
+
+    private final Context mContext;
     private final SettingsManager mSettingsManager;
+
+    private List<TranslationReader.SearchResult> mResults;
 }

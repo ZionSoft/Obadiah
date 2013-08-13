@@ -21,8 +21,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
@@ -42,8 +40,9 @@ import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 
 import net.zionsoft.obadiah.bible.TranslationReader;
-import net.zionsoft.obadiah.bible.TranslationsDatabaseHelper;
 import net.zionsoft.obadiah.util.SettingsManager;
+
+import java.util.List;
 
 public class SearchActivity extends ActionBarActivity {
     @Override
@@ -52,7 +51,6 @@ public class SearchActivity extends ActionBarActivity {
         setContentView(R.layout.search_activity);
 
         mSettingsManager = new SettingsManager(this);
-        mTranslationsDatabaseHelper = new TranslationsDatabaseHelper(this);
         mTranslationReader = new TranslationReader(this);
 
         // initializes the search bar
@@ -73,10 +71,10 @@ public class SearchActivity extends ActionBarActivity {
         mSearchResultListView.setAdapter(mSearchResultListAdapter);
         mSearchResultListView.setOnItemClickListener(new OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (position < 0 || position >= SearchActivity.this.mResults.length)
+                if (position < 0 || position >= mResults.size())
                     return;
 
-                final SearchResult result = SearchActivity.this.mResults[position];
+                final TranslationReader.SearchResult result = mResults.get(position);
                 final SharedPreferences.Editor editor = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE)
                         .edit();
                 editor.putInt(Constants.PREF_KEY_LAST_READ_BOOK, result.bookIndex);
@@ -137,22 +135,14 @@ public class SearchActivity extends ActionBarActivity {
         final Editable searchToken = mSearchText.getText();
         if (searchToken.length() == 0)
             return;
-
-        // TODO should the search functionality be moved to TranslationReader?
-        new SearchAsyncTask().execute(searchToken);
+        new SearchAsyncTask().execute(searchToken.toString());
     }
 
-    private static class SearchResult {
-        public int bookIndex;
-        public int chapterIndex;
-        public int verseIndex;
-    }
-
-    private class SearchAsyncTask extends AsyncTask<Editable, Void, Void> {
+    private class SearchAsyncTask extends AsyncTask<String, Void, List<TranslationReader.SearchResult>> {
         protected void onPreExecute() {
             // running in the main thread
 
-            SearchActivity.this.mSearchResultListAdapter.setTexts(null);
+            mSearchResultListAdapter.setSearchResults(null);
 
             InputMethodManager inputManager = (InputMethodManager) SearchActivity.this
                     .getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -167,69 +157,32 @@ public class SearchActivity extends ActionBarActivity {
             mProgressDialog.show();
         }
 
-        protected Void doInBackground(Editable... params) {
+        protected List<TranslationReader.SearchResult> doInBackground(String... params) {
             // running in the worker thread
 
-            final SQLiteDatabase db = SearchActivity.this.mTranslationsDatabaseHelper.getReadableDatabase();
-            final Cursor cursor = db.query(SearchActivity.this.mSelectedTranslationShortName, new String[]{
-                    TranslationsDatabaseHelper.COLUMN_BOOK_INDEX, TranslationsDatabaseHelper.COLUMN_CHAPTER_INDEX,
-                    TranslationsDatabaseHelper.COLUMN_VERSE_INDEX, TranslationsDatabaseHelper.COLUMN_TEXT},
-                    String.format("%s LIKE ?", TranslationsDatabaseHelper.COLUMN_TEXT),
-                    new String[]{String.format("%%%s%%", params[0].toString().trim().replaceAll("\\s+", "%"))},
-                    null, null, null);
-            if (cursor != null) {
-                final int count = cursor.getCount();
-                if (count > 0) {
-                    final int bookIndexColumnIndex = cursor
-                            .getColumnIndex(TranslationsDatabaseHelper.COLUMN_BOOK_INDEX);
-                    final int chapterIndexColumnIndex = cursor
-                            .getColumnIndex(TranslationsDatabaseHelper.COLUMN_CHAPTER_INDEX);
-                    final int verseIndexColumnIndex = cursor
-                            .getColumnIndex(TranslationsDatabaseHelper.COLUMN_VERSE_INDEX);
-                    final int textColumnIndex = cursor.getColumnIndex(TranslationsDatabaseHelper.COLUMN_TEXT);
-                    mTexts = new String[count];
-                    SearchActivity.this.mResults = new SearchResult[count];
-                    int i = 0;
-                    while (cursor.moveToNext()) {
-                        final SearchResult result = new SearchResult();
-                        result.bookIndex = cursor.getInt(bookIndexColumnIndex);
-                        result.chapterIndex = cursor.getInt(chapterIndexColumnIndex);
-                        result.verseIndex = cursor.getInt(verseIndexColumnIndex);
-                        SearchActivity.this.mResults[i] = result;
-
-                        // format: <book name> <chapter index>:<verse index>\n<text>
-                        mTexts[i++] = String.format("%s %d:%d\n%s",
-                                SearchActivity.this.mTranslationReader.bookNames()[result.bookIndex],
-                                result.chapterIndex + 1, result.verseIndex + 1,
-                                cursor.getString(textColumnIndex));
-                    }
-                }
-            }
-            db.close();
-            return null;
+            return mTranslationReader.search(params[0]);
         }
 
-        protected void onPostExecute(Void result) {
+        protected void onPostExecute(List<TranslationReader.SearchResult> results) {
             // running in the main thread
 
-            SearchActivity.this.mSearchResultListAdapter.setTexts(mTexts);
+            mResults = results;
+            mSearchResultListAdapter.setSearchResults(results);
             mProgressDialog.dismiss();
 
-            String text = SearchActivity.this.getResources().getString(R.string.text_search_result,
-                    mTexts == null ? 0 : mTexts.length);
+            String text = getResources().getString(R.string.text_search_result,
+                    results == null ? 0 : results.size());
             Toast.makeText(SearchActivity.this, text, Toast.LENGTH_SHORT).show();
         }
 
         private ProgressDialog mProgressDialog;
-        private String[] mTexts;
     }
 
     private EditText mSearchText;
     private ListView mSearchResultListView;
-    private SearchResult[] mResults;
+    private List<TranslationReader.SearchResult> mResults;
     private SearchResultListAdapter mSearchResultListAdapter;
     private SettingsManager mSettingsManager;
     private String mSelectedTranslationShortName;
-    private TranslationsDatabaseHelper mTranslationsDatabaseHelper;
     private TranslationReader mTranslationReader;
 }
