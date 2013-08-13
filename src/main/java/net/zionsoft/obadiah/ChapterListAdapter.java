@@ -29,7 +29,6 @@ import net.zionsoft.obadiah.util.SettingsManager;
 public class ChapterListAdapter extends ListBaseAdapter {
     public ChapterListAdapter(Context context, SettingsManager settingsManager) {
         super(context);
-        mContext = context;
         mSettingsManager = settingsManager;
     }
 
@@ -66,7 +65,6 @@ public class ChapterListAdapter extends ListBaseAdapter {
         notifyDataSetChanged();
     }
 
-    private final Context mContext;
     private final SettingsManager mSettingsManager;
 
     private int mLastReadBook;
