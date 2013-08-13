@@ -18,7 +18,7 @@
 package net.zionsoft.obadiah;
 
 public class Constants {
-    public static final int CURRENT_APPLICATION_VERSION = 10500;
+    public static final int CURRENT_APPLICATION_VERSION = 10700;
 
     public static final String SETTING_KEY = "settings";
     public static final String CURRENT_APPLICATION_VERSION_SETTING_KEY = "currentApplicationVersion";

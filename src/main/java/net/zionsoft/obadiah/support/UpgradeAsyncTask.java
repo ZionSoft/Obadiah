@@ -55,16 +55,21 @@ public class UpgradeAsyncTask extends AsyncTask<Void, Integer, Void> {
     protected Void doInBackground(Void... params) {
         // running in the worker thread
 
-        convertTranslations();
-        publishProgress(98);
-
-        convertSettings();
-        publishProgress(99);
-
-        // sets the application version
         final SharedPreferences preferences
                 = mBookSelectionActivity.getSharedPreferences(Constants.SETTING_KEY,
                 Context.MODE_PRIVATE);
+        final int currentApplicationVersion
+                = preferences.getInt(Constants.CURRENT_APPLICATION_VERSION_SETTING_KEY, 0);
+
+        if (currentApplicationVersion < 10500) {
+            convertTranslations();
+            publishProgress(98);
+
+            convertSettings();
+            publishProgress(99);
+        }
+
+        // sets the application version
         final SharedPreferences.Editor editor = preferences.edit();
         editor.putInt(Constants.CURRENT_APPLICATION_VERSION_SETTING_KEY,
                 Constants.CURRENT_APPLICATION_VERSION);
