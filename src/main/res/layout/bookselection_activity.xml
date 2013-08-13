@@ -1,26 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent">
 
-    <ListView
-            android:id="@+id/book_listview"
-            android:layout_width="@dimen/booklistview_width"
-            android:layout_height="match_parent"
-            android:divider="@null"
-            android:dividerHeight="0dip"
-            android:listSelector="@null"
-            android:numColumns="auto_fit"/>
-
-    <GridView
-            android:id="@+id/chapter_gridview"
+    <LinearLayout
+            android:id="@+id/book_selection_main_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_toRightOf="@id/book_listview"
-            android:columnWidth="@dimen/chaptergridview_column_width"
-            android:gravity="center"
-            android:listSelector="@null"
-            android:numColumns="auto_fit"
-            android:stretchMode="columnWidth"/>
+            android:orientation="horizontal">
 
-</RelativeLayout>
+        <ListView
+                android:id="@+id/book_listview"
+                android:layout_width="@dimen/booklistview_width"
+                android:layout_height="match_parent"
+                android:divider="@null"
+                android:dividerHeight="0dip"
+                android:listSelector="@null"
+                android:numColumns="auto_fit"/>
+
+        <GridView
+                android:id="@+id/chapter_gridview"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_toRightOf="@id/book_listview"
+                android:columnWidth="@dimen/chaptergridview_column_width"
+                android:gravity="center"
+                android:listSelector="@null"
+                android:numColumns="auto_fit"
+                android:stretchMode="columnWidth"/>
+
+    </LinearLayout>
+
+    <ProgressBar
+            android:id="@+id/book_selection_loading_spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"/>
+</FrameLayout>

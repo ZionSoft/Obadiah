@@ -23,16 +23,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import net.zionsoft.obadiah.bible.TranslationReader;
 import net.zionsoft.obadiah.util.SettingsManager;
 
 public class BookListAdapter extends ListBaseAdapter {
-    public BookListAdapter(Context context, SettingsManager settingsManager,
-                           TranslationReader translationReader) {
+    public BookListAdapter(Context context, SettingsManager settingsManager) {
         super(context);
         mContext = context;
         mSettingsManager = settingsManager;
-        mTranslationReader = translationReader;
     }
 
     @Override
@@ -57,12 +54,10 @@ public class BookListAdapter extends ListBaseAdapter {
 
     public void selectBook(int selectedBook) {
         mSelectedBook = selectedBook;
-        mTexts = mTranslationReader.bookNames();
         notifyDataSetChanged();
     }
 
     private final Context mContext;
     private final SettingsManager mSettingsManager;
-    private final TranslationReader mTranslationReader;
     private int mSelectedBook;
 }
