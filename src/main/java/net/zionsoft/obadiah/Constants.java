@@ -20,11 +20,11 @@ package net.zionsoft.obadiah;
 public class Constants {
     public static final int CURRENT_APPLICATION_VERSION = 10700;
 
-    public static final String SETTING_KEY = "settings";
-    public static final String CURRENT_APPLICATION_VERSION_SETTING_KEY = "currentApplicationVersion";
-    public static final String CURRENT_TRANSLATION_SETTING_KEY = "currentTranslation";
-    public static final String CURRENT_BOOK_SETTING_KEY = "currentBook";
-    public static final String CURRENT_CHAPTER_SETTING_KEY = "currentChapter";
-    public static final String CURRENT_VERSE_SETTING_KEY = "currentVerse";
-    public static final String LAST_UPDATED_SETTING_KEY = "lastUpdated";
+    public static final String PREF_NAME = "settings";
+    public static final String PREF_KEY_CURRENT_APPLICATION_VERSION = "currentApplicationVersion";
+    public static final String PREF_KEY_LAST_READ_TRANSLATION = "currentTranslation";
+    public static final String PREF_KEY_LAST_READ_BOOK = "currentBook";
+    public static final String PREF_KEY_LAST_READ_CHAPTER = "currentChapter";
+    public static final String PREF_KEY_LAST_READ_VERSE = "currentVerse";
+    public static final String PREF_KEY_LAST_UPDATED = "lastUpdated";
 }

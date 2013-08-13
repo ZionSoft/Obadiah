@@ -51,8 +51,8 @@ public class TranslationSelectionActivity extends ActionBarActivity {
 
         mSettingsManager = new SettingsManager(this);
         mTranslationManager = new TranslationManager(this);
-        mSelectedTranslationShortName = getSharedPreferences(Constants.SETTING_KEY, MODE_PRIVATE).getString(
-                Constants.CURRENT_TRANSLATION_SETTING_KEY, null);
+        mSelectedTranslationShortName = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE).getString(
+                Constants.PREF_KEY_LAST_READ_TRANSLATION, null);
 
         // initializes list view showing installed translations
         mTranslationListAdapter = new TranslationSelectionListAdapter(this);
@@ -149,8 +149,8 @@ public class TranslationSelectionActivity extends ActionBarActivity {
 
     @Override
     protected void onPause() {
-        getSharedPreferences(Constants.SETTING_KEY, MODE_PRIVATE).edit()
-                .putString(Constants.CURRENT_TRANSLATION_SETTING_KEY, mSelectedTranslationShortName)
+        getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE).edit()
+                .putString(Constants.PREF_KEY_LAST_READ_TRANSLATION, mSelectedTranslationShortName)
                 .commit();
         super.onPause();
     }

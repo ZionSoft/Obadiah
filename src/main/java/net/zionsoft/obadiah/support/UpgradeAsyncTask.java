@@ -56,10 +56,10 @@ public class UpgradeAsyncTask extends AsyncTask<Void, Integer, Void> {
         // running in the worker thread
 
         final SharedPreferences preferences
-                = mBookSelectionActivity.getSharedPreferences(Constants.SETTING_KEY,
+                = mBookSelectionActivity.getSharedPreferences(Constants.PREF_NAME,
                 Context.MODE_PRIVATE);
         final int currentApplicationVersion
-                = preferences.getInt(Constants.CURRENT_APPLICATION_VERSION_SETTING_KEY, 0);
+                = preferences.getInt(Constants.PREF_KEY_CURRENT_APPLICATION_VERSION, 0);
 
         if (currentApplicationVersion < 10500) {
             convertTranslations();
@@ -71,7 +71,7 @@ public class UpgradeAsyncTask extends AsyncTask<Void, Integer, Void> {
 
         // sets the application version
         final SharedPreferences.Editor editor = preferences.edit();
-        editor.putInt(Constants.CURRENT_APPLICATION_VERSION_SETTING_KEY,
+        editor.putInt(Constants.PREF_KEY_CURRENT_APPLICATION_VERSION,
                 Constants.CURRENT_APPLICATION_VERSION);
         editor.commit();
 
@@ -237,7 +237,7 @@ public class UpgradeAsyncTask extends AsyncTask<Void, Integer, Void> {
         // old settings format is used prior to 1.5.0
 
         final SharedPreferences preferences
-                = mBookSelectionActivity.getSharedPreferences(Constants.SETTING_KEY,
+                = mBookSelectionActivity.getSharedPreferences(Constants.PREF_NAME,
                 Context.MODE_PRIVATE);
         final SharedPreferences.Editor editor = preferences.edit();
         String selectedTranslation;
@@ -292,7 +292,7 @@ public class UpgradeAsyncTask extends AsyncTask<Void, Integer, Void> {
         if (translations != null) {
             for (TranslationInfo translation : translations) {
                 if (translation.shortName.equals(selectedTranslation))
-                    editor.putString(Constants.CURRENT_TRANSLATION_SETTING_KEY, selectedTranslation);
+                    editor.putString(Constants.PREF_KEY_LAST_READ_TRANSLATION, selectedTranslation);
             }
         }
         editor.remove("selectedTranslation");

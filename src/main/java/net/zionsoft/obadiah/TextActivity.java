@@ -87,12 +87,12 @@ public class TextActivity extends ActionBarActivity {
         mBackgroundColor = mSettingsManager.backgroundColor();
         mTextColor = mSettingsManager.textColor();
 
-        final SharedPreferences preferences = getSharedPreferences(Constants.SETTING_KEY, MODE_PRIVATE);
-        mCurrentBook = preferences.getInt(Constants.CURRENT_BOOK_SETTING_KEY, 0);
-        mCurrentChapter = preferences.getInt(Constants.CURRENT_CHAPTER_SETTING_KEY, 0);
-        mTranslationReader.selectTranslation(preferences.getString(Constants.CURRENT_TRANSLATION_SETTING_KEY, null));
+        final SharedPreferences preferences = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE);
+        mCurrentBook = preferences.getInt(Constants.PREF_KEY_LAST_READ_BOOK, 0);
+        mCurrentChapter = preferences.getInt(Constants.PREF_KEY_LAST_READ_CHAPTER, 0);
+        mTranslationReader.selectTranslation(preferences.getString(Constants.PREF_KEY_LAST_READ_TRANSLATION, null));
 
-        mVersePagerAdapter.setSelection(preferences.getInt(Constants.CURRENT_VERSE_SETTING_KEY, 0));
+        mVersePagerAdapter.setSelection(preferences.getInt(Constants.PREF_KEY_LAST_READ_VERSE, 0));
         mVersePagerAdapter.updateText();
         mVerseViewPager.setCurrentItem(mCurrentChapter);
 
@@ -106,9 +106,9 @@ public class TextActivity extends ActionBarActivity {
         if (mActionMode != null)
             mActionMode.finish();
 
-        final SharedPreferences.Editor editor = getSharedPreferences(Constants.SETTING_KEY, MODE_PRIVATE).edit();
-        editor.putInt(Constants.CURRENT_CHAPTER_SETTING_KEY, mCurrentChapter);
-        editor.putInt(Constants.CURRENT_VERSE_SETTING_KEY, mVersePagerAdapter.currentVerse());
+        final SharedPreferences.Editor editor = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE).edit();
+        editor.putInt(Constants.PREF_KEY_LAST_READ_CHAPTER, mCurrentChapter);
+        editor.putInt(Constants.PREF_KEY_LAST_READ_VERSE, mVersePagerAdapter.currentVerse());
         editor.commit();
     }
 

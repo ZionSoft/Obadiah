@@ -81,11 +81,11 @@ public class SearchActivity extends ActionBarActivity {
                     return;
 
                 final SearchResult result = SearchActivity.this.mResults[position];
-                final SharedPreferences.Editor editor = getSharedPreferences(Constants.SETTING_KEY, MODE_PRIVATE)
+                final SharedPreferences.Editor editor = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE)
                         .edit();
-                editor.putInt(Constants.CURRENT_BOOK_SETTING_KEY, result.bookIndex);
-                editor.putInt(Constants.CURRENT_CHAPTER_SETTING_KEY, result.chapterIndex);
-                editor.putInt(Constants.CURRENT_VERSE_SETTING_KEY, result.verseIndex);
+                editor.putInt(Constants.PREF_KEY_LAST_READ_BOOK, result.bookIndex);
+                editor.putInt(Constants.PREF_KEY_LAST_READ_CHAPTER, result.chapterIndex);
+                editor.putInt(Constants.PREF_KEY_LAST_READ_VERSE, result.verseIndex);
                 editor.commit();
 
                 SearchActivity.this.startActivity(new Intent(SearchActivity.this, TextActivity.class)
@@ -107,8 +107,8 @@ public class SearchActivity extends ActionBarActivity {
 
         mSearchResultListAdapter.notifyDataSetChanged();
 
-        final String selectedTranslationShortName = getSharedPreferences(Constants.SETTING_KEY, MODE_PRIVATE)
-                .getString(Constants.CURRENT_TRANSLATION_SETTING_KEY, null);
+        final String selectedTranslationShortName = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE)
+                .getString(Constants.PREF_KEY_LAST_READ_TRANSLATION, null);
         if (selectedTranslationShortName == null
                 || !selectedTranslationShortName.equals(mSelectedTranslationShortName)) {
             mTranslationReader.selectTranslation(selectedTranslationShortName);

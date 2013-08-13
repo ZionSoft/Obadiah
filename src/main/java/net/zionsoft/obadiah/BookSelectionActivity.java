@@ -46,8 +46,8 @@ public class BookSelectionActivity extends ActionBarActivity {
 
         // convert to new format from old format if needed
         final int currentApplicationVersion
-                = getSharedPreferences(Constants.SETTING_KEY, MODE_PRIVATE)
-                .getInt(Constants.CURRENT_APPLICATION_VERSION_SETTING_KEY, 0);
+                = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE)
+                .getInt(Constants.PREF_KEY_CURRENT_APPLICATION_VERSION, 0);
         if (currentApplicationVersion < Constants.CURRENT_APPLICATION_VERSION) {
             mUpgrading = true;
             new UpgradeAsyncTask(this).execute();
@@ -82,10 +82,10 @@ public class BookSelectionActivity extends ActionBarActivity {
         mChaptersGridView.setOnItemClickListener(new OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if (mLastReadBook != mSelectedBook || mLastReadChapter != position) {
-                    getSharedPreferences(Constants.SETTING_KEY, MODE_PRIVATE).edit()
-                            .putInt(Constants.CURRENT_BOOK_SETTING_KEY, mSelectedBook)
-                            .putInt(Constants.CURRENT_CHAPTER_SETTING_KEY, position)
-                            .putInt(Constants.CURRENT_VERSE_SETTING_KEY, 0)
+                    getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE).edit()
+                            .putInt(Constants.PREF_KEY_LAST_READ_BOOK, mSelectedBook)
+                            .putInt(Constants.PREF_KEY_LAST_READ_CHAPTER, position)
+                            .putInt(Constants.PREF_KEY_LAST_READ_VERSE, 0)
                             .commit();
                 }
 
@@ -140,8 +140,8 @@ public class BookSelectionActivity extends ActionBarActivity {
     }
 
     private void populateUi() {
-        boolean hasInstalledTranslation = getSharedPreferences(Constants.SETTING_KEY, MODE_PRIVATE)
-                .getString(Constants.CURRENT_TRANSLATION_SETTING_KEY, null) != null;
+        boolean hasInstalledTranslation = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE)
+                .getString(Constants.PREF_KEY_LAST_READ_TRANSLATION, null) != null;
         if (hasInstalledTranslation) {
             loadLastReadTranslation();
         } else {
@@ -175,12 +175,12 @@ public class BookSelectionActivity extends ActionBarActivity {
             protected String[] doInBackground(Void... params) {
                 // loads last read translation, book, and chapter
                 final SharedPreferences preferences
-                        = getSharedPreferences(Constants.SETTING_KEY, MODE_PRIVATE);
+                        = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE);
                 mTranslationReader.selectTranslation(preferences
-                        .getString(Constants.CURRENT_TRANSLATION_SETTING_KEY, null));
-                mLastReadBook = preferences.getInt(Constants.CURRENT_BOOK_SETTING_KEY, -1);
+                        .getString(Constants.PREF_KEY_LAST_READ_TRANSLATION, null));
+                mLastReadBook = preferences.getInt(Constants.PREF_KEY_LAST_READ_BOOK, -1);
                 mLastReadChapter
-                        = preferences.getInt(Constants.CURRENT_CHAPTER_SETTING_KEY, -1);
+                        = preferences.getInt(Constants.PREF_KEY_LAST_READ_CHAPTER, -1);
 
                 mSelectedBook = mLastReadBook < 0 ? 0 : mLastReadBook;
 

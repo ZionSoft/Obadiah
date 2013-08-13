@@ -129,8 +129,8 @@ public class TranslationDownloadActivity extends ActionBarActivity {
             // running in the worker thread
 
             try {
-                final long lastUpdated = TranslationDownloadActivity.this.getSharedPreferences(Constants.SETTING_KEY,
-                        MODE_PRIVATE).getLong(Constants.LAST_UPDATED_SETTING_KEY, 0);
+                final long lastUpdated = TranslationDownloadActivity.this.getSharedPreferences(Constants.PREF_NAME,
+                        MODE_PRIVATE).getLong(Constants.PREF_KEY_LAST_UPDATED, 0);
                 final long now = System.currentTimeMillis();
                 if (params[0] || lastUpdated <= 0 || lastUpdated >= now || ((now - lastUpdated) >= 86400000)) {
                     // force update
@@ -188,11 +188,11 @@ public class TranslationDownloadActivity extends ActionBarActivity {
                 TranslationDownloadActivity.this.mAvailableTranslations = null;
             } finally {
                 final SharedPreferences.Editor editor = TranslationDownloadActivity.this.getSharedPreferences(
-                        Constants.SETTING_KEY, MODE_PRIVATE).edit();
+                        Constants.PREF_NAME, MODE_PRIVATE).edit();
                 if (mHasError || TranslationDownloadActivity.this.mAvailableTranslations == null)
-                    editor.putLong(Constants.LAST_UPDATED_SETTING_KEY, 0);
+                    editor.putLong(Constants.PREF_KEY_LAST_UPDATED, 0);
                 else
-                    editor.putLong(Constants.LAST_UPDATED_SETTING_KEY, System.currentTimeMillis());
+                    editor.putLong(Constants.PREF_KEY_LAST_UPDATED, System.currentTimeMillis());
                 editor.commit();
             }
             return null;
