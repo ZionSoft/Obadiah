@@ -22,7 +22,6 @@
                 android:id="@+id/chapter_gridview"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_toRightOf="@id/book_listview"
                 android:columnWidth="@dimen/chaptergridview_column_width"
                 android:gravity="center"
                 android:listSelector="@null"

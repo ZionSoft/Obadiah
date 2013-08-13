@@ -54,10 +54,13 @@ public class TranslationSelectionActivity extends ActionBarActivity {
         mSelectedTranslationShortName = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE)
                 .getString(Constants.PREF_KEY_LAST_READ_TRANSLATION, null);
 
+        // initializes views
+        mLoadingSpinner = findViewById(R.id.translation_selection_loading_spinner);
+
         // initializes list view showing installed translations
         mTranslationListAdapter = new TranslationSelectionListAdapter(this, mSettingsManager);
         mTranslationListAdapter.setSelectedTranslation(mSelectedTranslationShortName);
-        mTranslationListView = (ListView) findViewById(R.id.translation_listview);
+        mTranslationListView = (ListView) findViewById(R.id.translation_list_view);
         mTranslationListView.setAdapter(mTranslationListAdapter);
         mTranslationListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -169,37 +172,55 @@ public class TranslationSelectionActivity extends ActionBarActivity {
     }
 
     private void populateUi() {
-        final TranslationInfo[] translations = mTranslationManager.translations();
-        int installedTranslationCount = translations == null ? 0 : translations.length;
-        if (installedTranslationCount > 0) {
-            for (TranslationInfo translationInfo : translations) {
-                if (!translationInfo.installed)
-                    --installedTranslationCount;
+        new AsyncTask<Void, Void, List<TranslationInfo>>() {
+            @Override
+            protected void onPreExecute() {
+                mLoadingSpinner.setVisibility(View.VISIBLE);
+                mTranslationListView.setVisibility(View.GONE);
             }
-        }
 
-        if (installedTranslationCount == 0) {
-            // only directly opens TranslationDownloadActivity once
-            if (mFirstTime) {
-                startTranslationDownloadActivity();
-                mFirstTime = false;
+            @Override
+            protected List<TranslationInfo> doInBackground(Void... params) {
+                final TranslationInfo[] translations = mTranslationManager.translations();
+                int installedTranslationCount = translations == null ? 0 : translations.length;
+                if (installedTranslationCount > 0) {
+                    for (TranslationInfo translationInfo : translations) {
+                        if (!translationInfo.installed)
+                            --installedTranslationCount;
+                    }
+                }
+                if (installedTranslationCount == 0)
+                    return null;
+
+                final List<TranslationInfo> installedTranslations
+                        = new ArrayList<TranslationInfo>(installedTranslationCount);
+                for (TranslationInfo translationInfo : translations) {
+                    if (translationInfo.installed)
+                        installedTranslations.add(translationInfo);
+                }
+                return installedTranslations;
             }
-            mTranslationListAdapter.setTranslations(null);
-            return;
-        }
 
-        final List<TranslationInfo> installedTranslations
-                = new ArrayList<TranslationInfo>(installedTranslationCount);
-        for (TranslationInfo translationInfo : translations) {
-            if (translationInfo.installed)
-                installedTranslations.add(translationInfo);
-        }
+            @Override
+            protected void onPostExecute(List<TranslationInfo> translations) {
+                if (translations == null) {
+                    if (mFirstTime) {
+                        startTranslationDownloadActivity();
+                        mFirstTime = false;
+                    }
+                    return;
+                }
 
-        // 1st time resumed from TranslationDownloadActivity with installed translation
-        if (mSelectedTranslationShortName == null)
-            mSelectedTranslationShortName = installedTranslations.get(0).shortName;
+                Animator.fadeOut(mLoadingSpinner);
+                Animator.fadeIn(mTranslationListView);
 
-        mTranslationListAdapter.setTranslations(installedTranslations);
+                // 1st time resumed from TranslationDownloadActivity with installed translation
+                if (mSelectedTranslationShortName == null)
+                    mSelectedTranslationShortName = translations.get(0).shortName;
+
+                mTranslationListAdapter.setTranslations(translations);
+            }
+        }.execute();
     }
 
     private void startTranslationDownloadActivity() {
@@ -219,7 +240,10 @@ public class TranslationSelectionActivity extends ActionBarActivity {
     }
 
     private boolean mFirstTime = true;
+
     private ListView mTranslationListView;
+    private View mLoadingSpinner;
+
     private SettingsManager mSettingsManager;
     private String mSelectedTranslationShortName;
     private TranslationManager mTranslationManager;
