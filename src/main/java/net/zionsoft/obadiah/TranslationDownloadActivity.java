@@ -172,12 +172,30 @@ public class TranslationDownloadActivity extends ActionBarActivity {
             Animator.fadeOut(mLoadingSpinner);
             Animator.fadeIn(mTranslationListView);
 
-            if (translations == null || translations.size() == 0) {
-                Toast.makeText(TranslationDownloadActivity.this, translations == null
-                        ? R.string.text_fail_to_fetch_translations_list
-                        : R.string.text_no_available_translation, Toast.LENGTH_SHORT).show();
+            if (translations == null) {
+                // error occurs
+                DialogHelper.showDialog(TranslationDownloadActivity.this,
+                        R.string.dialog_translation_list_fetch_failure_message,
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                loadTranslationList(true);
+                            }
+                        },
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                finish();
+                            }
+                        }
+                );
+            } else if (translations.size() == 0) {
+                // no translations available
+                Toast.makeText(TranslationDownloadActivity.this,
+                        R.string.text_no_available_translation, Toast.LENGTH_SHORT).show();
                 finish();
             } else {
+                // all is well
                 mAvailableTranslations = translations;
                 mTranslationListAdapter.setTranslations(mAvailableTranslations);
             }

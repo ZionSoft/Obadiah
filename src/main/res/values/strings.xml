@@ -16,6 +16,9 @@
     <string name="dialog_no_translation_message">No translation installed, please download from the
         Internet.
     </string>
+    <string name="dialog_translation_list_fetch_failure_message">Failed to fetch the translation
+        list, try again?
+    </string>
 
     <string name="text_available_translation_info">%1$s\nSize: %2$d KB</string>
     <string name="text_search_result">%1$d result(s) found.</string>
@@ -28,9 +31,6 @@
     <string name="text_delete_confirm">Are you sure to delete this translation?</string>
     <string name="text_deleted">Deleted.</string>
     <string name="text_deleting">Deleting, please wait.</string>
-    <string name="text_fail_to_fetch_translations_list">Can not fetch the translations list, please
-        try again!
-    </string>
     <string name="text_fail_to_fetch_translation">Can not fetch the translation, please try again!
     </string>
     <string name="text_no_available_translation">No available translations available for download.
