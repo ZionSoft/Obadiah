@@ -18,13 +18,17 @@
 package net.zionsoft.obadiah;
 
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -35,7 +39,8 @@ import android.widget.GridView;
 import android.widget.ListView;
 
 import net.zionsoft.obadiah.bible.TranslationReader;
-import net.zionsoft.obadiah.support.UpgradeAsyncTask;
+import net.zionsoft.obadiah.support.UpgradeService;
+import net.zionsoft.obadiah.util.NetworkHelper;
 import net.zionsoft.obadiah.util.SettingsManager;
 
 public class BookSelectionActivity extends ActionBarActivity {
@@ -44,14 +49,8 @@ public class BookSelectionActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.bookselection_activity);
 
-        // convert to new format from old format if needed
-        final int currentApplicationVersion
-                = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE)
-                .getInt(Constants.PREF_KEY_CURRENT_APPLICATION_VERSION, 0);
-        if (currentApplicationVersion < Constants.CURRENT_APPLICATION_VERSION) {
-            mUpgrading = true;
-            new UpgradeAsyncTask(this).execute();
-        }
+        if (needsUpgrade())
+            upgrade();
 
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 
@@ -105,10 +104,17 @@ public class BookSelectionActivity extends ActionBarActivity {
         mChaptersGridView.setBackgroundColor(backgroundColor);
         mChaptersGridView.setCacheColorHint(backgroundColor);
 
-        if (mUpgrading)
+        if (isUpgrading())
             return;
 
         populateUi();
+    }
+
+    @Override
+    protected void onDestroy() {
+        unregisterUpgradeStatusListener();
+
+        super.onDestroy();
     }
 
     @Override
@@ -134,9 +140,90 @@ public class BookSelectionActivity extends ActionBarActivity {
         }
     }
 
-    public void onUpgradeFinished() {
-        populateUi();
-        mUpgrading = false;
+
+    // upgrades from an older version
+
+    private boolean needsUpgrade() {
+        return getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE)
+                .getInt(Constants.PREF_KEY_CURRENT_APPLICATION_VERSION, 0)
+                < Constants.CURRENT_APPLICATION_VERSION;
+    }
+
+    private boolean isUpgrading() {
+        return getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE)
+                .getBoolean(Constants.PREF_KEY_UPGRADING, false);
+    }
+
+    private void upgrade() {
+        if (NetworkHelper.hasNetworkConnection(this)) {
+            registerUpgradeStatusListener();
+
+            if (!isUpgrading()) {
+                getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE).edit()
+                        .putBoolean(Constants.PREF_KEY_UPGRADING, true).commit();
+                startService(new Intent(this, UpgradeService.class));
+            }
+        } else {
+            showErrorDialog(R.string.dialog_no_network_message,
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            upgrade();
+                        }
+                    });
+        }
+    }
+
+    private void registerUpgradeStatusListener() {
+        if (mUpgradeStatusListener != null)
+            return;
+
+        mUpgradeStatusListener = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                unregisterUpgradeStatusListener();
+
+                if (intent.getBooleanExtra(UpgradeService.KEY_RESULT_UPGRADE_SUCCESS, true)) {
+                    populateUi();
+                } else {
+                    showErrorDialog(R.string.dialog_initialization_failure_message,
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    upgrade();
+                                }
+                            });
+                }
+            }
+        };
+        LocalBroadcastManager.getInstance(this).registerReceiver(mUpgradeStatusListener,
+                new IntentFilter(UpgradeService.ACTION_STATUS_UPDATE));
+    }
+
+    private void unregisterUpgradeStatusListener() {
+        if (mUpgradeStatusListener == null)
+            return;
+
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mUpgradeStatusListener);
+        mUpgradeStatusListener = null;
+    }
+
+
+    // UI related
+
+    private void showErrorDialog(int message, DialogInterface.OnClickListener onPositive) {
+        new AlertDialog.Builder(this)
+                .setCancelable(false)
+                .setNegativeButton(android.R.string.no,
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                finish();
+                            }
+                        })
+                .setPositiveButton(android.R.string.yes, onPositive)
+                .setMessage(message)
+                .create().show();
     }
 
     private void populateUi() {
@@ -144,24 +231,13 @@ public class BookSelectionActivity extends ActionBarActivity {
                 .getString(Constants.PREF_KEY_LAST_READ_TRANSLATION, null);
         if (lastReadTranslation == null) {
             // no translation installed
-            new AlertDialog.Builder(this).setMessage(R.string.text_no_translation)
-                    .setCancelable(false)
-                    .setPositiveButton(android.R.string.ok,
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
-                                    dialog.dismiss();
-                                    startActivity(new Intent(BookSelectionActivity.this,
-                                            TranslationSelectionActivity.class));
-                                }
-                            })
-                    .setNegativeButton(android.R.string.cancel,
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
-                                    dialog.cancel();
-                                    BookSelectionActivity.this.finish();
-                                }
-                            })
-                    .create().show();
+            showErrorDialog(R.string.dialog_no_translation_message,
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            startActivity(new Intent(BookSelectionActivity.this,
+                                    TranslationSelectionActivity.class));
+                        }
+                    });
             return;
         }
 
@@ -221,7 +297,7 @@ public class BookSelectionActivity extends ActionBarActivity {
         mChaptersGridView.setSelection(0);
     }
 
-    private boolean mUpgrading = false;
+    private BroadcastReceiver mUpgradeStatusListener;
 
     private String mLastReadTranslation;
     private int mLastReadBook;
