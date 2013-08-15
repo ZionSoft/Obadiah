@@ -22,32 +22,45 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class TranslationManager {
     public TranslationManager(Context context) {
         super();
         mTranslationsDatabaseHelper = new TranslationsDatabaseHelper(context);
     }
 
-    public void addTranslations(TranslationInfo[] translations) {
-        if (translations == null || translations.length == 0)
-            throw new IllegalArgumentException();
+    public void addTranslations(List<TranslationInfo> translations) {
+        if (translations == null || translations.size() == 0)
+            return;
 
         final TranslationInfo[] existingTranslations = translations();
+        List<TranslationInfo> newTranslations;
+        if (existingTranslations.length == 0) {
+            newTranslations = translations;
+        } else {
+            newTranslations = new ArrayList<TranslationInfo>(translations.size());
+            for (TranslationInfo translation : translations) {
+                boolean newTranslation = true;
+                for (TranslationInfo existing : existingTranslations) {
+                    if (translation.shortName.equals(existing.shortName)) {
+                        newTranslation = false;
+                        break;
+                    }
+                }
+                if (newTranslation)
+                    newTranslations.add(translation);
+            }
+        }
+        if (newTranslations.size() == 0)
+            return;
+
         final ContentValues values = new ContentValues(5);
         final SQLiteDatabase db = mTranslationsDatabaseHelper.getWritableDatabase();
         db.beginTransaction();
         try {
-            for (TranslationInfo translationInfo : translations) {
-                if (existingTranslations != null) {
-                    int i = 0;
-                    for (; i < existingTranslations.length; ++i) {
-                        if (translationInfo.shortName.equals(existingTranslations[i].shortName))
-                            break;
-                    }
-                    if (i < existingTranslations.length)
-                        continue;
-                }
-
+            for (TranslationInfo translationInfo : newTranslations) {
                 values.put(TranslationsDatabaseHelper.COLUMN_INSTALLED, 0);
                 values.put(TranslationsDatabaseHelper.COLUMN_TRANSLATION_NAME,
                         translationInfo.name);

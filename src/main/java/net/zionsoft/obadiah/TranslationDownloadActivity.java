@@ -36,6 +36,7 @@ import android.widget.Toast;
 import net.zionsoft.obadiah.bible.TranslationInfo;
 import net.zionsoft.obadiah.bible.TranslationManager;
 import net.zionsoft.obadiah.bible.TranslationsDatabaseHelper;
+import net.zionsoft.obadiah.util.NetworkHelper;
 import net.zionsoft.obadiah.util.SettingsManager;
 
 import org.json.JSONArray;
@@ -131,28 +132,7 @@ public class TranslationDownloadActivity extends ActionBarActivity {
                     // force update
                     // or no valid local cache, i.e. not fetched before, or last fetched more than 1 day ago
 
-                    // downloads from Internet
-                    final URL url = new URL(String.format("%slist.json", BASE_URL));
-                    final BufferedInputStream bis = new BufferedInputStream(url.openConnection().getInputStream());
-                    final byte[] buffer = new byte[bis.available()];
-                    bis.read(buffer);
-                    bis.close();
-
-                    // parses the result, and updates the database
-                    final JSONArray replyArray = new JSONArray(new String(buffer, "UTF8"));
-                    final int length = replyArray.length();
-                    final TranslationInfo[] allTranslations = new TranslationInfo[length];
-                    for (int i = 0; i < length; ++i) {
-                        final JSONObject translationObject = replyArray.getJSONObject(i);
-                        final TranslationInfo translationInfo = new TranslationInfo();
-                        translationInfo.installed = false;
-                        translationInfo.name = translationObject.getString("name");
-                        translationInfo.shortName = translationObject.getString("shortName");
-                        translationInfo.language = translationObject.getString("language");
-                        translationInfo.size = translationObject.getInt("size");
-                        allTranslations[i] = translationInfo;
-                    }
-                    TranslationDownloadActivity.this.mTranslationManager.addTranslations(allTranslations);
+                    mTranslationManager.addTranslations(NetworkHelper.fetchTranslationList());
                 }
 
                 // sets the available translations
