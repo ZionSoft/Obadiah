@@ -26,6 +26,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import net.zionsoft.obadiah.bible.TranslationInfo;
 import net.zionsoft.obadiah.util.SettingsManager;
 
 import java.util.ArrayList;
@@ -73,18 +74,17 @@ public class TranslationDownloadListAdapter extends BaseAdapter {
         return textView;
     }
 
-    public void setTexts(String[] texts, int[] sizes) {
-        m_texts = new ArrayList<SpannableStringBuilder>(texts.length);
-        for (int i = 0; i < texts.length; ++i) {
+    public void setTranslations(List<TranslationInfo> translations) {
+        m_texts = new ArrayList<SpannableStringBuilder>(translations.size());
+        for (TranslationInfo translation : translations) {
             String string
                     = mContext.getResources().getString(R.string.text_available_translation_info,
-                    texts[i], sizes[i]);
+                    translation.name, translation.size);
             SpannableStringBuilder text = new SpannableStringBuilder(string);
-            text.setSpan(mMediumSizeSpan, 0, texts[i].length(), 0);
-            text.setSpan(mSmallSizeSpan, texts[i].length(), text.length(), 0);
+            text.setSpan(mMediumSizeSpan, 0, translation.name.length(), 0);
+            text.setSpan(mSmallSizeSpan, translation.name.length(), text.length(), 0);
             m_texts.add(text);
         }
-
         notifyDataSetChanged();
     }
 

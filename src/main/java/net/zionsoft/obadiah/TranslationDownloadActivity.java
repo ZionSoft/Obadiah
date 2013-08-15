@@ -170,14 +170,7 @@ public class TranslationDownloadActivity extends ActionBarActivity {
                 TranslationDownloadActivity.this.finish();
             } else {
                 // everything fine with available translations
-                final int length = TranslationDownloadActivity.this.mAvailableTranslations.size();
-                final String[] texts = new String[length];
-                final int[] sizes = new int[length];
-                for (int i = 0; i < length; ++i) {
-                    texts[i] = TranslationDownloadActivity.this.mAvailableTranslations.get(i).name;
-                    sizes[i] = TranslationDownloadActivity.this.mAvailableTranslations.get(i).size;
-                }
-                TranslationDownloadActivity.this.mTranslationListAdapter.setTexts(texts, sizes);
+                mTranslationListAdapter.setTranslations(mAvailableTranslations);
             }
         }
 
