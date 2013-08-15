@@ -30,10 +30,11 @@ import org.json.JSONObject;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.net.ssl.HttpsURLConnection;
 
 public class NetworkHelper {
     public static boolean hasNetworkConnection(Context context) {
@@ -44,29 +45,27 @@ public class NetworkHelper {
     }
 
     public static List<TranslationInfo> fetchTranslationList() throws IOException, JSONException {
-        final byte[] response = get(String.format("%s/list.json", BASE_URL));
+        final byte[] response = get(String.format("%s/translations", BASE_URL));
         final JSONArray replyArray = new JSONArray(new String(response, "UTF8"));
         final int length = replyArray.length();
         final List<TranslationInfo> translations = new ArrayList<TranslationInfo>(length);
         for (int i = 0; i < length; ++i) {
             final JSONObject translationObject = replyArray.getJSONObject(i);
-            final TranslationInfo translationInfo = new TranslationInfo();
-            translationInfo.installed = false;
-            translationInfo.name = translationObject.getString("name");
-            translationInfo.shortName = translationObject.getString("shortName");
-            translationInfo.language = translationObject.getString("language");
-            translationInfo.size = translationObject.getInt("size");
-            translations.add(translationInfo);
+            translations.add(new TranslationInfo(translationObject.getLong("uniqueId"),
+                    translationObject.getString("name"), translationObject.getString("shortName"),
+                    translationObject.getString("language"), translationObject.getString("blobKey"),
+                    translationObject.getInt("size"), translationObject.getLong("timestamp"),
+                    false));
         }
         return translations;
     }
 
     private static byte[] get(String url) throws IOException {
         byte[] result = null;
-        HttpURLConnection httpConnection = null;
+        HttpsURLConnection httpsConnection = null;
         try {
-            httpConnection = (HttpURLConnection) new URL(url).openConnection();
-            InputStream is = new BufferedInputStream(httpConnection.getInputStream());
+            httpsConnection = (HttpsURLConnection) new URL(url).openConnection();
+            InputStream is = new BufferedInputStream(httpsConnection.getInputStream());
             result = new byte[0];
             byte[] buffer = new byte[2048];
             int read;
@@ -77,11 +76,11 @@ public class NetworkHelper {
                 result = tmp;
             }
         } finally {
-            if (httpConnection != null)
-                httpConnection.disconnect();
+            if (httpsConnection != null)
+                httpsConnection.disconnect();
         }
         return result;
     }
 
-    private static final String BASE_URL = "http://bible.zionsoft.net/translations";
+    private static final String BASE_URL = "https://zionsoft-bible.appspot.com/1.0";
 }

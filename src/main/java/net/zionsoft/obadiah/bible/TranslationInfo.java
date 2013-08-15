@@ -18,9 +18,25 @@
 package net.zionsoft.obadiah.bible;
 
 public class TranslationInfo {
+    public final long uniqueId;
+    public final String name;
+    public final String shortName;
+    public final String language;
+    public final String blobKey;
+    public final int size;
+    public final long timestamp;
     public boolean installed;
-    public int size;
-    public String language;
-    public String name;
-    public String shortName;
+
+    public TranslationInfo(long uniqueId, String name, String shortName, String language,
+                           String blobKey, int size, long timestamp, boolean installed) {
+        super();
+        this.uniqueId = uniqueId;
+        this.name = name;
+        this.shortName = shortName;
+        this.language = language;
+        this.blobKey = blobKey;
+        this.size = size;
+        this.timestamp = timestamp;
+        this.installed = installed;
+    }
 }

@@ -51,19 +51,36 @@ public class TranslationReader {
         if (translationShortName == null)
             throw new IllegalArgumentException();
 
-        final SQLiteDatabase db = mTranslationsDatabaseHelper.getReadableDatabase();
-        final Cursor cursor = db.query(TranslationsDatabaseHelper.TABLE_TRANSLATIONS,
-                new String[]{TranslationsDatabaseHelper.COLUMN_TRANSLATION_SHORTNAME},
-                String.format("%s = ? AND %s = ?",
-                        TranslationsDatabaseHelper.COLUMN_TRANSLATION_SHORTNAME,
-                        TranslationsDatabaseHelper.COLUMN_INSTALLED),
-                new String[]{translationShortName, "1"}, null, null, null);
-        if (cursor == null || cursor.getCount() != 1) {
-            db.close();
-            throw new IllegalArgumentException();
+        // checks if this translation is installed
+        SQLiteDatabase db = null;
+        try {
+            db = mTranslationsDatabaseHelper.getReadableDatabase();
+            Cursor cursor = db.query(TranslationsDatabaseHelper.TABLE_TRANSLATION_LIST,
+                    new String[]{TranslationsDatabaseHelper.COLUMN_TRANSLATION_ID},
+                    String.format("%s = ? AND %s = ?",
+                            TranslationsDatabaseHelper.COLUMN_KEY,
+                            TranslationsDatabaseHelper.COLUMN_VALUE),
+                    new String[]{TranslationsDatabaseHelper.KEY_SHORT_NAME, translationShortName},
+                    null, null, null);
+            if (cursor == null || cursor.getCount() != 1)
+                throw new IllegalArgumentException();
+            cursor.moveToFirst();
+            final long uniqueId = cursor.getLong(
+                    cursor.getColumnIndex(TranslationsDatabaseHelper.COLUMN_TRANSLATION_ID));
+            cursor = db.query(TranslationsDatabaseHelper.TABLE_TRANSLATION_LIST,
+                    new String[]{TranslationsDatabaseHelper.COLUMN_VALUE},
+                    String.format("%s = ? AND %s = ?",
+                            TranslationsDatabaseHelper.COLUMN_TRANSLATION_ID,
+                            TranslationsDatabaseHelper.COLUMN_KEY),
+                    new String[]{Long.toString(uniqueId), TranslationsDatabaseHelper.KEY_INSTALLED},
+                    null, null, null);
+            if (cursor == null || cursor.getCount() != 1)
+                throw new IllegalArgumentException();
+        } finally {
+            if (db != null)
+                db.close();
         }
 
-        db.close();
         mSelectedTranslationChanged = true;
         mSelectedTranslationShortName = translationShortName;
     }

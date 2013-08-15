@@ -30,17 +30,8 @@ public class TranslationsDatabaseHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.beginTransaction();
         try {
-            // creates the translations table
-            db.execSQL(String.format("CREATE TABLE %s (%s TEXT NOT NULL, %s TEXT UNIQUE NOT NULL, %s TEXT NOT NULL, %s INTEGER NOT NULL, %s INTEGER NOT NULL);",
-                    TABLE_TRANSLATIONS, COLUMN_TRANSLATION_NAME, COLUMN_TRANSLATION_SHORTNAME,
-                    COLUMN_LANGUAGE, COLUMN_DOWNLOAD_SIZE, COLUMN_INSTALLED));
-
-            // creates the books name table
-            db.execSQL(String.format("CREATE TABLE %s (%s TEXT NOT NULL, %s INTEGER NOT NULL, %s TEXT NOT NULL);",
-                    TABLE_BOOK_NAMES, COLUMN_TRANSLATION_SHORTNAME,
-                    COLUMN_BOOK_INDEX, COLUMN_BOOK_NAME));
-            db.execSQL(String.format("CREATE INDEX %s ON %s (%s);",
-                    INDEX_TABLE_BOOK_NAMES, TABLE_BOOK_NAMES, COLUMN_TRANSLATION_SHORTNAME));
+            createTranslationListTable(db);
+            createBookNamesTable(db);
 
             db.setTransactionSuccessful();
         } finally {
@@ -50,23 +41,54 @@ public class TranslationsDatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // does nothing
+        db.beginTransaction();
+        try {
+            if (oldVersion < 2) {
+                // new format of the translation list table is introduced in version 2
+                createTranslationListTable(db);
+                db.execSQL("DROP TABLE IF EXISTS TABLE_TRANSLATIONS");
+            }
+
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
     }
 
+    private void createTranslationListTable(SQLiteDatabase db) {
+        db.execSQL(String.format("CREATE TABLE %s (%s INTEGER NOT NULL, %s TEXT NOT NULL, %s TEXT NOT NULL);",
+                TABLE_TRANSLATION_LIST, COLUMN_TRANSLATION_ID, COLUMN_KEY, COLUMN_VALUE));
+    }
+
+    private void createBookNamesTable(SQLiteDatabase db) {
+        db.execSQL(String.format("CREATE TABLE %s (%s TEXT NOT NULL, %s INTEGER NOT NULL, %s TEXT NOT NULL);",
+                TABLE_BOOK_NAMES, COLUMN_TRANSLATION_SHORTNAME, COLUMN_BOOK_INDEX, COLUMN_BOOK_NAME));
+        db.execSQL(String.format("CREATE INDEX %s ON %s (%s);",
+                INDEX_TABLE_BOOK_NAMES, TABLE_BOOK_NAMES, COLUMN_TRANSLATION_SHORTNAME));
+    }
+
+    public static final String TABLE_TRANSLATION_LIST = "TABLE_TRANSLATION_LIST";
     public static final String TABLE_BOOK_NAMES = "TABLE_BOOK_NAMES";
-    public static final String TABLE_TRANSLATIONS = "TABLE_TRANSLATIONS";
     public static final String INDEX_TABLE_BOOK_NAMES = "INDEX_TABLE_BOOK_NAMES";
-    public static final String COLUMN_TRANSLATION_NAME = "COLUMN_TRANSLATION_NAME";
+
+    public static final String COLUMN_TRANSLATION_ID = "COLUMN_TRANSLATION_ID";
     public static final String COLUMN_TRANSLATION_SHORTNAME = "COLUMN_TRANSLATION_SHORTNAME";
-    public static final String COLUMN_LANGUAGE = "COLUMN_LANGUAGE";
-    public static final String COLUMN_DOWNLOAD_SIZE = "COLUMN_DOWNLOAD_SIZE";
-    public static final String COLUMN_INSTALLED = "COLUMN_INSTALLED";
-    public static final String COLUMN_BOOK_NAME = "COLUMN_BOOK_NAME";
     public static final String COLUMN_BOOK_INDEX = "COLUMN_BOOK_INDEX";
     public static final String COLUMN_CHAPTER_INDEX = "COLUMN_CHAPTER_INDEX";
     public static final String COLUMN_VERSE_INDEX = "COLUMN_VERSE_INDEX";
+    public static final String COLUMN_BOOK_NAME = "COLUMN_BOOK_NAME";
     public static final String COLUMN_TEXT = "COLUMN_TEXT";
+    public static final String COLUMN_KEY = "COLUMN_KEY";
+    public static final String COLUMN_VALUE = "COLUMN_VALUE";
 
-    private static final int DATABASE_VERSION = 1;
+    public static final String KEY_NAME = "KEY_NAME";
+    public static final String KEY_SHORT_NAME = "KEY_SHORT_NAME";
+    public static final String KEY_LANGUAGE = "KEY_LANGUAGE";
+    public static final String KEY_BLOB_KEY = "KEY_BLOB_KEY";
+    public static final String KEY_SIZE = "KEY_SIZE";
+    public static final String KEY_TIMESTAMP = "KEY_TIMESTAMP";
+    public static final String KEY_INSTALLED = "KEY_INSTALLED";
+
+    private static final int DATABASE_VERSION = 2;
     private static final String DATABASE_NAME = "DB_OBADIAH";
 }

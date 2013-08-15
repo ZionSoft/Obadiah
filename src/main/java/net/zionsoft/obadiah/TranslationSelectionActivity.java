@@ -65,8 +65,8 @@ public class TranslationSelectionActivity extends ActionBarActivity {
         });
         mTranslationListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                final String selected = mTranslationListAdapter.getItem(position).shortName;
-                if (selected.equals(mSelectedTranslationShortName))
+                final TranslationInfo selected = mTranslationListAdapter.getItem(position);
+                if (selected.shortName.equals(mSelectedTranslationShortName))
                     return false;
 
                 final Resources resources = TranslationSelectionActivity.this.getResources();
@@ -172,8 +172,8 @@ public class TranslationSelectionActivity extends ActionBarActivity {
         }.execute();
     }
 
-    private void removeTranslation(String translationShortName) {
-        new AsyncTask<String, Void, Void>() {
+    private void removeTranslation(TranslationInfo translation) {
+        new AsyncTask<TranslationInfo, Void, Void>() {
             protected void onPreExecute() {
                 // running in the main thread
 
@@ -183,7 +183,7 @@ public class TranslationSelectionActivity extends ActionBarActivity {
                 mProgressDialog.show();
             }
 
-            protected Void doInBackground(String... params) {
+            protected Void doInBackground(TranslationInfo... params) {
                 // running in the worker thread
 
                 mTranslationManager.removeTranslation(params[0]);
@@ -200,7 +200,7 @@ public class TranslationSelectionActivity extends ActionBarActivity {
             }
 
             private ProgressDialog mProgressDialog;
-        }.execute(translationShortName);
+        }.execute(translation);
     }
 
     private boolean mFirstTime = true;

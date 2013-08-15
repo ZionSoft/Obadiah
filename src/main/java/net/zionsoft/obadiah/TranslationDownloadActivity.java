@@ -34,6 +34,7 @@ import android.widget.Toast;
 
 import net.zionsoft.obadiah.bible.TranslationInfo;
 import net.zionsoft.obadiah.bible.TranslationManager;
+import net.zionsoft.obadiah.bible.TranslationReader;
 import net.zionsoft.obadiah.bible.TranslationsDatabaseHelper;
 import net.zionsoft.obadiah.util.NetworkHelper;
 import net.zionsoft.obadiah.util.SettingsManager;
@@ -252,9 +253,9 @@ public class TranslationDownloadActivity extends ActionBarActivity {
                         TranslationsDatabaseHelper.COLUMN_VERSE_INDEX));
 
                 // gets the data and writes to table
-                final URL url = new URL(String.format("%s%s.zip",
+                final URL url = new URL(String.format("%s/downloadTranslation?blobKey=%s",
                         TranslationDownloadActivity.BASE_URL,
-                        URLEncoder.encode(translationToDownload.shortName, "UTF-8")));
+                        URLEncoder.encode(translationToDownload.blobKey, "UTF-8")));
                 final HttpURLConnection httpConnection = (HttpURLConnection) url.openConnection();
                 final ZipInputStream zis = new ZipInputStream(new BufferedInputStream(httpConnection.getInputStream()));
 
@@ -285,7 +286,7 @@ public class TranslationDownloadActivity extends ActionBarActivity {
 
                         final JSONObject booksInfoObject = new JSONObject(new String(bytes, "UTF8"));
                         final JSONArray booksArray = booksInfoObject.getJSONArray("books");
-                        for (int i = 0; i < 66; ++i) { // TODO gets rid of magic number
+                        for (int i = 0; i < TranslationReader.bookCount(); ++i) {
                             bookNamesValues.put(TranslationsDatabaseHelper.COLUMN_BOOK_INDEX, i);
                             bookNamesValues.put(TranslationsDatabaseHelper.COLUMN_BOOK_NAME, booksArray.getString(i));
                             db.insert(TranslationsDatabaseHelper.TABLE_BOOK_NAMES, null, bookNamesValues);
@@ -314,13 +315,15 @@ public class TranslationDownloadActivity extends ActionBarActivity {
                 }
                 zis.close();
 
-                // sets as installed
-                final ContentValues translationInfoValues = new ContentValues(1);
-                translationInfoValues.put(TranslationsDatabaseHelper.COLUMN_INSTALLED, 1);
-                db.update(TranslationsDatabaseHelper.TABLE_TRANSLATIONS, translationInfoValues,
-                        String.format("%s = ?",
-                                TranslationsDatabaseHelper.COLUMN_TRANSLATION_SHORTNAME),
-                        new String[]{translationToDownload.shortName});
+                // sets as "installed"
+                final ContentValues values = new ContentValues(1);
+                values.put(TranslationsDatabaseHelper.COLUMN_VALUE, Boolean.toString(true));
+                db.update(TranslationsDatabaseHelper.TABLE_TRANSLATION_LIST, values,
+                        String.format("%s = ? AND %s = ?",
+                                TranslationsDatabaseHelper.COLUMN_TRANSLATION_ID,
+                                TranslationsDatabaseHelper.COLUMN_KEY),
+                        new String[]{Long.toString(translationToDownload.uniqueId),
+                                TranslationsDatabaseHelper.KEY_INSTALLED});
 
                 mHasError = false;
                 db.setTransactionSuccessful();
@@ -365,7 +368,7 @@ public class TranslationDownloadActivity extends ActionBarActivity {
         private ProgressDialog mProgressDialog;
     }
 
-    protected static final String BASE_URL = "http://bible.zionsoft.net/translations/";
+    protected static final String BASE_URL = "https://zionsoft-bible.appspot.com/1.0";
 
     private ListView mTranslationListView;
     private View mLoadingSpinner;

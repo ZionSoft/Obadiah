@@ -79,7 +79,7 @@ public class TranslationDownloadListAdapter extends BaseAdapter {
         for (TranslationInfo translation : translations) {
             String string
                     = mContext.getResources().getString(R.string.text_available_translation_info,
-                    translation.name, translation.size);
+                    translation.name, translation.size / 1024);
             SpannableStringBuilder text = new SpannableStringBuilder(string);
             text.setSpan(mMediumSizeSpan, 0, translation.name.length(), 0);
             text.setSpan(mSmallSizeSpan, translation.name.length(), text.length(), 0);
