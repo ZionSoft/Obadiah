@@ -227,8 +227,10 @@ public class BookSelectionActivity extends ActionBarActivity {
     }
 
     private void populateUi() {
-        String lastReadTranslation = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE)
-                .getString(Constants.PREF_KEY_LAST_READ_TRANSLATION, null);
+        final SharedPreferences preferences
+                = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE);
+        final String lastReadTranslation
+                = preferences.getString(Constants.PREF_KEY_LAST_READ_TRANSLATION, null);
         if (lastReadTranslation == null) {
             // no translation installed
             showErrorDialog(R.string.dialog_no_translation_message,
@@ -241,8 +243,14 @@ public class BookSelectionActivity extends ActionBarActivity {
             return;
         }
 
-        if (lastReadTranslation.equals(mLastReadTranslation))
+        mLastReadBook = preferences.getInt(Constants.PREF_KEY_LAST_READ_BOOK, -1);
+        mLastReadChapter = preferences.getInt(Constants.PREF_KEY_LAST_READ_CHAPTER, -1);
+        mSelectedBook = mLastReadBook < 0 ? 0 : mLastReadBook;
+
+        if (lastReadTranslation.equals(mLastReadTranslation)) {
+            updateUi();
             return;
+        }
 
         mLastReadTranslation = lastReadTranslation;
         new AsyncTask<Void, Void, String[]>() {
@@ -254,16 +262,7 @@ public class BookSelectionActivity extends ActionBarActivity {
 
             @Override
             protected String[] doInBackground(Void... params) {
-                // loads last read translation, book, and chapter
-                final SharedPreferences preferences
-                        = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE);
-                mTranslationReader.selectTranslation(preferences
-                        .getString(Constants.PREF_KEY_LAST_READ_TRANSLATION, null));
-                mLastReadBook = preferences.getInt(Constants.PREF_KEY_LAST_READ_BOOK, -1);
-                mLastReadChapter = preferences.getInt(Constants.PREF_KEY_LAST_READ_CHAPTER, -1);
-
-                mSelectedBook = mLastReadBook < 0 ? 0 : mLastReadBook;
-
+                mTranslationReader.selectTranslation(mLastReadTranslation);
                 return mTranslationReader.bookNames();
             }
 
@@ -272,9 +271,7 @@ public class BookSelectionActivity extends ActionBarActivity {
                 Animator.fadeOut(mLoadingSpinner);
                 Animator.fadeIn(mMainView);
 
-                // updates book list adapter and chapter list adapter
                 mBookListAdapter.setTexts(bookNames);
-                mChapterListAdapter.setLastReadChapter(mLastReadBook, mLastReadChapter);
 
                 updateUi();
 
@@ -294,6 +291,7 @@ public class BookSelectionActivity extends ActionBarActivity {
 
         mBookListAdapter.selectBook(mSelectedBook);
         mChapterListAdapter.selectBook(mSelectedBook);
+        mChapterListAdapter.setLastReadChapter(mLastReadBook, mLastReadChapter);
         mChaptersGridView.setSelection(0);
     }
 
