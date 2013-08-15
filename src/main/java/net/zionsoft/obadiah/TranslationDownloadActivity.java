@@ -74,8 +74,7 @@ public class TranslationDownloadActivity extends ActionBarActivity {
             }
         });
 
-        // gets translation list
-        new TranslationListDownloadAsyncTask().execute(false);
+        loadTranslationList(false);
     }
 
     @Override
@@ -107,10 +106,34 @@ public class TranslationDownloadActivity extends ActionBarActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_refresh:
-                new TranslationListDownloadAsyncTask().execute(true);
+                loadTranslationList(true);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+
+    // loads translation list
+
+    private void loadTranslationList(final boolean forceRefresh) {
+        if (NetworkHelper.hasNetworkConnection(this)) {
+            new TranslationListDownloadAsyncTask().execute(forceRefresh);
+        } else {
+            DialogHelper.showDialog(this, R.string.dialog_no_network_message,
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            loadTranslationList(forceRefresh);
+                        }
+                    },
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            finish();
+                        }
+                    }
+            );
         }
     }
 
@@ -176,6 +199,9 @@ public class TranslationDownloadActivity extends ActionBarActivity {
 
         private boolean mHasError;
     }
+
+
+    // downloads translation
 
     protected class TranslationDownloadAsyncTask extends AsyncTask<Integer, Integer, Void> {
         public void updateProgress(int progress) {

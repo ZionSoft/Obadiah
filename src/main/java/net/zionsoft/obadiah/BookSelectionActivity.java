@@ -17,7 +17,6 @@
 
 package net.zionsoft.obadiah;
 
-import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -164,13 +163,20 @@ public class BookSelectionActivity extends ActionBarActivity {
                 startService(new Intent(this, UpgradeService.class));
             }
         } else {
-            showErrorDialog(R.string.dialog_no_network_message,
+            DialogHelper.showDialog(this, R.string.dialog_no_network_message,
                     new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
                             upgrade();
                         }
-                    });
+                    },
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            finish();
+                        }
+                    }
+            );
         }
     }
 
@@ -186,13 +192,21 @@ public class BookSelectionActivity extends ActionBarActivity {
                 if (intent.getBooleanExtra(UpgradeService.KEY_RESULT_UPGRADE_SUCCESS, true)) {
                     populateUi();
                 } else {
-                    showErrorDialog(R.string.dialog_initialization_failure_message,
+                    DialogHelper.showDialog(BookSelectionActivity.this,
+                            R.string.dialog_initialization_failure_message,
                             new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialogInterface, int i) {
                                     upgrade();
                                 }
-                            });
+                            },
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    finish();
+                                }
+                            }
+                    );
                 }
             }
         };
@@ -211,21 +225,6 @@ public class BookSelectionActivity extends ActionBarActivity {
 
     // UI related
 
-    private void showErrorDialog(int message, DialogInterface.OnClickListener onPositive) {
-        new AlertDialog.Builder(this)
-                .setCancelable(false)
-                .setNegativeButton(android.R.string.no,
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                finish();
-                            }
-                        })
-                .setPositiveButton(android.R.string.yes, onPositive)
-                .setMessage(message)
-                .create().show();
-    }
-
     private void populateUi() {
         final SharedPreferences preferences
                 = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE);
@@ -233,13 +232,20 @@ public class BookSelectionActivity extends ActionBarActivity {
                 = preferences.getString(Constants.PREF_KEY_LAST_READ_TRANSLATION, null);
         if (lastReadTranslation == null) {
             // no translation installed
-            showErrorDialog(R.string.dialog_no_translation_message,
+            DialogHelper.showDialog(this, R.string.dialog_no_translation_message,
                     new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
                             startActivity(new Intent(BookSelectionActivity.this,
                                     TranslationSelectionActivity.class));
                         }
-                    });
+                    },
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            finish();
+                        }
+                    }
+            );
             return;
         }
 

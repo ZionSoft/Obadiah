@@ -19,14 +19,10 @@ package net.zionsoft.obadiah;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
@@ -133,7 +129,7 @@ public class TranslationSelectionActivity extends ActionBarActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_download:
-                startTranslationDownloadActivity();
+                startActivity(new Intent(this, TranslationDownloadActivity.class));
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -157,7 +153,8 @@ public class TranslationSelectionActivity extends ActionBarActivity {
             protected void onPostExecute(List<TranslationInfo> translations) {
                 if (translations.size() == 0) {
                     if (mFirstTime) {
-                        startTranslationDownloadActivity();
+                        startActivity(new Intent(TranslationSelectionActivity.this,
+                                TranslationDownloadActivity.class));
                         mFirstTime = false;
                     }
                     return;
@@ -204,22 +201,6 @@ public class TranslationSelectionActivity extends ActionBarActivity {
 
             private ProgressDialog mProgressDialog;
         }.execute(translationShortName);
-    }
-
-    private void startTranslationDownloadActivity() {
-        // checks connectivity
-        final ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        final NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
-        if (networkInfo == null || !networkInfo.isConnected()) {
-            Toast.makeText(TranslationSelectionActivity.this, R.string.text_no_network, Toast.LENGTH_LONG).show();
-            return;
-        }
-
-        // HTTP connection reuse was buggy before Froyo (i.e. Android 2.2, API Level 8)
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.FROYO)
-            System.setProperty("http.keepAlive", "false");
-
-        startActivity(new Intent(TranslationSelectionActivity.this, TranslationDownloadActivity.class));
     }
 
     private boolean mFirstTime = true;
