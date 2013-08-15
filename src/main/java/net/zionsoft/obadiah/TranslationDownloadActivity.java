@@ -47,6 +47,7 @@ import java.io.ByteArrayOutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -135,27 +136,7 @@ public class TranslationDownloadActivity extends ActionBarActivity {
                     mTranslationManager.addTranslations(NetworkHelper.fetchTranslationList());
                 }
 
-                // sets the available translations
-                final TranslationInfo[] allTranslations = TranslationDownloadActivity.this.mTranslationManager
-                        .translations();
-                int availableTranslationsCount = 0;
-                for (TranslationInfo translationInfo : allTranslations) {
-                    if (!translationInfo.installed)
-                        ++availableTranslationsCount;
-                }
-                if (availableTranslationsCount == 0) {
-                    TranslationDownloadActivity.this.mAvailableTranslations = null;
-                } else if (availableTranslationsCount == allTranslations.length) {
-                    TranslationDownloadActivity.this.mAvailableTranslations = allTranslations;
-                } else {
-                    final TranslationInfo[] availableTranslations = new TranslationInfo[availableTranslationsCount];
-                    int index = 0;
-                    for (TranslationInfo translationInfo : allTranslations) {
-                        if (!translationInfo.installed)
-                            availableTranslations[index++] = translationInfo;
-                    }
-                    TranslationDownloadActivity.this.mAvailableTranslations = availableTranslations;
-                }
+                mAvailableTranslations = mTranslationManager.availableTranslations();
             } catch (Exception e) {
                 e.printStackTrace();
 
@@ -180,7 +161,7 @@ public class TranslationDownloadActivity extends ActionBarActivity {
             Animator.fadeIn(mTranslationListView);
 
             if (mHasError || TranslationDownloadActivity.this.mAvailableTranslations == null
-                    || TranslationDownloadActivity.this.mAvailableTranslations.length == 0) {
+                    || TranslationDownloadActivity.this.mAvailableTranslations.size() == 0) {
                 // either error occurs, or no available translations
                 Toast.makeText(
                         TranslationDownloadActivity.this,
@@ -189,12 +170,12 @@ public class TranslationDownloadActivity extends ActionBarActivity {
                 TranslationDownloadActivity.this.finish();
             } else {
                 // everything fine with available translations
-                final int length = TranslationDownloadActivity.this.mAvailableTranslations.length;
+                final int length = TranslationDownloadActivity.this.mAvailableTranslations.size();
                 final String[] texts = new String[length];
                 final int[] sizes = new int[length];
                 for (int i = 0; i < length; ++i) {
-                    texts[i] = TranslationDownloadActivity.this.mAvailableTranslations[i].name;
-                    sizes[i] = TranslationDownloadActivity.this.mAvailableTranslations[i].size;
+                    texts[i] = TranslationDownloadActivity.this.mAvailableTranslations.get(i).name;
+                    sizes[i] = TranslationDownloadActivity.this.mAvailableTranslations.get(i).size;
                 }
                 TranslationDownloadActivity.this.mTranslationListAdapter.setTexts(texts, sizes);
             }
@@ -231,7 +212,7 @@ public class TranslationDownloadActivity extends ActionBarActivity {
 
             // the logic should be in TranslationManager
 
-            final TranslationInfo translationToDownload = TranslationDownloadActivity.this.mAvailableTranslations[positions[0]];
+            final TranslationInfo translationToDownload = TranslationDownloadActivity.this.mAvailableTranslations.get(positions[0]);
             final SQLiteDatabase db = new TranslationsDatabaseHelper(TranslationDownloadActivity.this)
                     .getWritableDatabase();
             db.beginTransaction();
@@ -372,5 +353,5 @@ public class TranslationDownloadActivity extends ActionBarActivity {
     private TranslationDownloadAsyncTask mTranslationDownloadAsyncTask;
     private TranslationDownloadListAdapter mTranslationListAdapter;
     private TranslationManager mTranslationManager;
-    private TranslationInfo[] mAvailableTranslations;
+    private List<TranslationInfo> mAvailableTranslations;
 }

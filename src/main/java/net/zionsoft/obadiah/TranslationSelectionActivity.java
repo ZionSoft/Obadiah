@@ -40,7 +40,6 @@ import net.zionsoft.obadiah.bible.TranslationInfo;
 import net.zionsoft.obadiah.bible.TranslationManager;
 import net.zionsoft.obadiah.util.SettingsManager;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class TranslationSelectionActivity extends ActionBarActivity {
@@ -151,29 +150,12 @@ public class TranslationSelectionActivity extends ActionBarActivity {
 
             @Override
             protected List<TranslationInfo> doInBackground(Void... params) {
-                final TranslationInfo[] translations = mTranslationManager.translations();
-                int installedTranslationCount = translations == null ? 0 : translations.length;
-                if (installedTranslationCount > 0) {
-                    for (TranslationInfo translationInfo : translations) {
-                        if (!translationInfo.installed)
-                            --installedTranslationCount;
-                    }
-                }
-                if (installedTranslationCount == 0)
-                    return null;
-
-                final List<TranslationInfo> installedTranslations
-                        = new ArrayList<TranslationInfo>(installedTranslationCount);
-                for (TranslationInfo translationInfo : translations) {
-                    if (translationInfo.installed)
-                        installedTranslations.add(translationInfo);
-                }
-                return installedTranslations;
+                return mTranslationManager.installedTranslations();
             }
 
             @Override
             protected void onPostExecute(List<TranslationInfo> translations) {
-                if (translations == null) {
+                if (translations.size() == 0) {
                     if (mFirstTime) {
                         startTranslationDownloadActivity();
                         mFirstTime = false;

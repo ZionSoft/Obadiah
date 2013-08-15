@@ -35,9 +35,9 @@ public class TranslationManager {
         if (translations == null || translations.size() == 0)
             return;
 
-        final TranslationInfo[] existingTranslations = translations();
+        final List<TranslationInfo> existingTranslations = translations(TRANSLATIONS_ALL);
         List<TranslationInfo> newTranslations;
-        if (existingTranslations.length == 0) {
+        if (existingTranslations.size() == 0) {
             newTranslations = translations;
         } else {
             newTranslations = new ArrayList<TranslationInfo>(translations.size());
@@ -107,17 +107,32 @@ public class TranslationManager {
         }
     }
 
-    public TranslationInfo[] translations() {
-        final SQLiteDatabase db = mTranslationsDatabaseHelper.getReadableDatabase();
-        final String[] columns = new String[]{TranslationsDatabaseHelper.COLUMN_TRANSLATION_NAME,
-                TranslationsDatabaseHelper.COLUMN_TRANSLATION_SHORTNAME,
-                TranslationsDatabaseHelper.COLUMN_LANGUAGE,
-                TranslationsDatabaseHelper.COLUMN_DOWNLOAD_SIZE,
-                TranslationsDatabaseHelper.COLUMN_INSTALLED};
-        final Cursor cursor = db.query(TranslationsDatabaseHelper.TABLE_TRANSLATIONS,
-                columns, null, null, null, null, null);
-        if (cursor != null) {
+    public List<TranslationInfo> installedTranslations() {
+        return translations(TRANSLATIONS_INSTALLED);
+    }
+
+    public List<TranslationInfo> availableTranslations() {
+        return translations(TRANSLATIONS_AVAILABLE);
+    }
+
+    private List<TranslationInfo> translations(int criteria) {
+        SQLiteDatabase db = null;
+        try {
+            db = mTranslationsDatabaseHelper.getReadableDatabase();
+            final String[] columns = new String[]{
+                    TranslationsDatabaseHelper.COLUMN_TRANSLATION_NAME,
+                    TranslationsDatabaseHelper.COLUMN_TRANSLATION_SHORTNAME,
+                    TranslationsDatabaseHelper.COLUMN_LANGUAGE,
+                    TranslationsDatabaseHelper.COLUMN_DOWNLOAD_SIZE,
+                    TranslationsDatabaseHelper.COLUMN_INSTALLED};
+            final String selection = (criteria == TRANSLATIONS_ALL)
+                    ? null : String.format("%s = ?", TranslationsDatabaseHelper.COLUMN_INSTALLED);
+            String[] selectionArgs = (criteria == TRANSLATIONS_ALL)
+                    ? null : new String[]{((criteria == TRANSLATIONS_INSTALLED) ? "1" : "0")};
+            final Cursor cursor = db.query(TranslationsDatabaseHelper.TABLE_TRANSLATIONS,
+                    columns, selection, selectionArgs, null, null, null);
             final int count = cursor.getCount();
+            List<TranslationInfo> translations = new ArrayList<TranslationInfo>(count);
             if (count > 0) {
                 final int languageColumnIndex
                         = cursor.getColumnIndex(TranslationsDatabaseHelper.COLUMN_LANGUAGE);
@@ -129,8 +144,6 @@ public class TranslationManager {
                         .getColumnIndex(TranslationsDatabaseHelper.COLUMN_DOWNLOAD_SIZE);
                 final int installedColumnIndex
                         = cursor.getColumnIndex(TranslationsDatabaseHelper.COLUMN_INSTALLED);
-                final TranslationInfo[] translations = new TranslationInfo[count];
-                int i = 0;
                 while (cursor.moveToNext()) {
                     final TranslationInfo translationinfo = new TranslationInfo();
                     translationinfo.installed = (cursor.getInt(installedColumnIndex) == 1);
@@ -138,15 +151,19 @@ public class TranslationManager {
                     translationinfo.shortName = cursor.getString(translationShortNameColumnIndex);
                     translationinfo.name = cursor.getString(translationNameColumnIndex);
                     translationinfo.language = cursor.getString(languageColumnIndex);
-                    translations[i++] = translationinfo;
+                    translations.add(translationinfo);
                 }
-                db.close();
-                return translations;
             }
+            return translations;
+        } finally {
+            if (db != null)
+                db.close();
         }
-        db.close();
-        return null;
     }
+
+    private static final int TRANSLATIONS_ALL = 0;
+    private static final int TRANSLATIONS_AVAILABLE = 1;
+    private static final int TRANSLATIONS_INSTALLED = 2;
 
     private final TranslationsDatabaseHelper mTranslationsDatabaseHelper;
 }
