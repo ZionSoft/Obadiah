@@ -14,13 +14,23 @@
             googleads:keywords="bible, jesus, christian, 圣经, 耶稣, 基督, raamattu"
             googleads:loadAdOnCreate="true"/>
 
-    <ListView
-            xmlns:android="http://schemas.android.com/apk/res/android"
-            android:id="@+id/translation_listview"
+    <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_above="@id/adview"
-            android:divider="@android:color/darker_gray"
-            android:dividerHeight="1dip"/>
+            android:layout_above="@id/adview">
+
+        <ListView
+                android:id="@+id/translation_listview"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:divider="@android:color/darker_gray"
+                android:dividerHeight="1dip"/>
+
+        <ProgressBar
+                android:id="@+id/translation_download_loading_spinner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"/>
+    </FrameLayout>
 
 </RelativeLayout>

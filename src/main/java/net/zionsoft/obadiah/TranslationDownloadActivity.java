@@ -58,6 +58,9 @@ public class TranslationDownloadActivity extends ActionBarActivity {
         mSettingsManager = new SettingsManager(this);
         mTranslationManager = new TranslationManager(this);
 
+        // initializes views
+        mLoadingSpinner = findViewById(R.id.translation_download_loading_spinner);
+
         // initializes list view showing available translations
         mTranslationListView = (ListView) findViewById(R.id.translation_listview);
         mTranslationListAdapter = new TranslationDownloadListAdapter(this, mSettingsManager);
@@ -113,10 +116,8 @@ public class TranslationDownloadActivity extends ActionBarActivity {
         protected void onPreExecute() {
             // running in the main thread
 
-            mProgressDialog = new ProgressDialog(TranslationDownloadActivity.this);
-            mProgressDialog.setCancelable(false);
-            mProgressDialog.setMessage(TranslationDownloadActivity.this.getText(R.string.text_downloading));
-            mProgressDialog.show();
+            mLoadingSpinner.setVisibility(View.VISIBLE);
+            mTranslationListView.setVisibility(View.GONE);
         }
 
         protected Void doInBackground(Boolean... params) {
@@ -195,7 +196,8 @@ public class TranslationDownloadActivity extends ActionBarActivity {
         protected void onPostExecute(Void result) {
             // running in the main thread
 
-            mProgressDialog.dismiss();
+            Animator.fadeOut(mLoadingSpinner);
+            Animator.fadeIn(mTranslationListView);
 
             if (mHasError || TranslationDownloadActivity.this.mAvailableTranslations == null
                     || TranslationDownloadActivity.this.mAvailableTranslations.length == 0) {
@@ -219,7 +221,6 @@ public class TranslationDownloadActivity extends ActionBarActivity {
         }
 
         private boolean mHasError;
-        private ProgressDialog mProgressDialog;
     }
 
     protected class TranslationDownloadAsyncTask extends AsyncTask<Integer, Integer, Void> {
@@ -385,6 +386,8 @@ public class TranslationDownloadActivity extends ActionBarActivity {
     protected static final String BASE_URL = "http://bible.zionsoft.net/translations/";
 
     private ListView mTranslationListView;
+    private View mLoadingSpinner;
+
     private SettingsManager mSettingsManager;
     private TranslationDownloadAsyncTask mTranslationDownloadAsyncTask;
     private TranslationDownloadListAdapter mTranslationListAdapter;
