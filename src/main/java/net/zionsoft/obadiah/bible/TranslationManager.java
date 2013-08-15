@@ -125,7 +125,6 @@ public class TranslationManager {
                     translationinfo.shortName = cursor.getString(translationShortNameColumnIndex);
                     translationinfo.name = cursor.getString(translationNameColumnIndex);
                     translationinfo.language = cursor.getString(languageColumnIndex);
-                    translationinfo.path = translationinfo.shortName;
                     translations[i++] = translationinfo;
                 }
                 db.close();
