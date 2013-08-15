@@ -54,6 +54,12 @@ public class UpgradeService extends IntentService {
                 Utils.removeDirectory(getFilesDir());
                 editor.remove("selectedTranslation");
             }
+            if (version < 10700) {
+                // prior to 1.7.0
+
+                // no longer tracks timestamp when translation list is fetched since 1.7.0
+                editor.remove("lastUpdated");
+            }
 
             editor.putInt(Constants.PREF_KEY_CURRENT_APPLICATION_VERSION,
                     Constants.CURRENT_APPLICATION_VERSION)

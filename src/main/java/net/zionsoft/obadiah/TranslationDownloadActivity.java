@@ -20,7 +20,6 @@ package net.zionsoft.obadiah;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.DialogInterface;
-import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -137,7 +136,7 @@ public class TranslationDownloadActivity extends ActionBarActivity {
         }
     }
 
-    private class TranslationListDownloadAsyncTask extends AsyncTask<Boolean, Void, Void> {
+    private class TranslationListDownloadAsyncTask extends AsyncTask<Boolean, Void, List<TranslationInfo>> {
         protected void onPreExecute() {
             // running in the main thread
 
@@ -145,59 +144,44 @@ public class TranslationDownloadActivity extends ActionBarActivity {
             mTranslationListView.setVisibility(View.GONE);
         }
 
-        protected Void doInBackground(Boolean... params) {
+        protected List<TranslationInfo> doInBackground(Boolean... params) {
             // running in the worker thread
 
             try {
-                final long lastUpdated = TranslationDownloadActivity.this.getSharedPreferences(Constants.PREF_NAME,
-                        MODE_PRIVATE).getLong(Constants.PREF_KEY_LAST_UPDATED, 0);
-                final long now = System.currentTimeMillis();
-                if (params[0] || lastUpdated <= 0 || lastUpdated >= now || ((now - lastUpdated) >= 86400000)) {
-                    // force update
-                    // or no valid local cache, i.e. not fetched before, or last fetched more than 1 day ago
-
-                    mTranslationManager.addTranslations(NetworkHelper.fetchTranslationList());
+                boolean forceRefresh = params[0];
+                List<TranslationInfo> translations = null;
+                if (!forceRefresh) {
+                    translations = mTranslationManager.availableTranslations();
+                    if (translations.size() == 0)
+                        forceRefresh = true;
                 }
 
-                mAvailableTranslations = mTranslationManager.availableTranslations();
+                if (forceRefresh) {
+                    mTranslationManager.addTranslations(NetworkHelper.fetchTranslationList());
+                    translations = mTranslationManager.availableTranslations();
+                }
+                return translations;
             } catch (Exception e) {
-                e.printStackTrace();
-
-                mHasError = true;
-                TranslationDownloadActivity.this.mAvailableTranslations = null;
-            } finally {
-                final SharedPreferences.Editor editor = TranslationDownloadActivity.this.getSharedPreferences(
-                        Constants.PREF_NAME, MODE_PRIVATE).edit();
-                if (mHasError || TranslationDownloadActivity.this.mAvailableTranslations == null)
-                    editor.putLong(Constants.PREF_KEY_LAST_UPDATED, 0);
-                else
-                    editor.putLong(Constants.PREF_KEY_LAST_UPDATED, System.currentTimeMillis());
-                editor.commit();
+                return null;
             }
-            return null;
         }
 
-        protected void onPostExecute(Void result) {
+        protected void onPostExecute(List<TranslationInfo> translations) {
             // running in the main thread
 
             Animator.fadeOut(mLoadingSpinner);
             Animator.fadeIn(mTranslationListView);
 
-            if (mHasError || TranslationDownloadActivity.this.mAvailableTranslations == null
-                    || TranslationDownloadActivity.this.mAvailableTranslations.size() == 0) {
-                // either error occurs, or no available translations
-                Toast.makeText(
-                        TranslationDownloadActivity.this,
-                        mHasError ? R.string.text_fail_to_fetch_translations_list
-                                : R.string.text_no_available_translation, Toast.LENGTH_SHORT).show();
-                TranslationDownloadActivity.this.finish();
+            if (translations == null || translations.size() == 0) {
+                Toast.makeText(TranslationDownloadActivity.this, translations == null
+                        ? R.string.text_fail_to_fetch_translations_list
+                        : R.string.text_no_available_translation, Toast.LENGTH_SHORT).show();
+                finish();
             } else {
-                // everything fine with available translations
+                mAvailableTranslations = translations;
                 mTranslationListAdapter.setTranslations(mAvailableTranslations);
             }
         }
-
-        private boolean mHasError;
     }
 
 
