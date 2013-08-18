@@ -11,8 +11,10 @@
     <string name="action_select_translation">Select Translations</string>
     <string name="action_share">Share</string>
 
-    <string name="dialog_no_network_message">Please connect to a network and try again.</string>
     <string name="dialog_initialization_failure_message">Failed to initialize, try again?</string>
+    <string name="dialog_network_failure_message">Please check your network connection, and try
+        again.
+    </string>
     <string name="dialog_no_translation_message">No translation installed, please download from the
         Internet.
     </string>

@@ -120,7 +120,7 @@ public class TranslationDownloadActivity extends ActionBarActivity {
         if (NetworkHelper.hasNetworkConnection(this)) {
             new TranslationListDownloadAsyncTask().execute(forceRefresh);
         } else {
-            DialogHelper.showDialog(this, R.string.dialog_no_network_message,
+            DialogHelper.showDialog(this, R.string.dialog_network_failure_message,
                     new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {

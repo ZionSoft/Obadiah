@@ -11,8 +11,8 @@
     <string name="action_select_translation">选择译本</string>
     <string name="action_share">分享</string>
 
-    <string name="dialog_no_network_message">请连接到网络并重试。</string>
     <string name="dialog_initialization_failure_message">初始化失败，请重试。</string>
+    <string name="dialog_network_failure_message">请检查网络连接，并重试。</string>
     <string name="dialog_no_translation_message">没有已安装的译本，请从互联网下载。</string>
     <string name="dialog_translation_list_fetch_failure_message">无法下载译本列表，请重试。</string>
 

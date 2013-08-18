@@ -39,7 +39,6 @@ import android.widget.ListView;
 
 import net.zionsoft.obadiah.bible.TranslationReader;
 import net.zionsoft.obadiah.support.UpgradeService;
-import net.zionsoft.obadiah.util.NetworkHelper;
 import net.zionsoft.obadiah.util.SettingsManager;
 
 public class BookSelectionActivity extends ActionBarActivity {
@@ -154,29 +153,12 @@ public class BookSelectionActivity extends ActionBarActivity {
     }
 
     private void upgrade() {
-        if (NetworkHelper.hasNetworkConnection(this)) {
-            registerUpgradeStatusListener();
+        registerUpgradeStatusListener();
 
-            if (!isUpgrading()) {
-                getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE).edit()
-                        .putBoolean(Constants.PREF_KEY_UPGRADING, true).commit();
-                startService(new Intent(this, UpgradeService.class));
-            }
-        } else {
-            DialogHelper.showDialog(this, R.string.dialog_no_network_message,
-                    new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            upgrade();
-                        }
-                    },
-                    new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            finish();
-                        }
-                    }
-            );
+        if (!isUpgrading()) {
+            getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE).edit()
+                    .putBoolean(Constants.PREF_KEY_UPGRADING, true).commit();
+            startService(new Intent(this, UpgradeService.class));
         }
     }
 
@@ -189,11 +171,15 @@ public class BookSelectionActivity extends ActionBarActivity {
             public void onReceive(Context context, Intent intent) {
                 unregisterUpgradeStatusListener();
 
-                if (intent.getBooleanExtra(UpgradeService.KEY_RESULT_UPGRADE_SUCCESS, true)) {
+                final int status = intent.getIntExtra(UpgradeService.KEY_STATUS,
+                        UpgradeService.STATUS_SUCCESS);
+                if (status == UpgradeService.STATUS_SUCCESS) {
                     populateUi();
                 } else {
                     DialogHelper.showDialog(BookSelectionActivity.this,
-                            R.string.dialog_initialization_failure_message,
+                            status == UpgradeService.STATUS_NETWORK_FAILURE
+                                    ? R.string.dialog_network_failure_message
+                                    : R.string.dialog_initialization_failure_message,
                             new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialogInterface, int i) {

@@ -39,10 +39,14 @@ import java.util.List;
 
 public class UpgradeService extends IntentService {
     public static final String ACTION_STATUS_UPDATE
-            = "net.zionsoft.obadiah.support.IntentService.ACTION_STATUS_UPDATE";
+            = "net.zionsoft.obadiah.support.UpgradeService.ACTION_STATUS_UPDATE";
 
-    public static final String KEY_RESULT_UPGRADE_SUCCESS
-            = "net.zionsoft.obadiah.support.IntentService.KEY_RESULT_UPGRADE_SUCCESS";
+    public static final String KEY_STATUS
+            = "net.zionsoft.obadiah.support.UpgradeService.KEY_STATUS";
+
+    public static final int STATUS_SUCCESS = 0;
+    public static final int STATUS_NETWORK_FAILURE = 1;
+    public static final int STATUS_SERVER_FAILURE = 2;
 
     public UpgradeService() {
         super("net.zionsoft.obadiah.support.UpgradeService");
@@ -50,42 +54,48 @@ public class UpgradeService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        boolean success = true;
-        final SharedPreferences preferences
-                = getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-        final SharedPreferences.Editor editor = preferences.edit();
+        int status = STATUS_SUCCESS;
         try {
-            final int version = preferences.getInt(Constants.PREF_KEY_CURRENT_APPLICATION_VERSION, 0);
+            final int version = getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE)
+                    .getInt(Constants.PREF_KEY_CURRENT_APPLICATION_VERSION, 0);
             if (version < 10500) {
                 // prior to 1.5.0
 
                 // upgrading from prior to 1.5.0 is no longer supported since 1.7.0
                 // now simply delete all the old data
                 Utils.removeDirectory(getFilesDir());
+
+                final SharedPreferences.Editor editor =
+                        getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE).edit();
                 editor.remove("selectedTranslation");
+
+                editor.putInt(Constants.PREF_KEY_CURRENT_APPLICATION_VERSION, 10500).commit();
             }
             if (version < 10700) {
                 // prior to 1.7.0
 
-                // no longer tracks timestamp when translation list is fetched since 1.7.0
-                editor.remove("lastUpdated");
-
                 // new database format for translation list is introduced in 1.7.0
                 new TranslationManager(this).addTranslations(allTranslations());
+
+                // no longer tracks timestamp when translation list is fetched since 1.7.0
+                final SharedPreferences.Editor editor =
+                        getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE).edit();
+                editor.remove("lastUpdated");
+
+                editor.putInt(Constants.PREF_KEY_CURRENT_APPLICATION_VERSION, 10700).commit();
             }
-
-            editor.putInt(Constants.PREF_KEY_CURRENT_APPLICATION_VERSION,
-                    Constants.CURRENT_APPLICATION_VERSION);
-        } catch (Exception e) {
-            e.printStackTrace();
-            success = false;
+        } catch (JSONException e) {
+            // malformed server response
+            status = STATUS_SERVER_FAILURE;
+        } catch (IOException e) {
+            // network failure
+            status = STATUS_NETWORK_FAILURE;
         } finally {
-            editor.putBoolean(Constants.PREF_KEY_UPGRADING, false).commit();
-        }
+            getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE).edit()
+                    .putBoolean(Constants.PREF_KEY_UPGRADING, false).commit();
 
-        final Intent result = new Intent(ACTION_STATUS_UPDATE);
-        result.putExtra(KEY_RESULT_UPGRADE_SUCCESS, success);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(result);
+            broadcastStatus(status);
+        }
     }
 
     private List<TranslationInfo> allTranslations() throws IOException, JSONException {
@@ -108,5 +118,10 @@ public class UpgradeService extends IntentService {
             }
         }
         return translations;
+    }
+
+    private void broadcastStatus(int status) {
+        LocalBroadcastManager.getInstance(this)
+                .sendBroadcast(new Intent(ACTION_STATUS_UPDATE).putExtra(KEY_STATUS, status));
     }
 }
