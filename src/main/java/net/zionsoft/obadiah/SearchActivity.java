@@ -52,35 +52,7 @@ public class SearchActivity extends ActionBarActivity {
         mSettingsManager = new SettingsManager(this);
         mTranslationReader = new TranslationReader(this);
 
-        // initializes the search bar
-        mSearchText = (EditText) findViewById(R.id.search_edittext);
-        mSearchText.setOnEditorActionListener(new OnEditorActionListener() {
-            public boolean onEditorAction(TextView view, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                    search(null);
-                    return true;
-                }
-                return false;
-            }
-        });
-
-        // initializes the search results list view
-        mSearchResultListView = (ListView) findViewById(R.id.search_result_listview);
-        mSearchResultListAdapter = new SearchResultListAdapter(this, mSettingsManager);
-        mSearchResultListView.setAdapter(mSearchResultListAdapter);
-        mSearchResultListView.setOnItemClickListener(new OnItemClickListener() {
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                final TranslationReader.SearchResult result = mResults.get(position);
-                getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE).edit()
-                        .putInt(Constants.PREF_KEY_LAST_READ_BOOK, result.bookIndex)
-                        .putInt(Constants.PREF_KEY_LAST_READ_CHAPTER, result.chapterIndex)
-                        .putInt(Constants.PREF_KEY_LAST_READ_VERSE, result.verseIndex)
-                        .commit();
-
-                startActivity(new Intent(SearchActivity.this, TextActivity.class)
-                        .setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
-            }
-        });
+        initializeUi();
     }
 
     @Override
@@ -122,6 +94,38 @@ public class SearchActivity extends ActionBarActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void initializeUi() {
+        // initializes the search bar
+        mSearchText = (EditText) findViewById(R.id.search_edittext);
+        mSearchText.setOnEditorActionListener(new OnEditorActionListener() {
+            public boolean onEditorAction(TextView view, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                    search(null);
+                    return true;
+                }
+                return false;
+            }
+        });
+
+        // initializes the search results list view
+        mSearchResultListView = (ListView) findViewById(R.id.search_result_listview);
+        mSearchResultListAdapter = new SearchResultListAdapter(this, mSettingsManager);
+        mSearchResultListView.setAdapter(mSearchResultListAdapter);
+        mSearchResultListView.setOnItemClickListener(new OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                final TranslationReader.SearchResult result = mResults.get(position);
+                getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE).edit()
+                        .putInt(Constants.PREF_KEY_LAST_READ_BOOK, result.bookIndex)
+                        .putInt(Constants.PREF_KEY_LAST_READ_CHAPTER, result.chapterIndex)
+                        .putInt(Constants.PREF_KEY_LAST_READ_VERSE, result.verseIndex)
+                        .commit();
+
+                startActivity(new Intent(SearchActivity.this, TextActivity.class)
+                        .setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
+            }
+        });
     }
 
     public void search(View view) {

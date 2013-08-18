@@ -28,7 +28,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -60,21 +59,7 @@ public class TranslationDownloadActivity extends ActionBarActivity {
         mSettingsManager = new SettingsManager(this);
         mTranslationManager = new TranslationManager(this);
 
-        // initializes views
-        mLoadingSpinner = findViewById(R.id.translation_download_loading_spinner);
-
-        // initializes list view showing available translations
-        mTranslationListView = (ListView) findViewById(R.id.translation_listview);
-        mTranslationListAdapter = new TranslationDownloadListAdapter(this, mSettingsManager);
-        mTranslationListView.setAdapter(mTranslationListAdapter);
-        mTranslationListView.setOnItemClickListener(new OnItemClickListener() {
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                TranslationDownloadActivity.this.mTranslationDownloadAsyncTask = new TranslationDownloadAsyncTask();
-                TranslationDownloadActivity.this.mTranslationDownloadAsyncTask.execute(position);
-            }
-        });
-
-        loadTranslationList(false);
+        initializeUi();
     }
 
     @Override
@@ -120,7 +105,7 @@ public class TranslationDownloadActivity extends ActionBarActivity {
         if (NetworkHelper.hasNetworkConnection(this)) {
             new TranslationListDownloadAsyncTask().execute(forceRefresh);
         } else {
-            DialogHelper.showDialog(this, R.string.dialog_network_failure_message,
+            DialogHelper.showDialog(this, false, R.string.dialog_network_failure_message,
                     new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
@@ -175,7 +160,7 @@ public class TranslationDownloadActivity extends ActionBarActivity {
 
             if (translations == null) {
                 // error occurs
-                DialogHelper.showDialog(TranslationDownloadActivity.this,
+                DialogHelper.showDialog(TranslationDownloadActivity.this, false,
                         R.string.dialog_translation_list_fetch_failure_message,
                         new DialogInterface.OnClickListener() {
                             @Override
@@ -369,6 +354,25 @@ public class TranslationDownloadActivity extends ActionBarActivity {
     }
 
     protected static final String BASE_URL = "https://zionsoft-bible.appspot.com/1.0";
+
+    // UI related
+
+    private void initializeUi() {
+        mLoadingSpinner = findViewById(R.id.translation_download_loading_spinner);
+
+        // translation list view
+        mTranslationListView = (ListView) findViewById(R.id.translation_listview);
+        mTranslationListAdapter = new TranslationDownloadListAdapter(this, mSettingsManager);
+        mTranslationListView.setAdapter(mTranslationListAdapter);
+        mTranslationListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                mTranslationDownloadAsyncTask = new TranslationDownloadAsyncTask();
+                mTranslationDownloadAsyncTask.execute(position);
+            }
+        });
+
+        loadTranslationList(false);
+    }
 
     private ListView mTranslationListView;
     private View mLoadingSpinner;

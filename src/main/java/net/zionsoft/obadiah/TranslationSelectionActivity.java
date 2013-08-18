@@ -21,7 +21,6 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
@@ -49,54 +48,7 @@ public class TranslationSelectionActivity extends ActionBarActivity {
         mSelectedTranslationShortName = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE)
                 .getString(Constants.PREF_KEY_LAST_READ_TRANSLATION, null);
 
-        // initializes views
-        mLoadingSpinner = findViewById(R.id.translation_selection_loading_spinner);
-
-        // initializes list view showing installed translations
-        mTranslationListAdapter = new TranslationSelectionListAdapter(this, mSettingsManager);
-        mTranslationListAdapter.setSelectedTranslation(mSelectedTranslationShortName);
-        mTranslationListView = (ListView) findViewById(R.id.translation_list_view);
-        mTranslationListView.setAdapter(mTranslationListAdapter);
-        mTranslationListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                mSelectedTranslationShortName = mTranslationListAdapter.getItem(position).shortName;
-                finish();
-            }
-        });
-        mTranslationListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                final TranslationInfo selected = mTranslationListAdapter.getItem(position);
-                if (selected.shortName.equals(mSelectedTranslationShortName))
-                    return false;
-
-                final Resources resources = TranslationSelectionActivity.this.getResources();
-                final CharSequence[] items = {resources.getText(R.string.text_delete)};
-                final AlertDialog.Builder contextMenuDialogBuilder = new AlertDialog.Builder(
-                        TranslationSelectionActivity.this);
-                contextMenuDialogBuilder.setItems(items, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        switch (which) {
-                            case 0: // delete
-                                new AlertDialog.Builder(TranslationSelectionActivity.this)
-                                        .setMessage(resources.getText(R.string.text_delete_confirm))
-                                        .setCancelable(true)
-                                        .setPositiveButton(android.R.string.ok,
-                                                new DialogInterface.OnClickListener() {
-                                                    public void onClick(DialogInterface dialog, int id) {
-                                                        removeTranslation(selected);
-                                                    }
-                                                })
-                                        .setNegativeButton(android.R.string.cancel, null)
-                                        .create().show();
-                                break;
-                        }
-                    }
-                });
-                contextMenuDialogBuilder.create().show();
-
-                return true;
-            }
-        });
+        initializeUi();
     }
 
     @Override
@@ -134,6 +86,51 @@ public class TranslationSelectionActivity extends ActionBarActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void initializeUi() {
+        mLoadingSpinner = findViewById(R.id.translation_selection_loading_spinner);
+
+        // translation list view
+        mTranslationListAdapter = new TranslationSelectionListAdapter(this, mSettingsManager);
+        mTranslationListAdapter.setSelectedTranslation(mSelectedTranslationShortName);
+        mTranslationListView = (ListView) findViewById(R.id.translation_list_view);
+        mTranslationListView.setAdapter(mTranslationListAdapter);
+        mTranslationListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                mSelectedTranslationShortName = mTranslationListAdapter.getItem(position).shortName;
+                finish();
+            }
+        });
+        mTranslationListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                final TranslationInfo selected = mTranslationListAdapter.getItem(position);
+                if (selected.shortName.equals(mSelectedTranslationShortName))
+                    return false;
+
+                final CharSequence[] items = {getResources().getText(R.string.text_delete)};
+                final AlertDialog.Builder contextMenuDialogBuilder = new AlertDialog.Builder(
+                        TranslationSelectionActivity.this);
+                contextMenuDialogBuilder.setItems(items, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which) {
+                            case 0: // delete
+                                DialogHelper.showDialog(TranslationSelectionActivity.this, true,
+                                        R.string.text_delete_confirm,
+                                        new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int id) {
+                                                removeTranslation(selected);
+                                            }
+                                        }, null);
+                                break;
+                        }
+                    }
+                });
+                contextMenuDialogBuilder.create().show();
+
+                return true;
+            }
+        });
     }
 
     private void populateUi() {

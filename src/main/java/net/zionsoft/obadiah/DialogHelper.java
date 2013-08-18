@@ -22,11 +22,11 @@ import android.content.Context;
 import android.content.DialogInterface;
 
 public class DialogHelper {
-    public static void showDialog(Context context, int message,
+    public static void showDialog(Context context, boolean cancelable, int message,
                                   DialogInterface.OnClickListener onPositive,
                                   DialogInterface.OnClickListener onNegative) {
         new AlertDialog.Builder(context)
-                .setCancelable(false)
+                .setCancelable(cancelable)
                 .setPositiveButton(android.R.string.yes, onPositive)
                 .setNegativeButton(android.R.string.no, onNegative)
                 .setMessage(message)

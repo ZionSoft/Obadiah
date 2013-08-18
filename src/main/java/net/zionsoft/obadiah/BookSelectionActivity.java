@@ -33,7 +33,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
 import android.widget.ListView;
 
@@ -55,40 +54,7 @@ public class BookSelectionActivity extends ActionBarActivity {
         mSettingsManager = new SettingsManager(this);
         mTranslationReader = new TranslationReader(this);
 
-        // initializes views
-        mLoadingSpinner = findViewById(R.id.book_selection_loading_spinner);
-        mMainView = findViewById(R.id.book_selection_main_view);
-
-        // initializes the book list view
-        mBookListView = (ListView) findViewById(R.id.book_listview);
-        mBookListAdapter = new BookListAdapter(this, mSettingsManager);
-        mBookListView.setAdapter(mBookListAdapter);
-        mBookListView.setOnItemClickListener(new OnItemClickListener() {
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (mSelectedBook == position)
-                    return;
-                mSelectedBook = position;
-                updateUi();
-            }
-        });
-
-        // initializes the chapters list view
-        mChaptersGridView = (GridView) findViewById(R.id.chapter_gridview);
-        mChapterListAdapter = new ChapterListAdapter(this, mSettingsManager);
-        mChaptersGridView.setAdapter(mChapterListAdapter);
-        mChaptersGridView.setOnItemClickListener(new OnItemClickListener() {
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (mLastReadBook != mSelectedBook || mLastReadChapter != position) {
-                    getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE).edit()
-                            .putInt(Constants.PREF_KEY_LAST_READ_BOOK, mSelectedBook)
-                            .putInt(Constants.PREF_KEY_LAST_READ_CHAPTER, position)
-                            .putInt(Constants.PREF_KEY_LAST_READ_VERSE, 0)
-                            .commit();
-                }
-
-                startActivity(new Intent(BookSelectionActivity.this, TextActivity.class));
-            }
-        });
+        initializeUi();
     }
 
     @Override
@@ -176,7 +142,7 @@ public class BookSelectionActivity extends ActionBarActivity {
                 if (status == UpgradeService.STATUS_SUCCESS) {
                     populateUi();
                 } else {
-                    DialogHelper.showDialog(BookSelectionActivity.this,
+                    DialogHelper.showDialog(BookSelectionActivity.this, false,
                             status == UpgradeService.STATUS_NETWORK_FAILURE
                                     ? R.string.dialog_network_failure_message
                                     : R.string.dialog_initialization_failure_message,
@@ -211,6 +177,42 @@ public class BookSelectionActivity extends ActionBarActivity {
 
     // UI related
 
+    private void initializeUi() {
+        mLoadingSpinner = findViewById(R.id.book_selection_loading_spinner);
+        mMainView = findViewById(R.id.book_selection_main_view);
+
+        // book list view
+        mBookListView = (ListView) findViewById(R.id.book_listview);
+        mBookListAdapter = new BookListAdapter(this, mSettingsManager);
+        mBookListView.setAdapter(mBookListAdapter);
+        mBookListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if (mSelectedBook == position)
+                    return;
+                mSelectedBook = position;
+                updateUi();
+            }
+        });
+
+        // chapters list view
+        mChaptersGridView = (GridView) findViewById(R.id.chapter_gridview);
+        mChapterListAdapter = new ChapterListAdapter(this, mSettingsManager);
+        mChaptersGridView.setAdapter(mChapterListAdapter);
+        mChaptersGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if (mLastReadBook != mSelectedBook || mLastReadChapter != position) {
+                    getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE).edit()
+                            .putInt(Constants.PREF_KEY_LAST_READ_BOOK, mSelectedBook)
+                            .putInt(Constants.PREF_KEY_LAST_READ_CHAPTER, position)
+                            .putInt(Constants.PREF_KEY_LAST_READ_VERSE, 0)
+                            .commit();
+                }
+
+                startActivity(new Intent(BookSelectionActivity.this, TextActivity.class));
+            }
+        });
+    }
+
     private void populateUi() {
         final SharedPreferences preferences
                 = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE);
@@ -218,7 +220,7 @@ public class BookSelectionActivity extends ActionBarActivity {
                 = preferences.getString(Constants.PREF_KEY_LAST_READ_TRANSLATION, null);
         if (lastReadTranslation == null) {
             // no translation installed
-            DialogHelper.showDialog(this, R.string.dialog_no_translation_message,
+            DialogHelper.showDialog(this, false, R.string.dialog_no_translation_message,
                     new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
                             startActivity(new Intent(BookSelectionActivity.this,
