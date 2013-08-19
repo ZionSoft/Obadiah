@@ -75,15 +75,19 @@ public class TranslationDownloadListAdapter extends BaseAdapter {
     }
 
     public void setTranslations(List<TranslationInfo> translations) {
-        m_texts = new ArrayList<SpannableStringBuilder>(translations.size());
-        for (TranslationInfo translation : translations) {
-            String string
-                    = mContext.getResources().getString(R.string.text_available_translation_info,
-                    translation.name, translation.size / 1024);
-            SpannableStringBuilder text = new SpannableStringBuilder(string);
-            text.setSpan(mMediumSizeSpan, 0, translation.name.length(), 0);
-            text.setSpan(mSmallSizeSpan, translation.name.length(), text.length(), 0);
-            m_texts.add(text);
+        if (translations == null) {
+            m_texts = null;
+        } else {
+            m_texts = new ArrayList<SpannableStringBuilder>(translations.size());
+            for (TranslationInfo translation : translations) {
+                String string
+                        = mContext.getResources().getString(R.string.text_available_translation_info,
+                        translation.name, translation.size / 1024);
+                SpannableStringBuilder text = new SpannableStringBuilder(string);
+                text.setSpan(mMediumSizeSpan, 0, translation.name.length(), 0);
+                text.setSpan(mSmallSizeSpan, translation.name.length(), text.length(), 0);
+                m_texts.add(text);
+            }
         }
         notifyDataSetChanged();
     }
