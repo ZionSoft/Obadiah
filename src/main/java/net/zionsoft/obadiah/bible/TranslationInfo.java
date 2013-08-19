@@ -17,7 +17,10 @@
 
 package net.zionsoft.obadiah.bible;
 
-public class TranslationInfo {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class TranslationInfo implements Parcelable {
     public final long uniqueId;
     public final String name;
     public final String shortName;
@@ -39,4 +42,38 @@ public class TranslationInfo {
         this.timestamp = timestamp;
         this.installed = installed;
     }
+
+    // Parcelable
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dst, int flags) {
+        dst.writeLong(uniqueId);
+        dst.writeString(name);
+        dst.writeString(shortName);
+        dst.writeString(language);
+        dst.writeString(blobKey);
+        dst.writeInt(size);
+        dst.writeLong(timestamp);
+        dst.writeByte((byte) (installed ? 1 : 0));
+    }
+
+    public static final Parcelable.Creator<TranslationInfo> CREATOR
+            = new Parcelable.Creator<TranslationInfo>() {
+        @Override
+        public TranslationInfo createFromParcel(Parcel in) {
+            return new TranslationInfo(in.readLong(), in.readString(), in.readString(),
+                    in.readString(), in.readString(), in.readInt(), in.readLong(),
+                    in.readByte() == 1);
+        }
+
+        @Override
+        public TranslationInfo[] newArray(int size) {
+            return new TranslationInfo[size];
+        }
+    };
 }

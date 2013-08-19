@@ -27,5 +27,7 @@ public class Constants {
     public static final String PREF_KEY_LAST_READ_CHAPTER = "currentChapter";
     public static final String PREF_KEY_LAST_READ_VERSE = "currentVerse";
 
+    public static final String PREF_KEY_LOADING_TRANSLATION_LIST
+            = "PREF_KEY_LOADING_TRANSLATION_LIST";
     public static final String PREF_KEY_UPGRADING = "PREF_KEY_UPGRADING";
 }

@@ -17,10 +17,6 @@
 
 package net.zionsoft.obadiah.util;
 
-import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-
 import net.zionsoft.obadiah.bible.TranslationInfo;
 
 import org.json.JSONArray;
@@ -37,13 +33,6 @@ import java.util.List;
 import javax.net.ssl.HttpsURLConnection;
 
 public class NetworkHelper {
-    public static boolean hasNetworkConnection(Context context) {
-        ConnectivityManager connectivityManager
-                = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
-        return (networkInfo != null && networkInfo.isConnected());
-    }
-
     public static List<TranslationInfo> fetchTranslationList() throws IOException, JSONException {
         final byte[] response = get(String.format("%s/translations", BASE_URL));
         final JSONArray replyArray = new JSONArray(new String(response, "UTF8"));
