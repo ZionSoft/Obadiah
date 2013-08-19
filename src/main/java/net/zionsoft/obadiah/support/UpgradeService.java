@@ -94,7 +94,8 @@ public class UpgradeService extends IntentService {
             getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE).edit()
                     .putBoolean(Constants.PREF_KEY_UPGRADING, false).commit();
 
-            broadcastStatus(status);
+            LocalBroadcastManager.getInstance(this)
+                    .sendBroadcast(new Intent(ACTION_STATUS_UPDATE).putExtra(KEY_STATUS, status));
         }
     }
 
@@ -118,10 +119,5 @@ public class UpgradeService extends IntentService {
             }
         }
         return translations;
-    }
-
-    private void broadcastStatus(int status) {
-        LocalBroadcastManager.getInstance(this)
-                .sendBroadcast(new Intent(ACTION_STATUS_UPDATE).putExtra(KEY_STATUS, status));
     }
 }
