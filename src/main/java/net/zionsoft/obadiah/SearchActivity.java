@@ -73,6 +73,8 @@ public class SearchActivity extends ActionBarActivity {
 
             mSearchText.setText(null);
             mSearchResultListAdapter.setSearchResults(null);
+        } else {
+            mSearchResultListAdapter.notifyDataSetChanged();
         }
     }
 
