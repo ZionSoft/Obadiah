@@ -14,6 +14,7 @@
     <string name="dialog_initialization_failure_message">初始化失败，请重试。</string>
     <string name="dialog_network_failure_message">请检查网络连接，并重试。</string>
     <string name="dialog_no_translation_message">没有已安装的译本，请从互联网下载。</string>
+    <string name="dialog_translation_download_failure_message">下载译本失败，请重试。</string>
     <string name="dialog_translation_list_fetch_failure_message">无法下载译本列表，请重试。</string>
 
     <string name="text_available_translation_info">%1$s\n体积%2$d KB</string>
@@ -27,7 +28,6 @@
     <string name="text_deleted">已删除。</string>
     <string name="text_deleting">删除中，请稍候。</string>
     <string name="text_downloading">下载中，请稍候。</string>
-    <string name="text_fail_to_fetch_translation">无法获取指定译本，请重试！</string>
     <string name="text_no_available_translation">没有可供下载的译本。</string>
     <string name="text_searching">搜索中&#8230;</string>
     <string name="text_share_with">分享到&#8230;</string>

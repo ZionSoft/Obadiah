@@ -55,7 +55,8 @@
                 android:label="@string/title_select_translation"
                 android:screenOrientation="portrait"/>
 
-        <service android:name=".bible.TranslationListLoadingService"/>
+        <service android:name=".bible.TranslationDownloadService"/>
+        <service android:name=".bible.TranslationListLoadService"/>
         <service android:name=".support.UpgradeService"/>
     </application>
 

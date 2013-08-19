@@ -25,7 +25,6 @@ import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,42 +33,40 @@ import javax.net.ssl.HttpsURLConnection;
 
 public class NetworkHelper {
     public static List<TranslationInfo> fetchTranslationList() throws IOException, JSONException {
-        final byte[] response = get(String.format("%s/translations", BASE_URL));
-        final JSONArray replyArray = new JSONArray(new String(response, "UTF8"));
-        final int length = replyArray.length();
-        final List<TranslationInfo> translations = new ArrayList<TranslationInfo>(length);
-        for (int i = 0; i < length; ++i) {
-            final JSONObject translationObject = replyArray.getJSONObject(i);
-            translations.add(new TranslationInfo(translationObject.getLong("uniqueId"),
-                    translationObject.getString("name"), translationObject.getString("shortName"),
-                    translationObject.getString("language"), translationObject.getString("blobKey"),
-                    translationObject.getInt("size"), translationObject.getLong("timestamp"),
-                    false));
-        }
-        return translations;
-    }
-
-    private static byte[] get(String url) throws IOException {
-        byte[] result = null;
-        HttpsURLConnection httpsConnection = null;
+        BufferedInputStream bis = null;
         try {
-            httpsConnection = (HttpsURLConnection) new URL(url).openConnection();
-            InputStream is = new BufferedInputStream(httpsConnection.getInputStream());
-            result = new byte[0];
+            bis = get("translations");
+            byte[] response = new byte[0];
             byte[] buffer = new byte[2048];
             int read;
-            while ((read = is.read(buffer)) > -1) {
-                byte[] tmp = new byte[result.length + read];
-                System.arraycopy(result, 0, tmp, 0, result.length);
-                System.arraycopy(buffer, 0, tmp, result.length, read);
-                result = tmp;
+            while ((read = bis.read(buffer)) > -1) {
+                byte[] tmp = new byte[response.length + read];
+                System.arraycopy(response, 0, tmp, 0, response.length);
+                System.arraycopy(buffer, 0, tmp, response.length, read);
+                response = tmp;
             }
+
+            final JSONArray replyArray = new JSONArray(new String(response, "UTF8"));
+            final int length = replyArray.length();
+            final List<TranslationInfo> translations = new ArrayList<TranslationInfo>(length);
+            for (int i = 0; i < length; ++i) {
+                final JSONObject translationObject = replyArray.getJSONObject(i);
+                translations.add(new TranslationInfo(translationObject.getLong("uniqueId"),
+                        translationObject.getString("name"), translationObject.getString("shortName"),
+                        translationObject.getString("language"), translationObject.getString("blobKey"),
+                        translationObject.getInt("size"), translationObject.getLong("timestamp"),
+                        false));
+            }
+            return translations;
         } finally {
-            if (httpsConnection != null)
-                httpsConnection.disconnect();
+            if (bis != null)
+                bis.close();
         }
-        return result;
     }
 
-    private static final String BASE_URL = "https://zionsoft-bible.appspot.com/1.0";
+    public static BufferedInputStream get(String url) throws IOException {
+        HttpsURLConnection httpsConnection = (HttpsURLConnection) new URL(String
+                .format("https://zionsoft-bible.appspot.com/1.0/%s", url)).openConnection();
+        return new BufferedInputStream(httpsConnection.getInputStream());
+    }
 }

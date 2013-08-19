@@ -31,23 +31,23 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TranslationListLoadingService extends IntentService {
+public class TranslationListLoadService extends IntentService {
     public static final String ACTION_STATUS_UPDATE
-            = "net.zionsoft.obadiah.bible.TranslationListLoadingService.ACTION_STATUS_UPDATE";
+            = "net.zionsoft.obadiah.bible.TranslationListLoadService.ACTION_STATUS_UPDATE";
 
     public static final String KEY_FORCE_REFRESH
-            = "net.zionsoft.obadiah.bible.TranslationListLoadingService.KEY_FORCE_REFRESH";
+            = "net.zionsoft.obadiah.bible.TranslationListLoadService.KEY_FORCE_REFRESH";
     public static final String KEY_STATUS
-            = "net.zionsoft.obadiah.bible.TranslationListLoadingService.KEY_STATUS";
+            = "net.zionsoft.obadiah.bible.TranslationListLoadService.KEY_STATUS";
     public static final String KEY_TRANSLATION_LIST
-            = "net.zionsoft.obadiah.bible.TranslationListLoadingService.KEY_TRANSLATION_LIST";
+            = "net.zionsoft.obadiah.bible.TranslationListLoadService.KEY_TRANSLATION_LIST";
 
     public static final int STATUS_SUCCESS = 0;
     public static final int STATUS_NETWORK_FAILURE = 1;
     public static final int STATUS_SERVER_FAILURE = 2;
 
-    public TranslationListLoadingService() {
-        super("net.zionsoft.obadiah.bible.TranslationListLoadingService");
+    public TranslationListLoadService() {
+        super("net.zionsoft.obadiah.bible.TranslationListLoadService");
     }
 
     @Override
