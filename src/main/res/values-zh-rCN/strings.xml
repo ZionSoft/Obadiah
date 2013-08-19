@@ -3,7 +3,12 @@
 
     <string name="app_name">圣经</string>
 
+    <string name="activity_download_translation">请选择要下载的译本</string>
+    <string name="activity_select_translation">选择译本</string>
+    <string name="activity_settings">设置</string>
+
     <string name="action_copy">复制</string>
+    <string name="action_delete_translation">删除</string>
     <string name="action_download">下载更多译本</string>
     <string name="action_refresh">刷新</string>
     <string name="action_search">搜索</string>
@@ -14,25 +19,24 @@
     <string name="dialog_initialization_failure_message">初始化失败，请重试。</string>
     <string name="dialog_network_failure_message">请检查网络连接，并重试。</string>
     <string name="dialog_no_translation_message">没有已安装的译本，请从互联网下载。</string>
+    <string name="dialog_translation_delete_confirm_message">确定删除该译本？</string>
     <string name="dialog_translation_download_failure_message">下载译本失败，请重试。</string>
     <string name="dialog_translation_list_fetch_failure_message">无法下载译本列表，请重试。</string>
 
-    <string name="text_available_translation_info">%1$s\n体积%2$d KB</string>
-    <string name="text_search_result">共找到%1$d个条目。</string>
+    <string name="pref_night_mode">夜间模式</string>
+    <string name="pref_rate_me">在Google Play上给我评分</string>
 
-    <string name="pref_nightmode_title">夜间模式</string>
-    <string name="pref_rateme_title">在Google Play上给我评分</string>
-    <string name="text_copied">文本已成功复制到剪贴板。</string>
-    <string name="text_delete">删除</string>
-    <string name="text_delete_confirm">确定删除该译本？</string>
-    <string name="text_deleted">已删除。</string>
-    <string name="text_deleting">删除中，请稍候。</string>
-    <string name="text_downloading">下载中，请稍候。</string>
-    <string name="text_no_available_translation">没有可供下载的译本。</string>
-    <string name="text_searching">搜索中&#8230;</string>
-    <string name="text_share_with">分享到&#8230;</string>
-    <string name="text_settings">设置</string>
-    <string name="title_download_translation">请选择要下载的译本</string>
-    <string name="title_select_translation">选择译本</string>
+    <string name="progress_dialog_translation_deleting">删除中，请稍候。</string>
+    <string name="progress_dialog_translation_downloading">下载中，请稍候。</string>
+    <string name="progress_dialog_verses_searching">搜索中&#8230;</string>
+
+    <string name="text_available_translation_info">%1$s\n体积%2$d KB</string>
+
+    <string name="title_share_with">分享到&#8230;</string>
+
+    <string name="toast_no_available_translation">没有可供下载的译本。</string>
+    <string name="toast_translation_deleted">已删除。</string>
+    <string name="toast_verses_copied">文本已成功复制到剪贴板。</string>
+    <string name="toast_verses_searched">共找到%1$d个条目。</string>
 
 </resources>

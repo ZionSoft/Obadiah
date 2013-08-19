@@ -324,7 +324,7 @@ public class TextActivity extends ActionBarActivity {
                                                     mClipboardManager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
                                                 }
                                                 mClipboardManager.setText(mVersePagerAdapter.selectedText());
-                                                Toast.makeText(TextActivity.this, R.string.text_copied, Toast.LENGTH_SHORT).show();
+                                                Toast.makeText(TextActivity.this, R.string.toast_verses_copied, Toast.LENGTH_SHORT).show();
                                                 actionMode.finish();
                                                 return true;
                                             case R.id.action_share:
@@ -332,7 +332,7 @@ public class TextActivity extends ActionBarActivity {
                                                 intent.setAction(Intent.ACTION_SEND);
                                                 intent.setType("text/plain");
                                                 intent.putExtra(Intent.EXTRA_TEXT, mVersePagerAdapter.selectedText());
-                                                startActivity(Intent.createChooser(intent, getResources().getText(R.string.text_share_with)));
+                                                startActivity(Intent.createChooser(intent, getResources().getText(R.string.title_share_with)));
                                                 actionMode.finish();
                                                 return true;
                                             default:

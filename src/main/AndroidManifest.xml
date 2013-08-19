@@ -41,18 +41,18 @@
         </activity>
         <activity
                 android:name=".SettingsActivity"
-                android:label="@string/text_settings"
+                android:label="@string/activity_settings"
                 android:screenOrientation="portrait"/>
         <activity
                 android:name=".TextActivity"
                 android:screenOrientation="portrait"/>
         <activity
                 android:name=".TranslationDownloadActivity"
-                android:label="@string/title_download_translation"
+                android:label="@string/activity_download_translation"
                 android:screenOrientation="portrait"/>
         <activity
                 android:name=".TranslationSelectionActivity"
-                android:label="@string/title_select_translation"
+                android:label="@string/activity_select_translation"
                 android:screenOrientation="portrait"/>
 
         <service android:name=".bible.TranslationDownloadService"/>

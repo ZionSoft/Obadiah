@@ -150,7 +150,7 @@ public class SearchActivity extends ActionBarActivity {
 
                 mProgressDialog = new ProgressDialog(SearchActivity.this);
                 mProgressDialog.setCancelable(false);
-                mProgressDialog.setMessage(getText(R.string.text_searching));
+                mProgressDialog.setMessage(getText(R.string.progress_dialog_verses_searching));
                 mProgressDialog.show();
             }
 
@@ -167,7 +167,7 @@ public class SearchActivity extends ActionBarActivity {
                 mSearchResultListAdapter.setSearchResults(results);
                 mProgressDialog.dismiss();
 
-                String text = getResources().getString(R.string.text_search_result,
+                String text = getResources().getString(R.string.toast_verses_searched,
                         results == null ? 0 : results.size());
                 Toast.makeText(SearchActivity.this, text, Toast.LENGTH_SHORT).show();
             }

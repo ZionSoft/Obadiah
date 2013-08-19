@@ -133,7 +133,7 @@ public class TranslationDownloadActivity extends ActionBarActivity {
                         mTranslationListAdapter.setTranslations(mAvailableTranslations);
                     } else {
                         Toast.makeText(TranslationDownloadActivity.this,
-                                R.string.text_no_available_translation, Toast.LENGTH_SHORT).show();
+                                R.string.toast_no_available_translation, Toast.LENGTH_SHORT).show();
                         finish();
                     }
                 } else {
@@ -193,7 +193,7 @@ public class TranslationDownloadActivity extends ActionBarActivity {
                                         TranslationDownloadService.ACTION_CANCEL_DOWNLOAD));
                     }
                 });
-        mTranslationDownloadProgressDialog.setMessage(getText(R.string.text_downloading));
+        mTranslationDownloadProgressDialog.setMessage(getText(R.string.progress_dialog_translation_downloading));
         mTranslationDownloadProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
         mTranslationDownloadProgressDialog.setMax(100);
         mTranslationDownloadProgressDialog.setProgress(0);

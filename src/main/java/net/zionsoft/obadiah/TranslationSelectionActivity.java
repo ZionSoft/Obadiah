@@ -108,7 +108,7 @@ public class TranslationSelectionActivity extends ActionBarActivity {
                 if (selected.shortName.equals(mSelectedTranslationShortName))
                     return false;
 
-                final CharSequence[] items = {getResources().getText(R.string.text_delete)};
+                final CharSequence[] items = {getResources().getText(R.string.action_delete_translation)};
                 final AlertDialog.Builder contextMenuDialogBuilder = new AlertDialog.Builder(
                         TranslationSelectionActivity.this);
                 contextMenuDialogBuilder.setItems(items, new DialogInterface.OnClickListener() {
@@ -116,7 +116,7 @@ public class TranslationSelectionActivity extends ActionBarActivity {
                         switch (which) {
                             case 0: // delete
                                 DialogHelper.showDialog(TranslationSelectionActivity.this, true,
-                                        R.string.text_delete_confirm,
+                                        R.string.dialog_translation_delete_confirm_message,
                                         new DialogInterface.OnClickListener() {
                                             public void onClick(DialogInterface dialog, int id) {
                                                 removeTranslation(selected);
@@ -176,7 +176,7 @@ public class TranslationSelectionActivity extends ActionBarActivity {
 
                 mProgressDialog = new ProgressDialog(TranslationSelectionActivity.this);
                 mProgressDialog.setCancelable(false);
-                mProgressDialog.setMessage(getText(R.string.text_deleting));
+                mProgressDialog.setMessage(getText(R.string.progress_dialog_translation_deleting));
                 mProgressDialog.show();
             }
 
@@ -193,7 +193,7 @@ public class TranslationSelectionActivity extends ActionBarActivity {
                 populateUi();
                 mProgressDialog.cancel();
                 Toast.makeText(TranslationSelectionActivity.this,
-                        R.string.text_deleted, Toast.LENGTH_SHORT).show();
+                        R.string.toast_translation_deleted, Toast.LENGTH_SHORT).show();
             }
 
             private ProgressDialog mProgressDialog;
