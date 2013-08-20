@@ -26,8 +26,8 @@
     <string name="pref_night_mode">夜间模式</string>
     <string name="pref_rate_me">在Google Play上给我评分</string>
 
-    <string name="progress_dialog_translation_deleting">删除中，请稍候。</string>
-    <string name="progress_dialog_translation_downloading">下载中，请稍候。</string>
+    <string name="progress_dialog_translation_deleting">删除中&#8230;</string>
+    <string name="progress_dialog_translation_downloading">下载中&#8230;</string>
     <string name="progress_dialog_verses_searching">搜索中&#8230;</string>
 
     <string name="text_available_translation_info">%1$s\n体积%2$d KB</string>

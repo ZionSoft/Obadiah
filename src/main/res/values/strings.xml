@@ -36,8 +36,8 @@
     <string name="pref_night_mode">Night Mode</string>
     <string name="pref_rate_me">Rate me on Google Play</string>
 
-    <string name="progress_dialog_translation_deleting">Deleting, please wait.</string>
-    <string name="progress_dialog_translation_downloading">Downloading, please wait.</string>
+    <string name="progress_dialog_translation_deleting">Deleting&#8230;</string>
+    <string name="progress_dialog_translation_downloading">Downloading&#8230;</string>
     <string name="progress_dialog_verses_searching">Searching&#8230;</string>
 
     <string name="text_available_translation_info">%1$s\nSize: %2$d KB</string>
