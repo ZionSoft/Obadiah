@@ -45,6 +45,7 @@
     <string name="title_share_with">Share with&#8230;</string>
 
     <string name="toast_no_available_translation">No translations available for download.</string>
+    <string name="toast_no_installed_translation">No translations installed.</string>
     <string name="toast_translation_deleted">Deleted.</string>
     <string name="toast_verses_copied">Texts copied to clipboard.</string>
     <string name="toast_verses_searched">%1$d result(s) found.</string>

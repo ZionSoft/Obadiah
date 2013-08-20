@@ -35,6 +35,7 @@
     <string name="title_share_with">分享到&#8230;</string>
 
     <string name="toast_no_available_translation">没有可供下载的译本。</string>
+    <string name="toast_no_installed_translation">没有已下载的译本。</string>
     <string name="toast_translation_deleted">已删除。</string>
     <string name="toast_verses_copied">文本已成功复制到剪贴板。</string>
     <string name="toast_verses_searched">共找到%1$d个条目。</string>

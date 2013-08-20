@@ -148,17 +148,20 @@ public class TranslationSelectionActivity extends ActionBarActivity {
 
             @Override
             protected void onPostExecute(List<TranslationInfo> translations) {
+                Animator.fadeOut(mLoadingSpinner);
+                Animator.fadeIn(mTranslationListView);
+
                 if (translations.size() == 0) {
                     if (mFirstTime) {
                         startActivity(new Intent(TranslationSelectionActivity.this,
                                 TranslationDownloadActivity.class));
                         mFirstTime = false;
+                    } else {
+                        Toast.makeText(TranslationSelectionActivity.this,
+                                R.string.toast_no_installed_translation, Toast.LENGTH_SHORT).show();
                     }
                     return;
                 }
-
-                Animator.fadeOut(mLoadingSpinner);
-                Animator.fadeIn(mTranslationListView);
 
                 // 1st time resumed from TranslationDownloadActivity with installed translation
                 if (mSelectedTranslationShortName == null)
