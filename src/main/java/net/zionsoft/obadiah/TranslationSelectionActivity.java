@@ -41,7 +41,7 @@ public class TranslationSelectionActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.translationselection_activity);
+        setContentView(R.layout.translation_selection_activity);
 
         mSettingsManager = new SettingsManager(this);
         mTranslationManager = new TranslationManager(this);

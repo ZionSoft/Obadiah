@@ -44,7 +44,7 @@ public class TranslationDownloadActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.translationdownload_activity);
+        setContentView(R.layout.translation_download_activity);
 
         mSettingsManager = new SettingsManager(this);
 
@@ -275,7 +275,7 @@ public class TranslationDownloadActivity extends ActionBarActivity {
         mLoadingSpinner = findViewById(R.id.translation_download_loading_spinner);
 
         // translation list view
-        mTranslationListView = (ListView) findViewById(R.id.translation_listview);
+        mTranslationListView = (ListView) findViewById(R.id.translation_list_view);
         mTranslationListAdapter = new TranslationDownloadListAdapter(this, mSettingsManager);
         mTranslationListView.setAdapter(mTranslationListAdapter);
         mTranslationListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {

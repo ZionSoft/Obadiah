@@ -100,7 +100,7 @@ public class SearchActivity extends ActionBarActivity {
 
     private void initializeUi() {
         // initializes the search bar
-        mSearchText = (EditText) findViewById(R.id.search_edittext);
+        mSearchText = (EditText) findViewById(R.id.search_edit_text);
         mSearchText.setOnEditorActionListener(new OnEditorActionListener() {
             public boolean onEditorAction(TextView view, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_SEARCH) {
@@ -112,7 +112,7 @@ public class SearchActivity extends ActionBarActivity {
         });
 
         // initializes the search results list view
-        mSearchResultListView = (ListView) findViewById(R.id.search_result_listview);
+        mSearchResultListView = (ListView) findViewById(R.id.search_result_list_view);
         mSearchResultListAdapter = new SearchResultListAdapter(this, mSettingsManager);
         mSearchResultListView.setAdapter(mSearchResultListAdapter);
         mSearchResultListView.setOnItemClickListener(new OnItemClickListener() {

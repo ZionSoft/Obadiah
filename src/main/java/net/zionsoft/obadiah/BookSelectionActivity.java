@@ -44,7 +44,7 @@ public class BookSelectionActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.bookselection_activity);
+        setContentView(R.layout.book_selection_activity);
 
         if (needsUpgrade())
             upgrade();
@@ -182,7 +182,7 @@ public class BookSelectionActivity extends ActionBarActivity {
         mMainView = findViewById(R.id.book_selection_main_view);
 
         // book list view
-        mBookListView = (ListView) findViewById(R.id.book_listview);
+        mBookListView = (ListView) findViewById(R.id.book_list_view);
         mBookListAdapter = new BookListAdapter(this, mSettingsManager);
         mBookListView.setAdapter(mBookListAdapter);
         mBookListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -195,7 +195,7 @@ public class BookSelectionActivity extends ActionBarActivity {
         });
 
         // chapters list view
-        mChaptersGridView = (GridView) findViewById(R.id.chapter_gridview);
+        mChaptersGridView = (GridView) findViewById(R.id.chapter_grid_view);
         mChapterListAdapter = new ChapterListAdapter(this, mSettingsManager);
         mChaptersGridView.setAdapter(mChapterListAdapter);
         mChaptersGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {

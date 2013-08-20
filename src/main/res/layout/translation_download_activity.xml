@@ -5,7 +5,7 @@
 
     <com.google.ads.AdView
             xmlns:googleads="http://schemas.android.com/apk/lib/com.google.ads"
-            android:id="@+id/adview"
+            android:id="@+id/ad_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
@@ -17,10 +17,10 @@
     <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_above="@id/adview">
+            android:layout_above="@id/ad_view">
 
         <ListView
-                android:id="@+id/translation_listview"
+                android:id="@+id/translation_list_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:divider="@android:color/darker_gray"

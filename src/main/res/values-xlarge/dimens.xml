@@ -4,7 +4,7 @@
     <dimen name="padding">12dip</dimen>
     <dimen name="text_size_small">24sp</dimen>
     <dimen name="text_size_medium">26sp</dimen>
-    <dimen name="booklistview_width">320dip</dimen>
-    <dimen name="chaptergridview_column_width">96dip</dimen>
+    <dimen name="book_list_view_width">320dip</dimen>
+    <dimen name="chapter_grid_view_column_width">96dip</dimen>
 
 </resources>

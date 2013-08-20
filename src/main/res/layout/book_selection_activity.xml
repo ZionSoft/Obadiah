@@ -10,8 +10,8 @@
             android:orientation="horizontal">
 
         <ListView
-                android:id="@+id/book_listview"
-                android:layout_width="@dimen/booklistview_width"
+                android:id="@+id/book_list_view"
+                android:layout_width="@dimen/book_list_view_width"
                 android:layout_height="match_parent"
                 android:divider="@null"
                 android:dividerHeight="0dip"
@@ -19,10 +19,10 @@
                 android:numColumns="auto_fit"/>
 
         <GridView
-                android:id="@+id/chapter_gridview"
+                android:id="@+id/chapter_grid_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:columnWidth="@dimen/chaptergridview_column_width"
+                android:columnWidth="@dimen/chapter_grid_view_column_width"
                 android:gravity="center"
                 android:listSelector="@null"
                 android:numColumns="auto_fit"
