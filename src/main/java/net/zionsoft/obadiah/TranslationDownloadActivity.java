@@ -129,7 +129,7 @@ public class TranslationDownloadActivity extends ActionBarActivity {
                 if (status == TranslationListLoadService.STATUS_SUCCESS) {
                     mAvailableTranslations = intent.getParcelableArrayListExtra(
                             TranslationListLoadService.KEY_TRANSLATION_LIST);
-                    if (mAvailableTranslations.size() > 0) {
+                    if (mAvailableTranslations != null && mAvailableTranslations.size() > 0) {
                         mTranslationListAdapter.setTranslations(mAvailableTranslations);
                     } else {
                         Toast.makeText(TranslationDownloadActivity.this,
@@ -220,6 +220,10 @@ public class TranslationDownloadActivity extends ActionBarActivity {
                         TranslationDownloadService.STATUS_SUCCESS);
                 if (status == TranslationDownloadService.STATUS_SUCCESS) {
                     unregisterTranslationDownloadingStatusListener();
+                    getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE).edit()
+                            .putString(Constants.PREF_KEY_LAST_READ_TRANSLATION,
+                                    translation.shortName)
+                            .commit();
                     finish();
                 } else if (status == TranslationDownloadService.STATUS_IN_PROGRESS) {
                     mTranslationDownloadProgressDialog.setProgress(intent.

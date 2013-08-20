@@ -64,14 +64,6 @@ public class TranslationSelectionActivity extends ActionBarActivity {
     }
 
     @Override
-    protected void onPause() {
-        getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE).edit()
-                .putString(Constants.PREF_KEY_LAST_READ_TRANSLATION, mSelectedTranslationShortName)
-                .commit();
-        super.onPause();
-    }
-
-    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_translation_selection, menu);
         return true;
@@ -98,7 +90,10 @@ public class TranslationSelectionActivity extends ActionBarActivity {
         mTranslationListView.setAdapter(mTranslationListAdapter);
         mTranslationListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                mSelectedTranslationShortName = mTranslationListAdapter.getItem(position).shortName;
+                getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE).edit()
+                        .putString(Constants.PREF_KEY_LAST_READ_TRANSLATION,
+                                mTranslationListAdapter.getItem(position).shortName)
+                        .commit();
                 finish();
             }
         });
@@ -152,14 +147,8 @@ public class TranslationSelectionActivity extends ActionBarActivity {
                 Animator.fadeIn(mTranslationListView);
 
                 if (translations.size() == 0) {
-                    if (mFirstTime) {
-                        startActivity(new Intent(TranslationSelectionActivity.this,
-                                TranslationDownloadActivity.class));
-                        mFirstTime = false;
-                    } else {
-                        Toast.makeText(TranslationSelectionActivity.this,
-                                R.string.toast_no_installed_translation, Toast.LENGTH_SHORT).show();
-                    }
+                    Toast.makeText(TranslationSelectionActivity.this,
+                            R.string.toast_no_installed_translation, Toast.LENGTH_SHORT).show();
                     return;
                 }
 
@@ -202,8 +191,6 @@ public class TranslationSelectionActivity extends ActionBarActivity {
             private ProgressDialog mProgressDialog;
         }.execute(translation);
     }
-
-    private boolean mFirstTime = true;
 
     private ListView mTranslationListView;
     private View mLoadingSpinner;

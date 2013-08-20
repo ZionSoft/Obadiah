@@ -224,7 +224,7 @@ public class BookSelectionActivity extends ActionBarActivity {
                     new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
                             startActivity(new Intent(BookSelectionActivity.this,
-                                    TranslationSelectionActivity.class));
+                                    TranslationDownloadActivity.class));
                         }
                     },
                     new DialogInterface.OnClickListener() {
