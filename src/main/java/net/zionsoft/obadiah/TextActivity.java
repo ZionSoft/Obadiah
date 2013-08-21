@@ -30,17 +30,13 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.view.ActionMode;
 import android.text.ClipboardManager;
-import android.text.SpannableString;
-import android.text.style.BackgroundColorSpan;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import net.zionsoft.obadiah.bible.TranslationReader;
@@ -131,7 +127,6 @@ public class TextActivity extends ActionBarActivity {
 
     private void populateUi() {
         mRootView.setBackgroundColor(mSettingsManager.backgroundColor());
-        mTextColor = mSettingsManager.textColor();
 
         final SharedPreferences preferences = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE);
         mCurrentBook = preferences.getInt(Constants.PREF_KEY_LAST_READ_BOOK, 0);
@@ -175,102 +170,6 @@ public class TextActivity extends ActionBarActivity {
         }
     }
 
-    private class VerseListAdapter extends ListBaseAdapter {
-        public VerseListAdapter(Context context) {
-            super(context);
-        }
-
-        public void selectItem(int position) {
-            if (position < 0 || position >= mTexts.length)
-                return;
-
-            mSelected[position] ^= true;
-            if (mSelected[position])
-                ++mSelectedCount;
-            else
-                --mSelectedCount;
-
-            notifyDataSetChanged();
-        }
-
-        public boolean hasItemSelected() {
-            return (mSelectedCount > 0);
-        }
-
-        public void deselect() {
-            int length = mSelected.length;
-            for (int i = 0; i < length; ++i)
-                mSelected[i] = false;
-            mSelectedCount = 0;
-
-            notifyDataSetChanged();
-        }
-
-        public String selectedText() {
-            if (!hasItemSelected())
-                return null;
-
-            // format: <book name> <chapter index>:<verse index> <verse text>
-            final String template = String.format("%s %d:%d %s",
-                    TextActivity.this.mTranslationReader.bookNames()[TextActivity.this.mCurrentBook],
-                    TextActivity.this.mCurrentChapter + 1);
-            StringBuilder selected = new StringBuilder();
-            for (int i = 0; i < mTexts.length; ++i) {
-                if (mSelected[i]) {
-                    if (selected.length() != 0)
-                        selected.append("\n");
-                    selected.append(String.format(template, i + 1, mTexts[i]));
-                }
-            }
-            return selected.toString();
-        }
-
-        public void setTexts(String[] texts) {
-            mTexts = texts;
-
-            final int length = texts.length;
-            if (mSelected == null || length > mSelected.length)
-                mSelected = new boolean[length];
-            for (int i = 0; i < length; ++i)
-                mSelected[i] = false;
-            mSelectedCount = 0;
-
-            notifyDataSetChanged();
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            LinearLayout linearLayout;
-            if (convertView == null)
-                linearLayout = (LinearLayout) View.inflate(mContext, R.layout.text_list_item, null);
-            else
-                linearLayout = (LinearLayout) convertView;
-
-            TextView textView = (TextView) linearLayout.getChildAt(0);
-            textView.setTextColor(TextActivity.this.mTextColor);
-            textView.setText(Integer.toString(position + 1));
-
-            textView = (TextView) linearLayout.getChildAt(1);
-            textView.setTextColor(TextActivity.this.mTextColor);
-            if (mSelected[position]) {
-                final SpannableString string = new SpannableString(mTexts[position]);
-                if (mBackgroundColorSpan == null)
-                    mBackgroundColorSpan = new BackgroundColorSpan(Color.LTGRAY);
-                string.setSpan(mBackgroundColorSpan, 0, mTexts[position].length(),
-                        SpannableString.SPAN_INCLUSIVE_INCLUSIVE);
-                textView.setText(string);
-            } else {
-                textView.setText(mTexts[position]);
-            }
-
-            return linearLayout;
-        }
-
-        private boolean mSelected[];
-        private int mSelectedCount;
-        private BackgroundColorSpan mBackgroundColorSpan;
-    }
-
     private class VersePagerAdapter extends PagerAdapter {
         public VersePagerAdapter() {
             super();
@@ -303,7 +202,8 @@ public class TextActivity extends ActionBarActivity {
                 verseListView.setDivider(null);
                 verseListView.setSelector(new ColorDrawable(Color.TRANSPARENT));
 
-                final VerseListAdapter verseListAdapter = new VerseListAdapter(TextActivity.this);
+                final VerseListAdapter verseListAdapter = new VerseListAdapter(TextActivity.this,
+                        mSettingsManager, mTranslationReader);
                 page.verseListAdapter = verseListAdapter;
                 verseListView.setAdapter(verseListAdapter);
                 verseListView.setOnItemClickListener(new OnItemClickListener() {
@@ -368,8 +268,7 @@ public class TextActivity extends ActionBarActivity {
             container.addView(page.verseListView, 0);
             page.inUse = true;
             page.position = position;
-            page.verseListAdapter.setTexts(TextActivity.this.mTranslationReader.verses(
-                    TextActivity.this.mCurrentBook, position));
+            page.verseListAdapter.selectChapter(mCurrentBook, position);
 
             // scroll to the correct position
             if (mSelection > 0 && position == TextActivity.this.mCurrentChapter) {
@@ -398,10 +297,8 @@ public class TextActivity extends ActionBarActivity {
 
         public void updateText() {
             for (Page page : mPages) {
-                if (page.inUse) {
-                    page.verseListAdapter.setTexts(TextActivity.this.mTranslationReader.verses(
-                            TextActivity.this.mCurrentBook, page.position));
-                }
+                if (page.inUse)
+                    page.verseListAdapter.selectChapter(mCurrentBook, page.position);
             }
 
             notifyDataSetChanged();
@@ -440,7 +337,6 @@ public class TextActivity extends ActionBarActivity {
 
     private int mCurrentBook = -1;
     private int mCurrentChapter = -1;
-    private int mTextColor;
     private ActionMode mActionMode;
     private SettingsManager mSettingsManager;
     private TranslationReader mTranslationReader;
