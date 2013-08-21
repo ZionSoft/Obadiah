@@ -90,8 +90,9 @@ public class VerseListAdapter extends ListBaseAdapter {
             return null;
 
         // format: <book name> <chapter index>:<verse index> <verse text>
-        final String template = String.format("%s %d:%d %s",
-                mTranslationReader.bookNames()[mCurrentBook], mCurrentChapter + 1);
+        final String template = new StringBuilder()
+                .append(mTranslationReader.bookNames()[mCurrentBook]).append(mCurrentChapter + 1)
+                .append(":%d %s").toString();
         StringBuilder selected = new StringBuilder();
         for (int i = 0; i < mTexts.length; ++i) {
             if (mSelected[i]) {
