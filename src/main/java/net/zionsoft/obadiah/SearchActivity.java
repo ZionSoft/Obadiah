@@ -60,9 +60,7 @@ public class SearchActivity extends ActionBarActivity {
         super.onResume();
 
         mSettingsManager.refresh();
-        final int backgroundColor = mSettingsManager.backgroundColor();
-        mSearchResultListView.setBackgroundColor(backgroundColor);
-        mSearchResultListView.setCacheColorHint(backgroundColor);
+        mRootView.setBackgroundColor(mSettingsManager.backgroundColor());
 
         final String selected = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE)
                 .getString(Constants.PREF_KEY_LAST_READ_TRANSLATION, null);
@@ -99,6 +97,8 @@ public class SearchActivity extends ActionBarActivity {
     }
 
     private void initializeUi() {
+        mRootView = getWindow().getDecorView();
+
         // initializes the search bar
         mSearchText = (EditText) findViewById(R.id.search_edit_text);
         mSearchText.setOnEditorActionListener(new OnEditorActionListener() {
@@ -178,6 +178,8 @@ public class SearchActivity extends ActionBarActivity {
 
     private EditText mSearchText;
     private ListView mSearchResultListView;
+    private View mRootView;
+
     private List<TranslationReader.SearchResult> mResults;
     private SearchResultListAdapter mSearchResultListAdapter;
     private SettingsManager mSettingsManager;

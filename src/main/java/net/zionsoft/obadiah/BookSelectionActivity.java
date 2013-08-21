@@ -62,11 +62,7 @@ public class BookSelectionActivity extends ActionBarActivity {
         super.onResume();
 
         mSettingsManager.refresh();
-        final int backgroundColor = mSettingsManager.backgroundColor();
-        mBookListView.setBackgroundColor(backgroundColor);
-        mBookListView.setCacheColorHint(backgroundColor);
-        mChaptersGridView.setBackgroundColor(backgroundColor);
-        mChaptersGridView.setCacheColorHint(backgroundColor);
+        mRootView.setBackgroundColor(mSettingsManager.backgroundColor());
 
         if (isUpgrading())
             return;
@@ -180,6 +176,7 @@ public class BookSelectionActivity extends ActionBarActivity {
     private void initializeUi() {
         mLoadingSpinner = findViewById(R.id.book_selection_loading_spinner);
         mMainView = findViewById(R.id.book_selection_main_view);
+        mRootView = getWindow().getDecorView();
 
         // book list view
         mBookListView = (ListView) findViewById(R.id.book_list_view);
@@ -303,6 +300,7 @@ public class BookSelectionActivity extends ActionBarActivity {
     private ListView mBookListView;
     private View mLoadingSpinner;
     private View mMainView;
+    private View mRootView;
 
     private SettingsManager mSettingsManager;
     private TranslationReader mTranslationReader;

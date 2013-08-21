@@ -56,9 +56,7 @@ public class TranslationSelectionActivity extends ActionBarActivity {
         super.onResume();
 
         mSettingsManager.refresh();
-        final int backgroundColor = mSettingsManager.backgroundColor();
-        mTranslationListView.setBackgroundColor(backgroundColor);
-        mTranslationListView.setCacheColorHint(backgroundColor);
+        mRootView.setBackgroundColor(mSettingsManager.backgroundColor());
 
         populateUi();
     }
@@ -82,6 +80,7 @@ public class TranslationSelectionActivity extends ActionBarActivity {
 
     private void initializeUi() {
         mLoadingSpinner = findViewById(R.id.translation_selection_loading_spinner);
+        mRootView = getWindow().getDecorView();
 
         // translation list view
         mTranslationListAdapter = new TranslationSelectionListAdapter(this, mSettingsManager);
@@ -194,6 +193,7 @@ public class TranslationSelectionActivity extends ActionBarActivity {
 
     private ListView mTranslationListView;
     private View mLoadingSpinner;
+    private View mRootView;
 
     private SettingsManager mSettingsManager;
     private String mSelectedTranslationShortName;

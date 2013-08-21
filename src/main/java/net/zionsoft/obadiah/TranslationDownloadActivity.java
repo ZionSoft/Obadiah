@@ -56,9 +56,7 @@ public class TranslationDownloadActivity extends ActionBarActivity {
         super.onResume();
 
         mSettingsManager.refresh();
-        final int backgroundColor = mSettingsManager.backgroundColor();
-        mTranslationListView.setBackgroundColor(backgroundColor);
-        mTranslationListView.setCacheColorHint(backgroundColor);
+        mRootView.setBackgroundColor(mSettingsManager.backgroundColor());
     }
 
     @Override
@@ -273,6 +271,7 @@ public class TranslationDownloadActivity extends ActionBarActivity {
 
     private void initializeUi() {
         mLoadingSpinner = findViewById(R.id.translation_download_loading_spinner);
+        mRootView = getWindow().getDecorView();
 
         // translation list view
         mTranslationListView = (ListView) findViewById(R.id.translation_list_view);
@@ -292,6 +291,7 @@ public class TranslationDownloadActivity extends ActionBarActivity {
 
     private View mLoadingSpinner;
     private ListView mTranslationListView;
+    private View mRootView;
     private ProgressDialog mTranslationDownloadProgressDialog;
 
     private SettingsManager mSettingsManager;

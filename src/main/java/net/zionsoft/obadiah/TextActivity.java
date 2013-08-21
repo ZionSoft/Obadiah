@@ -58,6 +58,8 @@ public class TextActivity extends ActionBarActivity {
         mSettingsManager = new SettingsManager(this);
         mTranslationReader = new TranslationReader(this);
 
+        mRootView = getWindow().getDecorView();
+
         // initializes verses view pager
         mVerseViewPager = (ViewPager) findViewById(R.id.verse_viewpager);
         mVersePagerAdapter = new VersePagerAdapter();
@@ -84,7 +86,7 @@ public class TextActivity extends ActionBarActivity {
         super.onResume();
 
         mSettingsManager.refresh();
-        mBackgroundColor = mSettingsManager.backgroundColor();
+        mRootView.setBackgroundColor(mSettingsManager.backgroundColor());
         mTextColor = mSettingsManager.textColor();
 
         final SharedPreferences preferences = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE);
@@ -290,8 +292,6 @@ public class TextActivity extends ActionBarActivity {
 
                 final ListView verseListView = new ListView(TextActivity.this);
                 page.verseListView = verseListView;
-                verseListView.setBackgroundColor(TextActivity.this.mBackgroundColor);
-                verseListView.setCacheColorHint(TextActivity.this.mBackgroundColor);
                 verseListView.setDivider(null);
                 verseListView.setSelector(new ColorDrawable(Color.TRANSPARENT));
 
@@ -390,8 +390,6 @@ public class TextActivity extends ActionBarActivity {
 
         public void updateText() {
             for (Page page : mPages) {
-                page.verseListView.setBackgroundColor(TextActivity.this.mBackgroundColor);
-                page.verseListView.setCacheColorHint(TextActivity.this.mBackgroundColor);
                 if (page.inUse) {
                     page.verseListAdapter.setTexts(TextActivity.this.mTranslationReader.verses(
                             TextActivity.this.mCurrentBook, page.position));
@@ -434,13 +432,13 @@ public class TextActivity extends ActionBarActivity {
 
     private int mCurrentBook = -1;
     private int mCurrentChapter = -1;
-    private int mBackgroundColor;
     private int mTextColor;
     private ActionMode mActionMode;
     private SettingsManager mSettingsManager;
     private TranslationReader mTranslationReader;
     private VersePagerAdapter mVersePagerAdapter;
     private ViewPager mVerseViewPager;
+    private View mRootView;
 
     @SuppressWarnings("deprecation")
     private ClipboardManager mClipboardManager;
