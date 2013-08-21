@@ -46,17 +46,10 @@ public class TranslationDownloadActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.translation_download_activity);
 
-        mSettingsManager = new SettingsManager(this);
+        SettingsManager settingsManager = new SettingsManager(this);
+        settingsManager.refresh();
 
-        initializeUi();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        mSettingsManager.refresh();
-        mRootView.setBackgroundColor(mSettingsManager.backgroundColor());
+        initializeUi(settingsManager);
     }
 
     @Override
@@ -269,13 +262,13 @@ public class TranslationDownloadActivity extends ActionBarActivity {
 
     // UI related
 
-    private void initializeUi() {
+    private void initializeUi(SettingsManager settingsManager) {
         mLoadingSpinner = findViewById(R.id.translation_download_loading_spinner);
-        mRootView = getWindow().getDecorView();
+        getWindow().getDecorView().setBackgroundColor(settingsManager.backgroundColor());
 
         // translation list view
         mTranslationListView = (ListView) findViewById(R.id.translation_list_view);
-        mTranslationListAdapter = new TranslationDownloadListAdapter(this, mSettingsManager);
+        mTranslationListAdapter = new TranslationDownloadListAdapter(this, settingsManager);
         mTranslationListView.setAdapter(mTranslationListAdapter);
         mTranslationListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -291,10 +284,7 @@ public class TranslationDownloadActivity extends ActionBarActivity {
 
     private View mLoadingSpinner;
     private ListView mTranslationListView;
-    private View mRootView;
     private ProgressDialog mTranslationDownloadProgressDialog;
-
-    private SettingsManager mSettingsManager;
 
     private TranslationDownloadListAdapter mTranslationListAdapter;
     private List<TranslationInfo> mAvailableTranslations;

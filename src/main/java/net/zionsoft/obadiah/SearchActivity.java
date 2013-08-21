@@ -60,21 +60,7 @@ public class SearchActivity extends ActionBarActivity {
         super.onResume();
 
         mSettingsManager.refresh();
-        mRootView.setBackgroundColor(mSettingsManager.backgroundColor());
-        mSearchText.setTextColor(mSettingsManager.textColor());
-
-        final String selected = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE)
-                .getString(Constants.PREF_KEY_LAST_READ_TRANSLATION, null);
-        if (!selected.equals(mSelectedTranslationShortName)) {
-            setTitle(selected);
-            mTranslationReader.selectTranslation(selected);
-            mSelectedTranslationShortName = mTranslationReader.selectedTranslationShortName();
-
-            mSearchText.setText(null);
-            mSearchResultListAdapter.setSearchResults(null);
-        } else {
-            mSearchResultListAdapter.notifyDataSetChanged();
-        }
+        populateUi();
     }
 
     @Override
@@ -129,6 +115,24 @@ public class SearchActivity extends ActionBarActivity {
                         .setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
             }
         });
+    }
+
+    private void populateUi() {
+        mRootView.setBackgroundColor(mSettingsManager.backgroundColor());
+        mSearchText.setTextColor(mSettingsManager.textColor());
+
+        final String selected = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE)
+                .getString(Constants.PREF_KEY_LAST_READ_TRANSLATION, null);
+        if (!selected.equals(mSelectedTranslationShortName)) {
+            setTitle(selected);
+            mTranslationReader.selectTranslation(selected);
+            mSelectedTranslationShortName = mTranslationReader.selectedTranslationShortName();
+
+            mSearchText.setText(null);
+            mSearchResultListAdapter.setSearchResults(null);
+        } else {
+            mSearchResultListAdapter.notifyDataSetChanged();
+        }
     }
 
     public void search(View view) {

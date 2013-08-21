@@ -58,27 +58,7 @@ public class TextActivity extends ActionBarActivity {
         mSettingsManager = new SettingsManager(this);
         mTranslationReader = new TranslationReader(this);
 
-        mRootView = getWindow().getDecorView();
-
-        // initializes verses view pager
-        mVerseViewPager = (ViewPager) findViewById(R.id.verse_viewpager);
-        mVersePagerAdapter = new VersePagerAdapter();
-        mVerseViewPager.setAdapter(mVersePagerAdapter);
-        mVerseViewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            public void onPageScrollStateChanged(int state) {
-            }
-
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-            }
-
-            public void onPageSelected(int position) {
-                mCurrentChapter = position;
-                if (mActionMode != null)
-                    mActionMode.finish();
-                populateUi();
-            }
-        });
-        mVerseViewPager.setPageTransformer(true, new DepthPageTransformer());
+        initializeUi();
     }
 
     @Override
@@ -86,18 +66,6 @@ public class TextActivity extends ActionBarActivity {
         super.onResume();
 
         mSettingsManager.refresh();
-        mRootView.setBackgroundColor(mSettingsManager.backgroundColor());
-        mTextColor = mSettingsManager.textColor();
-
-        final SharedPreferences preferences = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE);
-        mCurrentBook = preferences.getInt(Constants.PREF_KEY_LAST_READ_BOOK, 0);
-        mCurrentChapter = preferences.getInt(Constants.PREF_KEY_LAST_READ_CHAPTER, 0);
-        mTranslationReader.selectTranslation(preferences.getString(Constants.PREF_KEY_LAST_READ_TRANSLATION, null));
-
-        mVersePagerAdapter.setSelection(preferences.getInt(Constants.PREF_KEY_LAST_READ_VERSE, 0));
-        mVersePagerAdapter.updateText();
-        mVerseViewPager.setCurrentItem(mCurrentChapter);
-
         populateUi();
     }
 
@@ -137,7 +105,47 @@ public class TextActivity extends ActionBarActivity {
         }
     }
 
+    private void initializeUi() {
+        mRootView = getWindow().getDecorView();
+
+        // initializes verses view pager
+        mVerseViewPager = (ViewPager) findViewById(R.id.verse_viewpager);
+        mVersePagerAdapter = new VersePagerAdapter();
+        mVerseViewPager.setAdapter(mVersePagerAdapter);
+        mVerseViewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            public void onPageScrollStateChanged(int state) {
+            }
+
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+            }
+
+            public void onPageSelected(int position) {
+                mCurrentChapter = position;
+                if (mActionMode != null)
+                    mActionMode.finish();
+                updateUi();
+            }
+        });
+        mVerseViewPager.setPageTransformer(true, new DepthPageTransformer());
+    }
+
     private void populateUi() {
+        mRootView.setBackgroundColor(mSettingsManager.backgroundColor());
+        mTextColor = mSettingsManager.textColor();
+
+        final SharedPreferences preferences = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE);
+        mCurrentBook = preferences.getInt(Constants.PREF_KEY_LAST_READ_BOOK, 0);
+        mCurrentChapter = preferences.getInt(Constants.PREF_KEY_LAST_READ_CHAPTER, 0);
+        mTranslationReader.selectTranslation(preferences.getString(Constants.PREF_KEY_LAST_READ_TRANSLATION, null));
+
+        mVersePagerAdapter.setSelection(preferences.getInt(Constants.PREF_KEY_LAST_READ_VERSE, 0));
+        mVersePagerAdapter.updateText();
+        mVerseViewPager.setCurrentItem(mCurrentChapter);
+
+        updateUi();
+    }
+
+    private void updateUi() {
         setTitle(String.format("%s - %s, %d", mTranslationReader.selectedTranslationShortName(),
                 mTranslationReader.bookNames()[mCurrentBook], (mCurrentChapter + 1)));
     }

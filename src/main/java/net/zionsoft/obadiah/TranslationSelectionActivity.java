@@ -43,20 +43,19 @@ public class TranslationSelectionActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.translation_selection_activity);
 
-        mSettingsManager = new SettingsManager(this);
+        SettingsManager settingsManager = new SettingsManager(this);
+        settingsManager.refresh();
+
         mTranslationManager = new TranslationManager(this);
         mSelectedTranslationShortName = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE)
                 .getString(Constants.PREF_KEY_LAST_READ_TRANSLATION, null);
 
-        initializeUi();
+        initializeUi(settingsManager);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-
-        mSettingsManager.refresh();
-        mRootView.setBackgroundColor(mSettingsManager.backgroundColor());
 
         populateUi();
     }
@@ -78,12 +77,12 @@ public class TranslationSelectionActivity extends ActionBarActivity {
         }
     }
 
-    private void initializeUi() {
+    private void initializeUi(SettingsManager settingsManager) {
         mLoadingSpinner = findViewById(R.id.translation_selection_loading_spinner);
-        mRootView = getWindow().getDecorView();
+        getWindow().getDecorView().setBackgroundColor(settingsManager.backgroundColor());
 
         // translation list view
-        mTranslationListAdapter = new TranslationSelectionListAdapter(this, mSettingsManager);
+        mTranslationListAdapter = new TranslationSelectionListAdapter(this, settingsManager);
         mTranslationListAdapter.setSelectedTranslation(mSelectedTranslationShortName);
         mTranslationListView = (ListView) findViewById(R.id.translation_list_view);
         mTranslationListView.setAdapter(mTranslationListAdapter);
@@ -193,9 +192,7 @@ public class TranslationSelectionActivity extends ActionBarActivity {
 
     private ListView mTranslationListView;
     private View mLoadingSpinner;
-    private View mRootView;
 
-    private SettingsManager mSettingsManager;
     private String mSelectedTranslationShortName;
     private TranslationManager mTranslationManager;
     private TranslationSelectionListAdapter mTranslationListAdapter;

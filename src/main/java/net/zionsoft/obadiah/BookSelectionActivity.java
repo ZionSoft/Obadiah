@@ -62,11 +62,6 @@ public class BookSelectionActivity extends ActionBarActivity {
         super.onResume();
 
         mSettingsManager.refresh();
-        mRootView.setBackgroundColor(mSettingsManager.backgroundColor());
-
-        if (isUpgrading())
-            return;
-
         populateUi();
     }
 
@@ -211,6 +206,11 @@ public class BookSelectionActivity extends ActionBarActivity {
     }
 
     private void populateUi() {
+        mRootView.setBackgroundColor(mSettingsManager.backgroundColor());
+
+        if (isUpgrading())
+            return;
+
         final SharedPreferences preferences
                 = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE);
         final String lastReadTranslation
