@@ -125,8 +125,7 @@ public class SearchActivity extends ActionBarActivity {
                 .getString(Constants.PREF_KEY_LAST_READ_TRANSLATION, null);
         if (!selected.equals(mSelectedTranslationShortName)) {
             setTitle(selected);
-            mTranslationReader.selectTranslation(selected);
-            mSelectedTranslationShortName = mTranslationReader.selectedTranslationShortName();
+            mSelectedTranslationShortName = selected;
 
             mSearchText.setText(null);
             mSearchResultListAdapter.setSearchResults(null);
@@ -162,6 +161,9 @@ public class SearchActivity extends ActionBarActivity {
             protected List<TranslationReader.SearchResult> doInBackground(String... params) {
                 // running in the worker thread
 
+                mTranslationReader.selectTranslation(
+                        getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE)
+                                .getString(Constants.PREF_KEY_LAST_READ_TRANSLATION, null));
                 return mTranslationReader.search(params[0]);
             }
 

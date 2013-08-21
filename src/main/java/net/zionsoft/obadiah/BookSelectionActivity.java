@@ -263,6 +263,7 @@ public class BookSelectionActivity extends ActionBarActivity {
                 Animator.fadeIn(mMainView);
 
                 mBookListAdapter.setTexts(bookNames);
+                mBookNames = bookNames;
 
                 updateUi();
 
@@ -278,7 +279,7 @@ public class BookSelectionActivity extends ActionBarActivity {
     private void updateUi() {
         // format: <translation short name> - <book name>
         setTitle(String.format("%s - %s", mTranslationReader.selectedTranslationShortName(),
-                mTranslationReader.bookNames()[mSelectedBook]));
+                mBookNames[mSelectedBook]));
 
         mBookListAdapter.selectBook(mSelectedBook);
         mChapterListAdapter.selectBook(mSelectedBook);
@@ -292,6 +293,8 @@ public class BookSelectionActivity extends ActionBarActivity {
     private int mLastReadBook;
     private int mLastReadChapter;
     private int mSelectedBook = -1;
+
+    private String[] mBookNames;
 
     private BookListAdapter mBookListAdapter;
     private ChapterListAdapter mChapterListAdapter;

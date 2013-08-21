@@ -47,9 +47,13 @@ public class TranslationReader {
         mBookNames = new String[BOOK_COUNT];
     }
 
+    // TODO called in main thread by TextActivity
     public void selectTranslation(String translationShortName) {
         if (translationShortName == null)
             throw new IllegalArgumentException();
+
+        if (translationShortName.equals(mSelectedTranslationShortName))
+            return;
 
         // checks if this translation is installed
         SQLiteDatabase db = null;
@@ -99,6 +103,7 @@ public class TranslationReader {
         return CHAPTER_COUNT[bookIndex];
     }
 
+    // TODO called in main thread by VerseListAdapter and TextActivity
     public String[] bookNames() {
         if (mSelectedTranslationShortName == null)
             return null;
@@ -128,6 +133,7 @@ public class TranslationReader {
         return mBookNames;
     }
 
+    // TODO called in main thread by VerseListAdapter
     public String[] verses(int bookIndex, int chapterIndex) {
         // TODO caches the verses in memory
 

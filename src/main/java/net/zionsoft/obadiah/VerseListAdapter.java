@@ -79,8 +79,6 @@ public class VerseListAdapter extends ListBaseAdapter {
         mSelectedCount = 0;
 
         notifyDataSetChanged();
-
-        notifyDataSetChanged();
     }
 
     public boolean hasItemSelected() {
