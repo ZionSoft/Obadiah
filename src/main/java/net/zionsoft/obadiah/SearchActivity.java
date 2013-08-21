@@ -61,6 +61,7 @@ public class SearchActivity extends ActionBarActivity {
 
         mSettingsManager.refresh();
         mRootView.setBackgroundColor(mSettingsManager.backgroundColor());
+        mSearchText.setTextColor(mSettingsManager.textColor());
 
         final String selected = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE)
                 .getString(Constants.PREF_KEY_LAST_READ_TRANSLATION, null);
