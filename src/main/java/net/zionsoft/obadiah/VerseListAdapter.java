@@ -118,12 +118,14 @@ public class VerseListAdapter extends ListBaseAdapter {
     }
 
     public void deselectVerses() {
-        int length = mSelected.length;
-        for (int i = 0; i < length; ++i)
-            mSelected[i] = false;
-        mSelectedCount = 0;
+        if (hasVerseSelected()) {
+            final int length = mSelected.length;
+            for (int i = 0; i < length; ++i)
+                mSelected[i] = false;
+            mSelectedCount = 0;
 
-        notifyDataSetChanged();
+            notifyDataSetChanged();
+        }
     }
 
     private final SettingsManager mSettingsManager;
