@@ -65,11 +65,11 @@ public class VerseListAdapter extends ListBaseAdapter {
         return linearLayout;
     }
 
-    public void selectChapter(int book, int chapter) {
-        mCurrentBook = book;
-        mCurrentChapter = chapter;
+    public void setCurrentChapter(int currentBook, int currentChapter) {
+        mCurrentBook = currentBook;
+        mCurrentChapter = currentChapter;
 
-        mTexts = mTranslationReader.verses(book, chapter);
+        mTexts = mTranslationReader.verses(currentBook, currentChapter);
 
         final int length = mTexts.length;
         if (mSelected == null || length > mSelected.length)
@@ -81,12 +81,12 @@ public class VerseListAdapter extends ListBaseAdapter {
         notifyDataSetChanged();
     }
 
-    public boolean hasItemSelected() {
+    public boolean hasVerseSelected() {
         return (mSelectedCount > 0);
     }
 
     public String selectedText() {
-        if (!hasItemSelected())
+        if (!hasVerseSelected())
             return null;
 
         // format: <book name> <chapter index>:<verse index> <verse text>
@@ -104,7 +104,7 @@ public class VerseListAdapter extends ListBaseAdapter {
         return selected.toString();
     }
 
-    public void selectItem(int position) {
+    public void selectVerse(int position) {
         if (position < 0 || position >= mTexts.length)
             return;
 
@@ -117,7 +117,7 @@ public class VerseListAdapter extends ListBaseAdapter {
         notifyDataSetChanged();
     }
 
-    public void deselect() {
+    public void deselectVerses() {
         int length = mSelected.length;
         for (int i = 0; i < length; ++i)
             mSelected[i] = false;

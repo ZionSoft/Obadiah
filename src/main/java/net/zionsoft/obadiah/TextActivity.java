@@ -208,8 +208,8 @@ public class TextActivity extends ActionBarActivity {
                 verseListView.setAdapter(verseListAdapter);
                 verseListView.setOnItemClickListener(new OnItemClickListener() {
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        verseListAdapter.selectItem(position);
-                        if (verseListAdapter.hasItemSelected()) {
+                        verseListAdapter.selectVerse(position);
+                        if (verseListAdapter.hasVerseSelected()) {
                             if (mActionMode == null) {
                                 mActionMode = TextActivity.this.startSupportActionMode(new ActionMode.Callback() {
                                     @Override
@@ -252,7 +252,7 @@ public class TextActivity extends ActionBarActivity {
                                     public void onDestroyActionMode(ActionMode actionMode) {
                                         if (actionMode != mActionMode)
                                             return;
-                                        verseListAdapter.deselect();
+                                        verseListAdapter.deselectVerses();
                                         mActionMode = null;
                                     }
                                 });
@@ -268,7 +268,7 @@ public class TextActivity extends ActionBarActivity {
             container.addView(page.verseListView, 0);
             page.inUse = true;
             page.position = position;
-            page.verseListAdapter.selectChapter(mCurrentBook, position);
+            page.verseListAdapter.setCurrentChapter(mCurrentBook, position);
 
             // scroll to the correct position
             if (mSelection > 0 && position == TextActivity.this.mCurrentChapter) {
@@ -298,7 +298,7 @@ public class TextActivity extends ActionBarActivity {
         public void updateText() {
             for (Page page : mPages) {
                 if (page.inUse)
-                    page.verseListAdapter.selectChapter(mCurrentBook, page.position);
+                    page.verseListAdapter.setCurrentChapter(mCurrentBook, page.position);
             }
 
             notifyDataSetChanged();
