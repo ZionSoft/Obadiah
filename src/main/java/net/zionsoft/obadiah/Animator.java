@@ -25,15 +25,15 @@ import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 
-public class Animator {
-    public static void fadeIn(View view) {
+class Animator {
+    static void fadeIn(View view) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
             fadeInHoneyComb(view);
         else
             fadeInPreHoneyComb(view);
     }
 
-    public static void fadeOut(View view) {
+    static void fadeOut(View view) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
             fadeOutHoneyComb(view);
         else

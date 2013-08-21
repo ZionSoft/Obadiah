@@ -25,8 +25,8 @@ import android.widget.TextView;
 
 import net.zionsoft.obadiah.util.SettingsManager;
 
-public class BookListAdapter extends ListBaseAdapter {
-    public BookListAdapter(Context context, SettingsManager settingsManager) {
+class BookListAdapter extends ListBaseAdapter {
+    BookListAdapter(Context context, SettingsManager settingsManager) {
         super(context);
         mSettingsManager = settingsManager;
     }
@@ -51,7 +51,7 @@ public class BookListAdapter extends ListBaseAdapter {
         return textView;
     }
 
-    public void selectBook(int selectedBook) {
+    void selectBook(int selectedBook) {
         mSelectedBook = selectedBook;
         notifyDataSetChanged();
     }

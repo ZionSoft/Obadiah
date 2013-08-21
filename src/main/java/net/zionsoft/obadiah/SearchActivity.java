@@ -99,10 +99,10 @@ public class SearchActivity extends ActionBarActivity {
         });
 
         // initializes the search results list view
-        mSearchResultListView = (ListView) findViewById(R.id.search_result_list_view);
+        ListView searchResultListView = (ListView) findViewById(R.id.search_result_list_view);
         mSearchResultListAdapter = new SearchResultListAdapter(this, mSettingsManager);
-        mSearchResultListView.setAdapter(mSearchResultListAdapter);
-        mSearchResultListView.setOnItemClickListener(new OnItemClickListener() {
+        searchResultListView.setAdapter(mSearchResultListAdapter);
+        searchResultListView.setOnItemClickListener(new OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 final TranslationReader.SearchResult result = mResults.get(position);
                 getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE).edit()
@@ -184,7 +184,6 @@ public class SearchActivity extends ActionBarActivity {
     }
 
     private EditText mSearchText;
-    private ListView mSearchResultListView;
     private View mRootView;
 
     private List<TranslationReader.SearchResult> mResults;

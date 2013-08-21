@@ -26,8 +26,8 @@ import android.widget.TextView;
 import net.zionsoft.obadiah.bible.TranslationReader;
 import net.zionsoft.obadiah.util.SettingsManager;
 
-public class ChapterListAdapter extends ListBaseAdapter {
-    public ChapterListAdapter(Context context, SettingsManager settingsManager) {
+class ChapterListAdapter extends ListBaseAdapter {
+    ChapterListAdapter(Context context, SettingsManager settingsManager) {
         super(context);
         mSettingsManager = settingsManager;
     }

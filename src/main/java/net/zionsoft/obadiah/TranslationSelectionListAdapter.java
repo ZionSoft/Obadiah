@@ -29,8 +29,8 @@ import net.zionsoft.obadiah.util.SettingsManager;
 
 import java.util.List;
 
-public class TranslationSelectionListAdapter extends BaseAdapter {
-    public TranslationSelectionListAdapter(Context context, SettingsManager settingsManager) {
+class TranslationSelectionListAdapter extends BaseAdapter {
+    TranslationSelectionListAdapter(Context context, SettingsManager settingsManager) {
         super();
         mContext = context;
         mSettingsManager = settingsManager;
@@ -75,12 +75,12 @@ public class TranslationSelectionListAdapter extends BaseAdapter {
         return textView;
     }
 
-    public void setTranslations(List<TranslationInfo> translations) {
+    void setTranslations(List<TranslationInfo> translations) {
         mTranslations = translations;
         notifyDataSetChanged();
     }
 
-    public void setSelectedTranslation(String selectedTranslationShortName) {
+    void setSelectedTranslation(String selectedTranslationShortName) {
         mSelectedTranslationShortName = selectedTranslationShortName;
         notifyDataSetChanged();
     }

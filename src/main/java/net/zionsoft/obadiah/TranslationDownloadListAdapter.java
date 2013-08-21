@@ -32,8 +32,8 @@ import net.zionsoft.obadiah.util.SettingsManager;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TranslationDownloadListAdapter extends BaseAdapter {
-    public TranslationDownloadListAdapter(Context context, SettingsManager settingsManager) {
+class TranslationDownloadListAdapter extends BaseAdapter {
+    TranslationDownloadListAdapter(Context context, SettingsManager settingsManager) {
         super();
         mContext = context;
         mSettingsManager = settingsManager;
@@ -74,7 +74,7 @@ public class TranslationDownloadListAdapter extends BaseAdapter {
         return textView;
     }
 
-    public void setTranslations(List<TranslationInfo> translations) {
+    void setTranslations(List<TranslationInfo> translations) {
         if (translations == null) {
             m_texts = null;
         } else {
@@ -95,7 +95,7 @@ public class TranslationDownloadListAdapter extends BaseAdapter {
     private final Context mContext;
     private final SettingsManager mSettingsManager;
 
-    private AbsoluteSizeSpan mMediumSizeSpan;
-    private AbsoluteSizeSpan mSmallSizeSpan;
+    private final AbsoluteSizeSpan mMediumSizeSpan;
+    private final AbsoluteSizeSpan mSmallSizeSpan;
     private List<SpannableStringBuilder> m_texts;
 }

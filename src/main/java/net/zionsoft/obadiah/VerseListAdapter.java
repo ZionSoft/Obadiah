@@ -29,8 +29,8 @@ import android.widget.TextView;
 import net.zionsoft.obadiah.bible.TranslationReader;
 import net.zionsoft.obadiah.util.SettingsManager;
 
-public class VerseListAdapter extends ListBaseAdapter {
-    public VerseListAdapter(Context context, SettingsManager settingsManager,
+class VerseListAdapter extends ListBaseAdapter {
+    VerseListAdapter(Context context, SettingsManager settingsManager,
                             TranslationReader translationReader) {
         super(context);
         mSettingsManager = settingsManager;
@@ -65,7 +65,7 @@ public class VerseListAdapter extends ListBaseAdapter {
         return linearLayout;
     }
 
-    public void setCurrentChapter(int currentBook, int currentChapter) {
+    void setCurrentChapter(int currentBook, int currentChapter) {
         mCurrentBook = currentBook;
         mCurrentChapter = currentChapter;
 
@@ -81,11 +81,11 @@ public class VerseListAdapter extends ListBaseAdapter {
         notifyDataSetChanged();
     }
 
-    public boolean hasVerseSelected() {
+    boolean hasVerseSelected() {
         return (mSelectedCount > 0);
     }
 
-    public String selectedText() {
+    String selectedText() {
         if (!hasVerseSelected())
             return null;
 
@@ -104,7 +104,7 @@ public class VerseListAdapter extends ListBaseAdapter {
         return selected.toString();
     }
 
-    public void selectVerse(int position) {
+    void selectVerse(int position) {
         if (position < 0 || position >= mTexts.length)
             return;
 
@@ -117,7 +117,7 @@ public class VerseListAdapter extends ListBaseAdapter {
         notifyDataSetChanged();
     }
 
-    public void deselectVerses() {
+    void deselectVerses() {
         if (hasVerseSelected()) {
             final int length = mSelected.length;
             for (int i = 0; i < length; ++i)

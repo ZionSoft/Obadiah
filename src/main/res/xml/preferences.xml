@@ -3,7 +3,7 @@
 
     <CheckBoxPreference
             android:defaultValue="false"
-            android:key="pref_nightmode"
+            android:key="pref_night_mode"
             android:title="@string/pref_night_mode"/>
 
     <Preference android:title="@string/pref_rate_me">

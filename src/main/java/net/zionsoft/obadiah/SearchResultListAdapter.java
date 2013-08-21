@@ -28,8 +28,8 @@ import net.zionsoft.obadiah.util.SettingsManager;
 
 import java.util.List;
 
-public class SearchResultListAdapter extends BaseAdapter {
-    public SearchResultListAdapter(Context context, SettingsManager settingsManager) {
+class SearchResultListAdapter extends BaseAdapter {
+    SearchResultListAdapter(Context context, SettingsManager settingsManager) {
         super();
         mContext = context;
         mSettingsManager = settingsManager;
@@ -63,7 +63,7 @@ public class SearchResultListAdapter extends BaseAdapter {
         return textView;
     }
 
-    public void setSearchResults(List<TranslationReader.SearchResult> results) {
+    void setSearchResults(List<TranslationReader.SearchResult> results) {
         mResults = results;
         notifyDataSetChanged();
     }

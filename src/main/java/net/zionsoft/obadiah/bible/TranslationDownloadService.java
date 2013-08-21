@@ -120,7 +120,7 @@ public class TranslationDownloadService extends IntentService {
                     // writes the book names table
 
                     final ContentValues bookNamesValues = new ContentValues(3);
-                    bookNamesValues.put(TranslationsDatabaseHelper.COLUMN_TRANSLATION_SHORTNAME,
+                    bookNamesValues.put(TranslationsDatabaseHelper.COLUMN_TRANSLATION_SHORT_NAME,
                             translation.shortName);
 
                     final JSONObject booksInfoObject = new JSONObject(new String(bytes, "UTF8"));

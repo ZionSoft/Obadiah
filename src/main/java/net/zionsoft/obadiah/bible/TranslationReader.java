@@ -115,7 +115,7 @@ public class TranslationReader {
         final SQLiteDatabase db = mTranslationsDatabaseHelper.getReadableDatabase();
         final Cursor cursor = db.query(TranslationsDatabaseHelper.TABLE_BOOK_NAMES,
                 new String[]{TranslationsDatabaseHelper.COLUMN_BOOK_NAME},
-                String.format("%s = ?", TranslationsDatabaseHelper.COLUMN_TRANSLATION_SHORTNAME),
+                String.format("%s = ?", TranslationsDatabaseHelper.COLUMN_TRANSLATION_SHORT_NAME),
                 new String[]{mSelectedTranslationShortName}, null, null,
                 String.format("%s ASC", TranslationsDatabaseHelper.COLUMN_BOOK_INDEX));
         if (cursor == null) {
@@ -230,7 +230,7 @@ public class TranslationReader {
 
     private boolean mSelectedTranslationChanged;
     private String mSelectedTranslationShortName;
-    private String[] mBookNames;
+    private final String[] mBookNames;
 
-    private TranslationsDatabaseHelper mTranslationsDatabaseHelper;
+    private final TranslationsDatabaseHelper mTranslationsDatabaseHelper;
 }

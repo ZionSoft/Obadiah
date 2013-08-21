@@ -62,17 +62,17 @@ public class TranslationsDatabaseHelper extends SQLiteOpenHelper {
 
     private void createBookNamesTable(SQLiteDatabase db) {
         db.execSQL(String.format("CREATE TABLE %s (%s TEXT NOT NULL, %s INTEGER NOT NULL, %s TEXT NOT NULL);",
-                TABLE_BOOK_NAMES, COLUMN_TRANSLATION_SHORTNAME, COLUMN_BOOK_INDEX, COLUMN_BOOK_NAME));
+                TABLE_BOOK_NAMES, COLUMN_TRANSLATION_SHORT_NAME, COLUMN_BOOK_INDEX, COLUMN_BOOK_NAME));
         db.execSQL(String.format("CREATE INDEX %s ON %s (%s);",
-                INDEX_TABLE_BOOK_NAMES, TABLE_BOOK_NAMES, COLUMN_TRANSLATION_SHORTNAME));
+                INDEX_TABLE_BOOK_NAMES, TABLE_BOOK_NAMES, COLUMN_TRANSLATION_SHORT_NAME));
     }
 
     public static final String TABLE_TRANSLATION_LIST = "TABLE_TRANSLATION_LIST";
     public static final String TABLE_BOOK_NAMES = "TABLE_BOOK_NAMES";
-    public static final String INDEX_TABLE_BOOK_NAMES = "INDEX_TABLE_BOOK_NAMES";
+    private static final String INDEX_TABLE_BOOK_NAMES = "INDEX_TABLE_BOOK_NAMES";
 
     public static final String COLUMN_TRANSLATION_ID = "COLUMN_TRANSLATION_ID";
-    public static final String COLUMN_TRANSLATION_SHORTNAME = "COLUMN_TRANSLATION_SHORTNAME";
+    public static final String COLUMN_TRANSLATION_SHORT_NAME = "COLUMN_TRANSLATION_SHORTNAME";
     public static final String COLUMN_BOOK_INDEX = "COLUMN_BOOK_INDEX";
     public static final String COLUMN_CHAPTER_INDEX = "COLUMN_CHAPTER_INDEX";
     public static final String COLUMN_VERSE_INDEX = "COLUMN_VERSE_INDEX";

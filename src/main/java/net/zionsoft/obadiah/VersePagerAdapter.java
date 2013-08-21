@@ -30,13 +30,13 @@ import net.zionsoft.obadiah.util.SettingsManager;
 import java.util.LinkedList;
 import java.util.List;
 
-public class VersePagerAdapter extends PagerAdapter {
-    public static interface OnVerseSelectedListener {
+class VersePagerAdapter extends PagerAdapter {
+    static interface OnVerseSelectedListener {
         public void onVerseSelectionChanged(boolean hasVerseSelected);
     }
 
-    public VersePagerAdapter(Context context, OnVerseSelectedListener onVerseSelectedListener,
-                             SettingsManager settingsManager) {
+    VersePagerAdapter(Context context, OnVerseSelectedListener onVerseSelectedListener,
+                      SettingsManager settingsManager) {
         super();
         mContext = context;
         mOnVerseSelectedListener = onVerseSelectedListener;
@@ -118,33 +118,33 @@ public class VersePagerAdapter extends PagerAdapter {
         super.notifyDataSetChanged();
     }
 
-    public void setCurrentTranslation(String translationShortName) {
+    void setCurrentTranslation(String translationShortName) {
         // TODO no data base operation in main thread
         mTranslationReader.selectTranslation(translationShortName);
     }
 
-    public void setCurrentBook(int currentBook) {
+    void setCurrentBook(int currentBook) {
         mCurrentBook = currentBook;
     }
 
-    public void setLastReadChapter(int lastReadChapter) {
+    void setLastReadChapter(int lastReadChapter) {
         mLastReadChapter = lastReadChapter;
     }
 
-    public void setLastReadVerse(int lastReadVerse) {
+    void setLastReadVerse(int lastReadVerse) {
         mLastReadVerse = lastReadVerse;
     }
 
-    public String currentTranslationName() {
+    String currentTranslationName() {
         return mTranslationReader.selectedTranslationShortName();
     }
 
-    public String currentBookName() {
+    String currentBookName() {
         // TODO no data base operation in main thread
         return mTranslationReader.bookNames()[mCurrentBook];
     }
 
-    public int lastReadVerse() {
+    int lastReadVerse() {
         for (Page page : mPages) {
             if (page.position == mLastReadChapter)
                 return page.verseListView.getFirstVisiblePosition();
@@ -152,7 +152,7 @@ public class VersePagerAdapter extends PagerAdapter {
         return 0;
     }
 
-    public String selectedText() {
+    String selectedText() {
         for (Page page : mPages) {
             if (page.position == mLastReadChapter)
                 return page.verseListAdapter.selectedText();
@@ -160,7 +160,7 @@ public class VersePagerAdapter extends PagerAdapter {
         return null;
     }
 
-    public void deselectVerses() {
+    void deselectVerses() {
         for (Page page : mPages) {
             if (page.inUse)
                 page.verseListAdapter.deselectVerses();

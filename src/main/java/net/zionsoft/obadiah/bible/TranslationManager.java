@@ -130,7 +130,7 @@ public class TranslationManager {
 
             // deletes the book names
             db.delete(TranslationsDatabaseHelper.TABLE_BOOK_NAMES,
-                    String.format("%s = ?", TranslationsDatabaseHelper.COLUMN_TRANSLATION_SHORTNAME),
+                    String.format("%s = ?", TranslationsDatabaseHelper.COLUMN_TRANSLATION_SHORT_NAME),
                     new String[]{translation.shortName});
 
             // sets the translation as "not installed"

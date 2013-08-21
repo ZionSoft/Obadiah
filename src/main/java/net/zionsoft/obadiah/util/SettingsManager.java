@@ -30,7 +30,7 @@ public class SettingsManager {
 
     public void refresh() {
         // night / day mode
-        if (mSharedPreferences.getBoolean(SETTING_KEY_NIGHTMODE, false)) {
+        if (mSharedPreferences.getBoolean(SETTING_KEY_NIGHT_MODE, false)) {
             mBackgroundColor = Color.BLACK;
             mTextColor = Color.WHITE;
         } else {
@@ -47,7 +47,7 @@ public class SettingsManager {
         return mTextColor;
     }
 
-    private static final String SETTING_KEY_NIGHTMODE = "pref_nightmode";
+    private static final String SETTING_KEY_NIGHT_MODE = "pref_night_mode";
 
     private final SharedPreferences mSharedPreferences;
 

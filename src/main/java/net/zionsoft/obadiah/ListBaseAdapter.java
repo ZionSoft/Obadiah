@@ -20,8 +20,8 @@ package net.zionsoft.obadiah;
 import android.content.Context;
 import android.widget.BaseAdapter;
 
-public abstract class ListBaseAdapter extends BaseAdapter {
-    public ListBaseAdapter(Context context) {
+abstract class ListBaseAdapter extends BaseAdapter {
+    ListBaseAdapter(Context context) {
         super();
         mContext = context;
     }
@@ -41,11 +41,11 @@ public abstract class ListBaseAdapter extends BaseAdapter {
         return position;
     }
 
-    public void setTexts(String[] texts) {
+    void setTexts(String[] texts) {
         mTexts = texts;
         notifyDataSetChanged();
     }
 
-    protected final Context mContext;
-    protected String[] mTexts;
+    final Context mContext;
+    String[] mTexts;
 }
