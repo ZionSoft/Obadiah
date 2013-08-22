@@ -67,27 +67,27 @@ public class TranslationsDatabaseHelper extends SQLiteOpenHelper {
                 INDEX_TABLE_BOOK_NAMES, TABLE_BOOK_NAMES, COLUMN_TRANSLATION_SHORT_NAME));
     }
 
-    public static final String TABLE_TRANSLATION_LIST = "TABLE_TRANSLATION_LIST";
-    public static final String TABLE_BOOK_NAMES = "TABLE_BOOK_NAMES";
+    static final String TABLE_TRANSLATION_LIST = "TABLE_TRANSLATION_LIST";
+    static final String TABLE_BOOK_NAMES = "TABLE_BOOK_NAMES";
     private static final String INDEX_TABLE_BOOK_NAMES = "INDEX_TABLE_BOOK_NAMES";
 
-    public static final String COLUMN_TRANSLATION_ID = "COLUMN_TRANSLATION_ID";
-    public static final String COLUMN_TRANSLATION_SHORT_NAME = "COLUMN_TRANSLATION_SHORTNAME";
-    public static final String COLUMN_BOOK_INDEX = "COLUMN_BOOK_INDEX";
-    public static final String COLUMN_CHAPTER_INDEX = "COLUMN_CHAPTER_INDEX";
-    public static final String COLUMN_VERSE_INDEX = "COLUMN_VERSE_INDEX";
-    public static final String COLUMN_BOOK_NAME = "COLUMN_BOOK_NAME";
-    public static final String COLUMN_TEXT = "COLUMN_TEXT";
-    public static final String COLUMN_KEY = "COLUMN_KEY";
-    public static final String COLUMN_VALUE = "COLUMN_VALUE";
+    static final String COLUMN_TRANSLATION_ID = "COLUMN_TRANSLATION_ID";
+    static final String COLUMN_TRANSLATION_SHORT_NAME = "COLUMN_TRANSLATION_SHORTNAME";
+    static final String COLUMN_BOOK_INDEX = "COLUMN_BOOK_INDEX";
+    static final String COLUMN_CHAPTER_INDEX = "COLUMN_CHAPTER_INDEX";
+    static final String COLUMN_VERSE_INDEX = "COLUMN_VERSE_INDEX";
+    static final String COLUMN_BOOK_NAME = "COLUMN_BOOK_NAME";
+    static final String COLUMN_TEXT = "COLUMN_TEXT";
+    static final String COLUMN_KEY = "COLUMN_KEY";
+    static final String COLUMN_VALUE = "COLUMN_VALUE";
 
-    public static final String KEY_NAME = "KEY_NAME";
-    public static final String KEY_SHORT_NAME = "KEY_SHORT_NAME";
-    public static final String KEY_LANGUAGE = "KEY_LANGUAGE";
-    public static final String KEY_BLOB_KEY = "KEY_BLOB_KEY";
-    public static final String KEY_SIZE = "KEY_SIZE";
-    public static final String KEY_TIMESTAMP = "KEY_TIMESTAMP";
-    public static final String KEY_INSTALLED = "KEY_INSTALLED";
+    static final String KEY_NAME = "KEY_NAME";
+    static final String KEY_SHORT_NAME = "KEY_SHORT_NAME";
+    static final String KEY_LANGUAGE = "KEY_LANGUAGE";
+    static final String KEY_BLOB_KEY = "KEY_BLOB_KEY";
+    static final String KEY_SIZE = "KEY_SIZE";
+    static final String KEY_TIMESTAMP = "KEY_TIMESTAMP";
+    static final String KEY_INSTALLED = "KEY_INSTALLED";
 
     private static final int DATABASE_VERSION = 2;
     private static final String DATABASE_NAME = "DB_OBADIAH";

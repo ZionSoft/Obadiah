@@ -47,7 +47,6 @@ public class TranslationReader {
         mBookNames = new String[BOOK_COUNT];
     }
 
-    // TODO called in main thread by VersePagerAdapter
     public void selectTranslation(String translationShortName) {
         if (translationShortName == null)
             throw new IllegalArgumentException();
@@ -103,7 +102,6 @@ public class TranslationReader {
         return CHAPTER_COUNT[bookIndex];
     }
 
-    // TODO called in main thread by VerseListAdapter and VersePagerAdapter
     public String[] bookNames() {
         if (mSelectedTranslationShortName == null)
             return null;
@@ -133,7 +131,6 @@ public class TranslationReader {
         return mBookNames;
     }
 
-    // TODO called in main thread by VerseListAdapter
     public String[] verses(int bookIndex, int chapterIndex) {
         // TODO caches the verses in memory
 

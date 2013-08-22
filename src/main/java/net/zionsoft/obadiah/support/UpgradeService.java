@@ -33,6 +33,7 @@ import net.zionsoft.obadiah.util.NetworkHelper;
 
 import org.json.JSONException;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -63,7 +64,7 @@ public class UpgradeService extends IntentService {
 
                 // upgrading from prior to 1.5.0 is no longer supported since 1.7.0
                 // now simply delete all the old data
-                Utils.removeDirectory(getFilesDir());
+                removeDirectory(getFilesDir());
 
                 final SharedPreferences.Editor editor =
                         getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE).edit();
@@ -100,14 +101,20 @@ public class UpgradeService extends IntentService {
     }
 
     private List<TranslationInfo> allTranslations() throws IOException, JSONException {
-        SQLiteDatabase db = new TranslationsDatabaseHelper(this).getReadableDatabase();
-        final Cursor cursor = db.query("sqlite_master", new String[]{"name"},
-                "type = ?", new String[]{"table"}, null, null, null);
-        final int columnIndex = cursor.getColumnIndex("name");
-        List<String> tableNames = new ArrayList<String>(cursor.getCount());
-        while (cursor.moveToNext())
-            tableNames.add(cursor.getString(columnIndex));
-        db.close();
+        SQLiteDatabase db = null;
+        List<String> tableNames = null;
+        try {
+            db = new TranslationsDatabaseHelper(this).getReadableDatabase();
+            final Cursor cursor = db.query("sqlite_master", new String[]{"name"},
+                    "type = ?", new String[]{"table"}, null, null, null);
+            final int columnIndex = cursor.getColumnIndex("name");
+            tableNames = new ArrayList<String>(cursor.getCount());
+            while (cursor.moveToNext())
+                tableNames.add(cursor.getString(columnIndex));
+        } finally {
+            if (db != null)
+                db.close();
+        }
 
         List<TranslationInfo> translations = NetworkHelper.fetchTranslationList();
         for (TranslationInfo translationInfo : translations) {
@@ -119,5 +126,20 @@ public class UpgradeService extends IntentService {
             }
         }
         return translations;
+    }
+
+    private static void removeDirectory(File directory) {
+        if (directory == null)
+            return;
+        final File[] files = directory.listFiles();
+        if (files == null)
+            return;
+        for (File file : files) {
+            if (file.isDirectory())
+                removeDirectory(file);
+            else
+                file.delete();
+        }
+        directory.delete();
     }
 }

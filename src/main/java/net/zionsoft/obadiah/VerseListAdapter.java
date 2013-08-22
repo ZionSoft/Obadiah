@@ -31,7 +31,7 @@ import net.zionsoft.obadiah.util.SettingsManager;
 
 class VerseListAdapter extends ListBaseAdapter {
     VerseListAdapter(Context context, SettingsManager settingsManager,
-                            TranslationReader translationReader) {
+                     TranslationReader translationReader) {
         super(context);
         mSettingsManager = settingsManager;
         mTranslationReader = translationReader;
@@ -69,6 +69,7 @@ class VerseListAdapter extends ListBaseAdapter {
         mCurrentBook = currentBook;
         mCurrentChapter = currentChapter;
 
+        // TODO no data base operation in main thread
         mTexts = mTranslationReader.verses(currentBook, currentChapter);
 
         final int length = mTexts.length;
@@ -89,6 +90,7 @@ class VerseListAdapter extends ListBaseAdapter {
         if (!hasVerseSelected())
             return null;
 
+        // TODO no data base operation in main thread
         // format: <book name> <chapter index>:<verse index> <verse text>
         final String template = new StringBuilder()
                 .append(mTranslationReader.bookNames()[mCurrentBook]).append(mCurrentChapter + 1)
