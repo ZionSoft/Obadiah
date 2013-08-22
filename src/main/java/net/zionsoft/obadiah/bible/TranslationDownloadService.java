@@ -168,6 +168,11 @@ public class TranslationDownloadService extends IntentService {
                     new String[]{Long.toString(translation.uniqueId),
                             TranslationsDatabaseHelper.KEY_INSTALLED});
 
+            // sets as selected translation
+            getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE).edit()
+                    .putString(Constants.PREF_KEY_LAST_READ_TRANSLATION, translation.shortName)
+                    .commit();
+
             db.setTransactionSuccessful();
         } catch (IOException e) {
             // network failure

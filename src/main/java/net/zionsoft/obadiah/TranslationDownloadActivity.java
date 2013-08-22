@@ -50,6 +50,23 @@ public class TranslationDownloadActivity extends ActionBarActivity {
         settingsManager.refresh();
 
         initializeUi(settingsManager);
+
+        mData = (NonConfigurationData) getLastCustomNonConfigurationInstance();
+        if (mData == null) {
+            mData = new NonConfigurationData();
+            loadTranslationList(false);
+        } else {
+            mLoadingSpinner.setVisibility(View.GONE);
+            mTranslationListAdapter.setTranslations(mData.availableTranslations);
+
+            if (isDownloadingTranslation())
+                downloadTranslation();
+        }
+    }
+
+    @Override
+    public Object onRetainCustomNonConfigurationInstance() {
+        return mData;
     }
 
     @Override
@@ -118,10 +135,10 @@ public class TranslationDownloadActivity extends ActionBarActivity {
                 final int status = intent.getIntExtra(TranslationListLoadService.KEY_STATUS,
                         TranslationListLoadService.STATUS_SUCCESS);
                 if (status == TranslationListLoadService.STATUS_SUCCESS) {
-                    mAvailableTranslations = intent.getParcelableArrayListExtra(
+                    mData.availableTranslations = intent.getParcelableArrayListExtra(
                             TranslationListLoadService.KEY_TRANSLATION_LIST);
-                    if (mAvailableTranslations != null && mAvailableTranslations.size() > 0) {
-                        mTranslationListAdapter.setTranslations(mAvailableTranslations);
+                    if (mData.availableTranslations.size() > 0) {
+                        mTranslationListAdapter.setTranslations(mData.availableTranslations);
                     } else {
                         Toast.makeText(TranslationDownloadActivity.this,
                                 R.string.toast_no_available_translation, Toast.LENGTH_SHORT).show();
@@ -170,8 +187,8 @@ public class TranslationDownloadActivity extends ActionBarActivity {
                 .getBoolean(Constants.PREF_KEY_DOWNLOADING_TRANSLATION, false);
     }
 
-    private void downloadTranslation(TranslationInfo translation) {
-        registerTranslationDownloadingStatusListener(translation);
+    private void downloadTranslation() {
+        registerTranslationDownloadingStatusListener();
 
         mTranslationDownloadProgressDialog = new ProgressDialog(this);
         mTranslationDownloadProgressDialog.setCancelable(true);
@@ -194,13 +211,13 @@ public class TranslationDownloadActivity extends ActionBarActivity {
             getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE).edit()
                     .putBoolean(Constants.PREF_KEY_DOWNLOADING_TRANSLATION, true).commit();
 
-            final Intent intent = new Intent(this, TranslationDownloadService.class);
-            intent.putExtra(TranslationDownloadService.KEY_TRANSLATION, translation);
-            startService(intent);
+            startService(new Intent(this, TranslationDownloadService.class)
+                    .putExtra(TranslationDownloadService.KEY_TRANSLATION,
+                            mData.translationToDownload));
         }
     }
 
-    private void registerTranslationDownloadingStatusListener(final TranslationInfo translation) {
+    private void registerTranslationDownloadingStatusListener() {
         if (mTranslationDownloadingStatusListener != null)
             return;
 
@@ -211,10 +228,7 @@ public class TranslationDownloadActivity extends ActionBarActivity {
                         TranslationDownloadService.STATUS_SUCCESS);
                 if (status == TranslationDownloadService.STATUS_SUCCESS) {
                     unregisterTranslationDownloadingStatusListener();
-                    getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE).edit()
-                            .putString(Constants.PREF_KEY_LAST_READ_TRANSLATION,
-                                    translation.shortName)
-                            .commit();
+
                     finish();
                 } else if (status == TranslationDownloadService.STATUS_IN_PROGRESS) {
                     mTranslationDownloadProgressDialog.setProgress(intent.
@@ -232,7 +246,7 @@ public class TranslationDownloadActivity extends ActionBarActivity {
                             new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialogInterface, int i) {
-                                    downloadTranslation(translation);
+                                    downloadTranslation();
                                 }
                             },
                             new DialogInterface.OnClickListener() {
@@ -272,11 +286,15 @@ public class TranslationDownloadActivity extends ActionBarActivity {
         mTranslationListView.setAdapter(mTranslationListAdapter);
         mTranslationListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                downloadTranslation(mAvailableTranslations.get(position));
+                mData.translationToDownload = mData.availableTranslations.get(position);
+                downloadTranslation();
             }
         });
+    }
 
-        loadTranslationList(false);
+    private static class NonConfigurationData {
+        TranslationInfo translationToDownload;
+        List<TranslationInfo> availableTranslations;
     }
 
     private BroadcastReceiver mTranslationDownloadingStatusListener;
@@ -285,7 +303,7 @@ public class TranslationDownloadActivity extends ActionBarActivity {
     private View mLoadingSpinner;
     private ListView mTranslationListView;
     private ProgressDialog mTranslationDownloadProgressDialog;
-
     private TranslationDownloadListAdapter mTranslationListAdapter;
-    private List<TranslationInfo> mAvailableTranslations;
+
+    private NonConfigurationData mData;
 }

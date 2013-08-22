@@ -31,5 +31,7 @@ public class Constants {
             = "PREF_KEY_DOWNLOADING_TRANSLATION";
     public static final String PREF_KEY_LOADING_TRANSLATION_LIST
             = "PREF_KEY_LOADING_TRANSLATION_LIST";
+    public static final String PREF_KEY_REMOVING_TRANSLATION
+            = "PREF_KEY_REMOVING_TRANSLATION";
     public static final String PREF_KEY_UPGRADING = "PREF_KEY_UPGRADING";
 }

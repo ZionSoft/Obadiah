@@ -53,6 +53,14 @@ public class SearchActivity extends ActionBarActivity {
         mTranslationReader = new TranslationReader(this);
 
         initializeUi();
+
+        mData = (NonConfigurationData) getLastCustomNonConfigurationInstance();
+        if (mData == null) {
+            mData = new NonConfigurationData();
+        } else {
+            mSearchText.setText(mData.searchText);
+            mSearchResultListAdapter.setSearchResults(mData.results);
+        }
     }
 
     @Override
@@ -61,6 +69,12 @@ public class SearchActivity extends ActionBarActivity {
 
         mSettingsManager.refresh();
         populateUi();
+    }
+
+    @Override
+    public Object onRetainCustomNonConfigurationInstance() {
+        mData.searchText = mSearchText.getText();
+        return mData;
     }
 
     @Override
@@ -104,7 +118,7 @@ public class SearchActivity extends ActionBarActivity {
         searchResultListView.setAdapter(mSearchResultListAdapter);
         searchResultListView.setOnItemClickListener(new OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                final TranslationReader.SearchResult result = mResults.get(position);
+                final TranslationReader.SearchResult result = mData.results.get(position);
                 getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE).edit()
                         .putInt(Constants.PREF_KEY_LAST_READ_BOOK, result.bookIndex)
                         .putInt(Constants.PREF_KEY_LAST_READ_CHAPTER, result.chapterIndex)
@@ -123,9 +137,9 @@ public class SearchActivity extends ActionBarActivity {
 
         final String selected = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE)
                 .getString(Constants.PREF_KEY_LAST_READ_TRANSLATION, null);
-        if (!selected.equals(mSelectedTranslationShortName)) {
+        if (!selected.equals(mData.selectedTranslationShortName)) {
             setTitle(selected);
-            mSelectedTranslationShortName = selected;
+            mData.selectedTranslationShortName = selected;
 
             mSearchText.setText(null);
             mSearchResultListAdapter.setSearchResults(null);
@@ -170,7 +184,7 @@ public class SearchActivity extends ActionBarActivity {
             protected void onPostExecute(List<TranslationReader.SearchResult> results) {
                 // running in the main thread
 
-                mResults = results;
+                mData.results = results;
                 mSearchResultListAdapter.setSearchResults(results);
                 mProgressDialog.dismiss();
 
@@ -183,12 +197,18 @@ public class SearchActivity extends ActionBarActivity {
         }.execute(searchToken.toString());
     }
 
+    private static class NonConfigurationData {
+        Editable searchText;
+        List<TranslationReader.SearchResult> results;
+        String selectedTranslationShortName;
+    }
+
     private EditText mSearchText;
     private View mRootView;
 
-    private List<TranslationReader.SearchResult> mResults;
+    private NonConfigurationData mData;
+
     private SearchResultListAdapter mSearchResultListAdapter;
     private SettingsManager mSettingsManager;
-    private String mSelectedTranslationShortName;
     private TranslationReader mTranslationReader;
 }
