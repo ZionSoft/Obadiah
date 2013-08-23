@@ -41,11 +41,6 @@ abstract class ListBaseAdapter extends BaseAdapter {
         return position;
     }
 
-    void setTexts(String[] texts) {
-        mTexts = texts;
-        notifyDataSetChanged();
-    }
-
     final Context mContext;
     String[] mTexts;
 }

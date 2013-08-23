@@ -64,7 +64,7 @@ class VersePagerAdapter extends PagerAdapter {
             page = new Page();
             page.verseListView = (ListView) View.inflate(mContext, R.layout.text_verse_page, null);
             final VerseListAdapter verseListAdapter
-                    = new VerseListAdapter(mContext, mSettingsManager, mTranslationReader);
+                    = new VerseListAdapter(mContext, mSettingsManager);
             page.verseListAdapter = verseListAdapter;
             page.verseListView.setAdapter(verseListAdapter);
             page.verseListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -81,7 +81,10 @@ class VersePagerAdapter extends PagerAdapter {
         container.addView(page.verseListView, 0);
         page.inUse = true;
         page.position = position;
-        page.verseListAdapter.setCurrentChapter(mCurrentBook, position);
+
+        // TODO no data base operation in main thread
+        page.verseListAdapter.setVerses(mCurrentBookName, position,
+                mTranslationReader.verses(mCurrentBook, position));
 
         if (mLastReadVerse > 0 && mLastReadChapter == position) {
             page.verseListView.setSelection(mLastReadVerse);
@@ -109,30 +112,28 @@ class VersePagerAdapter extends PagerAdapter {
         return view == ((Page) object).verseListView;
     }
 
-    @Override
-    public void notifyDataSetChanged() {
-        for (Page page : mPages) {
-            if (page.inUse)
-                page.verseListAdapter.setCurrentChapter(mCurrentBook, page.position);
-        }
-        super.notifyDataSetChanged();
-    }
-
-    void setCurrentTranslation(String translationShortName) {
+    void setCurrentVerse(String translationShortName, int book, int chapter, int verse) {
         // TODO no data base operation in main thread
         mTranslationReader.selectTranslation(translationShortName);
-    }
+        mCurrentBookName = mTranslationReader.bookNames()[book];
 
-    void setCurrentBook(int currentBook) {
-        mCurrentBook = currentBook;
+        mCurrentBook = book;
+        mLastReadChapter = chapter;
+        mLastReadVerse = verse;
+
+        for (Page page : mPages) {
+            if (page.inUse) {
+                // TODO no data base operation in main thread
+                page.verseListAdapter.setVerses(mCurrentBookName, page.position,
+                        mTranslationReader.verses(mCurrentBook, page.position));
+            }
+        }
+
+        notifyDataSetChanged();
     }
 
     void setLastReadChapter(int lastReadChapter) {
         mLastReadChapter = lastReadChapter;
-    }
-
-    void setLastReadVerse(int lastReadVerse) {
-        mLastReadVerse = lastReadVerse;
     }
 
     String currentTranslationName() {
@@ -140,17 +141,25 @@ class VersePagerAdapter extends PagerAdapter {
     }
 
     String currentBookName() {
-        // TODO no data base operation in main thread
-        return mTranslationReader.bookNames()[mCurrentBook];
+        return mCurrentBookName;
+    }
+
+    int lastReadChapter() {
+        return mLastReadChapter;
     }
 
     int lastReadVerse() {
         for (Page page : mPages) {
-            if (page.position == mLastReadChapter)
-                return page.verseListView.getFirstVisiblePosition();
+            if (page.position == mLastReadChapter) {
+                mLastReadVerse = page.verseListView.getFirstVisiblePosition();
+                return mLastReadVerse;
+            }
         }
         return 0;
     }
+
+
+    // verses selection
 
     String selectedText() {
         for (Page page : mPages) {
@@ -180,6 +189,7 @@ class VersePagerAdapter extends PagerAdapter {
     private final TranslationReader mTranslationReader;
     private final List<Page> mPages;
 
+    private String mCurrentBookName;
     private int mCurrentBook = -1;
     private int mLastReadChapter;
     private int mLastReadVerse;

@@ -51,6 +51,11 @@ class BookListAdapter extends ListBaseAdapter {
         return textView;
     }
 
+    void setBookNames(String[] texts) {
+        mTexts = texts;
+        notifyDataSetChanged();
+    }
+
     void selectBook(int selectedBook) {
         mSelectedBook = selectedBook;
         notifyDataSetChanged();

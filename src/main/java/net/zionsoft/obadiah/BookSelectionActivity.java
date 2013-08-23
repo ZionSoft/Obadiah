@@ -126,7 +126,7 @@ public class BookSelectionActivity extends ActionBarActivity {
                 Animator.fadeOut(mLoadingSpinner);
                 Animator.fadeIn(mMainView);
 
-                mBookListAdapter.setTexts(bookNames);
+                mBookListAdapter.setBookNames(bookNames);
                 mData.bookNames = bookNames;
 
                 updateUi();
@@ -281,7 +281,7 @@ public class BookSelectionActivity extends ActionBarActivity {
 
         if (lastReadTranslation.equals(mData.selectedTranslationShortName)) {
             mLoadingSpinner.setVisibility(View.GONE);
-            mBookListAdapter.setTexts(mData.bookNames);
+            mBookListAdapter.setBookNames(mData.bookNames);
             updateUi();
         } else {
             mData.selectedTranslationShortName = lastReadTranslation;

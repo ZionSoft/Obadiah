@@ -34,7 +34,8 @@ import android.widget.Toast;
 
 import net.zionsoft.obadiah.util.SettingsManager;
 
-public class TextActivity extends ActionBarActivity implements VersePagerAdapter.OnVerseSelectedListener {
+public class TextActivity extends ActionBarActivity
+        implements VersePagerAdapter.OnVerseSelectedListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,8 +61,9 @@ public class TextActivity extends ActionBarActivity implements VersePagerAdapter
         if (mActionMode != null)
             mActionMode.finish();
 
-        final SharedPreferences.Editor editor = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE).edit();
-        editor.putInt(Constants.PREF_KEY_LAST_READ_CHAPTER, mLastReadChapter);
+        final SharedPreferences.Editor editor
+                = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE).edit();
+        editor.putInt(Constants.PREF_KEY_LAST_READ_CHAPTER, mVersePagerAdapter.lastReadChapter());
         editor.putInt(Constants.PREF_KEY_LAST_READ_VERSE, mVersePagerAdapter.lastReadVerse());
         editor.commit();
     }
@@ -76,7 +78,8 @@ public class TextActivity extends ActionBarActivity implements VersePagerAdapter
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_search:
-                startActivity(new Intent(this, SearchActivity.class).setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
+                startActivity(new Intent(this, SearchActivity.class)
+                        .setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
                 return true;
             case R.id.action_settings:
                 startActivity(new Intent(this, SettingsActivity.class));
@@ -157,14 +160,16 @@ public class TextActivity extends ActionBarActivity implements VersePagerAdapter
         mVerseViewPager.setAdapter(mVersePagerAdapter);
         mVerseViewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             public void onPageScrollStateChanged(int state) {
+                // do nothing
             }
 
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+            public void onPageScrolled(int position, float positionOffset,
+                                       int positionOffsetPixels) {
+                // do nothing
             }
 
             public void onPageSelected(int position) {
-                mLastReadChapter = position;
-                mVersePagerAdapter.setLastReadChapter(mLastReadChapter);
+                mVersePagerAdapter.setLastReadChapter(position);
                 if (mActionMode != null)
                     mActionMode.finish();
                 updateUi();
@@ -176,28 +181,29 @@ public class TextActivity extends ActionBarActivity implements VersePagerAdapter
     private void populateUi() {
         mRootView.setBackgroundColor(mSettingsManager.backgroundColor());
 
-        final SharedPreferences preferences = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE);
-        mVersePagerAdapter.setCurrentTranslation(preferences.getString(Constants.PREF_KEY_LAST_READ_TRANSLATION, null));
-        mVersePagerAdapter.setCurrentBook(preferences.getInt(Constants.PREF_KEY_LAST_READ_BOOK, 0));
-        mLastReadChapter = preferences.getInt(Constants.PREF_KEY_LAST_READ_CHAPTER, 0);
-        mVersePagerAdapter.setLastReadChapter(mLastReadChapter);
-        mVersePagerAdapter.setLastReadVerse(preferences.getInt(Constants.PREF_KEY_LAST_READ_VERSE, 0));
-        mVersePagerAdapter.notifyDataSetChanged();
-        mVerseViewPager.setCurrentItem(mLastReadChapter);
+        // TODO caches verses for orientation change
+        final SharedPreferences preferences
+                = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE);
+        mVersePagerAdapter.setCurrentVerse(
+                preferences.getString(Constants.PREF_KEY_LAST_READ_TRANSLATION, null),
+                preferences.getInt(Constants.PREF_KEY_LAST_READ_BOOK, 0),
+                preferences.getInt(Constants.PREF_KEY_LAST_READ_CHAPTER, 0),
+                preferences.getInt(Constants.PREF_KEY_LAST_READ_VERSE, 0));
+        mVerseViewPager.setCurrentItem(mVersePagerAdapter.lastReadChapter());
 
         updateUi();
     }
 
     private void updateUi() {
         setTitle(String.format("%s - %s, %d", mVersePagerAdapter.currentTranslationName(),
-                mVersePagerAdapter.currentBookName(), (mLastReadChapter + 1)));
+                mVersePagerAdapter.currentBookName(), (mVersePagerAdapter.lastReadChapter() + 1)));
     }
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     private static class DepthPageTransformer implements ViewPager.PageTransformer {
         @Override
         public void transformPage(View view, float position) {
-            int pageWidth = view.getWidth();
+            final int pageWidth = view.getWidth();
             if (position < -1) {
                 view.setAlpha(0);
             } else if (position <= 0) {
@@ -209,7 +215,7 @@ public class TextActivity extends ActionBarActivity implements VersePagerAdapter
                 view.setAlpha(1 - position);
                 view.setTranslationX(pageWidth * -position);
 
-                float scaleFactor = 0.7f + 0.3f * (1 - Math.abs(position));
+                final float scaleFactor = 0.7f + 0.3f * (1 - Math.abs(position));
                 view.setScaleX(scaleFactor);
                 view.setScaleY(scaleFactor);
             } else {
@@ -218,7 +224,6 @@ public class TextActivity extends ActionBarActivity implements VersePagerAdapter
         }
     }
 
-    private int mLastReadChapter;
     private ActionMode mActionMode;
     private SettingsManager mSettingsManager;
     private VersePagerAdapter mVersePagerAdapter;

@@ -26,15 +26,12 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import net.zionsoft.obadiah.bible.TranslationReader;
 import net.zionsoft.obadiah.util.SettingsManager;
 
 class VerseListAdapter extends ListBaseAdapter {
-    VerseListAdapter(Context context, SettingsManager settingsManager,
-                     TranslationReader translationReader) {
+    VerseListAdapter(Context context, SettingsManager settingsManager) {
         super(context);
         mSettingsManager = settingsManager;
-        mTranslationReader = translationReader;
     }
 
     @Override
@@ -65,12 +62,10 @@ class VerseListAdapter extends ListBaseAdapter {
         return linearLayout;
     }
 
-    void setCurrentChapter(int currentBook, int currentChapter) {
-        mCurrentBook = currentBook;
+    void setVerses(String currentBookName, int currentChapter, String[] verses) {
+        mCurrentBookName = currentBookName;
         mCurrentChapter = currentChapter;
-
-        // TODO no data base operation in main thread
-        mTexts = mTranslationReader.verses(currentBook, currentChapter);
+        mTexts = verses;
 
         final int length = mTexts.length;
         if (mSelected == null || length > mSelected.length)
@@ -82,6 +77,9 @@ class VerseListAdapter extends ListBaseAdapter {
         notifyDataSetChanged();
     }
 
+
+    // verses selection
+
     boolean hasVerseSelected() {
         return (mSelectedCount > 0);
     }
@@ -90,10 +88,9 @@ class VerseListAdapter extends ListBaseAdapter {
         if (!hasVerseSelected())
             return null;
 
-        // TODO no data base operation in main thread
         // format: <book name> <chapter index>:<verse index> <verse text>
         final String template = new StringBuilder()
-                .append(mTranslationReader.bookNames()[mCurrentBook]).append(mCurrentChapter + 1)
+                .append(mCurrentBookName).append(mCurrentChapter + 1)
                 .append(":%d %s").toString();
         StringBuilder selected = new StringBuilder();
         for (int i = 0; i < mTexts.length; ++i) {
@@ -131,12 +128,11 @@ class VerseListAdapter extends ListBaseAdapter {
     }
 
     private final SettingsManager mSettingsManager;
-    private final TranslationReader mTranslationReader;
+
+    private String mCurrentBookName;
+    private int mCurrentChapter;
 
     private boolean mSelected[];
     private int mSelectedCount;
     private BackgroundColorSpan mBackgroundColorSpan;
-
-    private int mCurrentBook;
-    private int mCurrentChapter;
 }
