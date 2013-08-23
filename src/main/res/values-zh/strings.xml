@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">聖經</string>
+
+    <string name="activity_download_translation">請選擇要下載的譯本</string>
+    <string name="activity_select_translation">選擇譯本</string>
+    <string name="activity_settings">設置</string>
+
+    <string name="action_copy">拷貝</string>
+    <string name="action_delete_translation">刪除</string>
+    <string name="action_download">下載更多譯本</string>
+    <string name="action_refresh">刷新</string>
+    <string name="action_search">搜索</string>
+    <string name="action_settings">設置</string>
+    <string name="action_select_translation">選擇譯本</string>
+    <string name="action_share">分享</string>
+
+    <string name="dialog_initialization_failure_message">初始化失敗，請重試。</string>
+    <string name="dialog_network_failure_message">請檢查網路連接，並重試。</string>
+    <string name="dialog_no_translation_message">沒有已安裝的譯本，請從互聯網下載。</string>
+    <string name="dialog_translation_delete_confirm_message">確定刪除該譯本？</string>
+    <string name="dialog_translation_download_failure_message">下載譯本失敗，請重試。</string>
+    <string name="dialog_translation_list_fetch_failure_message">無法下載譯本列表，請重試。</string>
+
+    <string name="pref_night_mode">夜間模式</string>
+    <string name="pref_rate_me">在Google Play上給我評分</string>
+
+    <string name="progress_dialog_translation_deleting">删除中&#8230;</string>
+    <string name="progress_dialog_translation_downloading">下載中&#8230;</string>
+    <string name="progress_dialog_verses_searching">搜索中&#8230;</string>
+
+    <string name="text_available_translation_info">%1$s\n檔案大小%2$d KB</string>
+
+    <string name="title_share_with">分享到&#8230;</string>
+
+    <string name="toast_no_available_translation">沒有可供下載的譯本。</string>
+    <string name="toast_no_installed_translation">沒有已下載的譯本。</string>
+    <string name="toast_translation_deleted">已刪除。</string>
+    <string name="toast_verses_copied">文本已成功拷貝到剪貼板。</string>
+    <string name="toast_verses_searched">共找到%1$d個條目。</string>
+
+</resources>
