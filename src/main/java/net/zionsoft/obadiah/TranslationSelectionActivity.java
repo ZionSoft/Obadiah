@@ -245,12 +245,12 @@ public class TranslationSelectionActivity extends ActionBarActivity {
     private void populateUi() {
         final String selected = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE)
                 .getString(Constants.PREF_KEY_LAST_READ_TRANSLATION, null);
-        if (!selected.equals(mData.selectedTranslationShortName)) {
-            mData.selectedTranslationShortName = selected;
-            loadTranslationList();
-        } else {
+        if (selected.equals(mData.selectedTranslationShortName)) {
             mLoadingSpinner.setVisibility(View.GONE);
             mTranslationListAdapter.setTranslations(mData.installedTranslations);
+        } else {
+            mData.selectedTranslationShortName = selected;
+            loadTranslationList();
         }
         mTranslationListAdapter.setSelectedTranslation(mData.selectedTranslationShortName);
     }
