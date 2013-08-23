@@ -52,9 +52,12 @@ public class BookSelectionActivity extends ActionBarActivity {
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 
         mSettingsManager = new SettingsManager(this);
-        mTranslationReader = new TranslationReader(this);
 
         initializeUi();
+
+        mData = (NonConfigurationData) getLastCustomNonConfigurationInstance();
+        if (mData == null)
+            mData = new NonConfigurationData();
     }
 
     @Override
@@ -63,6 +66,11 @@ public class BookSelectionActivity extends ActionBarActivity {
 
         mSettingsManager.refresh();
         populateUi();
+    }
+
+    @Override
+    public Object onRetainCustomNonConfigurationInstance() {
+        return mData;
     }
 
     @Override
@@ -93,6 +101,43 @@ public class BookSelectionActivity extends ActionBarActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+
+    // loads book list
+
+    private void loadBookList() {
+        new AsyncTask<Void, Void, String[]>() {
+            @Override
+            protected void onPreExecute() {
+                mLoadingSpinner.setVisibility(View.VISIBLE);
+                mMainView.setVisibility(View.GONE);
+            }
+
+            @Override
+            protected String[] doInBackground(Void... params) {
+                final TranslationReader translationReader = new TranslationReader(BookSelectionActivity.this);
+                translationReader.selectTranslation(mData.selectedTranslationShortName);
+                return translationReader.bookNames();
+            }
+
+            @Override
+            protected void onPostExecute(String[] bookNames) {
+                Animator.fadeOut(mLoadingSpinner);
+                Animator.fadeIn(mMainView);
+
+                mBookListAdapter.setTexts(bookNames);
+                mData.bookNames = bookNames;
+
+                updateUi();
+
+                // scrolls to the currently selected book
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.FROYO)
+                    mBookListView.smoothScrollToPosition(mData.selectedBook);
+                else
+                    mBookListView.setSelection(mData.selectedBook);
+            }
+        }.execute();
     }
 
 
@@ -179,9 +224,9 @@ public class BookSelectionActivity extends ActionBarActivity {
         mBookListView.setAdapter(mBookListAdapter);
         mBookListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (mSelectedBook == position)
+                if (mData.selectedBook == position)
                     return;
-                mSelectedBook = position;
+                mData.selectedBook = position;
                 updateUi();
             }
         });
@@ -192,9 +237,9 @@ public class BookSelectionActivity extends ActionBarActivity {
         mChaptersGridView.setAdapter(mChapterListAdapter);
         mChaptersGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (mLastReadBook != mSelectedBook || mLastReadChapter != position) {
+                if (mData.lastReadBook != mData.selectedBook || mData.lastReadChapter != position) {
                     getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE).edit()
-                            .putInt(Constants.PREF_KEY_LAST_READ_BOOK, mSelectedBook)
+                            .putInt(Constants.PREF_KEY_LAST_READ_BOOK, mData.selectedBook)
                             .putInt(Constants.PREF_KEY_LAST_READ_CHAPTER, position)
                             .putInt(Constants.PREF_KEY_LAST_READ_VERSE, 0)
                             .commit();
@@ -234,67 +279,41 @@ public class BookSelectionActivity extends ActionBarActivity {
             return;
         }
 
-        mLastReadBook = preferences.getInt(Constants.PREF_KEY_LAST_READ_BOOK, -1);
-        mLastReadChapter = preferences.getInt(Constants.PREF_KEY_LAST_READ_CHAPTER, -1);
-        mSelectedBook = mLastReadBook < 0 ? 0 : mLastReadBook;
-
-        if (lastReadTranslation.equals(mLastReadTranslation)) {
+        if (lastReadTranslation.equals(mData.selectedTranslationShortName)) {
+            mLoadingSpinner.setVisibility(View.GONE);
+            mBookListAdapter.setTexts(mData.bookNames);
             updateUi();
-            return;
+        } else {
+            mData.selectedTranslationShortName = lastReadTranslation;
+            mData.lastReadBook = preferences.getInt(Constants.PREF_KEY_LAST_READ_BOOK, -1);
+            mData.lastReadChapter = preferences.getInt(Constants.PREF_KEY_LAST_READ_CHAPTER, -1);
+            mData.selectedBook = mData.lastReadBook < 0 ? 0 : mData.lastReadBook;
+            loadBookList();
         }
-
-        mLastReadTranslation = lastReadTranslation;
-        new AsyncTask<Void, Void, String[]>() {
-            @Override
-            protected void onPreExecute() {
-                mLoadingSpinner.setVisibility(View.VISIBLE);
-                mMainView.setVisibility(View.GONE);
-            }
-
-            @Override
-            protected String[] doInBackground(Void... params) {
-                mTranslationReader.selectTranslation(mLastReadTranslation);
-                return mTranslationReader.bookNames();
-            }
-
-            @Override
-            protected void onPostExecute(String[] bookNames) {
-                Animator.fadeOut(mLoadingSpinner);
-                Animator.fadeIn(mMainView);
-
-                mBookListAdapter.setTexts(bookNames);
-                mBookNames = bookNames;
-
-                updateUi();
-
-                // scrolls to the currently selected book
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.FROYO)
-                    mBookListView.smoothScrollToPosition(mSelectedBook);
-                else
-                    mBookListView.setSelection(mSelectedBook);
-            }
-        }.execute();
     }
 
     private void updateUi() {
         // format: <translation short name> - <book name>
-        setTitle(String.format("%s - %s", mTranslationReader.selectedTranslationShortName(),
-                mBookNames[mSelectedBook]));
+        setTitle(String.format("%s - %s", mData.selectedTranslationShortName,
+                mData.bookNames[mData.selectedBook]));
 
-        mBookListAdapter.selectBook(mSelectedBook);
-        mChapterListAdapter.selectBook(mSelectedBook);
-        mChapterListAdapter.setLastReadChapter(mLastReadBook, mLastReadChapter);
+        mBookListAdapter.selectBook(mData.selectedBook);
+        mChapterListAdapter.selectBook(mData.selectedBook);
+        mChapterListAdapter.setLastReadChapter(mData.lastReadBook, mData.lastReadChapter);
         mChaptersGridView.setSelection(0);
+    }
+
+    private static class NonConfigurationData {
+        String[] bookNames;
+        String selectedTranslationShortName;
+        int lastReadBook;
+        int lastReadChapter;
+        int selectedBook;
     }
 
     private BroadcastReceiver mUpgradeStatusListener;
 
-    private String mLastReadTranslation;
-    private int mLastReadBook;
-    private int mLastReadChapter;
-    private int mSelectedBook = -1;
-
-    private String[] mBookNames;
+    private NonConfigurationData mData;
 
     private BookListAdapter mBookListAdapter;
     private ChapterListAdapter mChapterListAdapter;
@@ -306,5 +325,4 @@ public class BookSelectionActivity extends ActionBarActivity {
     private View mRootView;
 
     private SettingsManager mSettingsManager;
-    private TranslationReader mTranslationReader;
 }
