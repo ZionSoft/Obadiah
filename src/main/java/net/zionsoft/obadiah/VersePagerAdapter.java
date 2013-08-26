@@ -136,10 +136,6 @@ class VersePagerAdapter extends PagerAdapter {
         mLastReadChapter = lastReadChapter;
     }
 
-    String currentTranslationName() {
-        return mTranslationReader.selectedTranslationShortName();
-    }
-
     String currentBookName() {
         return mCurrentBookName;
     }

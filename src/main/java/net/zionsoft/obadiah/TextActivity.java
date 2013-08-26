@@ -195,8 +195,8 @@ public class TextActivity extends ActionBarActivity
     }
 
     private void updateUi() {
-        setTitle(String.format("%s - %s, %d", mVersePagerAdapter.currentTranslationName(),
-                mVersePagerAdapter.currentBookName(), (mVersePagerAdapter.lastReadChapter() + 1)));
+        setTitle(String.format("%s, %d", mVersePagerAdapter.currentBookName(),
+                mVersePagerAdapter.lastReadChapter() + 1));
     }
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
