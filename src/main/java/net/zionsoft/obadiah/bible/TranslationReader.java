@@ -20,6 +20,7 @@ package net.zionsoft.obadiah.bible;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.support.v4.util.LruCache;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -132,8 +133,6 @@ public class TranslationReader {
     }
 
     public String[] verses(int bookIndex, int chapterIndex) {
-        // TODO caches the verses in memory
-
         if (mSelectedTranslationShortName == null)
             return null;
 
@@ -142,31 +141,9 @@ public class TranslationReader {
             throw new IllegalArgumentException();
         }
 
-        final SQLiteDatabase db = mTranslationsDatabaseHelper.getReadableDatabase();
-        final Cursor cursor = db.query(mSelectedTranslationShortName,
-                new String[]{TranslationsDatabaseHelper.COLUMN_TEXT},
-                String.format("%s = ? AND %s = ?",
-                        TranslationsDatabaseHelper.COLUMN_BOOK_INDEX,
-                        TranslationsDatabaseHelper.COLUMN_CHAPTER_INDEX),
-                new String[]{Integer.toString(bookIndex), Integer.toString(chapterIndex)},
-                null, null, String.format("%s ASC", TranslationsDatabaseHelper.COLUMN_VERSE_INDEX));
-        if (cursor == null) {
-            db.close();
-            return null;
-        }
-        final int count = cursor.getCount();
-        if (count == 0) {
-            db.close();
-            return null;
-        }
-
-        final int textColumnIndex = cursor.getColumnIndex(TranslationsDatabaseHelper.COLUMN_TEXT);
-        final String[] texts = new String[count];
-        int i = 0;
-        while (cursor.moveToNext())
-            texts[i++] = cursor.getString(textColumnIndex);
-        db.close();
-        return texts;
+        if (sVersesCache == null)
+            createVersesCache();
+        return loadVerses(bookIndex, chapterIndex);
     }
 
     public List<SearchResult> search(String key) {
@@ -221,11 +198,73 @@ public class TranslationReader {
         }
     }
 
+
+    // memcache for verses
+
+    private void createVersesCache() {
+        // uses 1/8 of available memory for the cache
+        final int cacheSize = (int) (Runtime.getRuntime().maxMemory() / 8L);
+        sVersesCache = new LruCache<String, String[]>(cacheSize) {
+            @Override
+            protected int sizeOf(String key, String[] verses) {
+                // strings are UTF-16 encoded (with a length of one or two 16-bit code units)
+                int length = 0;
+                for (String verse : verses)
+                    length += verse.length() * 4;
+                return length;
+            }
+        };
+    }
+
+    private String[] loadVerses(int bookIndex, int chapterIndex) {
+        final String key
+                = buildVersesCacheKey(mSelectedTranslationShortName, bookIndex, chapterIndex);
+        String[] verses = sVersesCache.get(key);
+        if (verses == null) {
+            SQLiteDatabase db = null;
+            try {
+                db = mTranslationsDatabaseHelper.getReadableDatabase();
+                final Cursor cursor = db.query(mSelectedTranslationShortName,
+                        new String[]{TranslationsDatabaseHelper.COLUMN_TEXT},
+                        String.format("%s = ? AND %s = ?",
+                                TranslationsDatabaseHelper.COLUMN_BOOK_INDEX,
+                                TranslationsDatabaseHelper.COLUMN_CHAPTER_INDEX),
+                        new String[]{Integer.toString(bookIndex), Integer.toString(chapterIndex)},
+                        null, null, String.format("%s ASC", TranslationsDatabaseHelper.COLUMN_VERSE_INDEX));
+                if (cursor == null)
+                    return null;
+                final int count = cursor.getCount();
+                if (count == 0)
+                    return null;
+
+                final int textColumnIndex = cursor.getColumnIndex(TranslationsDatabaseHelper.COLUMN_TEXT);
+                verses = new String[count];
+                int i = -1;
+                while (cursor.moveToNext())
+                    verses[++i] = cursor.getString(textColumnIndex);
+
+                sVersesCache.put(key, verses);
+            } finally {
+                if (db != null)
+                    db.close();
+            }
+        }
+        return verses;
+    }
+
+    private static String buildVersesCacheKey(String translationShortName,
+                                              int bookIndex, int chapterIndex) {
+        return String.format("%s%d%d", translationShortName, bookIndex, chapterIndex);
+    }
+
+
     private static final int BOOK_COUNT = 66;
     private static final int[] CHAPTER_COUNT = {50, 40, 27, 36, 34, 24, 21, 4, 31, 24, 22, 25, 29,
             36, 10, 13, 10, 42, 150, 31, 12, 8, 66, 52, 5, 48, 12, 14, 3, 9, 1, 4, 7, 3, 3, 3, 2,
             14, 4, 28, 16, 24, 21, 28, 16, 16, 13, 6, 6, 4, 4, 5, 3, 6, 4, 3, 1, 13, 5, 5, 3, 5, 1,
             1, 1, 22};
+
+    private static LruCache<String, String[]> sVersesCache = null;
 
     private boolean mSelectedTranslationChanged;
     private String mSelectedTranslationShortName;
