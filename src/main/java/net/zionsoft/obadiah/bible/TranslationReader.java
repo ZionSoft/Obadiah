@@ -137,8 +137,10 @@ public class TranslationReader {
         if (mSelectedTranslationShortName == null)
             return null;
 
-        if (chapterIndex < 0 || chapterIndex >= chapterCount(bookIndex))
+        if (bookIndex < 0 || bookIndex >= BOOK_COUNT
+                || chapterIndex < 0 || chapterIndex >= chapterCount(bookIndex)) {
             throw new IllegalArgumentException();
+        }
 
         final SQLiteDatabase db = mTranslationsDatabaseHelper.getReadableDatabase();
         final Cursor cursor = db.query(mSelectedTranslationShortName,
