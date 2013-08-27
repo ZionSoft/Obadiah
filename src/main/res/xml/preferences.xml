@@ -12,4 +12,10 @@
                 android:data="market://details?id=net.zionsoft.obadiah"/>
     </Preference>
 
+    <Preference android:title="@string/pref_report_issue">
+        <intent
+                android:action="android.intent.action.VIEW"
+                android:data="https://github.com/ZionSoft/Obadiah/issues/new"/>
+    </Preference>
+
 </PreferenceScreen>
