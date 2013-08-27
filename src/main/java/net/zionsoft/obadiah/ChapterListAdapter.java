@@ -52,6 +52,8 @@ class ChapterListAdapter extends ListBaseAdapter {
     void setLastReadChapter(int lastReadBook, int lastReadChapter) {
         mLastReadBook = lastReadBook;
         mLastReadChapter = lastReadChapter;
+
+        notifyDataSetChanged();
     }
 
     void selectBook(int selectedBook) {

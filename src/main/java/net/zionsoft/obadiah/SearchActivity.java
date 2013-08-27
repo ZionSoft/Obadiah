@@ -67,7 +67,7 @@ public class SearchActivity extends ActionBarActivity {
     protected void onResume() {
         super.onResume();
 
-        mSettingsManager.refresh();
+        mData.settingsChanged = mSettingsManager.refresh();
         populateUi();
     }
 
@@ -132,19 +132,20 @@ public class SearchActivity extends ActionBarActivity {
     }
 
     private void populateUi() {
-        mRootView.setBackgroundColor(mSettingsManager.backgroundColor());
-        mSearchText.setTextColor(mSettingsManager.textColor());
+        if (mData.settingsChanged) {
+            mRootView.setBackgroundColor(mSettingsManager.backgroundColor());
+            mSearchText.setTextColor(mSettingsManager.textColor());
+            mSearchResultListAdapter.notifyDataSetChanged();
+        }
 
         final String selected = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE)
                 .getString(Constants.PREF_KEY_LAST_READ_TRANSLATION, null);
+        setTitle(selected);
         if (!selected.equals(mData.selectedTranslationShortName)) {
-            setTitle(selected);
             mData.selectedTranslationShortName = selected;
 
             mSearchText.setText(null);
             mSearchResultListAdapter.setSearchResults(null);
-        } else {
-            mSearchResultListAdapter.notifyDataSetChanged();
         }
     }
 
@@ -159,12 +160,9 @@ public class SearchActivity extends ActionBarActivity {
 
                 mSearchResultListAdapter.setSearchResults(null);
 
-                InputMethodManager inputManager
-                        = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                if (inputManager != null) {
-                    inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
-                            InputMethodManager.HIDE_NOT_ALWAYS);
-                }
+                ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE))
+                        .hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
+                                InputMethodManager.HIDE_NOT_ALWAYS);
 
                 mProgressDialog = new ProgressDialog(SearchActivity.this);
                 mProgressDialog.setCancelable(false);
@@ -201,6 +199,7 @@ public class SearchActivity extends ActionBarActivity {
         Editable searchText;
         List<TranslationReader.SearchResult> results;
         String selectedTranslationShortName;
+        boolean settingsChanged;
     }
 
     private EditText mSearchText;

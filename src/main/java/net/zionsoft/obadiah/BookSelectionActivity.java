@@ -65,12 +65,13 @@ public class BookSelectionActivity extends ActionBarActivity {
     protected void onResume() {
         super.onResume();
 
-        mSettingsManager.refresh();
+        mData.settingsChanged = mSettingsManager.refresh();
         populateUi();
     }
 
     @Override
     public Object onRetainCustomNonConfigurationInstance() {
+        mData.orientationChanged = true;
         return mData;
     }
 
@@ -256,7 +257,11 @@ public class BookSelectionActivity extends ActionBarActivity {
     }
 
     private void populateUi() {
-        mRootView.setBackgroundColor(mSettingsManager.backgroundColor());
+        if (mData.settingsChanged) {
+            mRootView.setBackgroundColor(mSettingsManager.backgroundColor());
+            mBookListAdapter.notifyDataSetChanged();
+            mChapterListAdapter.notifyDataSetChanged();
+        }
 
         if (isUpgrading())
             return;
@@ -285,10 +290,23 @@ public class BookSelectionActivity extends ActionBarActivity {
         }
 
         if (lastReadTranslation.equals(mData.selectedTranslationShortName)) {
-            mLoadingSpinner.setVisibility(View.GONE);
-            mBookListAdapter.setBookNames(mData.bookNames);
-            updateUi();
+            if (mData.orientationChanged) {
+                mData.orientationChanged = false;
+                mLoadingSpinner.setVisibility(View.GONE);
+                mBookListAdapter.setBookNames(mData.bookNames);
+                updateUi();
+            } else {
+                // resumed from other Activities
+                final int lastReadChapter
+                        = preferences.getInt(Constants.PREF_KEY_LAST_READ_CHAPTER, -1);
+                if (lastReadChapter != mData.lastReadChapter) {
+                    mData.lastReadChapter = lastReadChapter;
+                    mChapterListAdapter.setLastReadChapter(mData.lastReadBook,
+                            mData.lastReadChapter);
+                }
+            }
         } else {
+            // the Activity was just created, or selected another translation
             mData.selectedTranslationShortName = lastReadTranslation;
             mData.lastReadBook = preferences.getInt(Constants.PREF_KEY_LAST_READ_BOOK, -1);
             mData.lastReadChapter = preferences.getInt(Constants.PREF_KEY_LAST_READ_CHAPTER, -1);
@@ -314,6 +332,8 @@ public class BookSelectionActivity extends ActionBarActivity {
         int lastReadBook;
         int lastReadChapter;
         int selectedBook;
+        boolean orientationChanged;
+        boolean settingsChanged;
     }
 
     private BroadcastReceiver mUpgradeStatusListener;

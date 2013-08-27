@@ -28,29 +28,34 @@ public class SettingsManager {
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
     }
 
-    public void refresh() {
-        // night / day mode
-        if (mSharedPreferences.getBoolean(SETTING_KEY_NIGHT_MODE, false)) {
-            mBackgroundColor = Color.BLACK;
-            mTextColor = Color.WHITE;
+    public boolean refresh() {
+        boolean nightMode = mSharedPreferences.getBoolean(SETTING_KEY_NIGHT_MODE, false);
+        if (nightMode) {
+            if (mMode == NIGHT_MODE)
+                return false;
+            mMode = NIGHT_MODE;
         } else {
-            mBackgroundColor = Color.WHITE;
-            mTextColor = Color.BLACK;
+            if (mMode == DAY_MODE)
+                return false;
+            mMode = DAY_MODE;
         }
+        return true;
     }
 
     public int backgroundColor() {
-        return mBackgroundColor;
+        return mMode == NIGHT_MODE ? Color.BLACK : Color.WHITE;
     }
 
     public int textColor() {
-        return mTextColor;
+        return mMode == NIGHT_MODE ? Color.WHITE : Color.BLACK;
     }
 
     private static final String SETTING_KEY_NIGHT_MODE = "pref_night_mode";
 
-    private final SharedPreferences mSharedPreferences;
+    private static final int UNKNOWN_MODE = 0;
+    private static final int DAY_MODE = 1;
+    private static final int NIGHT_MODE = 2;
 
-    private int mBackgroundColor;
-    private int mTextColor;
+    private final SharedPreferences mSharedPreferences;
+    private int mMode = UNKNOWN_MODE;
 }

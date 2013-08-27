@@ -179,6 +179,7 @@ public class TextActivity extends ActionBarActivity
     }
 
     private void populateUi() {
+        // TODO only changes if the setting is changed
         mRootView.setBackgroundColor(mSettingsManager.backgroundColor());
 
         // TODO caches verses for orientation change
