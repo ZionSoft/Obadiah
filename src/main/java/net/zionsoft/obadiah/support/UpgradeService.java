@@ -21,6 +21,7 @@ import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.v4.content.LocalBroadcastManager;
@@ -85,12 +86,19 @@ public class UpgradeService extends IntentService {
 
                 editor.putInt(Constants.PREF_KEY_CURRENT_APPLICATION_VERSION, 10700).commit();
             }
+
+            getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE).edit()
+                    .putInt(Constants.PREF_KEY_CURRENT_APPLICATION_VERSION,
+                            getPackageManager().getPackageInfo(getPackageName(), 0).versionCode)
+                    .commit();
         } catch (JSONException e) {
             // malformed server response
             status = STATUS_SERVER_FAILURE;
         } catch (IOException e) {
             // network failure
             status = STATUS_NETWORK_FAILURE;
+        } catch (PackageManager.NameNotFoundException e) {
+            // should not reach here
         } finally {
             getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE).edit()
                     .putBoolean(Constants.PREF_KEY_UPGRADING, false).commit();

@@ -18,8 +18,6 @@
 package net.zionsoft.obadiah;
 
 public class Constants {
-    public static final int CURRENT_APPLICATION_VERSION = 10700;
-
     public static final String PREF_NAME = "settings";
     public static final String PREF_KEY_CURRENT_APPLICATION_VERSION = "currentApplicationVersion";
     public static final String PREF_KEY_LAST_READ_TRANSLATION = "currentTranslation";

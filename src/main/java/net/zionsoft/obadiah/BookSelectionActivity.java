@@ -23,6 +23,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -144,9 +145,13 @@ public class BookSelectionActivity extends ActionBarActivity {
     // upgrades from an older version
 
     private boolean needsUpgrade() {
-        return getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE)
-                .getInt(Constants.PREF_KEY_CURRENT_APPLICATION_VERSION, 0)
-                < Constants.CURRENT_APPLICATION_VERSION;
+        try {
+            return getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE)
+                    .getInt(Constants.PREF_KEY_CURRENT_APPLICATION_VERSION, 0)
+                    < getPackageManager().getPackageInfo(getPackageName(), 0).versionCode;
+        } catch (PackageManager.NameNotFoundException e) {
+            return true;
+        }
     }
 
     private boolean isUpgrading() {
