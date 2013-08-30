@@ -77,11 +77,23 @@ public class UpgradeService extends IntentService {
                 // prior to 1.7.0
 
                 // new database format for translation list is introduced in 1.7.0
-                new TranslationManager(this).addTranslations(allTranslations());
+                final TranslationManager translationManager = new TranslationManager(this);
+                translationManager.addTranslations(allTranslations());
+
+                // there's a bug that the selected translation might not be set prior to 1.7.0
+                final SharedPreferences preferences
+                        = getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+                final SharedPreferences.Editor editor = preferences.edit();
+                final List<TranslationInfo> installedTranslations
+                        = translationManager.installedTranslations();
+                if (installedTranslations.size() > 0
+                        && preferences.getString(Constants.PREF_KEY_LAST_READ_TRANSLATION, null)
+                        == null) {
+                    editor.putString(Constants.PREF_KEY_LAST_READ_TRANSLATION,
+                            installedTranslations.get(0).shortName);
+                }
 
                 // no longer tracks timestamp when translation list is fetched since 1.7.0
-                final SharedPreferences.Editor editor =
-                        getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE).edit();
                 editor.remove("lastUpdated");
 
                 editor.putInt(Constants.PREF_KEY_CURRENT_APPLICATION_VERSION, 10700).commit();
