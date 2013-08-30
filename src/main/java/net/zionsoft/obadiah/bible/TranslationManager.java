@@ -23,6 +23,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class TranslationManager {
@@ -240,6 +242,15 @@ public class TranslationManager {
                         translations.add(translationInfo);
                     }
                 }
+
+                Collections.sort(translations, new Comparator<TranslationInfo>() {
+                    @Override
+                    public int compare(TranslationInfo obj1, TranslationInfo obj2) {
+                        int result = obj1.language.compareTo(obj2.language);
+                        return result == 0 ? obj1.name.compareTo(obj2.name) : result;
+                    }
+                });
+
                 return translations;
             }
         } finally {
