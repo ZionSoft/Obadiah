@@ -16,4 +16,21 @@ dependencies {
 android {
     compileSdkVersion 18
     buildToolsVersion "18.0.1"
+
+    signingConfigs {
+        release {
+            storeFile file("zionsoft.keystore")
+            storePassword "TODO"
+            keyAlias "zionsoft"
+            keyPassword "TODO"
+        }
+    }
+
+    buildTypes {
+        release {
+            runProguard true
+            proguardFile getDefaultProguardFile('proguard-android-optimize.txt')
+            signingConfig signingConfigs.release
+        }
+    }
 }
