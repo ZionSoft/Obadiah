@@ -71,7 +71,6 @@ public class BookSelectionActivity extends ActionBarActivity {
 
     @Override
     public Object onRetainCustomNonConfigurationInstance() {
-        mData.orientationChanged = true;
         return mData;
     }
 
@@ -289,28 +288,20 @@ public class BookSelectionActivity extends ActionBarActivity {
             return;
         }
 
-        if (lastReadTranslation.equals(mData.selectedTranslationShortName)) {
-            if (mData.orientationChanged) {
-                mData.orientationChanged = false;
-                mLoadingSpinner.setVisibility(View.GONE);
-                mBookListAdapter.setBookNames(mData.bookNames);
-                updateUi();
-            } else {
-                // resumed from other Activities
-                final int lastReadChapter
-                        = preferences.getInt(Constants.PREF_KEY_LAST_READ_CHAPTER, -1);
-                if (lastReadChapter != mData.lastReadChapter) {
-                    mData.lastReadChapter = lastReadChapter;
-                    mChapterListAdapter.setLastReadChapter(mData.lastReadBook,
-                            mData.lastReadChapter);
-                }
-            }
+        final int lastReadBook = preferences.getInt(Constants.PREF_KEY_LAST_READ_BOOK, -1);
+        final int lastReadChapter = preferences.getInt(Constants.PREF_KEY_LAST_READ_CHAPTER, -1);
+        final int selectedBook = mData.selectedBook < 0 ? lastReadBook : mData.selectedBook;
+        if (lastReadTranslation.equals(mData.selectedTranslationShortName)
+                && lastReadBook == mData.lastReadBook && lastReadChapter == mData.lastReadChapter
+                && selectedBook == mData.selectedBook) {
+            mLoadingSpinner.setVisibility(View.GONE);
+            mBookListAdapter.setBookNames(mData.bookNames);
+            updateUi();
         } else {
-            // the Activity was just created, or selected another translation
             mData.selectedTranslationShortName = lastReadTranslation;
-            mData.lastReadBook = preferences.getInt(Constants.PREF_KEY_LAST_READ_BOOK, -1);
-            mData.lastReadChapter = preferences.getInt(Constants.PREF_KEY_LAST_READ_CHAPTER, -1);
-            mData.selectedBook = mData.lastReadBook < 0 ? 0 : mData.lastReadBook;
+            mData.lastReadBook = lastReadBook;
+            mData.lastReadChapter = lastReadChapter;
+            mData.selectedBook = selectedBook;
             loadBookList();
         }
     }
@@ -331,8 +322,7 @@ public class BookSelectionActivity extends ActionBarActivity {
         String selectedTranslationShortName;
         int lastReadBook;
         int lastReadChapter;
-        int selectedBook;
-        boolean orientationChanged;
+        int selectedBook = -1;
         boolean settingsChanged;
     }
 
