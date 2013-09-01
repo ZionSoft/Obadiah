@@ -20,3 +20,6 @@ libs
 
 # Mac
 .DS_Store
+
+# Key Store
+*.keystore
