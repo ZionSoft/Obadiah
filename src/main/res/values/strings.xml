@@ -32,6 +32,9 @@
     <string name="dialog_translation_list_fetch_failure_message">Failed to fetch the translation
         list, try again?
     </string>
+    <string name="dialog_translation_remove_failure_message">Failed to remove the translation, try
+        again?
+    </string>
 
     <string name="pref_night_mode">Night Mode</string>
     <string name="pref_rate_me">Rate me on Google Play</string>

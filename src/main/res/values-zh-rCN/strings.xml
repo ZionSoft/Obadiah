@@ -22,6 +22,7 @@
     <string name="dialog_translation_delete_confirm_message">确定删除该译本？</string>
     <string name="dialog_translation_download_failure_message">下载译本失败，请重试。</string>
     <string name="dialog_translation_list_fetch_failure_message">无法下载译本列表，请重试。</string>
+    <string name="dialog_translation_remove_failure_message">删除译本失败，请重试。</string>
 
     <string name="pref_night_mode">夜间模式</string>
     <string name="pref_rate_me">在Google Play上给我评分</string>
