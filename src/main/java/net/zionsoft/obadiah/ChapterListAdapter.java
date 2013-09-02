@@ -51,15 +51,11 @@ class ChapterListAdapter extends ListBaseAdapter {
         return textView;
     }
 
-    void setLastReadChapter(int lastReadBook, int lastReadChapter) {
+    void setLastReadChapter(int selectedBook, int lastReadBook, int lastReadChapter) {
+        mSelectedBook = selectedBook;
         mLastReadBook = lastReadBook;
         mLastReadChapter = lastReadChapter;
 
-        notifyDataSetChanged();
-    }
-
-    void selectBook(int selectedBook) {
-        mSelectedBook = selectedBook;
         final int chapterCount = TranslationReader.chapterCount(mSelectedBook);
         final String[] chapters = new String[chapterCount];
         for (int i = 0; i < chapterCount; ++i)

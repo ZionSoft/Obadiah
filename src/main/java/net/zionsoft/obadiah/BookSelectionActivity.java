@@ -288,8 +288,8 @@ public class BookSelectionActivity extends ActionBarActivity {
             return;
         }
 
-        final int lastReadBook = preferences.getInt(Constants.PREF_KEY_LAST_READ_BOOK, -1);
-        final int lastReadChapter = preferences.getInt(Constants.PREF_KEY_LAST_READ_CHAPTER, -1);
+        final int lastReadBook = preferences.getInt(Constants.PREF_KEY_LAST_READ_BOOK, 0);
+        final int lastReadChapter = preferences.getInt(Constants.PREF_KEY_LAST_READ_CHAPTER, 0);
         final int selectedBook = mData.selectedBook < 0 ? lastReadBook : mData.selectedBook;
         if (lastReadTranslation.equals(mData.selectedTranslationShortName)
                 && lastReadBook == mData.lastReadBook && lastReadChapter == mData.lastReadChapter
@@ -312,8 +312,8 @@ public class BookSelectionActivity extends ActionBarActivity {
                 mData.bookNames[mData.selectedBook]));
 
         mBookListAdapter.selectBook(mData.selectedBook);
-        mChapterListAdapter.selectBook(mData.selectedBook);
-        mChapterListAdapter.setLastReadChapter(mData.lastReadBook, mData.lastReadChapter);
+        mChapterListAdapter.setLastReadChapter(mData.selectedBook,
+                mData.lastReadBook, mData.lastReadChapter);
         mChaptersGridView.setSelection(0);
     }
 
