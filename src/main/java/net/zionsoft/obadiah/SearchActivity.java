@@ -24,6 +24,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.text.Editable;
+import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -135,6 +136,7 @@ public class SearchActivity extends ActionBarActivity {
         if (mData.settingsChanged) {
             mRootView.setBackgroundColor(mSettingsManager.backgroundColor());
             mSearchText.setTextColor(mSettingsManager.textColor());
+            mSearchText.setTextSize(TypedValue.COMPLEX_UNIT_PX, mSettingsManager.textSize());
             mSearchResultListAdapter.notifyDataSetChanged();
         }
 

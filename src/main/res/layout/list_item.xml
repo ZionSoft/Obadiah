@@ -4,5 +4,4 @@
           android:layout_height="wrap_content"
           android:background="@drawable/list_item_background"
           android:gravity="center"
-          android:padding="@dimen/padding"
-          android:textSize="@dimen/text_size_medium"/>
+          android:padding="@dimen/padding"/>

@@ -19,6 +19,7 @@ package net.zionsoft.obadiah;
 
 import android.content.Context;
 import android.graphics.Typeface;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -62,6 +63,7 @@ class TranslationSelectionListAdapter extends BaseAdapter {
         }
 
         textView.setTextColor(mSettingsManager.textColor());
+        textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, mSettingsManager.textSize());
 
         final TranslationInfo translationInfo = mTranslations.get(position);
         textView.setText(translationInfo.name);

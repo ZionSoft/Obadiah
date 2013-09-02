@@ -18,7 +18,6 @@
 package net.zionsoft.obadiah;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.text.SpannableStringBuilder;
 import android.text.style.AbsoluteSizeSpan;
 import android.view.View;
@@ -37,12 +36,8 @@ class TranslationDownloadListAdapter extends BaseAdapter {
         super();
         mContext = context;
         mSettingsManager = settingsManager;
-
-        Resources resources = context.getResources();
-        mMediumSizeSpan
-                = new AbsoluteSizeSpan(resources.getDimensionPixelSize(R.dimen.text_size_medium));
-        mSmallSizeSpan
-                = new AbsoluteSizeSpan(resources.getDimensionPixelSize(R.dimen.text_size_small));
+        mMediumSizeSpan = new AbsoluteSizeSpan((int) mSettingsManager.textSize());
+        mSmallSizeSpan = new AbsoluteSizeSpan((int) mSettingsManager.smallerTextSize());
     }
 
     @Override

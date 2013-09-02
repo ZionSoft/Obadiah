@@ -26,6 +26,23 @@
     <string name="pref_night_mode">夜间模式</string>
     <string name="pref_rate_me">在Google Play上给我评分</string>
     <string name="pref_report_issue">报告问题</string>
+    <string name="pref_text_size_title">文字大小</string>
+    <string name="pref_text_size_dialog_title">请选择文字大小：</string>
+    <string name="pref_text_size_default">medium</string>
+    <string-array name="pref_text_size_name">
+        <item>超小号</item>
+        <item>小号</item>
+        <item>中号</item>
+        <item>大号</item>
+        <item>超大号</item>
+    </string-array>
+    <string-array name="pref_text_size_value">
+        <item>very_small</item>
+        <item>small</item>
+        <item>medium</item>
+        <item>large</item>
+        <item>very_large</item>
+    </string-array>
 
     <string name="progress_dialog_translation_deleting">删除中&#8230;</string>
     <string name="progress_dialog_translation_downloading">下载中&#8230;</string>

@@ -18,6 +18,7 @@
 package net.zionsoft.obadiah;
 
 import android.content.Context;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -59,6 +60,7 @@ class SearchResultListAdapter extends BaseAdapter {
             textView = (TextView) convertView;
 
         textView.setTextColor(mSettingsManager.textColor());
+        textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, mSettingsManager.textSize());
         textView.setText(mResults.get(position).verse);
         return textView;
     }
