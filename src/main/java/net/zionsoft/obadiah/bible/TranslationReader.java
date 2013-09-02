@@ -97,7 +97,7 @@ public class TranslationReader {
         return BOOK_COUNT;
     }
 
-    public static int chapterCount(int bookIndex) {
+    public static int chapterCount(int bookIndex) throws IllegalArgumentException {
         if (bookIndex < 0 || bookIndex >= BOOK_COUNT)
             throw new IllegalArgumentException();
         return CHAPTER_COUNT[bookIndex];

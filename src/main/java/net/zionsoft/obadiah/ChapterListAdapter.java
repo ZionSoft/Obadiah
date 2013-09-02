@@ -52,17 +52,24 @@ class ChapterListAdapter extends ListBaseAdapter {
     }
 
     void setLastReadChapter(int selectedBook, int lastReadBook, int lastReadChapter) {
-        mSelectedBook = selectedBook;
-        mLastReadBook = lastReadBook;
-        mLastReadChapter = lastReadChapter;
+        try {
+            mSelectedBook = selectedBook;
+            mLastReadBook = lastReadBook;
+            mLastReadChapter = lastReadChapter;
 
-        final int chapterCount = TranslationReader.chapterCount(mSelectedBook);
-        final String[] chapters = new String[chapterCount];
-        for (int i = 0; i < chapterCount; ++i)
-            chapters[i] = Integer.toString(i + 1);
-        mTexts = chapters;
-
-        notifyDataSetChanged();
+            final int chapterCount = TranslationReader.chapterCount(mSelectedBook);
+            final String[] chapters = new String[chapterCount];
+            for (int i = 0; i < chapterCount; ++i)
+                chapters[i] = Integer.toString(i + 1);
+            mTexts = chapters;
+        } catch (IllegalArgumentException e) {
+            mSelectedBook = 0;
+            mLastReadBook = 0;
+            mLastReadChapter = 0;
+            mTexts = null;
+        } finally {
+            notifyDataSetChanged();
+        }
     }
 
     private final SettingsManager mSettingsManager;
