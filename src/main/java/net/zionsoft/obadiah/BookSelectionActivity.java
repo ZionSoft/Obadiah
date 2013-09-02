@@ -117,9 +117,14 @@ public class BookSelectionActivity extends ActionBarActivity {
 
             @Override
             protected String[] doInBackground(Void... params) {
-                final TranslationReader translationReader = new TranslationReader(BookSelectionActivity.this);
-                translationReader.selectTranslation(mData.selectedTranslationShortName);
-                return translationReader.bookNames();
+                try {
+                    final TranslationReader translationReader
+                            = new TranslationReader(BookSelectionActivity.this);
+                    translationReader.selectTranslation(mData.selectedTranslationShortName);
+                    return translationReader.bookNames();
+                } catch (IllegalArgumentException e) {
+                    return null;
+                }
             }
 
             @Override
@@ -130,13 +135,31 @@ public class BookSelectionActivity extends ActionBarActivity {
                 mBookListAdapter.setBookNames(bookNames);
                 mData.bookNames = bookNames;
 
-                updateUi();
+                if (bookNames == null) {
+                    DialogHelper.showDialog(BookSelectionActivity.this, false,
+                            R.string.dialog_book_list_loading_failure_message,
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    loadBookList();
+                                }
+                            },
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    finish();
+                                }
+                            }
+                    );
+                } else {
+                    updateUi();
 
-                // scrolls to the currently selected book
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.FROYO)
-                    mBookListView.smoothScrollToPosition(mData.selectedBook);
-                else
-                    mBookListView.setSelection(mData.selectedBook);
+                    // scrolls to the currently selected book
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.FROYO)
+                        mBookListView.smoothScrollToPosition(mData.selectedBook);
+                    else
+                        mBookListView.setSelection(mData.selectedBook);
+                }
             }
         }.execute();
     }

@@ -48,7 +48,7 @@ public class TranslationReader {
         mBookNames = new String[BOOK_COUNT];
     }
 
-    public void selectTranslation(String translationShortName) {
+    public void selectTranslation(String translationShortName) throws IllegalArgumentException {
         if (translationShortName == null)
             throw new IllegalArgumentException();
 
