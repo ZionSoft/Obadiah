@@ -175,10 +175,14 @@ public class SearchActivity extends ActionBarActivity {
             protected List<TranslationReader.SearchResult> doInBackground(String... params) {
                 // running in the worker thread
 
-                mTranslationReader.selectTranslation(
-                        getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE)
-                                .getString(Constants.PREF_KEY_LAST_READ_TRANSLATION, null));
-                return mTranslationReader.search(params[0]);
+                try {
+                    mTranslationReader.selectTranslation(
+                            getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE)
+                                    .getString(Constants.PREF_KEY_LAST_READ_TRANSLATION, null));
+                    return mTranslationReader.search(params[0]);
+                } catch (IllegalArgumentException e) {
+                    return null;
+                }
             }
 
             protected void onPostExecute(List<TranslationReader.SearchResult> results) {

@@ -146,7 +146,7 @@ public class TranslationReader {
         return loadVerses(bookIndex, chapterIndex);
     }
 
-    public List<SearchResult> search(String key) {
+    public List<SearchResult> search(String key) throws IllegalArgumentException {
         if (mSelectedTranslationShortName == null)
             return null;
         if (key == null || key.length() == 0)
