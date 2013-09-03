@@ -118,7 +118,7 @@ public class TranslationManager {
         }
     }
 
-    public void removeTranslation(TranslationInfo translation) {
+    public void removeTranslation(TranslationInfo translation) throws IllegalArgumentException {
         if (translation == null)
             throw new IllegalArgumentException();
 

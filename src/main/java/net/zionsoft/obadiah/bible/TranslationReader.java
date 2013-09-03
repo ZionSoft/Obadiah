@@ -48,7 +48,7 @@ public class TranslationReader {
         mBookNames = new String[BOOK_COUNT];
     }
 
-    public void selectTranslation(String translationShortName) {
+    public void selectTranslation(String translationShortName) throws IllegalArgumentException {
         if (translationShortName == null)
             throw new IllegalArgumentException();
 
@@ -97,7 +97,7 @@ public class TranslationReader {
         return BOOK_COUNT;
     }
 
-    public static int chapterCount(int bookIndex) {
+    public static int chapterCount(int bookIndex) throws IllegalArgumentException {
         if (bookIndex < 0 || bookIndex >= BOOK_COUNT)
             throw new IllegalArgumentException();
         return CHAPTER_COUNT[bookIndex];
@@ -146,7 +146,7 @@ public class TranslationReader {
         return loadVerses(bookIndex, chapterIndex);
     }
 
-    public List<SearchResult> search(String key) {
+    public List<SearchResult> search(String key) throws IllegalArgumentException {
         if (mSelectedTranslationShortName == null)
             return null;
         if (key == null || key.length() == 0)

@@ -47,7 +47,11 @@ class VersePagerAdapter extends PagerAdapter {
 
     @Override
     public int getCount() {
-        return (mCurrentBook < 0) ? 0 : TranslationReader.chapterCount(mCurrentBook);
+        try {
+            return (mCurrentBook < 0) ? 0 : TranslationReader.chapterCount(mCurrentBook);
+        } catch (IllegalArgumentException e) {
+            return 0;
+        }
     }
 
     @Override

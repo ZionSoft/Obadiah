@@ -19,6 +19,7 @@ package net.zionsoft.obadiah;
 
 import android.content.Context;
 import android.graphics.Typeface;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -45,26 +46,30 @@ class ChapterListAdapter extends ListBaseAdapter {
         else
             textView.setTypeface(null, Typeface.NORMAL);
         textView.setTextColor(mSettingsManager.textColor());
+        textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, mSettingsManager.textSize());
         textView.setText(mTexts[position]);
         return textView;
     }
 
-    void setLastReadChapter(int lastReadBook, int lastReadChapter) {
-        mLastReadBook = lastReadBook;
-        mLastReadChapter = lastReadChapter;
+    void setLastReadChapter(int selectedBook, int lastReadBook, int lastReadChapter) {
+        try {
+            mSelectedBook = selectedBook;
+            mLastReadBook = lastReadBook;
+            mLastReadChapter = lastReadChapter;
 
-        notifyDataSetChanged();
-    }
-
-    void selectBook(int selectedBook) {
-        mSelectedBook = selectedBook;
-        final int chapterCount = TranslationReader.chapterCount(mSelectedBook);
-        final String[] chapters = new String[chapterCount];
-        for (int i = 0; i < chapterCount; ++i)
-            chapters[i] = Integer.toString(i + 1);
-        mTexts = chapters;
-
-        notifyDataSetChanged();
+            final int chapterCount = TranslationReader.chapterCount(mSelectedBook);
+            final String[] chapters = new String[chapterCount];
+            for (int i = 0; i < chapterCount; ++i)
+                chapters[i] = Integer.toString(i + 1);
+            mTexts = chapters;
+        } catch (IllegalArgumentException e) {
+            mSelectedBook = 0;
+            mLastReadBook = 0;
+            mLastReadChapter = 0;
+            mTexts = null;
+        } finally {
+            notifyDataSetChanged();
+        }
     }
 
     private final SettingsManager mSettingsManager;

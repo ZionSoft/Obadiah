@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -35,7 +36,7 @@ public class NetworkHelper {
     public static List<TranslationInfo> fetchTranslationList() throws IOException, JSONException {
         BufferedInputStream bis = null;
         try {
-            bis = get("translations");
+            bis = get(String.format("translations?locale=%s", Locale.getDefault().toString()));
             byte[] response = new byte[0];
             byte[] buffer = new byte[2048];
             int read;

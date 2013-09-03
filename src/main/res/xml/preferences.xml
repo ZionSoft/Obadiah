@@ -6,6 +6,14 @@
             android:key="pref_night_mode"
             android:title="@string/pref_night_mode"/>
 
+    <ListPreference
+            android:defaultValue="@string/pref_text_size_default"
+            android:dialogTitle="@string/pref_text_size_dialog_title"
+            android:entries="@array/pref_text_size_name"
+            android:entryValues="@array/pref_text_size_value"
+            android:key="pref_text_size"
+            android:title="@string/pref_text_size_title"/>
+
     <Preference android:title="@string/pref_rate_me">
         <intent
                 android:action="android.intent.action.VIEW"

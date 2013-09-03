@@ -19,6 +19,7 @@ package net.zionsoft.obadiah;
 
 import android.content.Context;
 import android.graphics.Typeface;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -47,6 +48,7 @@ class BookListAdapter extends ListBaseAdapter {
             textView.setBackgroundResource(R.drawable.list_item_background);
         }
         textView.setTextColor(mSettingsManager.textColor());
+        textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, mSettingsManager.textSize());
         textView.setText(mTexts[position]);
         return textView;
     }

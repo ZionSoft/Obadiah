@@ -173,6 +173,16 @@ public class TranslationSelectionActivity extends ActionBarActivity {
                     mTranslationRemoveProgressDialog.dismiss();
                     Toast.makeText(TranslationSelectionActivity.this,
                             R.string.toast_translation_deleted, Toast.LENGTH_SHORT).show();
+                } else {
+                    DialogHelper.showDialog(TranslationSelectionActivity.this, false,
+                            R.string.dialog_translation_remove_failure_message,
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    removeTranslation();
+                                }
+                            },
+                            null);
                 }
             }
         };

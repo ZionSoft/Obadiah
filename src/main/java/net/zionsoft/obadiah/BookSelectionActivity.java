@@ -71,7 +71,6 @@ public class BookSelectionActivity extends ActionBarActivity {
 
     @Override
     public Object onRetainCustomNonConfigurationInstance() {
-        mData.orientationChanged = true;
         return mData;
     }
 
@@ -118,9 +117,14 @@ public class BookSelectionActivity extends ActionBarActivity {
 
             @Override
             protected String[] doInBackground(Void... params) {
-                final TranslationReader translationReader = new TranslationReader(BookSelectionActivity.this);
-                translationReader.selectTranslation(mData.selectedTranslationShortName);
-                return translationReader.bookNames();
+                try {
+                    final TranslationReader translationReader
+                            = new TranslationReader(BookSelectionActivity.this);
+                    translationReader.selectTranslation(mData.selectedTranslationShortName);
+                    return translationReader.bookNames();
+                } catch (IllegalArgumentException e) {
+                    return null;
+                }
             }
 
             @Override
@@ -131,13 +135,31 @@ public class BookSelectionActivity extends ActionBarActivity {
                 mBookListAdapter.setBookNames(bookNames);
                 mData.bookNames = bookNames;
 
-                updateUi();
+                if (bookNames == null) {
+                    DialogHelper.showDialog(BookSelectionActivity.this, false,
+                            R.string.dialog_book_list_loading_failure_message,
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    loadBookList();
+                                }
+                            },
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    finish();
+                                }
+                            }
+                    );
+                } else {
+                    updateUi();
 
-                // scrolls to the currently selected book
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.FROYO)
-                    mBookListView.smoothScrollToPosition(mData.selectedBook);
-                else
-                    mBookListView.setSelection(mData.selectedBook);
+                    // scrolls to the currently selected book
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.FROYO)
+                        mBookListView.smoothScrollToPosition(mData.selectedBook);
+                    else
+                        mBookListView.setSelection(mData.selectedBook);
+                }
             }
         }.execute();
     }
@@ -289,28 +311,20 @@ public class BookSelectionActivity extends ActionBarActivity {
             return;
         }
 
-        if (lastReadTranslation.equals(mData.selectedTranslationShortName)) {
-            if (mData.orientationChanged) {
-                mData.orientationChanged = false;
-                mLoadingSpinner.setVisibility(View.GONE);
-                mBookListAdapter.setBookNames(mData.bookNames);
-                updateUi();
-            } else {
-                // resumed from other Activities
-                final int lastReadChapter
-                        = preferences.getInt(Constants.PREF_KEY_LAST_READ_CHAPTER, -1);
-                if (lastReadChapter != mData.lastReadChapter) {
-                    mData.lastReadChapter = lastReadChapter;
-                    mChapterListAdapter.setLastReadChapter(mData.lastReadBook,
-                            mData.lastReadChapter);
-                }
-            }
+        final int lastReadBook = preferences.getInt(Constants.PREF_KEY_LAST_READ_BOOK, 0);
+        final int lastReadChapter = preferences.getInt(Constants.PREF_KEY_LAST_READ_CHAPTER, 0);
+        final int selectedBook = mData.selectedBook < 0 ? lastReadBook : mData.selectedBook;
+        if (lastReadTranslation.equals(mData.selectedTranslationShortName)
+                && lastReadBook == mData.lastReadBook && lastReadChapter == mData.lastReadChapter
+                && selectedBook == mData.selectedBook) {
+            mLoadingSpinner.setVisibility(View.GONE);
+            mBookListAdapter.setBookNames(mData.bookNames);
+            updateUi();
         } else {
-            // the Activity was just created, or selected another translation
             mData.selectedTranslationShortName = lastReadTranslation;
-            mData.lastReadBook = preferences.getInt(Constants.PREF_KEY_LAST_READ_BOOK, -1);
-            mData.lastReadChapter = preferences.getInt(Constants.PREF_KEY_LAST_READ_CHAPTER, -1);
-            mData.selectedBook = mData.lastReadBook < 0 ? 0 : mData.lastReadBook;
+            mData.lastReadBook = lastReadBook;
+            mData.lastReadChapter = lastReadChapter;
+            mData.selectedBook = selectedBook;
             loadBookList();
         }
     }
@@ -321,8 +335,8 @@ public class BookSelectionActivity extends ActionBarActivity {
                 mData.bookNames[mData.selectedBook]));
 
         mBookListAdapter.selectBook(mData.selectedBook);
-        mChapterListAdapter.selectBook(mData.selectedBook);
-        mChapterListAdapter.setLastReadChapter(mData.lastReadBook, mData.lastReadChapter);
+        mChapterListAdapter.setLastReadChapter(mData.selectedBook,
+                mData.lastReadBook, mData.lastReadChapter);
         mChaptersGridView.setSelection(0);
     }
 
@@ -331,8 +345,7 @@ public class BookSelectionActivity extends ActionBarActivity {
         String selectedTranslationShortName;
         int lastReadBook;
         int lastReadChapter;
-        int selectedBook;
-        boolean orientationChanged;
+        int selectedBook = -1;
         boolean settingsChanged;
     }
 

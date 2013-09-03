@@ -16,16 +16,35 @@
     <string name="action_select_translation">選擇譯本</string>
     <string name="action_share">分享</string>
 
+    <string name="dialog_book_list_loading_failure_message">讀取書卷列表失敗，請重試。</string>
     <string name="dialog_initialization_failure_message">初始化失敗，請重試。</string>
     <string name="dialog_network_failure_message">請檢查網路連接，並重試。</string>
     <string name="dialog_no_translation_message">沒有已安裝的譯本，請從互聯網下載。</string>
     <string name="dialog_translation_delete_confirm_message">確定刪除該譯本？</string>
     <string name="dialog_translation_download_failure_message">下載譯本失敗，請重試。</string>
     <string name="dialog_translation_list_fetch_failure_message">無法下載譯本列表，請重試。</string>
+    <string name="dialog_translation_remove_failure_message">刪除譯本失敗，請重試。</string>
 
     <string name="pref_night_mode">夜間模式</string>
     <string name="pref_rate_me">在Google Play上給我評分</string>
     <string name="pref_report_issue">報告問題</string>
+    <string name="pref_text_size_title">文字大小</string>
+    <string name="pref_text_size_dialog_title">請選擇文字大小：</string>
+    <string name="pref_text_size_default">medium</string>
+    <string-array name="pref_text_size_name">
+        <item>超小號</item>
+        <item>小號</item>
+        <item>中號</item>
+        <item>大號</item>
+        <item>超大號</item>
+    </string-array>
+    <string-array name="pref_text_size_value">
+        <item>very_small</item>
+        <item>small</item>
+        <item>medium</item>
+        <item>large</item>
+        <item>very_large</item>
+    </string-array>
 
     <string name="progress_dialog_translation_deleting">删除中&#8230;</string>
     <string name="progress_dialog_translation_downloading">下載中&#8230;</string>

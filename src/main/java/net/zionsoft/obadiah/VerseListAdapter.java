@@ -21,6 +21,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.text.SpannableString;
 import android.text.style.BackgroundColorSpan;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -44,10 +45,12 @@ class VerseListAdapter extends ListBaseAdapter {
 
         TextView textView = (TextView) linearLayout.getChildAt(0);
         textView.setTextColor(mSettingsManager.textColor());
+        textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, mSettingsManager.textSize());
         textView.setText(Integer.toString(position + 1));
 
         textView = (TextView) linearLayout.getChildAt(1);
         textView.setTextColor(mSettingsManager.textColor());
+        textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, mSettingsManager.textSize());
         if (mSelected[position]) {
             final SpannableString string = new SpannableString(mTexts[position]);
             if (mBackgroundColorSpan == null)

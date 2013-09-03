@@ -34,6 +34,7 @@ public class TranslationRemoveService extends IntentService {
             = "net.zionsoft.obadiah.bible.TranslationRemoveService.KEY_TRANSLATION";
 
     public static final int STATUS_SUCCESS = 0;
+    public static final int STATUS_FAILURE = 1;
 
     public TranslationRemoveService() {
         super("net.zionsoft.obadiah.bible.TranslationRemoveService");
@@ -41,13 +42,18 @@ public class TranslationRemoveService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        final TranslationInfo translation = intent.getParcelableExtra(KEY_TRANSLATION);
-        new TranslationManager(this).removeTranslation(translation);
+        int status = STATUS_SUCCESS;
+        try {
+            final TranslationInfo translation = intent.getParcelableExtra(KEY_TRANSLATION);
+            new TranslationManager(this).removeTranslation(translation);
+        } catch (IllegalArgumentException e) {
+            status = STATUS_FAILURE;
+        } finally {
+            getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE).edit()
+                    .putBoolean(Constants.PREF_KEY_REMOVING_TRANSLATION, false).commit();
 
-        getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE).edit()
-                .putBoolean(Constants.PREF_KEY_REMOVING_TRANSLATION, false).commit();
-
-        LocalBroadcastManager.getInstance(this).sendBroadcast(
-                new Intent(ACTION_STATUS_UPDATE).putExtra(KEY_STATUS, STATUS_SUCCESS));
+            LocalBroadcastManager.getInstance(this).sendBroadcast(
+                    new Intent(ACTION_STATUS_UPDATE).putExtra(KEY_STATUS, status));
+        }
     }
 }
