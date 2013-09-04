@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 
 public class TranslationManager {
     public TranslationManager(Context context) {
@@ -245,9 +246,24 @@ public class TranslationManager {
 
                 Collections.sort(translations, new Comparator<TranslationInfo>() {
                     @Override
-                    public int compare(TranslationInfo obj1, TranslationInfo obj2) {
-                        int result = obj1.language.compareTo(obj2.language);
-                        return result == 0 ? obj1.name.compareTo(obj2.name) : result;
+                    public int compare(TranslationInfo translation1, TranslationInfo translation2) {
+                        // first compares with user's default locale
+                        final Locale userLocale = Locale.getDefault();
+                        final String userLanguage = userLocale.getLanguage().toLowerCase();
+                        final String userCountry = userLocale.getCountry().toLowerCase();
+                        final String[] fields1 = translation1.language.split("_");
+                        final String[] fields2 = translation2.language.split("_");
+                        final int score1 = compareLocale(fields1[0], fields1[1],
+                                userLanguage, userCountry);
+                        final int score2 = compareLocale(fields2[0], fields2[1],
+                                userLanguage, userCountry);
+                        int r = score2 - score1;
+                        if (r != 0)
+                            return r;
+
+                        // then sorts by language & name
+                        r = translation1.language.compareTo(translation2.language);
+                        return r == 0 ? translation1.name.compareTo(translation2.name) : r;
                     }
                 });
 
@@ -257,6 +273,13 @@ public class TranslationManager {
             if (db != null)
                 db.close();
         }
+    }
+
+    private static int compareLocale(String language, String country,
+                                     String targetLanguage, String targetCountry) {
+        if (language.equals(targetLanguage))
+            return (country.equals(targetCountry)) ? 2 : 1;
+        return 0;
     }
 
     private static final int TRANSLATIONS_ALL = 0;
