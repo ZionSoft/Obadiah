@@ -113,7 +113,8 @@ public class TranslationManager {
             db.setTransactionSuccessful();
         } finally {
             if (db != null) {
-                db.endTransaction();
+                if (db.inTransaction())
+                    db.endTransaction();
                 db.close();
             }
         }
@@ -149,7 +150,8 @@ public class TranslationManager {
             db.setTransactionSuccessful();
         } finally {
             if (db != null) {
-                db.endTransaction();
+                if (db.inTransaction())
+                    db.endTransaction();
                 db.close();
             }
         }

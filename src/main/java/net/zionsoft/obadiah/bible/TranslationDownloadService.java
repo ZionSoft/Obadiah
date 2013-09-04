@@ -189,7 +189,8 @@ public class TranslationDownloadService extends IntentService {
                 }
             }
             if (db != null) {
-                db.endTransaction();
+                if (db.inTransaction())
+                    db.endTransaction();
                 db.close();
             }
 
