@@ -66,8 +66,8 @@ class TranslationSelectionListAdapter extends BaseAdapter {
         textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, mSettingsManager.textSize());
 
         final TranslationInfo translationInfo = mTranslations.get(position);
-        textView.setText(translationInfo.name);
-        if (translationInfo.shortName.equals(mSelectedTranslationShortName)) {
+        textView.setText(translationInfo.name());
+        if (translationInfo.shortName().equals(mSelectedTranslationShortName)) {
             textView.setTypeface(null, Typeface.BOLD);
             textView.setBackgroundResource(R.drawable.list_item_background_selected);
         } else {

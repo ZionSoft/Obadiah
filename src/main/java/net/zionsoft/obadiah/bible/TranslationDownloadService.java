@@ -84,19 +84,19 @@ public class TranslationDownloadService extends IntentService {
             // creates a translation table
             final TranslationInfo translation = intent.getParcelableExtra(KEY_TRANSLATION);
             db.execSQL(String.format("CREATE TABLE %s (%s INTEGER NOT NULL, %s INTEGER NOT NULL, %s INTEGER NOT NULL, %s TEXT NOT NULL);",
-                    translation.shortName, TranslationsDatabaseHelper.COLUMN_BOOK_INDEX,
+                    translation.shortName(), TranslationsDatabaseHelper.COLUMN_BOOK_INDEX,
                     TranslationsDatabaseHelper.COLUMN_CHAPTER_INDEX,
                     TranslationsDatabaseHelper.COLUMN_VERSE_INDEX,
                     TranslationsDatabaseHelper.COLUMN_TEXT));
             db.execSQL(String.format("CREATE INDEX INDEX_%s ON %s (%s, %s, %s);",
-                    translation.shortName, translation.shortName,
+                    translation.shortName(), translation.shortName(),
                     TranslationsDatabaseHelper.COLUMN_BOOK_INDEX,
                     TranslationsDatabaseHelper.COLUMN_CHAPTER_INDEX,
                     TranslationsDatabaseHelper.COLUMN_VERSE_INDEX));
 
             zis = new ZipInputStream(NetworkHelper.get(String.
                     format("downloadTranslation?blobKey=%s",
-                            URLEncoder.encode(translation.blobKey, "UTF-8"))));
+                            URLEncoder.encode(translation.blobKey(), "UTF-8"))));
 
             final byte buffer[] = new byte[BUFFER_LENGTH];
             final ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -121,7 +121,7 @@ public class TranslationDownloadService extends IntentService {
 
                     final ContentValues bookNamesValues = new ContentValues(3);
                     bookNamesValues.put(TranslationsDatabaseHelper.COLUMN_TRANSLATION_SHORT_NAME,
-                            translation.shortName);
+                            translation.shortName());
 
                     final JSONObject booksInfoObject = new JSONObject(new String(bytes, "UTF8"));
                     final JSONArray booksArray = booksInfoObject.getJSONArray("books");
@@ -148,7 +148,7 @@ public class TranslationDownloadService extends IntentService {
                         versesValues.put(TranslationsDatabaseHelper.COLUMN_VERSE_INDEX, verseIndex);
                         versesValues.put(TranslationsDatabaseHelper.COLUMN_TEXT,
                                 paragraphArray.getString(verseIndex));
-                        db.insert(translation.shortName, null, versesValues);
+                        db.insert(translation.shortName(), null, versesValues);
                     }
                 }
 
@@ -165,12 +165,12 @@ public class TranslationDownloadService extends IntentService {
                     String.format("%s = ? AND %s = ?",
                             TranslationsDatabaseHelper.COLUMN_TRANSLATION_ID,
                             TranslationsDatabaseHelper.COLUMN_KEY),
-                    new String[]{Long.toString(translation.uniqueId),
+                    new String[]{Long.toString(translation.uniqueId()),
                             TranslationsDatabaseHelper.KEY_INSTALLED});
 
             // sets as selected translation
             getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE).edit()
-                    .putString(Constants.PREF_KEY_LAST_READ_TRANSLATION, translation.shortName)
+                    .putString(Constants.PREF_KEY_LAST_READ_TRANSLATION, translation.shortName())
                     .commit();
 
             db.setTransactionSuccessful();

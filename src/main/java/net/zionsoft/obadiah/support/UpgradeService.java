@@ -90,7 +90,7 @@ public class UpgradeService extends IntentService {
                         && preferences.getString(Constants.PREF_KEY_LAST_READ_TRANSLATION, null)
                         == null) {
                     editor.putString(Constants.PREF_KEY_LAST_READ_TRANSLATION,
-                            installedTranslations.get(0).shortName);
+                            installedTranslations.get(0).shortName());
                 }
 
                 // no longer tracks timestamp when translation list is fetched since 1.7.0
@@ -139,8 +139,8 @@ public class UpgradeService extends IntentService {
         List<TranslationInfo> translations = NetworkHelper.fetchTranslationList();
         for (TranslationInfo translationInfo : translations) {
             for (String name : tableNames) {
-                if (translationInfo.shortName.equals(name)) {
-                    translationInfo.installed = true;
+                if (translationInfo.shortName().equals(name)) {
+                    translationInfo.setInstalled(true);
                     break;
                 }
             }

@@ -215,7 +215,7 @@ public class TranslationSelectionActivity extends ActionBarActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE).edit()
                         .putString(Constants.PREF_KEY_LAST_READ_TRANSLATION,
-                                mTranslationListAdapter.getItem(position).shortName)
+                                mTranslationListAdapter.getItem(position).shortName())
                         .commit();
                 finish();
             }
@@ -223,7 +223,7 @@ public class TranslationSelectionActivity extends ActionBarActivity {
         mTranslationListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 final TranslationInfo selected = mTranslationListAdapter.getItem(position);
-                if (selected.shortName.equals(mData.selectedTranslationShortName))
+                if (selected.shortName().equals(mData.selectedTranslationShortName))
                     return false;
 
                 final CharSequence[] items = {getResources().getText(R.string.action_delete_translation)};

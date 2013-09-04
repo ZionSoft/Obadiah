@@ -21,27 +21,56 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 public class TranslationInfo implements Parcelable {
-    public final long uniqueId;
-    public final String name;
-    public final String shortName;
-    public final String language;
-    public final String blobKey;
-    public final int size;
-    public final long timestamp;
-    public boolean installed;
-
     public TranslationInfo(long uniqueId, String name, String shortName, String language,
                            String blobKey, int size, long timestamp, boolean installed) {
         super();
-        this.uniqueId = uniqueId;
-        this.name = name;
-        this.shortName = shortName;
-        this.language = language;
-        this.blobKey = blobKey;
-        this.size = size;
-        this.timestamp = timestamp;
-        this.installed = installed;
+        mUniqueId = uniqueId;
+        mName = name;
+        mShortName = shortName;
+        mLanguage = language;
+        mBlobKey = blobKey;
+        mSize = size;
+        mTimestamp = timestamp;
+        mInstalled = installed;
     }
+
+    public long uniqueId() {
+        return mUniqueId;
+    }
+
+    public String name() {
+        return mName;
+    }
+
+    public String shortName() {
+        return mShortName;
+    }
+
+    public String language() {
+        return mLanguage;
+    }
+
+    public String blobKey() {
+        return mBlobKey;
+    }
+
+    public int size() {
+        return mSize;
+    }
+
+    public long timestamp() {
+        return mTimestamp;
+    }
+
+    public boolean installed() {
+        return mInstalled;
+    }
+
+    // TODO should be package access only
+    public void setInstalled(boolean installed) {
+        mInstalled = installed;
+    }
+
 
     // Parcelable
 
@@ -52,14 +81,14 @@ public class TranslationInfo implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dst, int flags) {
-        dst.writeLong(uniqueId);
-        dst.writeString(name);
-        dst.writeString(shortName);
-        dst.writeString(language);
-        dst.writeString(blobKey);
-        dst.writeInt(size);
-        dst.writeLong(timestamp);
-        dst.writeByte((byte) (installed ? 1 : 0));
+        dst.writeLong(mUniqueId);
+        dst.writeString(mName);
+        dst.writeString(mShortName);
+        dst.writeString(mLanguage);
+        dst.writeString(mBlobKey);
+        dst.writeInt(mSize);
+        dst.writeLong(mTimestamp);
+        dst.writeByte((byte) (mInstalled ? 1 : 0));
     }
 
     public static final Parcelable.Creator<TranslationInfo> CREATOR
@@ -76,4 +105,14 @@ public class TranslationInfo implements Parcelable {
             return new TranslationInfo[size];
         }
     };
+
+
+    private final long mUniqueId;
+    private final String mName;
+    private final String mShortName;
+    private final String mLanguage;
+    private final String mBlobKey;
+    private final int mSize;
+    private final long mTimestamp;
+    private boolean mInstalled;
 }

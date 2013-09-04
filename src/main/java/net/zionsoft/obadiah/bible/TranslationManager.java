@@ -48,7 +48,7 @@ public class TranslationManager {
             for (TranslationInfo translation : translations) {
                 boolean newTranslation = true;
                 for (TranslationInfo existing : existingTranslations) {
-                    if (translation.shortName.equals(existing.shortName)) {
+                    if (translation.shortName().equals(existing.shortName())) {
                         newTranslation = false;
                         break;
                     }
@@ -69,44 +69,44 @@ public class TranslationManager {
             final ContentValues values = new ContentValues(3);
             for (TranslationInfo translationInfo : newTranslations) {
                 values.put(TranslationsDatabaseHelper.COLUMN_TRANSLATION_ID,
-                        translationInfo.uniqueId);
+                        translationInfo.uniqueId());
 
                 values.put(TranslationsDatabaseHelper.COLUMN_KEY,
                         TranslationsDatabaseHelper.KEY_NAME);
-                values.put(TranslationsDatabaseHelper.COLUMN_VALUE, translationInfo.name);
+                values.put(TranslationsDatabaseHelper.COLUMN_VALUE, translationInfo.name());
                 db.insert(TranslationsDatabaseHelper.TABLE_TRANSLATION_LIST, null, values);
 
                 values.put(TranslationsDatabaseHelper.COLUMN_KEY,
                         TranslationsDatabaseHelper.KEY_SHORT_NAME);
-                values.put(TranslationsDatabaseHelper.COLUMN_VALUE, translationInfo.shortName);
+                values.put(TranslationsDatabaseHelper.COLUMN_VALUE, translationInfo.shortName());
                 db.insert(TranslationsDatabaseHelper.TABLE_TRANSLATION_LIST, null, values);
 
                 values.put(TranslationsDatabaseHelper.COLUMN_KEY,
                         TranslationsDatabaseHelper.KEY_LANGUAGE);
-                values.put(TranslationsDatabaseHelper.COLUMN_VALUE, translationInfo.language);
+                values.put(TranslationsDatabaseHelper.COLUMN_VALUE, translationInfo.language());
                 db.insert(TranslationsDatabaseHelper.TABLE_TRANSLATION_LIST, null, values);
 
                 values.put(TranslationsDatabaseHelper.COLUMN_KEY,
                         TranslationsDatabaseHelper.KEY_BLOB_KEY);
-                values.put(TranslationsDatabaseHelper.COLUMN_VALUE, translationInfo.blobKey);
+                values.put(TranslationsDatabaseHelper.COLUMN_VALUE, translationInfo.blobKey());
                 db.insert(TranslationsDatabaseHelper.TABLE_TRANSLATION_LIST, null, values);
 
                 values.put(TranslationsDatabaseHelper.COLUMN_KEY,
                         TranslationsDatabaseHelper.KEY_SIZE);
                 values.put(TranslationsDatabaseHelper.COLUMN_VALUE,
-                        Integer.toString(translationInfo.size));
+                        Integer.toString(translationInfo.size()));
                 db.insert(TranslationsDatabaseHelper.TABLE_TRANSLATION_LIST, null, values);
 
                 values.put(TranslationsDatabaseHelper.COLUMN_KEY,
                         TranslationsDatabaseHelper.KEY_TIMESTAMP);
                 values.put(TranslationsDatabaseHelper.COLUMN_VALUE,
-                        Long.toString(translationInfo.timestamp));
+                        Long.toString(translationInfo.timestamp()));
                 db.insert(TranslationsDatabaseHelper.TABLE_TRANSLATION_LIST, null, values);
 
                 values.put(TranslationsDatabaseHelper.COLUMN_KEY,
                         TranslationsDatabaseHelper.KEY_INSTALLED);
                 values.put(TranslationsDatabaseHelper.COLUMN_VALUE,
-                        Boolean.toString(translationInfo.installed));
+                        Boolean.toString(translationInfo.installed()));
                 db.insert(TranslationsDatabaseHelper.TABLE_TRANSLATION_LIST, null, values);
             }
 
@@ -130,12 +130,12 @@ public class TranslationManager {
             db.beginTransaction();
 
             // deletes the translation table
-            db.execSQL(String.format("DROP TABLE IF EXISTS %s", translation.shortName));
+            db.execSQL(String.format("DROP TABLE IF EXISTS %s", translation.shortName()));
 
             // deletes the book names
             db.delete(TranslationsDatabaseHelper.TABLE_BOOK_NAMES,
                     String.format("%s = ?", TranslationsDatabaseHelper.COLUMN_TRANSLATION_SHORT_NAME),
-                    new String[]{translation.shortName});
+                    new String[]{translation.shortName()});
 
             // sets the translation as "not installed"
             final ContentValues values = new ContentValues(1);
@@ -144,7 +144,7 @@ public class TranslationManager {
                     String.format("%s = ? AND %s = ?",
                             TranslationsDatabaseHelper.COLUMN_TRANSLATION_ID,
                             TranslationsDatabaseHelper.COLUMN_KEY),
-                    new String[]{Long.toString(translation.uniqueId),
+                    new String[]{Long.toString(translation.uniqueId()),
                             TranslationsDatabaseHelper.KEY_INSTALLED});
 
             db.setTransactionSuccessful();
@@ -240,8 +240,8 @@ public class TranslationManager {
                 List<TranslationInfo> translations
                         = new ArrayList<TranslationInfo>(allTranslations.size());
                 for (TranslationInfo translationInfo : allTranslations) {
-                    if ((criteria == TRANSLATIONS_INSTALLED && translationInfo.installed)
-                            || (criteria == TRANSLATIONS_AVAILABLE && !translationInfo.installed)) {
+                    if ((criteria == TRANSLATIONS_INSTALLED && translationInfo.installed())
+                            || (criteria == TRANSLATIONS_AVAILABLE && !translationInfo.installed())) {
                         translations.add(translationInfo);
                     }
                 }
@@ -253,8 +253,8 @@ public class TranslationManager {
                         final Locale userLocale = Locale.getDefault();
                         final String userLanguage = userLocale.getLanguage().toLowerCase();
                         final String userCountry = userLocale.getCountry().toLowerCase();
-                        final String[] fields1 = translation1.language.split("_");
-                        final String[] fields2 = translation2.language.split("_");
+                        final String[] fields1 = translation1.language().split("_");
+                        final String[] fields2 = translation2.language().split("_");
                         final int score1 = compareLocale(fields1[0], fields1[1],
                                 userLanguage, userCountry);
                         final int score2 = compareLocale(fields2[0], fields2[1],
@@ -264,8 +264,8 @@ public class TranslationManager {
                             return r;
 
                         // then sorts by language & name
-                        r = translation1.language.compareTo(translation2.language);
-                        return r == 0 ? translation1.name.compareTo(translation2.name) : r;
+                        r = translation1.language().compareTo(translation2.language());
+                        return r == 0 ? translation1.name().compareTo(translation2.name()) : r;
                     }
                 });
 
