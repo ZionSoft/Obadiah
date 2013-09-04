@@ -24,7 +24,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import net.zionsoft.obadiah.bible.TranslationReader;
+import net.zionsoft.obadiah.bible.Verse;
 import net.zionsoft.obadiah.util.SettingsManager;
 
 import java.util.List;
@@ -38,12 +38,12 @@ class SearchResultListAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return (mResults == null) ? 0 : mResults.size();
+        return (mVerses == null) ? 0 : mVerses.size();
     }
 
     @Override
-    public TranslationReader.SearchResult getItem(int position) {
-        return (mResults == null) ? null : mResults.get(position);
+    public Verse getItem(int position) {
+        return (mVerses == null) ? null : mVerses.get(position);
     }
 
     @Override
@@ -61,17 +61,17 @@ class SearchResultListAdapter extends BaseAdapter {
 
         textView.setTextColor(mSettingsManager.textColor());
         textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, mSettingsManager.textSize());
-        textView.setText(mResults.get(position).verse);
+        textView.setText(mVerses.get(position).text());
         return textView;
     }
 
-    void setSearchResults(List<TranslationReader.SearchResult> results) {
-        mResults = results;
+    void setSearchResults(List<Verse> results) {
+        mVerses = results;
         notifyDataSetChanged();
     }
 
     private final Context mContext;
     private final SettingsManager mSettingsManager;
 
-    private List<TranslationReader.SearchResult> mResults;
+    private List<Verse> mVerses;
 }

@@ -40,6 +40,7 @@ import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 
 import net.zionsoft.obadiah.bible.TranslationReader;
+import net.zionsoft.obadiah.bible.Verse;
 import net.zionsoft.obadiah.util.SettingsManager;
 
 import java.util.List;
@@ -60,7 +61,7 @@ public class SearchActivity extends ActionBarActivity {
             mData = new NonConfigurationData();
         } else {
             mSearchText.setText(mData.searchText);
-            mSearchResultListAdapter.setSearchResults(mData.results);
+            mSearchResultListAdapter.setSearchResults(mData.verses);
         }
     }
 
@@ -119,11 +120,11 @@ public class SearchActivity extends ActionBarActivity {
         searchResultListView.setAdapter(mSearchResultListAdapter);
         searchResultListView.setOnItemClickListener(new OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                final TranslationReader.SearchResult result = mData.results.get(position);
+                final Verse verse = mData.verses.get(position);
                 getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE).edit()
-                        .putInt(Constants.PREF_KEY_LAST_READ_BOOK, result.bookIndex)
-                        .putInt(Constants.PREF_KEY_LAST_READ_CHAPTER, result.chapterIndex)
-                        .putInt(Constants.PREF_KEY_LAST_READ_VERSE, result.verseIndex)
+                        .putInt(Constants.PREF_KEY_LAST_READ_BOOK, verse.bookIndex())
+                        .putInt(Constants.PREF_KEY_LAST_READ_CHAPTER, verse.chapterIndex())
+                        .putInt(Constants.PREF_KEY_LAST_READ_VERSE, verse.verseIndex())
                         .commit();
 
                 startActivity(new Intent(SearchActivity.this, TextActivity.class)
@@ -156,7 +157,7 @@ public class SearchActivity extends ActionBarActivity {
         if (searchToken.length() == 0)
             return;
 
-        new AsyncTask<String, Void, List<TranslationReader.SearchResult>>() {
+        new AsyncTask<String, Void, List<Verse>>() {
             protected void onPreExecute() {
                 // running in the main thread
 
@@ -172,7 +173,7 @@ public class SearchActivity extends ActionBarActivity {
                 mProgressDialog.show();
             }
 
-            protected List<TranslationReader.SearchResult> doInBackground(String... params) {
+            protected List<Verse> doInBackground(String... params) {
                 // running in the worker thread
 
                 try {
@@ -185,10 +186,10 @@ public class SearchActivity extends ActionBarActivity {
                 }
             }
 
-            protected void onPostExecute(List<TranslationReader.SearchResult> results) {
+            protected void onPostExecute(List<Verse> results) {
                 // running in the main thread
 
-                mData.results = results;
+                mData.verses = results;
                 mSearchResultListAdapter.setSearchResults(results);
                 mProgressDialog.dismiss();
 
@@ -203,7 +204,7 @@ public class SearchActivity extends ActionBarActivity {
 
     private static class NonConfigurationData {
         Editable searchText;
-        List<TranslationReader.SearchResult> results;
+        List<Verse> verses;
         String selectedTranslationShortName;
         boolean settingsChanged;
     }

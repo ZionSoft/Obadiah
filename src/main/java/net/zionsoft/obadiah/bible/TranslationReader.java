@@ -26,21 +26,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TranslationReader {
-    public static class SearchResult {
-        public final int bookIndex;
-        public final int chapterIndex;
-        public final int verseIndex;
-        public final String verse;
-
-        public SearchResult(int bookIndex, int chapterIndex, int verseIndex, String verse) {
-            super();
-            this.bookIndex = bookIndex;
-            this.chapterIndex = chapterIndex;
-            this.verseIndex = verseIndex;
-            this.verse = verse;
-        }
-    }
-
     public TranslationReader(Context context) {
         super();
         mTranslationsDatabaseHelper = new TranslationsDatabaseHelper(context);
@@ -146,7 +131,7 @@ public class TranslationReader {
         return loadVerses(bookIndex, chapterIndex);
     }
 
-    public List<SearchResult> search(String key) throws IllegalArgumentException {
+    public List<Verse> search(String key) throws IllegalArgumentException {
         if (mSelectedTranslationShortName == null)
             return null;
         if (key == null || key.length() == 0)
@@ -178,7 +163,7 @@ public class TranslationReader {
             final int textColumnIndex
                     = cursor.getColumnIndex(TranslationsDatabaseHelper.COLUMN_TEXT);
 
-            List<SearchResult> results = new ArrayList<SearchResult>(count);
+            final List<Verse> verses = new ArrayList<Verse>(count);
             while (cursor.moveToNext()) {
                 final int bookIndex = cursor.getInt(bookIndexColumnIndex);
                 final int chapterIndex = cursor.getInt(chapterIndexColumnIndex);
@@ -189,9 +174,9 @@ public class TranslationReader {
                         bookNames()[bookIndex], chapterIndex + 1, verseIndex + 1,
                         cursor.getString(textColumnIndex));
 
-                results.add(new SearchResult(bookIndex, chapterIndex, verseIndex, verse));
+                verses.add(new Verse(bookIndex, chapterIndex, verseIndex, verse));
             }
-            return results;
+            return verses;
         } finally {
             if (db != null)
                 db.close();
