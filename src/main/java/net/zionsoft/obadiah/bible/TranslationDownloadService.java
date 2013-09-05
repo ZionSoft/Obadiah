@@ -36,6 +36,7 @@ import org.json.JSONObject;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.util.Locale;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -95,7 +96,8 @@ public class TranslationDownloadService extends IntentService {
                     TranslationsDatabaseHelper.COLUMN_VERSE_INDEX));
 
             zis = new ZipInputStream(NetworkHelper.get(String.
-                    format("downloadTranslation?blobKey=%s",
+                    format("downloadTranslation?locale=%s&blobKey=%s",
+                            Locale.getDefault().toString().toLowerCase(),
                             URLEncoder.encode(translation.blobKey(), "UTF-8"))));
 
             final byte buffer[] = new byte[BUFFER_LENGTH];
