@@ -36,7 +36,8 @@ public class NetworkHelper {
     public static List<TranslationInfo> fetchTranslationList() throws IOException, JSONException {
         BufferedInputStream bis = null;
         try {
-            bis = get(String.format("translations?locale=%s", Locale.getDefault().toString()));
+            bis = get(String.format("translations?locale=%s",
+                    Locale.getDefault().toString().toLowerCase()));
             byte[] response = new byte[0];
             byte[] buffer = new byte[2048];
             int read;
