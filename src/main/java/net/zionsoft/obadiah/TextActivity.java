@@ -17,11 +17,9 @@
 
 package net.zionsoft.obadiah;
 
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
@@ -175,7 +173,6 @@ public class TextActivity extends ActionBarActivity
                 updateUi();
             }
         });
-        mVerseViewPager.setPageTransformer(true, new DepthPageTransformer());
     }
 
     private void populateUi() {
@@ -198,31 +195,6 @@ public class TextActivity extends ActionBarActivity
     private void updateUi() {
         setTitle(String.format("%s, %d", mVersePagerAdapter.currentBookName(),
                 mVersePagerAdapter.lastReadChapter() + 1));
-    }
-
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    private static class DepthPageTransformer implements ViewPager.PageTransformer {
-        @Override
-        public void transformPage(View view, float position) {
-            final int pageWidth = view.getWidth();
-            if (position < -1) {
-                view.setAlpha(0);
-            } else if (position <= 0) {
-                view.setAlpha(1);
-                view.setTranslationX(0);
-                view.setScaleX(1);
-                view.setScaleY(1);
-            } else if (position <= 1) {
-                view.setAlpha(1 - position);
-                view.setTranslationX(pageWidth * -position);
-
-                final float scaleFactor = 0.7f + 0.3f * (1 - Math.abs(position));
-                view.setScaleX(scaleFactor);
-                view.setScaleY(scaleFactor);
-            } else {
-                view.setAlpha(0);
-            }
-        }
     }
 
     private ActionMode mActionMode;
