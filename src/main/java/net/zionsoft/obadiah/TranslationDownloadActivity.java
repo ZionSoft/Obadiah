@@ -26,8 +26,6 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBarActivity;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -35,7 +33,7 @@ import android.widget.Toast;
 
 import net.zionsoft.obadiah.bible.TranslationDownloadService;
 import net.zionsoft.obadiah.bible.TranslationInfo;
-import net.zionsoft.obadiah.bible.TranslationListLoadService;
+import net.zionsoft.obadiah.bible.TranslationListDownloadService;
 import net.zionsoft.obadiah.util.SettingsManager;
 
 import java.util.List;
@@ -54,7 +52,7 @@ public class TranslationDownloadActivity extends ActionBarActivity {
         mData = (NonConfigurationData) getLastCustomNonConfigurationInstance();
         if (mData == null) {
             mData = new NonConfigurationData();
-            loadTranslationList(false);
+            downloadTranslationList();
         } else {
             mLoadingSpinner.setVisibility(View.GONE);
             mTranslationListAdapter.setTranslations(mData.availableTranslations);
@@ -73,70 +71,51 @@ public class TranslationDownloadActivity extends ActionBarActivity {
     protected void onDestroy() {
         if (mTranslationDownloadProgressDialog != null)
             mTranslationDownloadProgressDialog.dismiss();
-        unregisterTranslationListLoadingStatusListener();
+        unregisterTranslationListDownloadingStatusListener();
         unregisterTranslationDownloadingStatusListener();
 
         super.onDestroy();
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_translationdownload, menu);
-        return true;
-    }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_refresh:
-                loadTranslationList(true);
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
+    // downloads translation list
 
-
-    // loads translation list
-
-    private boolean isLoadingTranslationList() {
+    private boolean isDownloadingTranslationList() {
         return getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE)
-                .getBoolean(Constants.PREF_KEY_LOADING_TRANSLATION_LIST, false);
+                .getBoolean(Constants.PREF_KEY_DOWNLOADING_TRANSLATION_LIST, false);
     }
 
-    private void loadTranslationList(final boolean forceRefresh) {
-        registerTranslationListLoadingStatusListener();
+    private void downloadTranslationList() {
+        registerTranslationListDownloadingStatusListener();
 
-        if (!isLoadingTranslationList()) {
+        if (!isDownloadingTranslationList()) {
             getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE).edit()
-                    .putBoolean(Constants.PREF_KEY_LOADING_TRANSLATION_LIST, true).commit();
+                    .putBoolean(Constants.PREF_KEY_DOWNLOADING_TRANSLATION_LIST, true).commit();
 
             mLoadingSpinner.setVisibility(View.VISIBLE);
             mTranslationListView.setVisibility(View.GONE);
 
-            final Intent intent = new Intent(this, TranslationListLoadService.class);
-            intent.putExtra(TranslationListLoadService.KEY_FORCE_REFRESH, forceRefresh);
-            startService(intent);
+            startService(new Intent(this, TranslationListDownloadService.class));
         }
     }
 
-    private void registerTranslationListLoadingStatusListener() {
-        if (mTranslationListLoadingStatusListener != null)
+    private void registerTranslationListDownloadingStatusListener() {
+        if (mTranslationListDownloadingStatusListener != null)
             return;
 
-        mTranslationListLoadingStatusListener = new BroadcastReceiver() {
+        mTranslationListDownloadingStatusListener = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                unregisterTranslationListLoadingStatusListener();
+                unregisterTranslationListDownloadingStatusListener();
 
                 Animator.fadeOut(mLoadingSpinner);
                 Animator.fadeIn(mTranslationListView);
 
-                final int status = intent.getIntExtra(TranslationListLoadService.KEY_STATUS,
-                        TranslationListLoadService.STATUS_SUCCESS);
-                if (status == TranslationListLoadService.STATUS_SUCCESS) {
+                final int status = intent.getIntExtra(TranslationListDownloadService.KEY_STATUS,
+                        TranslationListDownloadService.STATUS_SUCCESS);
+                if (status == TranslationListDownloadService.STATUS_SUCCESS) {
                     mData.availableTranslations = intent.getParcelableArrayListExtra(
-                            TranslationListLoadService.KEY_TRANSLATION_LIST);
+                            TranslationListDownloadService.KEY_TRANSLATION_LIST);
                     if (mData.availableTranslations.size() > 0) {
                         mTranslationListAdapter.setTranslations(mData.availableTranslations);
                     } else {
@@ -146,13 +125,13 @@ public class TranslationDownloadActivity extends ActionBarActivity {
                     }
                 } else {
                     DialogHelper.showDialog(TranslationDownloadActivity.this, false,
-                            status == TranslationListLoadService.STATUS_NETWORK_FAILURE
+                            status == TranslationListDownloadService.STATUS_NETWORK_FAILURE
                                     ? R.string.dialog_network_failure_message
                                     : R.string.dialog_translation_list_fetch_failure_message,
                             new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialogInterface, int i) {
-                                    loadTranslationList(true);
+                                    downloadTranslationList();
                                 }
                             },
                             new DialogInterface.OnClickListener() {
@@ -166,17 +145,17 @@ public class TranslationDownloadActivity extends ActionBarActivity {
             }
         };
         LocalBroadcastManager.getInstance(this)
-                .registerReceiver(mTranslationListLoadingStatusListener,
-                        new IntentFilter(TranslationListLoadService.ACTION_STATUS_UPDATE));
+                .registerReceiver(mTranslationListDownloadingStatusListener,
+                        new IntentFilter(TranslationListDownloadService.ACTION_STATUS_UPDATE));
     }
 
-    private void unregisterTranslationListLoadingStatusListener() {
-        if (mTranslationListLoadingStatusListener == null)
+    private void unregisterTranslationListDownloadingStatusListener() {
+        if (mTranslationListDownloadingStatusListener == null)
             return;
 
         LocalBroadcastManager.getInstance(this)
-                .unregisterReceiver(mTranslationListLoadingStatusListener);
-        mTranslationListLoadingStatusListener = null;
+                .unregisterReceiver(mTranslationListDownloadingStatusListener);
+        mTranslationListDownloadingStatusListener = null;
     }
 
 
@@ -298,7 +277,7 @@ public class TranslationDownloadActivity extends ActionBarActivity {
     }
 
     private BroadcastReceiver mTranslationDownloadingStatusListener;
-    private BroadcastReceiver mTranslationListLoadingStatusListener;
+    private BroadcastReceiver mTranslationListDownloadingStatusListener;
 
     private View mLoadingSpinner;
     private ListView mTranslationListView;

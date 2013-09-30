@@ -10,7 +10,6 @@
     <string name="action_copy">拷貝</string>
     <string name="action_delete_translation">刪除</string>
     <string name="action_download">下載更多譯本</string>
-    <string name="action_refresh">刷新</string>
     <string name="action_search">搜索</string>
     <string name="action_settings">設置</string>
     <string name="action_select_translation">選擇譯本</string>

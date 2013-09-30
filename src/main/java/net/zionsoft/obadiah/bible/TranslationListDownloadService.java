@@ -31,23 +31,21 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TranslationListLoadService extends IntentService {
+public class TranslationListDownloadService extends IntentService {
     public static final String ACTION_STATUS_UPDATE
-            = "net.zionsoft.obadiah.bible.TranslationListLoadService.ACTION_STATUS_UPDATE";
+            = "net.zionsoft.obadiah.bible.TranslationListDownloadService.ACTION_STATUS_UPDATE";
 
-    public static final String KEY_FORCE_REFRESH
-            = "net.zionsoft.obadiah.bible.TranslationListLoadService.KEY_FORCE_REFRESH";
     public static final String KEY_STATUS
-            = "net.zionsoft.obadiah.bible.TranslationListLoadService.KEY_STATUS";
+            = "net.zionsoft.obadiah.bible.TranslationListDownloadService.KEY_STATUS";
     public static final String KEY_TRANSLATION_LIST
-            = "net.zionsoft.obadiah.bible.TranslationListLoadService.KEY_TRANSLATION_LIST";
+            = "net.zionsoft.obadiah.bible.TranslationListDownloadService.KEY_TRANSLATION_LIST";
 
     public static final int STATUS_SUCCESS = 0;
     public static final int STATUS_NETWORK_FAILURE = 1;
     public static final int STATUS_SERVER_FAILURE = 2;
 
-    public TranslationListLoadService() {
-        super("net.zionsoft.obadiah.bible.TranslationListLoadService");
+    public TranslationListDownloadService() {
+        super("net.zionsoft.obadiah.bible.TranslationListDownloadService");
     }
 
     @Override
@@ -55,18 +53,9 @@ public class TranslationListLoadService extends IntentService {
         int status = STATUS_SUCCESS;
         List<TranslationInfo> translations = null;
         try {
-            boolean forceRefresh = intent.getBooleanExtra(KEY_FORCE_REFRESH, true);
             final TranslationManager translationManager = new TranslationManager(this);
-            if (!forceRefresh) {
-                translations = translationManager.availableTranslations();
-                if (translations.size() == 0)
-                    forceRefresh = true;
-            }
-
-            if (forceRefresh) {
-                translationManager.addTranslations(NetworkHelper.fetchTranslationList());
-                translations = translationManager.availableTranslations();
-            }
+            translationManager.addTranslations(NetworkHelper.fetchTranslationList());
+            translations = translationManager.availableTranslations();
         } catch (JSONException e) {
             // malformed server response
             status = STATUS_SERVER_FAILURE;
@@ -75,7 +64,7 @@ public class TranslationListLoadService extends IntentService {
             status = STATUS_NETWORK_FAILURE;
         } finally {
             getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE).edit()
-                    .putBoolean(Constants.PREF_KEY_LOADING_TRANSLATION_LIST, false).commit();
+                    .putBoolean(Constants.PREF_KEY_DOWNLOADING_TRANSLATION_LIST, false).commit();
 
             final Intent i = new Intent(ACTION_STATUS_UPDATE);
             i.putExtra(KEY_STATUS, status);

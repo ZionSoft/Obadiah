@@ -48,7 +48,7 @@
                 android:label="@string/activity_select_translation"/>
 
         <service android:name=".bible.TranslationDownloadService"/>
-        <service android:name=".bible.TranslationListLoadService"/>
+        <service android:name=".bible.TranslationListDownloadService"/>
         <service android:name=".bible.TranslationRemoveService"/>
         <service android:name=".support.UpgradeService"/>
     </application>
