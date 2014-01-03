@@ -3,19 +3,19 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.5.7'
+        classpath 'com.android.tools.build:gradle:0.8.+'
     }
 }
 apply plugin: 'android'
 
 dependencies {
-    compile "com.android.support:appcompat-v7:18.0.+"
+    compile "com.android.support:appcompat-v7:19.0.+"
     compile files('libs/GoogleAdMobAdsSdk.jar')
 }
 
 android {
-    compileSdkVersion 18
-    buildToolsVersion "18.1"
+    compileSdkVersion 19
+    buildToolsVersion "19.0.1"
 
     signingConfigs {
         release {
