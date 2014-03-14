@@ -1,56 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="net.zionsoft.obadiah"
-          android:versionCode="010800"
-          android:versionName="1.8.0">
+    package="net.zionsoft.obadiah"
+    android:versionCode="10800"
+    android:versionName="1.8.0">
 
     <uses-sdk
-            android:minSdkVersion="9"
-            android:targetSdkVersion="19"/>
+        android:minSdkVersion="9"
+        android:targetSdkVersion="19" />
 
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
-            android:allowBackup="true"
-            android:icon="@drawable/ic_launcher"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.AppCompat.Light.DarkActionBar">
+        android:allowBackup="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:name=".App"
+        android:theme="@style/Theme.AppCompat.Light.DarkActionBar">
         <activity
-                android:name="com.google.ads.AdActivity"
-                android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"/>
-        <activity
-                android:name=".BookSelectionActivity"
-                android:label="@string/app_name">
+            android:name=".BookSelectionActivity"
+            android:label="@string/app_name">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
+                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".SearchActivity"/>
-        <activity android:name=".ShortcutActivity">
+        <activity android:name=".ui.activities.SearchActivity" />
+        <activity android:name=".ui.activities.ShortcutActivity">
             <intent-filter>
-                <action android:name="android.intent.action.CREATE_SHORTCUT"/>
+                <action android:name="android.intent.action.CREATE_SHORTCUT" />
 
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
-                android:name=".SettingsActivity"
-                android:label="@string/activity_settings"/>
-        <activity android:name=".TextActivity"/>
+            android:name=".ui.activities.SettingsActivity"
+            android:label="@string/activity_settings" />
         <activity
-                android:name=".TranslationDownloadActivity"
-                android:label="@string/activity_download_translation"/>
-        <activity
-                android:name=".TranslationSelectionActivity"
-                android:label="@string/activity_select_translation"/>
+            android:name=".ui.activities.TranslationManagementActivity"
+            android:label="@string/activity_manage_translation" />
 
-        <service android:name=".bible.TranslationDownloadService"/>
-        <service android:name=".bible.TranslationListDownloadService"/>
-        <service android:name=".bible.TranslationRemoveService"/>
-        <service android:name=".support.UpgradeService"/>
+        <activity
+            android:name="com.google.android.gms.ads.AdActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize" />
+
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
     </application>
 
 </manifest>

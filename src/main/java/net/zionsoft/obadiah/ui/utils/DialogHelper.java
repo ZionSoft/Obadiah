@@ -15,13 +15,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah;
+package net.zionsoft.obadiah.ui.utils;
 
-public class Constants {
-    public static final String PREF_NAME = "settings";
-    public static final String PREF_KEY_CURRENT_APPLICATION_VERSION = "currentApplicationVersion";
-    public static final String PREF_KEY_LAST_READ_TRANSLATION = "currentTranslation";
-    public static final String PREF_KEY_LAST_READ_BOOK = "currentBook";
-    public static final String PREF_KEY_LAST_READ_CHAPTER = "currentChapter";
-    public static final String PREF_KEY_LAST_READ_VERSE = "currentVerse";
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+
+public class DialogHelper {
+    public static void showDialog(Context context, boolean cancelable, int message,
+                                  DialogInterface.OnClickListener onPositive,
+                                  DialogInterface.OnClickListener onNegative) {
+        new AlertDialog.Builder(context)
+                .setCancelable(cancelable)
+                .setPositiveButton(android.R.string.yes, onPositive)
+                .setNegativeButton(android.R.string.no, onNegative)
+                .setMessage(message)
+                .create().show();
+    }
 }

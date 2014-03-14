@@ -17,11 +17,26 @@
 
 package net.zionsoft.obadiah;
 
-public class Constants {
-    public static final String PREF_NAME = "settings";
-    public static final String PREF_KEY_CURRENT_APPLICATION_VERSION = "currentApplicationVersion";
-    public static final String PREF_KEY_LAST_READ_TRANSLATION = "currentTranslation";
-    public static final String PREF_KEY_LAST_READ_BOOK = "currentBook";
-    public static final String PREF_KEY_LAST_READ_CHAPTER = "currentChapter";
-    public static final String PREF_KEY_LAST_READ_VERSE = "currentVerse";
+import android.app.Application;
+
+import net.zionsoft.obadiah.model.Analytics;
+import net.zionsoft.obadiah.model.Obadiah;
+import net.zionsoft.obadiah.model.Settings;
+
+public class App extends Application {
+    @Override
+    public void onCreate() {
+        super.onCreate();
+
+        Analytics.initialize(this);
+        Obadiah.initialize(this);
+        Settings.initialize(this);
+    }
+
+    @Override
+    public void onLowMemory() {
+        Obadiah.getInstance().clearCache();
+
+        super.onLowMemory();
+    }
 }

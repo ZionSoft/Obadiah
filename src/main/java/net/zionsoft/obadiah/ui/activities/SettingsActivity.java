@@ -15,13 +15,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah;
+package net.zionsoft.obadiah.ui.activities;
 
-public class Constants {
-    public static final String PREF_NAME = "settings";
-    public static final String PREF_KEY_CURRENT_APPLICATION_VERSION = "currentApplicationVersion";
-    public static final String PREF_KEY_LAST_READ_TRANSLATION = "currentTranslation";
-    public static final String PREF_KEY_LAST_READ_BOOK = "currentBook";
-    public static final String PREF_KEY_LAST_READ_CHAPTER = "currentChapter";
-    public static final String PREF_KEY_LAST_READ_VERSE = "currentVerse";
+import android.os.Bundle;
+import android.preference.PreferenceActivity;
+
+import net.zionsoft.obadiah.R;
+import net.zionsoft.obadiah.model.Analytics;
+
+public class SettingsActivity extends PreferenceActivity {
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        // noinspection deprecation
+        addPreferencesFromResource(R.xml.preferences);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        Analytics.trackScreen(SettingsActivity.class.getSimpleName());
+    }
 }
