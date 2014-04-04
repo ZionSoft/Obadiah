@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <dimen name="padding">8dip</dimen>
+    <dimen name="padding">8dp</dimen>
     <dimen name="smaller_text_size_very_small">10sp</dimen>
     <dimen name="smaller_text_size_small">12sp</dimen>
     <dimen name="smaller_text_size_medium">16sp</dimen>
@@ -12,7 +12,9 @@
     <dimen name="text_size_medium">18sp</dimen>
     <dimen name="text_size_large">22sp</dimen>
     <dimen name="text_size_very_large">24sp</dimen>
-    <dimen name="book_list_view_width">160dip</dimen>
-    <dimen name="chapter_grid_view_column_width">48dip</dimen>
+
+    <dimen name="left_drawer_width">240dp</dimen>
+    <dimen name="chapter_grid_width">48dp</dimen>
+    <dimen name="chapter_grid_height">48dp</dimen>
 
 </resources>

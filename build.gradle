@@ -10,7 +10,7 @@ apply plugin: 'android'
 
 dependencies {
     compile "com.android.support:appcompat-v7:19.0.+"
-    compile files('libs/GoogleAdMobAdsSdk.jar')
+    compile "com.google.android.gms:play-services:4.3.23"
 }
 
 android {

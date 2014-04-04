@@ -3,46 +3,24 @@
 
     <string name="app_name">Bible</string>
 
-    <string name="activity_download_translation">Available translations</string>
-    <string name="activity_select_translation">Select a translation</string>
+    <string name="activity_manage_translation">Translations</string>
     <string name="activity_settings">Settings</string>
 
-    <string name="action_copy">Copy</string>
     <string name="action_delete_translation">Delete</string>
-    <string name="action_download">Download More</string>
+    <string name="action_manage_translation">Translations</string>
     <string name="action_search">Search</string>
     <string name="action_settings">Settings</string>
-    <string name="action_select_translation">Select Translations</string>
-    <string name="action_share">Share</string>
 
-    <string name="dialog_book_list_loading_failure_message">Failed to load book list, try again?
-    </string>
-    <string name="dialog_initialization_failure_message">Failed to initialize, try again?</string>
-    <string name="dialog_network_failure_message">Please check your network connection, and try
-        again.
-    </string>
-    <string name="dialog_no_translation_message">No translation installed, please download from the
-        Internet.
-    </string>
-    <string name="dialog_translation_delete_confirm_message">Are you sure to delete this
-        translation?
-    </string>
-    <string name="dialog_translation_download_failure_message">Failed to download the translation,
-        try again?
-    </string>
-    <string name="dialog_translation_list_fetch_failure_message">Failed to fetch the translation
-        list, try again?
-    </string>
-    <string name="dialog_translation_remove_failure_message">Failed to remove the translation, try
-        again?
-    </string>
+    <string name="dialog_no_translation">No translation available, download now?</string>
+    <string name="dialog_retry">Fail to load, retry?</string>
+    <string name="dialog_translation_delete_confirm_message">Are you sure to delete this translation?</string>
+    <string name="dialog_translation_download_failure_message">Failed to download the translation, try again?</string>
+    <string name="dialog_translation_remove_failure_message">Failed to remove the translation, try again?</string>
 
     <string name="pref_night_mode">Night Mode</string>
     <string name="pref_rate_me">Rate me on Google Play</string>
-    <string name="pref_report_issue">Report an Issue</string>
     <string name="pref_text_size_title">Text size</string>
     <string name="pref_text_size_dialog_title">Select text size:</string>
-    <string name="pref_text_size_default">medium</string>
     <string-array name="pref_text_size_name">
         <item>Very Small</item>
         <item>Small</item>
@@ -50,26 +28,17 @@
         <item>Large</item>
         <item>Very Large</item>
     </string-array>
-    <string-array name="pref_text_size_value">
-        <item>very_small</item>
-        <item>small</item>
-        <item>medium</item>
-        <item>large</item>
-        <item>very_large</item>
-    </string-array>
 
     <string name="progress_dialog_translation_deleting">Deleting&#8230;</string>
     <string name="progress_dialog_translation_downloading">Downloading&#8230;</string>
-    <string name="progress_dialog_verses_searching">Searching&#8230;</string>
 
     <string name="text_available_translation_info">%1$s\nSize: %2$d KB</string>
 
-    <string name="title_share_with">Share with&#8230;</string>
+    <string name="text_available_translation">Available Translations</string>
+    <string name="text_downloaded_translations">Downloaded Translations</string>
 
-    <string name="toast_no_available_translation">No translations available for download.</string>
-    <string name="toast_no_installed_translation">No translations installed.</string>
     <string name="toast_translation_deleted">Deleted.</string>
-    <string name="toast_verses_copied">Texts copied to clipboard.</string>
+    <string name="toast_translation_downloaded">Downloaded.</string>
     <string name="toast_verses_searched">%1$d result(s) found.</string>
 
 </resources>

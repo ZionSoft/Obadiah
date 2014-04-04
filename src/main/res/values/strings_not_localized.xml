@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="pref_text_size_default" translatable="false">medium</string>
+    <string-array name="pref_text_size_value" translatable="false">
+        <item>very_small</item>
+        <item>small</item>
+        <item>medium</item>
+        <item>large</item>
+        <item>very_large</item>
+    </string-array>
+</resources>

@@ -15,13 +15,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah;
+package net.zionsoft.obadiah.model;
 
-public class Constants {
-    public static final String PREF_NAME = "settings";
-    public static final String PREF_KEY_CURRENT_APPLICATION_VERSION = "currentApplicationVersion";
-    public static final String PREF_KEY_LAST_READ_TRANSLATION = "currentTranslation";
-    public static final String PREF_KEY_LAST_READ_BOOK = "currentBook";
-    public static final String PREF_KEY_LAST_READ_CHAPTER = "currentChapter";
-    public static final String PREF_KEY_LAST_READ_VERSE = "currentVerse";
+public class Verse {
+    public final int bookIndex;
+    public final int chapterIndex;
+    public final int verseIndex;
+    public final String bookName;
+    public final String verseText;
+
+    public Verse(int bookIndex, int chapterIndex, int verseIndex, String bookName, String verseText) {
+        super();
+
+        this.bookIndex = bookIndex;
+        this.chapterIndex = chapterIndex;
+        this.verseIndex = verseIndex;
+        this.bookName = bookName;
+        this.verseText = verseText;
+    }
 }

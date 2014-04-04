@@ -1,16 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-      xmlns:obadiah="http://schemas.android.com/apk/res-auto">
+    xmlns:obadiah="http://schemas.android.com/apk/res-auto">
     <item
-            android:id="@+id/action_search"
-            android:title="@string/action_search"
-            obadiah:showAsAction="never"/>
+        android:id="@+id/action_book_name"
+        android:title="@null"
+        obadiah:showAsAction="always"
+        obadiah:actionViewClass="android.widget.TextView" />
     <item
-            android:id="@+id/action_select_translation"
-            android:title="@string/action_select_translation"
-            obadiah:showAsAction="never"/>
+        android:id="@+id/action_search"
+        android:title="@string/action_search"
+        obadiah:showAsAction="never" />
     <item
-            android:id="@+id/action_settings"
-            android:title="@string/action_settings"
-            obadiah:showAsAction="never"/>
+        android:id="@+id/action_manage_translation"
+        android:title="@string/action_manage_translation"
+        obadiah:showAsAction="never" />
+    <item
+        android:id="@+id/action_settings"
+        android:title="@string/action_settings"
+        obadiah:showAsAction="never" />
 </menu>
