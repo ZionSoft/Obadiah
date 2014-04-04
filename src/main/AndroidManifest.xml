@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="net.zionsoft.obadiah"
     android:versionCode="10800"
-    android:versionName="1.8.0">
+    android:versionName="1.8.0 Alpha">
 
     <uses-sdk
         android:minSdkVersion="9"
