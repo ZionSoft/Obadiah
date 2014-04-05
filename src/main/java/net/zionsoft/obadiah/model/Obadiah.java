@@ -92,11 +92,11 @@ public class Obadiah {
     private static LruCache<String, String[]> createCache(int cacheSize) {
         return new LruCache<String, String[]>(cacheSize) {
             @Override
-            protected int sizeOf(String key, String[] verses) {
+            protected int sizeOf(String key, String[] texts) {
                 // strings are UTF-16 encoded (with a length of one or two 16-bit code units)
                 int length = 0;
-                for (String verse : verses)
-                    length += verse.length() * 4;
+                for (String text : texts)
+                    length += text.length() * 4;
                 return length;
             }
         };
@@ -186,7 +186,7 @@ public class Obadiah {
                 final int translationShortName = cursor.getColumnIndex(
                         DatabaseHelper.COLUMN_TRANSLATION_SHORT_NAME);
                 int i = 0;
-                String[] translations = new String[cursor.getCount()];
+                final String[] translations = new String[cursor.getCount()];
                 while (cursor.moveToNext())
                     translations[i++] = cursor.getString(translationShortName);
                 return translations;
@@ -220,7 +220,7 @@ public class Obadiah {
     }
 
     public void loadBookNames(final String translationShortName, final OnStringsLoadedListener listener) {
-        String[] bookNames = mBookNameCache.get(translationShortName);
+        final String[] bookNames = mBookNameCache.get(translationShortName);
         if (bookNames != null) {
             listener.onStringsLoaded(bookNames);
             return;
@@ -261,7 +261,7 @@ public class Obadiah {
                     String.format("%s ASC", DatabaseHelper.COLUMN_BOOK_INDEX));
             final int bookName = cursor.getColumnIndex(DatabaseHelper.COLUMN_BOOK_NAME);
             int i = 0;
-            String[] bookNames = new String[BOOK_COUNT];
+            final String[] bookNames = new String[BOOK_COUNT];
             while (cursor.moveToNext())
                 bookNames[i++] = cursor.getString(bookName);
             return bookNames;
@@ -274,7 +274,7 @@ public class Obadiah {
     public void loadVerses(final String translationShortName, final int book, final int chapter,
                            final OnStringsLoadedListener listener) {
         final String key = buildVersesCacheKey(translationShortName, book, chapter);
-        String[] verses = mVerseCache.get(key);
+        final String[] verses = mVerseCache.get(key);
         if (verses != null) {
             listener.onStringsLoaded(verses);
             return;
@@ -299,7 +299,7 @@ public class Obadiah {
                         );
                         final int verse = cursor.getColumnIndex(DatabaseHelper.COLUMN_TEXT);
                         int i = 0;
-                        String[] verses = new String[cursor.getCount()];
+                        final String[] verses = new String[cursor.getCount()];
                         while (cursor.moveToNext())
                             verses[i++] = cursor.getString(verse);
                         return verses;
