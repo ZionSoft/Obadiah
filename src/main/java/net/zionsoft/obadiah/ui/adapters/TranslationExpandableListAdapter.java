@@ -31,6 +31,8 @@ import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.Settings;
 import net.zionsoft.obadiah.model.TranslationInfo;
 
+import java.util.List;
+
 public class TranslationExpandableListAdapter extends BaseExpandableListAdapter {
     public static final int DOWNLOADED_TRANSLATIONS_GROUP = 0;
     public static final int AVAILABLE_TRANSLATIONS_GROUP = 1;
@@ -43,8 +45,8 @@ public class TranslationExpandableListAdapter extends BaseExpandableListAdapter 
     private final AbsoluteSizeSpan mMediumSizeSpan;
     private final AbsoluteSizeSpan mSmallSizeSpan;
 
-    private TranslationInfo[] mDownloadedTranslations;
-    private TranslationInfo[] mAvailableTranslations;
+    private List<TranslationInfo> mDownloadedTranslations;
+    private List<TranslationInfo> mAvailableTranslations;
     private SpannableStringBuilder[] mAvailableTranslationTexts;
 
     public TranslationExpandableListAdapter(Context context, String currentTranslation) {
@@ -68,9 +70,9 @@ public class TranslationExpandableListAdapter extends BaseExpandableListAdapter 
     @Override
     public int getChildrenCount(int groupPosition) {
         if (groupPosition == DOWNLOADED_TRANSLATIONS_GROUP)
-            return mDownloadedTranslations == null ? 0 : mDownloadedTranslations.length;
+            return mDownloadedTranslations == null ? 0 : mDownloadedTranslations.size();
         if (groupPosition == AVAILABLE_TRANSLATIONS_GROUP)
-            return mAvailableTranslations == null ? 0 : mAvailableTranslations.length;
+            return mAvailableTranslations == null ? 0 : mAvailableTranslations.size();
         return 0;
     }
 
@@ -82,9 +84,9 @@ public class TranslationExpandableListAdapter extends BaseExpandableListAdapter 
     @Override
     public TranslationInfo getChild(int groupPosition, int childPosition) {
         if (groupPosition == DOWNLOADED_TRANSLATIONS_GROUP)
-            return mDownloadedTranslations == null ? null : mDownloadedTranslations[childPosition];
+            return mDownloadedTranslations == null ? null : mDownloadedTranslations.get(childPosition);
         if (groupPosition == AVAILABLE_TRANSLATIONS_GROUP)
-            return mAvailableTranslations == null ? null : mAvailableTranslations[childPosition];
+            return mAvailableTranslations == null ? null : mAvailableTranslations.get(childPosition);
         return null;
     }
 
@@ -117,7 +119,7 @@ public class TranslationExpandableListAdapter extends BaseExpandableListAdapter 
         final TextView textView = (TextView) (convertView == null
                 ? View.inflate(mContext, R.layout.item_translation, null) : convertView);
         if (groupPosition == DOWNLOADED_TRANSLATIONS_GROUP) {
-            final TranslationInfo translationInfo = mDownloadedTranslations[childPosition];
+            final TranslationInfo translationInfo = mDownloadedTranslations.get(childPosition);
             if (translationInfo.shortName.equals(mCurrentTranslation))
                 textView.setBackgroundColor(Color.LTGRAY);
             else
@@ -137,12 +139,12 @@ public class TranslationExpandableListAdapter extends BaseExpandableListAdapter 
         return true;
     }
 
-    public void setTranslations(TranslationInfo[] downloaded, TranslationInfo[] available) {
+    public void setTranslations(List<TranslationInfo> downloaded, List<TranslationInfo> available) {
         mDownloadedTranslations = downloaded;
         mAvailableTranslations = available;
 
         if (available != null) {
-            mAvailableTranslationTexts = new SpannableStringBuilder[available.length];
+            mAvailableTranslationTexts = new SpannableStringBuilder[available.size()];
             int i = 0;
             for (TranslationInfo translation : available) {
                 final SpannableStringBuilder text = new SpannableStringBuilder(

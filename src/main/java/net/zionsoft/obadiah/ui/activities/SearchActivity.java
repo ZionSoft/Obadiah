@@ -49,11 +49,13 @@ import net.zionsoft.obadiah.ui.adapters.SearchResultListAdapter;
 import net.zionsoft.obadiah.ui.utils.AnimationHelper;
 import net.zionsoft.obadiah.ui.utils.DialogHelper;
 
+import java.util.List;
+
 public class SearchActivity extends ActionBarActivity {
     private static class NonConfigurationData {
         Editable searchText;
         String currentTranslation;
-        Verse[] verses;
+        List<Verse> verses;
     }
 
     private NonConfigurationData mData;
@@ -110,7 +112,7 @@ public class SearchActivity extends ActionBarActivity {
         mSearchResultListView.setAdapter(mSearchResultListAdapter);
         mSearchResultListView.setOnItemClickListener(new OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                final Verse verse = mData.verses[position];
+                final Verse verse = mData.verses.get(position);
                 mPreferences.edit()
                         .putInt(Constants.PREF_KEY_LAST_READ_BOOK, verse.bookIndex)
                         .putInt(Constants.PREF_KEY_LAST_READ_CHAPTER, verse.chapterIndex)
@@ -178,7 +180,7 @@ public class SearchActivity extends ActionBarActivity {
         Obadiah.getInstance().searchVerses(mData.currentTranslation, keyword,
                 new Obadiah.OnVersesSearchedListener() {
                     @Override
-                    public void onVersesSearched(Verse[] verses) {
+                    public void onVersesSearched(List<Verse> verses) {
                         if (verses == null) {
                             DialogHelper.showDialog(SearchActivity.this, false, R.string.dialog_retry,
                                     new DialogInterface.OnClickListener() {
@@ -199,7 +201,7 @@ public class SearchActivity extends ActionBarActivity {
 
                         mData.verses = verses;
 
-                        String text = getResources().getString(R.string.toast_verses_searched, verses.length);
+                        String text = getResources().getString(R.string.toast_verses_searched, verses.size());
                         Toast.makeText(SearchActivity.this, text, Toast.LENGTH_SHORT).show();
                     }
                 }

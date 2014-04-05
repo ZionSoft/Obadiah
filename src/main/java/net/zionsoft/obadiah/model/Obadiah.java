@@ -30,16 +30,19 @@ import org.json.JSONObject;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 public class Obadiah {
     public static interface OnStringsLoadedListener {
-        public void onStringsLoaded(String[] strings);
+        public void onStringsLoaded(List<String> strings);
     }
 
     public static interface OnTranslationsLoadedListener {
-        public void onTranslationsLoaded(TranslationInfo[] downloaded, TranslationInfo[] available);
+        public void onTranslationsLoaded(List<TranslationInfo> downloaded, List<TranslationInfo> available);
     }
 
     public static interface OnTranslationDownloadListener {
@@ -53,7 +56,7 @@ public class Obadiah {
     }
 
     public static interface OnVersesSearchedListener {
-        public void onVersesSearched(Verse[] verses);
+        public void onVersesSearched(List<Verse> verses);
     }
 
     private static final int BOOK_COUNT = 66;
@@ -66,9 +69,9 @@ public class Obadiah {
 
     private final DatabaseHelper mDatabaseHelper;
 
-    private final LruCache<String, String[]> mBookNameCache;
-    private final LruCache<String, String[]> mVerseCache;
-    private String[] mDownloadedTranslations;
+    private final LruCache<String, List<String>> mBookNameCache;
+    private final LruCache<String, List<String>> mVerseCache;
+    private List<String> mDownloadedTranslations;
 
     public static void initialize(Context context) {
         if (sInstance == null) {
@@ -89,10 +92,10 @@ public class Obadiah {
         mVerseCache = createCache((int) (maxMemory / 8L));
     }
 
-    private static LruCache<String, String[]> createCache(int cacheSize) {
-        return new LruCache<String, String[]>(cacheSize) {
+    private static LruCache<String, List<String>> createCache(int cacheSize) {
+        return new LruCache<String, List<String>>(cacheSize) {
             @Override
-            protected int sizeOf(String key, String[] texts) {
+            protected int sizeOf(String key, List<String> texts) {
                 // strings are UTF-16 encoded (with a length of one or two 16-bit code units)
                 int length = 0;
                 for (String text : texts)
@@ -120,22 +123,20 @@ public class Obadiah {
     }
 
     public void loadTranslations(final OnTranslationsLoadedListener listener) {
-        new AsyncTask<Void, Void, TranslationInfo[][]>() {
+        new AsyncTask<Void, Void, List<TranslationInfo>[]>() {
             @Override
-            protected TranslationInfo[][] doInBackground(Void... params) {
+            protected List<TranslationInfo>[] doInBackground(Void... params) {
                 try {
                     if (mDownloadedTranslations == null) {
                         // this should not happen, but just in case
-                        mDownloadedTranslations = getDownloadedTranslations();
+                        mDownloadedTranslations = Collections.unmodifiableList(getDownloadedTranslations());
                     }
 
                     final JSONArray replyArray = new JSONArray(
                             new String(NetworkHelper.get(NetworkHelper.TRANSLATIONS_LIST_URL), "UTF8"));
                     final int length = replyArray.length();
-                    final TranslationInfo[] downloaded = new TranslationInfo[mDownloadedTranslations.length];
-                    final TranslationInfo[] available = new TranslationInfo[length - mDownloadedTranslations.length];
-                    int downloadedCounter = 0;
-                    int availableCounter = 0;
+                    final List<TranslationInfo> downloaded = new ArrayList<TranslationInfo>(mDownloadedTranslations.size());
+                    final List<TranslationInfo> available = new ArrayList<TranslationInfo>(length - mDownloadedTranslations.size());
                     for (int i = 0; i < length; ++i) {
                         final JSONObject translationObject = replyArray.getJSONObject(i);
                         final TranslationInfo translationInfo = new TranslationInfo(
@@ -150,12 +151,12 @@ public class Obadiah {
                             }
                         }
                         if (isDownloaded)
-                            downloaded[downloadedCounter++] = translationInfo;
+                            downloaded.add(translationInfo);
                         else
-                            available[availableCounter++] = translationInfo;
+                            available.add(translationInfo);
                     }
 
-                    return new TranslationInfo[][]{downloaded, available};
+                    return new List[]{downloaded, available};
                 } catch (Exception e) {
                     Analytics.trackException("Failed to load translations - " + e.getMessage());
                 }
@@ -163,7 +164,7 @@ public class Obadiah {
             }
 
             @Override
-            protected void onPostExecute(TranslationInfo[][] result) {
+            protected void onPostExecute(List<TranslationInfo>[] result) {
                 if (result == null || result.length != 2)
                     listener.onTranslationsLoaded(null, null);
                 else
@@ -172,7 +173,7 @@ public class Obadiah {
         }.execute();
     }
 
-    private String[] getDownloadedTranslations() {
+    private List<String> getDownloadedTranslations() {
         synchronized (mDatabaseHelper) {
             SQLiteDatabase db = null;
             Cursor cursor = null;
@@ -185,10 +186,9 @@ public class Obadiah {
                         null, null, null, null, null, null);
                 final int translationShortName = cursor.getColumnIndex(
                         DatabaseHelper.COLUMN_TRANSLATION_SHORT_NAME);
-                int i = 0;
-                final String[] translations = new String[cursor.getCount()];
+                final List<String> translations = new ArrayList<String>(cursor.getCount());
                 while (cursor.moveToNext())
-                    translations[i++] = cursor.getString(translationShortName);
+                    translations.add(cursor.getString(translationShortName));
                 return translations;
             } finally {
                 if (cursor != null)
@@ -205,30 +205,30 @@ public class Obadiah {
             return;
         }
 
-        new AsyncTask<Void, Void, String[]>() {
+        new AsyncTask<Void, Void, List<String>>() {
             @Override
-            protected String[] doInBackground(Void... params) {
+            protected List<String> doInBackground(Void... params) {
                 return getDownloadedTranslations();
             }
 
             @Override
-            protected void onPostExecute(String[] result) {
-                mDownloadedTranslations = result;
-                listener.onStringsLoaded(result);
+            protected void onPostExecute(List<String> result) {
+                mDownloadedTranslations = Collections.unmodifiableList(result);
+                listener.onStringsLoaded(mDownloadedTranslations);
             }
         }.execute();
     }
 
     public void loadBookNames(final String translationShortName, final OnStringsLoadedListener listener) {
-        final String[] bookNames = mBookNameCache.get(translationShortName);
+        final List<String> bookNames = mBookNameCache.get(translationShortName);
         if (bookNames != null) {
             listener.onStringsLoaded(bookNames);
             return;
         }
 
-        new AsyncTask<Void, Void, String[]>() {
+        new AsyncTask<Void, Void, List<String>>() {
             @Override
-            protected String[] doInBackground(Void... params) {
+            protected List<String> doInBackground(Void... params) {
                 synchronized (mDatabaseHelper) {
                     SQLiteDatabase db = null;
                     try {
@@ -244,14 +244,15 @@ public class Obadiah {
             }
 
             @Override
-            protected void onPostExecute(String[] result) {
+            protected void onPostExecute(List<String> result) {
+                result = Collections.unmodifiableList(result);
                 mBookNameCache.put(translationShortName, result);
                 listener.onStringsLoaded(result);
             }
         }.execute();
     }
 
-    private static String[] getBookNames(SQLiteDatabase db, String translationShortName) {
+    private static List<String> getBookNames(SQLiteDatabase db, String translationShortName) {
         Cursor cursor = null;
         try {
             cursor = db.query(DatabaseHelper.TABLE_BOOK_NAMES,
@@ -260,10 +261,9 @@ public class Obadiah {
                     new String[]{translationShortName}, null, null,
                     String.format("%s ASC", DatabaseHelper.COLUMN_BOOK_INDEX));
             final int bookName = cursor.getColumnIndex(DatabaseHelper.COLUMN_BOOK_NAME);
-            int i = 0;
-            final String[] bookNames = new String[BOOK_COUNT];
+            final List<String> bookNames = new ArrayList<String>(BOOK_COUNT);
             while (cursor.moveToNext())
-                bookNames[i++] = cursor.getString(bookName);
+                bookNames.add(cursor.getString(bookName));
             return bookNames;
         } finally {
             if (cursor != null)
@@ -274,15 +274,15 @@ public class Obadiah {
     public void loadVerses(final String translationShortName, final int book, final int chapter,
                            final OnStringsLoadedListener listener) {
         final String key = buildVersesCacheKey(translationShortName, book, chapter);
-        final String[] verses = mVerseCache.get(key);
+        final List<String> verses = mVerseCache.get(key);
         if (verses != null) {
             listener.onStringsLoaded(verses);
             return;
         }
 
-        new AsyncTask<Void, Void, String[]>() {
+        new AsyncTask<Void, Void, List<String>>() {
             @Override
-            protected String[] doInBackground(Void... params) {
+            protected List<String> doInBackground(Void... params) {
                 synchronized (mDatabaseHelper) {
                     SQLiteDatabase db = null;
                     Cursor cursor = null;
@@ -298,10 +298,9 @@ public class Obadiah {
                                 null, null, String.format("%s ASC", DatabaseHelper.COLUMN_VERSE_INDEX)
                         );
                         final int verse = cursor.getColumnIndex(DatabaseHelper.COLUMN_TEXT);
-                        int i = 0;
-                        final String[] verses = new String[cursor.getCount()];
+                        final List<String> verses = new ArrayList<String>(cursor.getCount());
                         while (cursor.moveToNext())
-                            verses[i++] = cursor.getString(verse);
+                            verses.add(cursor.getString(verse));
                         return verses;
                     } finally {
                         if (cursor != null)
@@ -313,7 +312,8 @@ public class Obadiah {
             }
 
             @Override
-            protected void onPostExecute(String[] result) {
+            protected void onPostExecute(List<String> result) {
+                result = Collections.unmodifiableList(result);
                 mVerseCache.put(key, result);
                 listener.onStringsLoaded(result);
             }
@@ -326,9 +326,9 @@ public class Obadiah {
 
     public void searchVerses(final String translationShortName, final String keyword,
                              final OnVersesSearchedListener listener) {
-        new AsyncTask<Void, Void, Verse[]>() {
+        new AsyncTask<Void, Void, List<Verse>>() {
             @Override
-            protected Verse[] doInBackground(Void... params) {
+            protected List<Verse> doInBackground(Void... params) {
                 synchronized (mDatabaseHelper) {
                     SQLiteDatabase db = null;
                     Cursor cursor = null;
@@ -345,12 +345,12 @@ public class Obadiah {
                         );
                         final int count = cursor.getCount();
                         if (count == 0)
-                            return new Verse[0];
+                            return Collections.EMPTY_LIST;
 
-                        String[] bookNames = mBookNameCache.get(translationShortName);
+                        List<String> bookNames = mBookNameCache.get(translationShortName);
                         if (bookNames == null) {
                             // this should not happen, but just in case
-                            bookNames = getBookNames(db, translationShortName);
+                            bookNames = Collections.unmodifiableList(getBookNames(db, translationShortName));
                             mBookNameCache.put(translationShortName, bookNames);
                         }
 
@@ -358,12 +358,11 @@ public class Obadiah {
                         final int chapterIndex = cursor.getColumnIndex(DatabaseHelper.COLUMN_CHAPTER_INDEX);
                         final int verseIndex = cursor.getColumnIndex(DatabaseHelper.COLUMN_VERSE_INDEX);
                         final int verseText = cursor.getColumnIndex(DatabaseHelper.COLUMN_TEXT);
-                        int i = 0;
-                        final Verse[] verses = new Verse[count];
+                        final List<Verse> verses = new ArrayList<Verse>(count);
                         while (cursor.moveToNext()) {
                             final int book = cursor.getInt(bookIndex);
-                            verses[i++] = new Verse(book, cursor.getInt(chapterIndex), cursor.getInt(verseIndex),
-                                    bookNames[book], cursor.getString(verseText));
+                            verses.add(new Verse(book, cursor.getInt(chapterIndex), cursor.getInt(verseIndex),
+                                    bookNames.get(book), cursor.getString(verseText)));
                         }
                         return verses;
                     } finally {
@@ -376,7 +375,7 @@ public class Obadiah {
             }
 
             @Override
-            protected void onPostExecute(Verse[] result) {
+            protected void onPostExecute(List<Verse> result) {
                 listener.onVersesSearched(result);
             }
         }.execute();
@@ -487,11 +486,10 @@ public class Obadiah {
             protected void onPostExecute(Boolean result) {
                 Analytics.trackTranslationDownload(translationShortName, result);
 
-                final String[] downloadedTranslations = new String[mDownloadedTranslations.length + 1];
-                System.arraycopy(mDownloadedTranslations, 0, downloadedTranslations, 0, mDownloadedTranslations.length);
-                downloadedTranslations[mDownloadedTranslations.length] = translationShortName;
-
-                mDownloadedTranslations = downloadedTranslations;
+                final List<String> downloadedTranslations = new ArrayList<String>(mDownloadedTranslations.size() + 1);
+                downloadedTranslations.addAll(mDownloadedTranslations);
+                downloadedTranslations.add(translationShortName);
+                mDownloadedTranslations = Collections.unmodifiableList(downloadedTranslations);
 
                 listener.onTranslationDownloaded(translationShortName, result);
             }
@@ -536,13 +534,12 @@ public class Obadiah {
             protected void onPostExecute(Boolean result) {
                 Analytics.trackTranslationRemoval(translationShortName, result);
 
-                final String[] downloadedTranslations = new String[mDownloadedTranslations.length - 1];
-                int i = 0;
+                final List<String> downloadedTranslations = new ArrayList<String>(mDownloadedTranslations.size() - 1);
                 for (String translation : mDownloadedTranslations) {
                     if (!translation.equals(translationShortName))
-                        downloadedTranslations[i++] = translation;
+                        downloadedTranslations.add(translation);
                 }
-                mDownloadedTranslations = downloadedTranslations;
+                mDownloadedTranslations = Collections.unmodifiableList(downloadedTranslations);
 
                 listener.onTranslationRemoved(translationShortName, result);
             }

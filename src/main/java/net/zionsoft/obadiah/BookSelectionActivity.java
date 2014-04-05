@@ -47,6 +47,8 @@ import net.zionsoft.obadiah.ui.fragments.TextFragment;
 import net.zionsoft.obadiah.ui.utils.DialogHelper;
 import net.zionsoft.obadiah.ui.utils.UIHelper;
 
+import java.util.List;
+
 public class BookSelectionActivity extends ActionBarActivity
         implements ChapterSelectionFragment.Listener, TextFragment.Listener {
     private Obadiah mObadiah;
@@ -54,7 +56,7 @@ public class BookSelectionActivity extends ActionBarActivity
     private SharedPreferences mPreferences;
 
     private String mCurrentTranslation;
-    private String[] mBookNames;
+    private List<String> mBookNames;
     private int mCurrentBook;
     private int mCurrentChapter;
 
@@ -184,8 +186,8 @@ public class BookSelectionActivity extends ActionBarActivity
     private void loadTranslations() {
         mObadiah.loadDownloadedTranslations(new Obadiah.OnStringsLoadedListener() {
             @Override
-            public void onStringsLoaded(String[] strings) {
-                if (strings == null || strings.length == 0) {
+            public void onStringsLoaded(List<String> strings) {
+                if (strings == null || strings.size() == 0) {
                     DialogHelper.showDialog(BookSelectionActivity.this, false, R.string.dialog_retry,
                             new DialogInterface.OnClickListener() {
                                 @Override
@@ -201,13 +203,13 @@ public class BookSelectionActivity extends ActionBarActivity
                 actionBar.setDisplayShowTitleEnabled(false);
                 actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 
-                final String[] translations = strings;
+                final List<String> translations = strings;
                 actionBar.setListNavigationCallbacks(
                         new ArrayAdapter<String>(BookSelectionActivity.this, R.layout.item_drop_down, translations),
                         new ActionBar.OnNavigationListener() {
                             @Override
                             public boolean onNavigationItemSelected(int itemPosition, long itemId) {
-                                final String selected = translations[itemPosition];
+                                final String selected = translations.get(itemPosition);
                                 if (!selected.equals(mCurrentTranslation)) {
                                     Analytics.trackTranslationSelection(selected);
 
@@ -223,11 +225,13 @@ public class BookSelectionActivity extends ActionBarActivity
                             }
                         }
                 );
-                for (int i = 0; i < translations.length; ++i) {
-                    if (translations[i].equals(mCurrentTranslation)) {
+                int i = 0;
+                for (String translation : translations) {
+                    if (translation.equals(mCurrentTranslation)) {
                         actionBar.setSelectedNavigationItem(i);
                         break;
                     }
+                    ++i;
                 }
             }
         });
@@ -236,8 +240,8 @@ public class BookSelectionActivity extends ActionBarActivity
     private void loadTexts() {
         mObadiah.loadBookNames(mCurrentTranslation, new Obadiah.OnStringsLoadedListener() {
                     @Override
-                    public void onStringsLoaded(String[] strings) {
-                        if (strings == null || strings.length == 0) {
+                    public void onStringsLoaded(List<String> strings) {
+                        if (strings == null || strings.size() == 0) {
                             DialogHelper.showDialog(BookSelectionActivity.this, false, R.string.dialog_retry,
                                     new DialogInterface.OnClickListener() {
                                         @Override
@@ -299,7 +303,7 @@ public class BookSelectionActivity extends ActionBarActivity
         // onCreateOptionsMenu() is invoked after onResume(), but we can't guarantee the loading of
         // book names is finished before that
         if (mBookNames != null && mBookNameTextView != null)
-            mBookNameTextView.setText(String.format("%s, %d", mBookNames[mCurrentBook], mCurrentChapter + 1));
+            mBookNameTextView.setText(String.format("%s, %d", mBookNames.get(mCurrentBook), mCurrentChapter + 1));
     }
 
     @Override

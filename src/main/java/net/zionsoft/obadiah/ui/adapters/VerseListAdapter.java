@@ -28,6 +28,8 @@ import android.widget.TextView;
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.Settings;
 
+import java.util.List;
+
 class VerseListAdapter extends BaseAdapter {
     private static class ViewTag {
         TextView index;
@@ -36,7 +38,7 @@ class VerseListAdapter extends BaseAdapter {
 
     private final Context mContext;
     private final Settings mSettings;
-    private String[] mVerses;
+    private List<String> mVerses;
 
     VerseListAdapter(Context context) {
         super();
@@ -47,12 +49,12 @@ class VerseListAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return mVerses == null ? 0 : mVerses.length;
+        return mVerses == null ? 0 : mVerses.size();
     }
 
     @Override
     public String getItem(int position) {
-        return mVerses == null ? null : mVerses[position];
+        return mVerses == null ? null : mVerses.get(position);
     }
 
     @Override
@@ -83,12 +85,12 @@ class VerseListAdapter extends BaseAdapter {
         viewTag.index.setText(Integer.toString(position + 1));
         viewTag.text.setTextColor(textColor);
         viewTag.text.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
-        viewTag.text.setText(mVerses[position]);
+        viewTag.text.setText(mVerses.get(position));
 
         return linearLayout;
     }
 
-    void setVerses(String[] verses) {
+    void setVerses(List<String> verses) {
         mVerses = verses;
     }
 }

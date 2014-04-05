@@ -28,6 +28,8 @@ import android.widget.TextView;
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.Obadiah;
 
+import java.util.List;
+
 public class BookExpandableListAdapter extends BaseExpandableListAdapter {
     public static interface OnChapterClickListener {
         void onChapterClicked(int book, int chapter);
@@ -48,7 +50,7 @@ public class BookExpandableListAdapter extends BaseExpandableListAdapter {
     private final OnChapterClickListener mListener;
     private final View.OnClickListener mViewClickListener;
 
-    private String[] mBookNames;
+    private List<String> mBookNames;
     private int mCurrentBook;
     private int mCurrentChapter;
 
@@ -82,7 +84,7 @@ public class BookExpandableListAdapter extends BaseExpandableListAdapter {
 
     @Override
     public String getGroup(int groupPosition) {
-        return mBookNames[groupPosition];
+        return mBookNames.get(groupPosition);
     }
 
     @Override
@@ -109,7 +111,7 @@ public class BookExpandableListAdapter extends BaseExpandableListAdapter {
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
         final TextView textView = (TextView) (convertView == null
                 ? View.inflate(mContext, R.layout.item_book_name, null) : convertView);
-        textView.setText(mBookNames[groupPosition]);
+        textView.setText(mBookNames.get(groupPosition));
         return textView;
     }
 
@@ -163,7 +165,7 @@ public class BookExpandableListAdapter extends BaseExpandableListAdapter {
         return true;
     }
 
-    public void setBookNames(String[] bookNames) {
+    public void setBookNames(List<String> bookNames) {
         mBookNames = bookNames;
     }
 

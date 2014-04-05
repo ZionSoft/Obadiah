@@ -43,6 +43,8 @@ import net.zionsoft.obadiah.ui.adapters.TranslationExpandableListAdapter;
 import net.zionsoft.obadiah.ui.utils.AnimationHelper;
 import net.zionsoft.obadiah.ui.utils.DialogHelper;
 
+import java.util.List;
+
 public class TranslationListFragment extends Fragment {
     private static final String TAG_DOWNLOAD_DIALOG_FRAGMENT = "net.zionsoft.obadiah.ui.fragments.TranslationListFragment.TAG_DOWNLOAD_DIALOG_FRAGMENT";
     private static final String TAG_REMOVE_DIALOG_FRAGMENT = "net.zionsoft.obadiah.ui.fragments.TranslationListFragment.TAG_REMOVE_DIALOG_FRAGMENT";
@@ -117,7 +119,7 @@ public class TranslationListFragment extends Fragment {
 
         mObadiah.loadTranslations(new Obadiah.OnTranslationsLoadedListener() {
             @Override
-            public void onTranslationsLoaded(TranslationInfo[] downloaded, TranslationInfo[] available) {
+            public void onTranslationsLoaded(List<TranslationInfo> downloaded, List<TranslationInfo> available) {
                 if (downloaded == null || available == null) {
                     DialogHelper.showDialog(getActivity(), false, R.string.dialog_retry,
                             new DialogInterface.OnClickListener() {

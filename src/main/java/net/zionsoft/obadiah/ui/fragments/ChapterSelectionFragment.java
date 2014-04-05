@@ -31,6 +31,8 @@ import net.zionsoft.obadiah.model.Obadiah;
 import net.zionsoft.obadiah.ui.adapters.BookExpandableListAdapter;
 import net.zionsoft.obadiah.ui.utils.DialogHelper;
 
+import java.util.List;
+
 public class ChapterSelectionFragment extends Fragment {
     public static interface Listener {
         public void onChapterSelected(int bookIndex, int chapterIndex);
@@ -113,8 +115,8 @@ public class ChapterSelectionFragment extends Fragment {
     private void loadBookNames(final String translationShortName) {
         mObadiah.loadBookNames(translationShortName, new Obadiah.OnStringsLoadedListener() {
                     @Override
-                    public void onStringsLoaded(String[] strings) {
-                        if (strings == null || strings.length == 0) {
+                    public void onStringsLoaded(List<String> strings) {
+                        if (strings == null || strings.size() == 0) {
                             DialogHelper.showDialog(getActivity(), false, R.string.dialog_retry,
                                     new DialogInterface.OnClickListener() {
                                         @Override

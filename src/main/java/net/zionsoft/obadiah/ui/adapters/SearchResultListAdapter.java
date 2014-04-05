@@ -28,10 +28,12 @@ import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.Settings;
 import net.zionsoft.obadiah.model.Verse;
 
+import java.util.List;
+
 public class SearchResultListAdapter extends BaseAdapter {
     private final Context mContext;
     private final Settings mSettings;
-    private Verse[] mVerses;
+    private List<Verse> mVerses;
 
     public SearchResultListAdapter(Context context) {
         super();
@@ -42,12 +44,12 @@ public class SearchResultListAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return mVerses == null ? 0 : mVerses.length;
+        return mVerses == null ? 0 : mVerses.size();
     }
 
     @Override
     public Verse getItem(int position) {
-        return mVerses[position];
+        return mVerses.get(position);
     }
 
     @Override
@@ -63,14 +65,14 @@ public class SearchResultListAdapter extends BaseAdapter {
         textView.setTextColor(mSettings.getTextColor());
         textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, mSettings.getTextSize());
 
-        final Verse verse = mVerses[position];
+        final Verse verse = mVerses.get(position);
         textView.setText(String.format("%s %d:%d\n%s", verse.bookName,
                 verse.chapterIndex + 1, verse.verseIndex + 1, verse.verseText));
 
         return textView;
     }
 
-    public void setVerses(Verse[] verses) {
+    public void setVerses(List<Verse> verses) {
         mVerses = verses;
     }
 }

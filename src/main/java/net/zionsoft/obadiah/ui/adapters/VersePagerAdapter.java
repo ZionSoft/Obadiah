@@ -100,8 +100,8 @@ public class VersePagerAdapter extends PagerAdapter {
     private void loadVerses(final int position, final Page page) {
         mObadiah.loadVerses(mTranslationShortName, mCurrentBook, position, new Obadiah.OnStringsLoadedListener() {
                     @Override
-                    public void onStringsLoaded(String[] strings) {
-                        if (strings == null || strings.length == 0) {
+                    public void onStringsLoaded(List<String> strings) {
+                        if (strings == null || strings.size() == 0) {
                             DialogHelper.showDialog(mContext, false, R.string.dialog_retry,
                                     new DialogInterface.OnClickListener() {
                                         @Override
