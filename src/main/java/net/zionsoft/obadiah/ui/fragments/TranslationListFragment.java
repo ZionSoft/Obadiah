@@ -94,14 +94,12 @@ public class TranslationListFragment extends Fragment {
                     return false;
 
                 if (groupPosition == TranslationExpandableListAdapter.DOWNLOADED_TRANSLATIONS_GROUP) {
-                    if (!mCurrentTranslation.equals(translationInfo.shortName)) {
-                        Analytics.trackTranslationSelection(translationInfo.shortName);
+                    Analytics.trackTranslationSelection(translationInfo.shortName);
 
-                        mPreferences.edit()
-                                .putString(Constants.PREF_KEY_LAST_READ_TRANSLATION, translationInfo.shortName)
-                                .apply();
-                        getActivity().finish();
-                    }
+                    mPreferences.edit()
+                            .putString(Constants.PREF_KEY_LAST_READ_TRANSLATION, translationInfo.shortName)
+                            .apply();
+                    getActivity().finish();
                 } else if (groupPosition == TranslationExpandableListAdapter.AVAILABLE_TRANSLATIONS_GROUP) {
                     downloadTranslation(translationInfo.shortName);
                 }
