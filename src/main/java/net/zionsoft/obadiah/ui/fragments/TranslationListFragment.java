@@ -110,14 +110,14 @@ public class TranslationListFragment extends Fragment {
         });
         registerForContextMenu(mTranslationListView);
 
-        loadTranslations();
+        loadTranslations(true);
     }
 
-    private void loadTranslations() {
+    private void loadTranslations(final boolean forceRefresh) {
         mLoadingSpinner.setVisibility(View.VISIBLE);
         mTranslationListView.setVisibility(View.GONE);
 
-        mObadiah.loadTranslations(new Obadiah.OnTranslationsLoadedListener() {
+        mObadiah.loadTranslations(forceRefresh, new Obadiah.OnTranslationsLoadedListener() {
             @Override
             public void onTranslationsLoaded(List<TranslationInfo> downloaded, List<TranslationInfo> available) {
                 if (downloaded == null || available == null) {
@@ -125,7 +125,7 @@ public class TranslationListFragment extends Fragment {
                             new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    loadTranslations();
+                                    loadTranslations(forceRefresh);
                                 }
                             }, null
                     );
@@ -164,7 +164,7 @@ public class TranslationListFragment extends Fragment {
                                 .putString(Constants.PREF_KEY_LAST_READ_TRANSLATION, mCurrentTranslation)
                                 .apply();
                     }
-                    loadTranslations();
+                    loadTranslations(false);
                 } else {
                     DialogHelper.showDialog(getActivity(), true,
                             R.string.dialog_translation_download_failure_message,
@@ -259,7 +259,7 @@ public class TranslationListFragment extends Fragment {
 
                 if (isSuccessful) {
                     Toast.makeText(getActivity(), R.string.toast_translation_deleted, Toast.LENGTH_SHORT).show();
-                    loadTranslations();
+                    loadTranslations(false);
                 } else {
                     DialogHelper.showDialog(getActivity(), true,
                             R.string.dialog_translation_remove_failure_message,

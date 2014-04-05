@@ -71,7 +71,9 @@ public class Obadiah {
 
     private final LruCache<String, List<String>> mBookNameCache;
     private final LruCache<String, List<String>> mVerseCache;
-    private List<String> mDownloadedTranslations;
+    private List<String> mDownloadedTranslationShortNames;
+    private List<TranslationInfo> mDownloadedTranslations;
+    private List<TranslationInfo> mAvailableTranslations;
 
     public static void initialize(Context context) {
         if (sInstance == null) {
@@ -122,21 +124,24 @@ public class Obadiah {
         mVerseCache.evictAll();
     }
 
-    public void loadTranslations(final OnTranslationsLoadedListener listener) {
+    public void loadTranslations(boolean forceRefresh, final OnTranslationsLoadedListener listener) {
+        if (!forceRefresh && mDownloadedTranslations != null && mAvailableTranslations != null)
+            listener.onTranslationsLoaded(mDownloadedTranslations, mAvailableTranslations);
+
         new AsyncTask<Void, Void, List<TranslationInfo>[]>() {
             @Override
             protected List<TranslationInfo>[] doInBackground(Void... params) {
                 try {
-                    if (mDownloadedTranslations == null) {
+                    if (mDownloadedTranslationShortNames == null) {
                         // this should not happen, but just in case
-                        mDownloadedTranslations = Collections.unmodifiableList(getDownloadedTranslations());
+                        mDownloadedTranslationShortNames = Collections.unmodifiableList(getDownloadedTranslations());
                     }
 
                     final JSONArray replyArray = new JSONArray(
                             new String(NetworkHelper.get(NetworkHelper.TRANSLATIONS_LIST_URL), "UTF8"));
                     final int length = replyArray.length();
-                    final List<TranslationInfo> downloaded = new ArrayList<TranslationInfo>(mDownloadedTranslations.size());
-                    final List<TranslationInfo> available = new ArrayList<TranslationInfo>(length - mDownloadedTranslations.size());
+                    final List<TranslationInfo> downloaded = new ArrayList<TranslationInfo>(mDownloadedTranslationShortNames.size());
+                    final List<TranslationInfo> available = new ArrayList<TranslationInfo>(length - mDownloadedTranslationShortNames.size());
                     for (int i = 0; i < length; ++i) {
                         final JSONObject translationObject = replyArray.getJSONObject(i);
                         final TranslationInfo translationInfo = new TranslationInfo(
@@ -144,7 +149,7 @@ public class Obadiah {
                                 translationObject.getString("language"), translationObject.getInt("size"));
 
                         boolean isDownloaded = false;
-                        for (String shortName : mDownloadedTranslations) {
+                        for (String shortName : mDownloadedTranslationShortNames) {
                             if (translationInfo.shortName.equals(shortName)) {
                                 isDownloaded = true;
                                 break;
@@ -165,10 +170,14 @@ public class Obadiah {
 
             @Override
             protected void onPostExecute(List<TranslationInfo>[] result) {
-                if (result == null || result.length != 2)
-                    listener.onTranslationsLoaded(null, null);
-                else
-                    listener.onTranslationsLoaded(result[0], result[1]);
+                if (result == null || result.length != 2) {
+                    mDownloadedTranslations = null;
+                    mAvailableTranslations = null;
+                } else {
+                    mDownloadedTranslations = result[0];
+                    mAvailableTranslations = result[1];
+                }
+                listener.onTranslationsLoaded(mDownloadedTranslations, mAvailableTranslations);
             }
         }.execute();
     }
@@ -200,8 +209,8 @@ public class Obadiah {
     }
 
     public void loadDownloadedTranslations(final OnStringsLoadedListener listener) {
-        if (mDownloadedTranslations != null) {
-            listener.onStringsLoaded(mDownloadedTranslations);
+        if (mDownloadedTranslationShortNames != null) {
+            listener.onStringsLoaded(mDownloadedTranslationShortNames);
             return;
         }
 
@@ -213,8 +222,8 @@ public class Obadiah {
 
             @Override
             protected void onPostExecute(List<String> result) {
-                mDownloadedTranslations = Collections.unmodifiableList(result);
-                listener.onStringsLoaded(mDownloadedTranslations);
+                mDownloadedTranslationShortNames = Collections.unmodifiableList(result);
+                listener.onStringsLoaded(mDownloadedTranslationShortNames);
             }
         }.execute();
     }
@@ -486,14 +495,37 @@ public class Obadiah {
             protected void onPostExecute(Boolean result) {
                 Analytics.trackTranslationDownload(translationShortName, result);
 
-                final List<String> downloadedTranslations = new ArrayList<String>(mDownloadedTranslations.size() + 1);
-                downloadedTranslations.addAll(mDownloadedTranslations);
-                downloadedTranslations.add(translationShortName);
-                mDownloadedTranslations = Collections.unmodifiableList(downloadedTranslations);
+                mDownloadedTranslationShortNames = unmodifiableAppend(mDownloadedTranslationShortNames, translationShortName);
+
+                TranslationInfo downloaded = null;
+                for (TranslationInfo available : mAvailableTranslations) {
+                    if (available.shortName.equals(translationShortName)) {
+                        downloaded = available;
+                        break;
+                    }
+                }
+                mDownloadedTranslations = unmodifiableAppend(mDownloadedTranslations, downloaded);
+                mAvailableTranslations = unmodifiableRemove(mAvailableTranslations, downloaded);
 
                 listener.onTranslationDownloaded(translationShortName, result);
             }
         }.execute();
+    }
+
+    private static <T> List<T> unmodifiableAppend(List<T> original, T toAppend) {
+        final List<T> list = new ArrayList<T>(original.size() + 1);
+        list.addAll(original);
+        list.add(toAppend);
+        return Collections.unmodifiableList(list);
+    }
+
+    private static <T> List<T> unmodifiableRemove(List<T> original, T toRemove) {
+        final List<T> list = new ArrayList<T>(original.size() - 1);
+        for (T t : original) {
+            if (!t.equals(toRemove))
+                list.add(t);
+        }
+        return Collections.unmodifiableList(list);
     }
 
     public void removeTranslation(final String translationShortName, final OnTranslationRemovedListener listener) {
@@ -534,12 +566,17 @@ public class Obadiah {
             protected void onPostExecute(Boolean result) {
                 Analytics.trackTranslationRemoval(translationShortName, result);
 
-                final List<String> downloadedTranslations = new ArrayList<String>(mDownloadedTranslations.size() - 1);
-                for (String translation : mDownloadedTranslations) {
-                    if (!translation.equals(translationShortName))
-                        downloadedTranslations.add(translation);
+                mDownloadedTranslationShortNames = unmodifiableRemove(mDownloadedTranslationShortNames, translationShortName);
+
+                TranslationInfo removed = null;
+                for (TranslationInfo downloaded : mDownloadedTranslations) {
+                    if (downloaded.shortName.equals(translationShortName)) {
+                        removed = downloaded;
+                        break;
+                    }
                 }
-                mDownloadedTranslations = Collections.unmodifiableList(downloadedTranslations);
+                mDownloadedTranslations = unmodifiableRemove(mDownloadedTranslations, removed);
+                mAvailableTranslations = unmodifiableAppend(mAvailableTranslations, removed);
 
                 listener.onTranslationRemoved(translationShortName, result);
             }
