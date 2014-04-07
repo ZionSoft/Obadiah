@@ -22,10 +22,12 @@ import android.content.DialogInterface;
 import android.support.v4.view.PagerAdapter;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.Obadiah;
+import net.zionsoft.obadiah.model.Verse;
 import net.zionsoft.obadiah.ui.utils.AnimationHelper;
 import net.zionsoft.obadiah.ui.utils.DialogHelper;
 
@@ -33,6 +35,10 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class VersePagerAdapter extends PagerAdapter {
+    public static interface Listener {
+        public void onVersesSelectionChanged(boolean hasSelected);
+    }
+
     private static class Page {
         boolean inUse;
         int position;
@@ -44,6 +50,7 @@ public class VersePagerAdapter extends PagerAdapter {
     }
 
     private final Context mContext;
+    private final Listener mListener;
     private final Obadiah mObadiah;
     private final List<Page> mPages;
 
@@ -52,10 +59,11 @@ public class VersePagerAdapter extends PagerAdapter {
     private int mCurrentChapter;
     private int mCurrentVerse;
 
-    public VersePagerAdapter(Context context) {
+    public VersePagerAdapter(Context context, Listener listener) {
         super();
 
         mContext = context;
+        mListener = listener;
         mObadiah = Obadiah.getInstance();
         mPages = new LinkedList<Page>();
     }
@@ -83,6 +91,15 @@ public class VersePagerAdapter extends PagerAdapter {
             final VerseListAdapter verseListAdapter = new VerseListAdapter(mContext);
             page.verseListAdapter = verseListAdapter;
             page.verseListView.setAdapter(verseListAdapter);
+            page.verseListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    verseListAdapter.select(position);
+                    verseListAdapter.notifyDataSetChanged();
+
+                    mListener.onVersesSelectionChanged(verseListAdapter.hasSelectedVerses());
+                }
+            });
             mPages.add(page);
         }
 
@@ -98,10 +115,10 @@ public class VersePagerAdapter extends PagerAdapter {
     }
 
     private void loadVerses(final int position, final Page page) {
-        mObadiah.loadVerses(mTranslationShortName, mCurrentBook, position, new Obadiah.OnStringsLoadedListener() {
+        mObadiah.loadVerses(mTranslationShortName, mCurrentBook, position, new Obadiah.OnVersesLoadedListener() {
                     @Override
-                    public void onStringsLoaded(List<String> strings) {
-                        if (strings == null || strings.size() == 0) {
+                    public void onVersesLoaded(List<Verse> verses) {
+                        if (verses == null || verses.size() == 0) {
                             DialogHelper.showDialog(mContext, false, R.string.dialog_retry,
                                     new DialogInterface.OnClickListener() {
                                         @Override
@@ -117,7 +134,7 @@ public class VersePagerAdapter extends PagerAdapter {
                             AnimationHelper.fadeOut(page.loadingSpinner);
                             AnimationHelper.fadeIn(page.verseListView);
 
-                            page.verseListAdapter.setVerses(strings);
+                            page.verseListAdapter.setVerses(verses);
                             page.verseListAdapter.notifyDataSetChanged();
 
                             if (mCurrentVerse > 0 && mCurrentChapter == position) {
@@ -174,5 +191,20 @@ public class VersePagerAdapter extends PagerAdapter {
                 return page.verseListView.getFirstVisiblePosition();
         }
         return 0;
+    }
+
+    public List<Verse> getSelectedVerses(int chapter) {
+        for (Page page : mPages) {
+            if (page.position == chapter)
+                return page.verseListAdapter.getSelectedVerses();
+        }
+        return null;
+    }
+
+    public void deselectVerses() {
+        for (Page page : mPages) {
+            page.verseListAdapter.deselectVerses();
+            page.verseListAdapter.notifyDataSetChanged();
+        }
     }
 }

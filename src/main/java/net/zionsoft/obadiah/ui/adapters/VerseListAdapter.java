@@ -18,6 +18,7 @@
 package net.zionsoft.obadiah.ui.adapters;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,7 +28,9 @@ import android.widget.TextView;
 
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.Settings;
+import net.zionsoft.obadiah.model.Verse;
 
+import java.util.ArrayList;
 import java.util.List;
 
 class VerseListAdapter extends BaseAdapter {
@@ -38,7 +41,9 @@ class VerseListAdapter extends BaseAdapter {
 
     private final Context mContext;
     private final Settings mSettings;
-    private List<String> mVerses;
+    private List<Verse> mVerses;
+    private boolean[] mSelected;
+    private int mSelectedCount;
 
     VerseListAdapter(Context context) {
         super();
@@ -53,7 +58,7 @@ class VerseListAdapter extends BaseAdapter {
     }
 
     @Override
-    public String getItem(int position) {
+    public Verse getItem(int position) {
         return mVerses == null ? null : mVerses.get(position);
     }
 
@@ -78,6 +83,8 @@ class VerseListAdapter extends BaseAdapter {
             viewTag = (ViewTag) linearLayout.getTag();
         }
 
+        linearLayout.setBackgroundColor(mSelected[position] ? Color.LTGRAY : Color.TRANSPARENT);
+
         final int textColor = mSettings.getTextColor();
         final float textSize = mSettings.getTextSize();
         viewTag.index.setTextColor(textColor);
@@ -85,12 +92,46 @@ class VerseListAdapter extends BaseAdapter {
         viewTag.index.setText(Integer.toString(position + 1));
         viewTag.text.setTextColor(textColor);
         viewTag.text.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
-        viewTag.text.setText(mVerses.get(position));
+        viewTag.text.setText(mVerses.get(position).verseText);
 
         return linearLayout;
     }
 
-    void setVerses(List<String> verses) {
+    void setVerses(List<Verse> verses) {
         mVerses = verses;
+
+        final int size = mVerses.size();
+        if (mSelected == null || mSelected.length < size)
+            mSelected = new boolean[size];
+        deselectVerses();
+    }
+
+    void select(int position) {
+        mSelected[position] ^= true;
+        if (mSelected[position])
+            ++mSelectedCount;
+        else
+            --mSelectedCount;
+    }
+
+    boolean hasSelectedVerses() {
+        return mSelectedCount > 0;
+    }
+
+    List<Verse> getSelectedVerses() {
+        final List<Verse> selectedVerses = new ArrayList<Verse>(mSelectedCount);
+        int i = 0;
+        for (boolean selected : mSelected) {
+            if (selected)
+                selectedVerses.add(mVerses.get(i));
+            ++i;
+        }
+        return selectedVerses;
+    }
+
+    void deselectVerses() {
+        for (int i = 0; i < mSelected.length; ++i)
+            mSelected[i] = false;
+        mSelectedCount = 0;
     }
 }

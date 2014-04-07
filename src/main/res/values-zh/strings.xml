@@ -6,10 +6,12 @@
     <string name="activity_manage_translation">譯本</string>
     <string name="activity_settings">設置</string>
 
+    <string name="action_copy">拷貝</string>
     <string name="action_delete_translation">刪除</string>
     <string name="action_manage_translation">譯本</string>
     <string name="action_search">搜索</string>
     <string name="action_settings">設置</string>
+    <string name="action_share">分享</string>
 
     <string name="dialog_no_translation">沒有可用譯本，現在下載？</string>
     <string name="dialog_retry">讀取失敗，重試？</string>
@@ -36,9 +38,11 @@
 
     <string name="text_available_translation">可下載譯本</string>
     <string name="text_downloaded_translations">已下載譯本</string>
+    <string name="text_share_with">分享到&#8230;</string>
 
     <string name="toast_translation_deleted">已刪除。</string>
     <string name="toast_translation_downloaded">已下載。</string>
+    <string name="toast_verses_copied">已復製到剪貼板。</string>
     <string name="toast_verses_searched">共找到%1$d個條目。</string>
 
 </resources>

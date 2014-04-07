@@ -178,9 +178,9 @@ public class SearchActivity extends ActionBarActivity {
         mSearchResultListView.setVisibility(View.GONE);
 
         Obadiah.getInstance().searchVerses(mData.currentTranslation, keyword,
-                new Obadiah.OnVersesSearchedListener() {
+                new Obadiah.OnVersesLoadedListener() {
                     @Override
-                    public void onVersesSearched(List<Verse> verses) {
+                    public void onVersesLoaded(List<Verse> verses) {
                         if (verses == null) {
                             DialogHelper.showDialog(SearchActivity.this, false, R.string.dialog_retry,
                                     new DialogInterface.OnClickListener() {

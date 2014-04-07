@@ -55,8 +55,8 @@ public class Obadiah {
         public void onTranslationRemoved(String translation, boolean isSuccessful);
     }
 
-    public static interface OnVersesSearchedListener {
-        public void onVersesSearched(List<Verse> verses);
+    public static interface OnVersesLoadedListener {
+        public void onVersesLoaded(List<Verse> verses);
     }
 
     private static final int BOOK_COUNT = 66;
@@ -70,7 +70,7 @@ public class Obadiah {
     private final DatabaseHelper mDatabaseHelper;
 
     private final LruCache<String, List<String>> mBookNameCache;
-    private final LruCache<String, List<String>> mVerseCache;
+    private final LruCache<String, List<Verse>> mVerseCache;
     private List<String> mDownloadedTranslationShortNames;
     private List<TranslationInfo> mDownloadedTranslations;
     private List<TranslationInfo> mAvailableTranslations;
@@ -90,18 +90,24 @@ public class Obadiah {
         mDatabaseHelper = new DatabaseHelper(context);
 
         final long maxMemory = Runtime.getRuntime().maxMemory();
-        mBookNameCache = createCache((int) (maxMemory / 16L));
-        mVerseCache = createCache((int) (maxMemory / 8L));
-    }
-
-    private static LruCache<String, List<String>> createCache(int cacheSize) {
-        return new LruCache<String, List<String>>(cacheSize) {
+        mBookNameCache = new LruCache<String, List<String>>((int) (maxMemory / 16L)) {
             @Override
             protected int sizeOf(String key, List<String> texts) {
                 // strings are UTF-16 encoded (with a length of one or two 16-bit code units)
                 int length = 0;
                 for (String text : texts)
                     length += text.length() * 4;
+                return length;
+            }
+        };
+        mVerseCache = new LruCache<String, List<Verse>>((int) (maxMemory / 8L)) {
+            @Override
+            protected int sizeOf(String key, List<Verse> verses) {
+                // each Verse contains 3 integers and 2 strings
+                // strings are UTF-16 encoded (with a length of one or two 16-bit code units)
+                int length = 0;
+                for (Verse verse : verses)
+                    length += 12 + (verse.bookName.length() + verse.verseText.length()) * 4;
                 return length;
             }
         };
@@ -281,17 +287,17 @@ public class Obadiah {
     }
 
     public void loadVerses(final String translationShortName, final int book, final int chapter,
-                           final OnStringsLoadedListener listener) {
+                           final OnVersesLoadedListener listener) {
         final String key = buildVersesCacheKey(translationShortName, book, chapter);
-        final List<String> verses = mVerseCache.get(key);
+        final List<Verse> verses = mVerseCache.get(key);
         if (verses != null) {
-            listener.onStringsLoaded(verses);
+            listener.onVersesLoaded(verses);
             return;
         }
 
-        new AsyncTask<Void, Void, List<String>>() {
+        new AsyncTask<Void, Void, List<Verse>>() {
             @Override
-            protected List<String> doInBackground(Void... params) {
+            protected List<Verse> doInBackground(Void... params) {
                 synchronized (mDatabaseHelper) {
                     SQLiteDatabase db = null;
                     Cursor cursor = null;
@@ -299,6 +305,15 @@ public class Obadiah {
                         db = mDatabaseHelper.getReadableDatabase();
                         if (db == null)
                             return null;
+
+                        List<String> bookNames = mBookNameCache.get(translationShortName);
+                        if (bookNames == null) {
+                            // this should not happen, but just in case
+                            bookNames = Collections.unmodifiableList(getBookNames(db, translationShortName));
+                            mBookNameCache.put(translationShortName, bookNames);
+                        }
+                        final String bookName = bookNames.get(book);
+
                         cursor = db.query(translationShortName,
                                 new String[]{DatabaseHelper.COLUMN_TEXT},
                                 String.format("%s = ? AND %s = ?",
@@ -307,9 +322,10 @@ public class Obadiah {
                                 null, null, String.format("%s ASC", DatabaseHelper.COLUMN_VERSE_INDEX)
                         );
                         final int verse = cursor.getColumnIndex(DatabaseHelper.COLUMN_TEXT);
-                        final List<String> verses = new ArrayList<String>(cursor.getCount());
+                        final List<Verse> verses = new ArrayList<Verse>(cursor.getCount());
+                        int verseIndex = 0;
                         while (cursor.moveToNext())
-                            verses.add(cursor.getString(verse));
+                            verses.add(new Verse(book, chapter, verseIndex++, bookName, cursor.getString(verse)));
                         return verses;
                     } finally {
                         if (cursor != null)
@@ -321,10 +337,10 @@ public class Obadiah {
             }
 
             @Override
-            protected void onPostExecute(List<String> result) {
+            protected void onPostExecute(List<Verse> result) {
                 result = Collections.unmodifiableList(result);
                 mVerseCache.put(key, result);
-                listener.onStringsLoaded(result);
+                listener.onVersesLoaded(result);
             }
         }.execute();
     }
@@ -334,7 +350,7 @@ public class Obadiah {
     }
 
     public void searchVerses(final String translationShortName, final String keyword,
-                             final OnVersesSearchedListener listener) {
+                             final OnVersesLoadedListener listener) {
         new AsyncTask<Void, Void, List<Verse>>() {
             @Override
             protected List<Verse> doInBackground(Void... params) {
@@ -385,7 +401,7 @@ public class Obadiah {
 
             @Override
             protected void onPostExecute(List<Verse> result) {
-                listener.onVersesSearched(result);
+                listener.onVersesLoaded(result);
             }
         }.execute();
     }

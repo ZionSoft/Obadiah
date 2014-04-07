@@ -6,10 +6,12 @@
     <string name="activity_manage_translation">Translations</string>
     <string name="activity_settings">Settings</string>
 
+    <string name="action_copy">Copy</string>
     <string name="action_delete_translation">Delete</string>
     <string name="action_manage_translation">Translations</string>
     <string name="action_search">Search</string>
     <string name="action_settings">Settings</string>
+    <string name="action_share">Share</string>
 
     <string name="dialog_no_translation">No translation available, download now?</string>
     <string name="dialog_retry">Fail to load, retry?</string>
@@ -36,9 +38,11 @@
 
     <string name="text_available_translation">Available Translations</string>
     <string name="text_downloaded_translations">Downloaded Translations</string>
+    <string name="text_share_with">Share with&#8230;</string>
 
     <string name="toast_translation_deleted">Deleted.</string>
     <string name="toast_translation_downloaded">Downloaded.</string>
+    <string name="toast_verses_copied">Copied to clipboard.</string>
     <string name="toast_verses_searched">%1$d result(s) found.</string>
 
 </resources>
