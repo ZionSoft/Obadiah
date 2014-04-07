@@ -45,6 +45,7 @@ public class Analytics {
 
     public static void trackScreen(String name) {
         sTracker.setScreenName(name);
+        sTracker.send(new HitBuilders.AppViewBuilder().build());
     }
 
     public static void trackTranslationDownload(String translation, boolean isSuccessful) {
