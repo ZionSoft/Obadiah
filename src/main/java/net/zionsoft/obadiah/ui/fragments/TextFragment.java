@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import net.zionsoft.obadiah.R;
+import net.zionsoft.obadiah.model.Analytics;
 import net.zionsoft.obadiah.model.Verse;
 import net.zionsoft.obadiah.ui.adapters.VersePagerAdapter;
 
@@ -113,6 +114,8 @@ public class TextFragment extends Fragment implements VersePagerAdapter.Listener
                 public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
                     switch (menuItem.getItemId()) {
                         case R.id.action_copy:
+                            Analytics.trackUICopy();
+
                             final Activity activity = getActivity();
                             if (mClipboardManager == null) {
                                 // noinspection deprecation
@@ -123,6 +126,8 @@ public class TextFragment extends Fragment implements VersePagerAdapter.Listener
                             actionMode.finish();
                             return true;
                         case R.id.action_share:
+                            Analytics.trackUIShare();
+
                             startActivity(Intent.createChooser(new Intent().setAction(Intent.ACTION_SEND).setType("text/plain")
                                             .putExtra(Intent.EXTRA_TEXT,
                                                     buildText(mVersePagerAdapter.getSelectedVerses(mVerseViewPager.getCurrentItem()))),

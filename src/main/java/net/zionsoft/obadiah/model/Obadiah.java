@@ -22,6 +22,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
+import android.os.SystemClock;
 import android.support.v4.util.LruCache;
 
 import org.json.JSONArray;
@@ -135,6 +136,8 @@ public class Obadiah {
             listener.onTranslationsLoaded(mDownloadedTranslations, mAvailableTranslations);
 
         new AsyncTask<Void, Void, List<TranslationInfo>[]>() {
+            private final long mTimestamp = SystemClock.elapsedRealtime();
+
             @Override
             protected List<TranslationInfo>[] doInBackground(Void... params) {
                 try {
@@ -176,12 +179,15 @@ public class Obadiah {
 
             @Override
             protected void onPostExecute(List<TranslationInfo>[] result) {
-                if (result == null || result.length != 2) {
-                    mDownloadedTranslations = null;
-                    mAvailableTranslations = null;
-                } else {
+                final boolean isSuccessful = result != null && result.length == 2;
+                Analytics.trackTranslationListDownloading(isSuccessful, SystemClock.elapsedRealtime() - mTimestamp);
+
+                if (isSuccessful) {
                     mDownloadedTranslations = result[0];
                     mAvailableTranslations = result[1];
+                } else {
+                    mDownloadedTranslations = null;
+                    mAvailableTranslations = null;
                 }
                 listener.onTranslationsLoaded(mDownloadedTranslations, mAvailableTranslations);
             }
@@ -408,6 +414,8 @@ public class Obadiah {
 
     public void downloadTranslation(final String translationShortName, final OnTranslationDownloadListener listener) {
         new AsyncTask<Void, Integer, Boolean>() {
+            private final long mTimestamp = SystemClock.elapsedRealtime();
+
             @Override
             protected Boolean doInBackground(Void... params) {
                 synchronized (mDatabaseHelper) {
@@ -509,7 +517,7 @@ public class Obadiah {
 
             @Override
             protected void onPostExecute(Boolean result) {
-                Analytics.trackTranslationDownload(translationShortName, result);
+                Analytics.trackTranslationDownload(translationShortName, result, SystemClock.elapsedRealtime() - mTimestamp);
 
                 mDownloadedTranslationShortNames = unmodifiableAppend(mDownloadedTranslationShortNames, translationShortName);
 

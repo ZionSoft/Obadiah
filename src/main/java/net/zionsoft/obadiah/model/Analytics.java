@@ -48,10 +48,16 @@ public class Analytics {
         sTracker.send(new HitBuilders.AppViewBuilder().build());
     }
 
-    public static void trackTranslationDownload(String translation, boolean isSuccessful) {
+    public static void trackTranslationListDownloading(boolean isSuccessful, long elapsedTime) {
+        sTracker.send(new HitBuilders.EventBuilder()
+                .setCategory("translation").setAction("download_list").setValue(isSuccessful ? elapsedTime : -1)
+                .build());
+    }
+
+    public static void trackTranslationDownload(String translation, boolean isSuccessful, long elapsedTime) {
         sTracker.send(new HitBuilders.EventBuilder()
                 .setCategory("translation").setAction("download")
-                .setLabel(translation).setValue(isSuccessful ? 1 : 0)
+                .setLabel(translation).setValue(isSuccessful ? elapsedTime : -1)
                 .build());
     }
 
@@ -65,6 +71,20 @@ public class Analytics {
     public static void trackTranslationSelection(String translation) {
         sTracker.send(new HitBuilders.EventBuilder()
                 .setCategory("translation").setAction("selection").setLabel(translation)
+                .build());
+    }
+
+    public static void trackUICopy() {
+        trackUIEvent("copy");
+    }
+
+    public static void trackUIShare() {
+        trackUIEvent("share");
+    }
+
+    private static void trackUIEvent(String label) {
+        sTracker.send(new HitBuilders.EventBuilder()
+                .setCategory("ui").setAction("button").setLabel(label)
                 .build());
     }
 }
