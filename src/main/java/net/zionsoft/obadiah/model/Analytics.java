@@ -49,28 +49,30 @@ public class Analytics {
     }
 
     public static void trackTranslationListDownloading(boolean isSuccessful, long elapsedTime) {
-        sTracker.send(new HitBuilders.EventBuilder()
-                .setCategory("translation").setAction("download_list").setValue(isSuccessful ? elapsedTime : -1)
+        sTracker.send(new HitBuilders.EventBuilder("download_translation_list", "")
+                .setLabel(Boolean.toString(isSuccessful))
                 .build());
+        if (isSuccessful)
+            sTracker.send(new HitBuilders.TimingBuilder("network", "download_list", elapsedTime).build());
     }
 
     public static void trackTranslationDownload(String translation, boolean isSuccessful, long elapsedTime) {
-        sTracker.send(new HitBuilders.EventBuilder()
-                .setCategory("translation").setAction("download")
-                .setLabel(translation).setValue(isSuccessful ? elapsedTime : -1)
+        sTracker.send(new HitBuilders.EventBuilder("download_translation", translation)
+                .setLabel(Boolean.toString(isSuccessful))
                 .build());
+        if (isSuccessful)
+            sTracker.send(new HitBuilders.TimingBuilder("download_translation", translation, elapsedTime).build());
     }
 
     public static void trackTranslationRemoval(String translation, boolean isSuccessful) {
-        sTracker.send(new HitBuilders.EventBuilder()
-                .setCategory("translation").setAction("removal")
-                .setLabel(translation).setValue(isSuccessful ? 1 : 0)
+        sTracker.send(new HitBuilders.EventBuilder("remove_translation", translation)
+                .setLabel(Boolean.toString(isSuccessful))
                 .build());
     }
 
     public static void trackTranslationSelection(String translation) {
-        sTracker.send(new HitBuilders.EventBuilder()
-                .setCategory("translation").setAction("selection").setLabel(translation)
+        sTracker.send(new HitBuilders.EventBuilder("select_translation", "")
+                .setLabel(translation)
                 .build());
     }
 
@@ -83,8 +85,8 @@ public class Analytics {
     }
 
     private static void trackUIEvent(String label) {
-        sTracker.send(new HitBuilders.EventBuilder()
-                .setCategory("ui").setAction("button").setLabel(label)
+        sTracker.send(new HitBuilders.EventBuilder("ui", "button_click")
+                .setLabel(label)
                 .build());
     }
 }
