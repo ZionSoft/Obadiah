@@ -33,7 +33,9 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -170,6 +172,29 @@ public class Obadiah {
                             available.add(translationInfo);
                     }
 
+                    Collections.sort(available, new Comparator<TranslationInfo>() {
+                        @Override
+                        public int compare(TranslationInfo translation1, TranslationInfo translation2) {
+                            // first compares with user's default locale
+                            final Locale userLocale = Locale.getDefault();
+                            final String userLanguage = userLocale.getLanguage().toLowerCase();
+                            final String userCountry = userLocale.getCountry().toLowerCase();
+                            final String[] fields1 = translation1.language.split("_");
+                            final String[] fields2 = translation2.language.split("_");
+                            final int score1 = compareLocale(fields1[0], fields1[1],
+                                    userLanguage, userCountry);
+                            final int score2 = compareLocale(fields2[0], fields2[1],
+                                    userLanguage, userCountry);
+                            int r = score2 - score1;
+                            if (r != 0)
+                                return r;
+
+                            // then sorts by language & name
+                            r = translation1.language.compareTo(translation2.language);
+                            return r == 0 ? translation1.name.compareTo(translation2.name) : r;
+                        }
+                    });
+
                     return new List[]{downloaded, available};
                 } catch (Exception e) {
                     Analytics.trackException("Failed to load translations - " + e.getMessage());
@@ -218,6 +243,12 @@ public class Obadiah {
                     db.close();
             }
         }
+    }
+
+    private static int compareLocale(String language, String country, String targetLanguage, String targetCountry) {
+        if (language.equals(targetLanguage))
+            return (country.equals(targetCountry)) ? 2 : 1;
+        return 0;
     }
 
     public void loadDownloadedTranslations(final OnStringsLoadedListener listener) {
