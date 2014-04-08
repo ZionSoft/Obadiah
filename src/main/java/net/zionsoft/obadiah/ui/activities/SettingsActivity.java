@@ -20,6 +20,7 @@ package net.zionsoft.obadiah.ui.activities;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 
+import net.zionsoft.obadiah.Constants;
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.Analytics;
 
@@ -30,6 +31,9 @@ public class SettingsActivity extends PreferenceActivity {
 
         // noinspection deprecation
         addPreferencesFromResource(R.xml.preferences);
+
+        getWindow().getDecorView().setKeepScreenOn(
+                getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE).getBoolean(Constants.PREF_KEY_SCREEN_ON, false));
     }
 
     @Override

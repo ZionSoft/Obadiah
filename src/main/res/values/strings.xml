@@ -9,6 +9,7 @@
     <string name="action_copy">Copy</string>
     <string name="action_delete_translation">Delete</string>
     <string name="action_manage_translation">Translations</string>
+    <string name="action_screen_on">Screen On</string>
     <string name="action_search">Search</string>
     <string name="action_settings">Settings</string>
     <string name="action_share">Share</string>

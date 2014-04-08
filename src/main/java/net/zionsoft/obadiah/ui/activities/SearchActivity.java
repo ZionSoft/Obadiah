@@ -92,6 +92,7 @@ public class SearchActivity extends ActionBarActivity {
         setContentView(R.layout.activity_search);
 
         mRootView = getWindow().getDecorView();
+        mRootView.setKeepScreenOn(mPreferences.getBoolean(Constants.PREF_KEY_SCREEN_ON, false));
 
         mSearchText = (EditText) findViewById(R.id.search_edit_text);
         mSearchText.setOnEditorActionListener(new OnEditorActionListener() {

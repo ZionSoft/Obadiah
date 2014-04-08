@@ -125,6 +125,7 @@ public class BookSelectionActivity extends ActionBarActivity
         setContentView(R.layout.activity_book_selection);
 
         mRootView = getWindow().getDecorView();
+        mRootView.setKeepScreenOn(mPreferences.getBoolean(Constants.PREF_KEY_SCREEN_ON, false));
 
         final ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
@@ -293,8 +294,12 @@ public class BookSelectionActivity extends ActionBarActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_bookselection, menu);
+
         mBookNameTextView = (TextView) MenuItemCompat.getActionView(menu.findItem(R.id.action_book_name));
         updateTitle();
+
+        //noinspection ConstantConditions
+        menu.findItem(R.id.action_screen_on).setChecked(mPreferences.getBoolean(Constants.PREF_KEY_SCREEN_ON, false));
 
         return true;
     }
@@ -314,6 +319,12 @@ public class BookSelectionActivity extends ActionBarActivity
         switch (item.getItemId()) {
             case R.id.action_search:
                 startActivity(new Intent(this, SearchActivity.class).setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
+                return true;
+            case R.id.action_screen_on:
+                final boolean screenOn = !item.isChecked();
+                item.setChecked(screenOn);
+                mRootView.setKeepScreenOn(screenOn);
+                mPreferences.edit().putBoolean(Constants.PREF_KEY_SCREEN_ON, screenOn).apply();
                 return true;
             case R.id.action_settings:
                 startActivity(new Intent(this, SettingsActivity.class));
