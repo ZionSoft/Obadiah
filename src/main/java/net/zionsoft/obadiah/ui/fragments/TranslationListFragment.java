@@ -201,7 +201,7 @@ public class TranslationListFragment extends Fragment {
         }
 
         final TranslationInfo translationInfo = getTranslationInfo((ExpandableListView.ExpandableListContextMenuInfo) menuInfo);
-        if (mCurrentTranslation.equals(translationInfo.name))
+        if (translationInfo == null || mCurrentTranslation.equals(translationInfo.name))
             return;
 
         menu.setHeaderTitle(translationInfo.name);
