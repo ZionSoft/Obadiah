@@ -20,7 +20,6 @@ package net.zionsoft.obadiah;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -78,46 +77,7 @@ public class BookSelectionActivity extends ActionBarActivity
         mSettings = Settings.getInstance();
         mPreferences = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE);
 
-        upgrade();
         initializeUi();
-    }
-
-    private void upgrade() {
-        final int version = mPreferences.getInt(Constants.PREF_KEY_CURRENT_APPLICATION_VERSION, 0);
-        final int applicationVersion;
-        try {
-            //noinspection ConstantConditions
-            applicationVersion = getPackageManager().getPackageInfo(getPackageName(), 0).versionCode;
-        } catch (PackageManager.NameNotFoundException e) {
-            // should never reach here
-            return;
-        }
-        if (version >= applicationVersion)
-            return;
-
-        if (version < 10500) {
-            // TODO remove everything in getFilesDir()
-            mPreferences.edit()
-                    .remove("selectedTranslation")
-                    .putInt(Constants.PREF_KEY_CURRENT_APPLICATION_VERSION, 10500)
-                    .apply();
-        }
-        if (version < 10700) {
-            mPreferences.edit()
-                    .remove("lastUpdated")
-                    .putInt(Constants.PREF_KEY_CURRENT_APPLICATION_VERSION, 10700)
-                    .apply();
-        }
-        if (version < 10800) {
-            mPreferences.edit()
-                    .remove("PREF_KEY_DOWNLOADING_TRANSLATION").remove("PREF_KEY_DOWNLOADING_TRANSLATION_LIST")
-                    .remove("PREF_KEY_REMOVING_TRANSLATION").remove("PREF_KEY_UPGRADING")
-                    .putInt(Constants.PREF_KEY_CURRENT_APPLICATION_VERSION, 10800)
-                    .apply();
-        }
-        mPreferences.edit()
-                .putInt(Constants.PREF_KEY_CURRENT_APPLICATION_VERSION, applicationVersion)
-                .apply();
     }
 
     private void initializeUi() {

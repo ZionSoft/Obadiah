@@ -19,6 +19,7 @@ package net.zionsoft.obadiah;
 
 import android.app.Application;
 
+import net.zionsoft.obadiah.legacy.Upgrader;
 import net.zionsoft.obadiah.model.Analytics;
 import net.zionsoft.obadiah.model.Obadiah;
 import net.zionsoft.obadiah.model.Settings;
@@ -27,6 +28,8 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+
+        Upgrader.upgrade(this);
 
         Analytics.initialize(this);
         Obadiah.initialize(this);
