@@ -90,7 +90,7 @@ public class Bible {
     private Bible(Context context) {
         super();
 
-        mDatabaseHelper = new DatabaseHelper(context);
+        mDatabaseHelper = DatabaseHelper.getInstance(context);
 
         final long maxMemory = Runtime.getRuntime().maxMemory();
         mBookNameCache = new LruCache<String, List<String>>((int) (maxMemory / 16L)) {

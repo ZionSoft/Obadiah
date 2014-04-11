@@ -23,6 +23,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 class DatabaseHelper extends SQLiteOpenHelper {
     static final String TABLE_BOOK_NAMES = "TABLE_BOOK_NAMES";
+    static final String TABLE_READING_PROGRESS = "TABLE_READING_PROGRESS";
     private static final String INDEX_TABLE_BOOK_NAMES = "INDEX_TABLE_BOOK_NAMES";
 
     static final String COLUMN_TRANSLATION_SHORT_NAME = "COLUMN_TRANSLATION_SHORTNAME";
@@ -31,11 +32,24 @@ class DatabaseHelper extends SQLiteOpenHelper {
     static final String COLUMN_VERSE_INDEX = "COLUMN_VERSE_INDEX";
     static final String COLUMN_BOOK_NAME = "COLUMN_BOOK_NAME";
     static final String COLUMN_TEXT = "COLUMN_TEXT";
+    static final String COLUMN_LAST_READING_TIMESTAMP = "COLUMN_LAST_READING_TIMESTAMP";
 
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 4;
     private static final String DATABASE_NAME = "DB_OBADIAH";
 
-    DatabaseHelper(Context context) {
+    private static DatabaseHelper sInstance;
+
+    static DatabaseHelper getInstance(Context context) {
+        if (sInstance == null) {
+            synchronized (Bible.class) {
+                if (sInstance == null)
+                    sInstance = new DatabaseHelper(context.getApplicationContext());
+            }
+        }
+        return sInstance;
+    }
+
+    private DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
@@ -44,15 +58,22 @@ class DatabaseHelper extends SQLiteOpenHelper {
         db.beginTransaction();
         try {
             db.execSQL(String.format("CREATE TABLE %s (%s TEXT NOT NULL, %s INTEGER NOT NULL, %s TEXT NOT NULL);",
-                    TABLE_BOOK_NAMES, COLUMN_TRANSLATION_SHORT_NAME,
-                    COLUMN_BOOK_INDEX, COLUMN_BOOK_NAME));
+                    TABLE_BOOK_NAMES, COLUMN_TRANSLATION_SHORT_NAME, COLUMN_BOOK_INDEX, COLUMN_BOOK_NAME));
             db.execSQL(String.format("CREATE INDEX %s ON %s (%s);",
                     INDEX_TABLE_BOOK_NAMES, TABLE_BOOK_NAMES, COLUMN_TRANSLATION_SHORT_NAME));
+
+            createReadingProgressTable(db);
 
             db.setTransactionSuccessful();
         } finally {
             db.endTransaction();
         }
+    }
+
+    private static void createReadingProgressTable(SQLiteDatabase db) {
+        db.execSQL(String.format("CREATE TABLE %s (%s INTEGER NOT NULL, %s INTEGER NOT NULL, %s INTEGER NOT NULL, PRIMARY KEY (%s, %s));",
+                TABLE_READING_PROGRESS, COLUMN_BOOK_INDEX, COLUMN_CHAPTER_INDEX, COLUMN_LAST_READING_TIMESTAMP,
+                COLUMN_BOOK_INDEX, COLUMN_CHAPTER_INDEX));
     }
 
     @Override
@@ -64,6 +85,9 @@ class DatabaseHelper extends SQLiteOpenHelper {
 
             if (oldVersion < 3)
                 db.execSQL("DROP TABLE IF EXISTS TABLE_TRANSLATION_LIST");
+
+            if (oldVersion < 4)
+                createReadingProgressTable(db);
 
             db.setTransactionSuccessful();
         } finally {

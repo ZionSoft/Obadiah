@@ -37,6 +37,7 @@ import android.widget.TextView;
 
 import net.zionsoft.obadiah.model.Analytics;
 import net.zionsoft.obadiah.model.Bible;
+import net.zionsoft.obadiah.model.ReadingProgressTracker;
 import net.zionsoft.obadiah.model.Settings;
 import net.zionsoft.obadiah.ui.activities.SearchActivity;
 import net.zionsoft.obadiah.ui.activities.SettingsActivity;
@@ -269,6 +270,9 @@ public class BookSelectionActivity extends ActionBarActivity
         // book names is finished before that
         if (mBookNames != null && mBookNameTextView != null)
             mBookNameTextView.setText(String.format("%s, %d", mBookNames.get(mCurrentBook), mCurrentChapter + 1));
+
+        // TODO get an improved tracking algorithm, e.g. only consider as "read" if the user stays for a while
+        ReadingProgressTracker.getInstance().trackChapterReading(mCurrentBook, mCurrentChapter);
     }
 
     @Override

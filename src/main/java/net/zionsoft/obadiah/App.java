@@ -22,6 +22,7 @@ import android.app.Application;
 import net.zionsoft.obadiah.legacy.Upgrader;
 import net.zionsoft.obadiah.model.Analytics;
 import net.zionsoft.obadiah.model.Bible;
+import net.zionsoft.obadiah.model.ReadingProgressTracker;
 import net.zionsoft.obadiah.model.Settings;
 
 public class App extends Application {
@@ -33,6 +34,7 @@ public class App extends Application {
 
         Analytics.initialize(this);
         Bible.initialize(this);
+        ReadingProgressTracker.initialize(this);
         Settings.initialize(this);
     }
 
