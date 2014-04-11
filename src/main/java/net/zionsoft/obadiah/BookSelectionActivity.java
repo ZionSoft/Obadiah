@@ -25,6 +25,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -257,6 +258,15 @@ public class BookSelectionActivity extends ActionBarActivity
         getMenuInflater().inflate(R.menu.menu_bookselection, menu);
 
         mBookNameTextView = (TextView) MenuItemCompat.getActionView(menu.findItem(R.id.action_book_name));
+        mBookNameTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mDrawerLayout.isDrawerVisible(GravityCompat.START))
+                    mDrawerLayout.closeDrawer(GravityCompat.START);
+                else
+                    mDrawerLayout.openDrawer(GravityCompat.START);
+            }
+        });
         updateTitle();
 
         return true;
