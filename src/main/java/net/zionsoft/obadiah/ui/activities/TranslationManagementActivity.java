@@ -25,7 +25,6 @@ import android.view.View;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 
-import net.zionsoft.obadiah.Constants;
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.Analytics;
 import net.zionsoft.obadiah.model.Settings;
@@ -42,8 +41,7 @@ public class TranslationManagementActivity extends ActionBarActivity {
 
         final View rootView = getWindow().getDecorView();
         rootView.setBackgroundColor(Settings.getInstance().getBackgroundColor());
-        rootView.setKeepScreenOn(
-                getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE).getBoolean(Constants.PREF_KEY_SCREEN_ON, false));
+        rootView.setKeepScreenOn(Settings.getInstance().keepScreenOn());
 
         final FragmentManager fm = getSupportFragmentManager();
         if (fm.findFragmentByTag(TAG_TRANSLATION_LIST_FRAGMENT) == null) {

@@ -27,6 +27,7 @@ import net.zionsoft.obadiah.R;
 
 public class Settings {
     private static final String SETTING_KEY_NIGHT_MODE = "pref_night_mode";
+    private static final String SETTING_KEY_SCREEN_ONS = "pref_screen_on";
     private static final String SETTING_KEY_TEXT_SIZE = "pref_text_size";
 
     private static final String TEXT_SIZE_VERY_SMALL = "very_small";
@@ -41,6 +42,7 @@ public class Settings {
     private final Resources mResources;
 
     private boolean mNightMode;
+    private boolean mScreenOn;
     private float mTextSize;
     private float mSmallerTextSize;
 
@@ -66,9 +68,9 @@ public class Settings {
 
     public void refresh() {
         mNightMode = mSharedPreferences.getBoolean(SETTING_KEY_NIGHT_MODE, false);
+        mScreenOn = mSharedPreferences.getBoolean(SETTING_KEY_SCREEN_ONS, false);
 
-        final String textSize = mSharedPreferences.getString(
-                SETTING_KEY_TEXT_SIZE, TEXT_SIZE_MEDIUM);
+        final String textSize = mSharedPreferences.getString(SETTING_KEY_TEXT_SIZE, TEXT_SIZE_MEDIUM);
         if (textSize.equals(TEXT_SIZE_VERY_SMALL)) {
             mTextSize = mResources.getDimension(R.dimen.text_size_very_small);
             mSmallerTextSize = mResources.getDimension(R.dimen.smaller_text_size_very_small);
@@ -85,6 +87,10 @@ public class Settings {
             mTextSize = mResources.getDimension(R.dimen.text_size_medium);
             mSmallerTextSize = mResources.getDimension(R.dimen.smaller_text_size_medium);
         }
+    }
+
+    public boolean keepScreenOn() {
+        return mScreenOn;
     }
 
     public int getBackgroundColor() {

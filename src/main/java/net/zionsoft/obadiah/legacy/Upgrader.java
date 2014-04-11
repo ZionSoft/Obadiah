@@ -58,6 +58,12 @@ public class Upgrader {
                     .putInt(Constants.PREF_KEY_CURRENT_APPLICATION_VERSION, 10800)
                     .apply();
         }
+        if (version < 10802) {
+            preferences.edit()
+                    .remove("screenOn")
+                    .putInt(Constants.PREF_KEY_CURRENT_APPLICATION_VERSION, 10802)
+                    .apply();
+        }
         preferences.edit()
                 .putInt(Constants.PREF_KEY_CURRENT_APPLICATION_VERSION, applicationVersion)
                 .apply();
