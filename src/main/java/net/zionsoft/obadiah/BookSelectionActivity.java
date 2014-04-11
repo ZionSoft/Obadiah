@@ -36,7 +36,7 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import net.zionsoft.obadiah.model.Analytics;
-import net.zionsoft.obadiah.model.Obadiah;
+import net.zionsoft.obadiah.model.Bible;
 import net.zionsoft.obadiah.model.Settings;
 import net.zionsoft.obadiah.ui.activities.SearchActivity;
 import net.zionsoft.obadiah.ui.activities.SettingsActivity;
@@ -50,7 +50,7 @@ import java.util.List;
 
 public class BookSelectionActivity extends ActionBarActivity
         implements ChapterSelectionFragment.Listener, TextFragment.Listener {
-    private Obadiah mObadiah;
+    private Bible mBible;
     private Settings mSettings;
     private SharedPreferences mPreferences;
 
@@ -73,7 +73,7 @@ public class BookSelectionActivity extends ActionBarActivity
 
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 
-        mObadiah = Obadiah.getInstance();
+        mBible = Bible.getInstance();
         mSettings = Settings.getInstance();
         mPreferences = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE);
 
@@ -145,7 +145,7 @@ public class BookSelectionActivity extends ActionBarActivity
     }
 
     private void loadTranslations() {
-        mObadiah.loadDownloadedTranslations(new Obadiah.OnStringsLoadedListener() {
+        mBible.loadDownloadedTranslations(new Bible.OnStringsLoadedListener() {
             @Override
             public void onStringsLoaded(List<String> strings) {
                 if (strings == null || strings.size() == 0) {
@@ -199,7 +199,7 @@ public class BookSelectionActivity extends ActionBarActivity
     }
 
     private void loadTexts() {
-        mObadiah.loadBookNames(mCurrentTranslation, new Obadiah.OnStringsLoadedListener() {
+        mBible.loadBookNames(mCurrentTranslation, new Bible.OnStringsLoadedListener() {
                     @Override
                     public void onStringsLoaded(List<String> strings) {
                         if (strings == null || strings.size() == 0) {

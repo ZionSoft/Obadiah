@@ -37,7 +37,7 @@ import android.widget.Toast;
 import net.zionsoft.obadiah.Constants;
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.Analytics;
-import net.zionsoft.obadiah.model.Obadiah;
+import net.zionsoft.obadiah.model.Bible;
 import net.zionsoft.obadiah.model.TranslationInfo;
 import net.zionsoft.obadiah.ui.adapters.TranslationExpandableListAdapter;
 import net.zionsoft.obadiah.ui.utils.AnimationHelper;
@@ -50,7 +50,7 @@ public class TranslationListFragment extends Fragment {
     private static final String TAG_REMOVE_DIALOG_FRAGMENT = "net.zionsoft.obadiah.ui.fragments.TranslationListFragment.TAG_REMOVE_DIALOG_FRAGMENT";
     private static final int CONTEXT_MENU_ITEM_DELETE = 0;
 
-    private Obadiah mObadiah;
+    private Bible mBible;
     private SharedPreferences mPreferences;
     private String mCurrentTranslation;
 
@@ -68,7 +68,7 @@ public class TranslationListFragment extends Fragment {
         super.onAttach(activity);
 
         setRetainInstance(true);
-        mObadiah = Obadiah.getInstance();
+        mBible = Bible.getInstance();
         mPreferences = activity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
         mCurrentTranslation = mPreferences.getString(Constants.PREF_KEY_LAST_READ_TRANSLATION, null);
     }
@@ -117,7 +117,7 @@ public class TranslationListFragment extends Fragment {
         mLoadingSpinner.setVisibility(View.VISIBLE);
         mTranslationListView.setVisibility(View.GONE);
 
-        mObadiah.loadTranslations(forceRefresh, new Obadiah.OnTranslationsLoadedListener() {
+        mBible.loadTranslations(forceRefresh, new Bible.OnTranslationsLoadedListener() {
             @Override
             public void onTranslationsLoaded(List<TranslationInfo> downloaded, List<TranslationInfo> available) {
                 if (downloaded == null || available == null) {
@@ -149,7 +149,7 @@ public class TranslationListFragment extends Fragment {
         ProgressDialogFragment.newInstance(R.string.progress_dialog_translation_downloading, 100)
                 .show(getFragmentManager(), TAG_DOWNLOAD_DIALOG_FRAGMENT);
 
-        mObadiah.downloadTranslation(translationShortName, new Obadiah.OnTranslationDownloadListener() {
+        mBible.downloadTranslation(translationShortName, new Bible.OnTranslationDownloadListener() {
             @Override
             public void onTranslationDownloaded(final String translation, boolean isSuccessful) {
                 ((DialogFragment) getFragmentManager().findFragmentByTag(TAG_DOWNLOAD_DIALOG_FRAGMENT)).dismiss();
@@ -252,7 +252,7 @@ public class TranslationListFragment extends Fragment {
         ProgressDialogFragment.newInstance(R.string.progress_dialog_translation_deleting)
                 .show(getFragmentManager(), TAG_REMOVE_DIALOG_FRAGMENT);
 
-        mObadiah.removeTranslation(translationShortName, new Obadiah.OnTranslationRemovedListener() {
+        mBible.removeTranslation(translationShortName, new Bible.OnTranslationRemovedListener() {
             @Override
             public void onTranslationRemoved(final String translation, boolean isSuccessful) {
                 ((DialogFragment) getFragmentManager().findFragmentByTag(TAG_REMOVE_DIALOG_FRAGMENT)).dismiss();

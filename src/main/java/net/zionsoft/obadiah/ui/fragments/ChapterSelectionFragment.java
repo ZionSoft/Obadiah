@@ -27,7 +27,7 @@ import android.view.ViewGroup;
 import android.widget.ExpandableListView;
 
 import net.zionsoft.obadiah.R;
-import net.zionsoft.obadiah.model.Obadiah;
+import net.zionsoft.obadiah.model.Bible;
 import net.zionsoft.obadiah.ui.adapters.BookExpandableListAdapter;
 import net.zionsoft.obadiah.ui.utils.DialogHelper;
 
@@ -38,7 +38,7 @@ public class ChapterSelectionFragment extends Fragment {
         public void onChapterSelected(int bookIndex, int chapterIndex);
     }
 
-    private Obadiah mObadiah;
+    private Bible mBible;
     private Listener mListener;
 
     private int mCurrentBook;
@@ -52,7 +52,7 @@ public class ChapterSelectionFragment extends Fragment {
         super.onAttach(activity);
 
         setRetainInstance(true);
-        mObadiah = Obadiah.getInstance();
+        mBible = Bible.getInstance();
         mListener = (Listener) activity;
     }
 
@@ -113,7 +113,7 @@ public class ChapterSelectionFragment extends Fragment {
     }
 
     private void loadBookNames(final String translationShortName) {
-        mObadiah.loadBookNames(translationShortName, new Obadiah.OnStringsLoadedListener() {
+        mBible.loadBookNames(translationShortName, new Bible.OnStringsLoadedListener() {
                     @Override
                     public void onStringsLoaded(List<String> strings) {
                         if (strings == null || strings.size() == 0) {

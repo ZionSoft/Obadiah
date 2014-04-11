@@ -42,7 +42,7 @@ import net.zionsoft.obadiah.BookSelectionActivity;
 import net.zionsoft.obadiah.Constants;
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.Analytics;
-import net.zionsoft.obadiah.model.Obadiah;
+import net.zionsoft.obadiah.model.Bible;
 import net.zionsoft.obadiah.model.Settings;
 import net.zionsoft.obadiah.model.Verse;
 import net.zionsoft.obadiah.ui.adapters.SearchResultListAdapter;
@@ -178,8 +178,8 @@ public class SearchActivity extends ActionBarActivity {
         mLoadingSpinner.setVisibility(View.VISIBLE);
         mSearchResultListView.setVisibility(View.GONE);
 
-        Obadiah.getInstance().searchVerses(mData.currentTranslation, keyword,
-                new Obadiah.OnVersesLoadedListener() {
+        Bible.getInstance().searchVerses(mData.currentTranslation, keyword,
+                new Bible.OnVersesLoadedListener() {
                     @Override
                     public void onVersesLoaded(List<Verse> verses) {
                         if (verses == null) {

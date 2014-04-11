@@ -26,7 +26,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import net.zionsoft.obadiah.R;
-import net.zionsoft.obadiah.model.Obadiah;
+import net.zionsoft.obadiah.model.Bible;
 
 import java.util.List;
 
@@ -70,7 +70,7 @@ public class BookExpandableListAdapter extends BaseExpandableListAdapter {
 
     @Override
     public int getGroupCount() {
-        return mBookNames == null ? 0 : Obadiah.getBookCount();
+        return mBookNames == null ? 0 : Bible.getBookCount();
     }
 
     @Override
@@ -78,7 +78,7 @@ public class BookExpandableListAdapter extends BaseExpandableListAdapter {
         if (mBookNames == null)
             return 0;
 
-        final int chapterCount = Obadiah.getChapterCount(groupPosition);
+        final int chapterCount = Bible.getChapterCount(groupPosition);
         return chapterCount / ROW_CHILD_COUNT + (chapterCount % ROW_CHILD_COUNT == 0 ? 0 : 1);
     }
 
@@ -134,7 +134,7 @@ public class BookExpandableListAdapter extends BaseExpandableListAdapter {
             viewTag = (ViewTag) linearLayout.getTag();
         }
 
-        final int chapterCount = Obadiah.getChapterCount(groupPosition);
+        final int chapterCount = Bible.getChapterCount(groupPosition);
         for (int i = 0; i < ROW_CHILD_COUNT; ++i) {
             final int chapter = childPosition * ROW_CHILD_COUNT + i;
             final TextView textView = viewTag.textViews[i];

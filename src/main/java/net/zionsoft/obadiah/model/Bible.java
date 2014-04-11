@@ -39,7 +39,7 @@ import java.util.Locale;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-public class Obadiah {
+public class Bible {
     public static interface OnStringsLoadedListener {
         public void onStringsLoaded(List<String> strings);
     }
@@ -68,7 +68,7 @@ public class Obadiah {
             14, 4, 28, 16, 24, 21, 28, 16, 16, 13, 6, 6, 4, 4, 5, 3, 6, 4, 3, 1, 13, 5, 5, 3, 5, 1,
             1, 1, 22};
 
-    private static Obadiah sInstance;
+    private static Bible sInstance;
 
     private final DatabaseHelper mDatabaseHelper;
 
@@ -80,14 +80,14 @@ public class Obadiah {
 
     public static void initialize(Context context) {
         if (sInstance == null) {
-            synchronized (Obadiah.class) {
+            synchronized (Bible.class) {
                 if (sInstance == null)
-                    sInstance = new Obadiah(context.getApplicationContext());
+                    sInstance = new Bible(context.getApplicationContext());
             }
         }
     }
 
-    private Obadiah(Context context) {
+    private Bible(Context context) {
         super();
 
         mDatabaseHelper = new DatabaseHelper(context);
@@ -116,7 +116,7 @@ public class Obadiah {
         };
     }
 
-    public static Obadiah getInstance() {
+    public static Bible getInstance() {
         return sInstance;
     }
 
@@ -490,7 +490,7 @@ public class Obadiah {
 
                                 final JSONObject booksInfoObject = new JSONObject(new String(bytes, "UTF8"));
                                 final JSONArray booksArray = booksInfoObject.getJSONArray("books");
-                                for (int i = 0; i < Obadiah.getBookCount(); ++i) {
+                                for (int i = 0; i < Bible.getBookCount(); ++i) {
                                     bookNamesValues.put(DatabaseHelper.COLUMN_BOOK_INDEX, i);
                                     bookNamesValues.put(DatabaseHelper.COLUMN_BOOK_NAME, booksArray.getString(i));
                                     db.insert(DatabaseHelper.TABLE_BOOK_NAMES, null, bookNamesValues);

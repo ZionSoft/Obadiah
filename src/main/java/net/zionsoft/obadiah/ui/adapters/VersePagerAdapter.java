@@ -26,7 +26,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import net.zionsoft.obadiah.R;
-import net.zionsoft.obadiah.model.Obadiah;
+import net.zionsoft.obadiah.model.Bible;
 import net.zionsoft.obadiah.model.Verse;
 import net.zionsoft.obadiah.ui.utils.AnimationHelper;
 import net.zionsoft.obadiah.ui.utils.DialogHelper;
@@ -51,7 +51,7 @@ public class VersePagerAdapter extends PagerAdapter {
 
     private final Context mContext;
     private final Listener mListener;
-    private final Obadiah mObadiah;
+    private final Bible mBible;
     private final List<Page> mPages;
 
     private String mTranslationShortName;
@@ -64,13 +64,13 @@ public class VersePagerAdapter extends PagerAdapter {
 
         mContext = context;
         mListener = listener;
-        mObadiah = Obadiah.getInstance();
+        mBible = Bible.getInstance();
         mPages = new LinkedList<Page>();
     }
 
     @Override
     public int getCount() {
-        return mCurrentBook < 0 || mTranslationShortName == null ? 0 : Obadiah.getChapterCount(mCurrentBook);
+        return mCurrentBook < 0 || mTranslationShortName == null ? 0 : Bible.getChapterCount(mCurrentBook);
     }
 
     @Override
@@ -115,7 +115,7 @@ public class VersePagerAdapter extends PagerAdapter {
     }
 
     private void loadVerses(final int position, final Page page) {
-        mObadiah.loadVerses(mTranslationShortName, mCurrentBook, position, new Obadiah.OnVersesLoadedListener() {
+        mBible.loadVerses(mTranslationShortName, mCurrentBook, position, new Bible.OnVersesLoadedListener() {
                     @Override
                     public void onVersesLoaded(List<Verse> verses) {
                         if (verses == null || verses.size() == 0) {
