@@ -22,6 +22,7 @@ import android.graphics.Color;
 import android.text.SpannableStringBuilder;
 import android.text.style.AbsoluteSizeSpan;
 import android.util.TypedValue;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
@@ -38,6 +39,7 @@ public class TranslationExpandableListAdapter extends BaseExpandableListAdapter 
     public static final int AVAILABLE_TRANSLATIONS_GROUP = 1;
 
     private final Context mContext;
+    private final LayoutInflater mInflater;
     private final String mCurrentTranslation;
 
     private final int mTextColor;
@@ -53,6 +55,7 @@ public class TranslationExpandableListAdapter extends BaseExpandableListAdapter 
         super();
 
         mContext = context;
+        mInflater = LayoutInflater.from(context);
         mCurrentTranslation = currentTranslation;
 
         final Settings settings = Settings.getInstance();
@@ -108,7 +111,7 @@ public class TranslationExpandableListAdapter extends BaseExpandableListAdapter 
     @Override
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
         final TextView textView = (TextView) (convertView == null
-                ? View.inflate(mContext, R.layout.item_translation_section, null) : convertView);
+                ? mInflater.inflate(R.layout.item_translation_section, null, false) : convertView);
         textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, mMediumTextSize);
         textView.setText(groupPosition == 0 ? R.string.text_downloaded_translations : R.string.text_available_translation);
         return textView;
@@ -117,7 +120,7 @@ public class TranslationExpandableListAdapter extends BaseExpandableListAdapter 
     @Override
     public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
         final TextView textView = (TextView) (convertView == null
-                ? View.inflate(mContext, R.layout.item_translation, null) : convertView);
+                ? mInflater.inflate(R.layout.item_translation, null, false) : convertView);
         if (groupPosition == DOWNLOADED_TRANSLATIONS_GROUP) {
             final TranslationInfo translationInfo = mDownloadedTranslations.get(childPosition);
             if (translationInfo.shortName.equals(mCurrentTranslation))

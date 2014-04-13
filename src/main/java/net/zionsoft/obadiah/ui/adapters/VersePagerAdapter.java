@@ -20,6 +20,7 @@ package net.zionsoft.obadiah.ui.adapters;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.support.v4.view.PagerAdapter;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -51,6 +52,7 @@ public class VersePagerAdapter extends PagerAdapter {
 
     private final Context mContext;
     private final Listener mListener;
+    private final LayoutInflater mInflater;
     private final Bible mBible;
     private final List<Page> mPages;
 
@@ -64,6 +66,7 @@ public class VersePagerAdapter extends PagerAdapter {
 
         mContext = context;
         mListener = listener;
+        mInflater = LayoutInflater.from(context);
         mBible = Bible.getInstance();
         mPages = new LinkedList<Page>();
     }
@@ -85,7 +88,7 @@ public class VersePagerAdapter extends PagerAdapter {
 
         if (page == null) {
             page = new Page();
-            page.rootView = View.inflate(mContext, R.layout.item_verse_pager, null);
+            page.rootView = mInflater.inflate(R.layout.item_verse_pager, null, false);
             page.loadingSpinner = page.rootView.findViewById(R.id.loading_spinner);
             page.verseListView = (ListView) page.rootView.findViewById(R.id.verse_list_view);
             final VerseListAdapter verseListAdapter = new VerseListAdapter(mContext);

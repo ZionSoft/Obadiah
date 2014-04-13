@@ -20,6 +20,7 @@ package net.zionsoft.obadiah.ui.adapters;
 import android.content.Context;
 import android.graphics.Color;
 import android.util.TypedValue;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -39,7 +40,7 @@ class VerseListAdapter extends BaseAdapter {
         TextView text;
     }
 
-    private final Context mContext;
+    private final LayoutInflater mInflater;
     private final Settings mSettings;
     private List<Verse> mVerses;
     private boolean[] mSelected;
@@ -48,7 +49,7 @@ class VerseListAdapter extends BaseAdapter {
     VerseListAdapter(Context context) {
         super();
 
-        mContext = context;
+        mInflater = LayoutInflater.from(context);
         mSettings = Settings.getInstance();
     }
 
@@ -72,7 +73,7 @@ class VerseListAdapter extends BaseAdapter {
         final LinearLayout linearLayout;
         final ViewTag viewTag;
         if (convertView == null) {
-            linearLayout = (LinearLayout) View.inflate(mContext, R.layout.item_text, null);
+            linearLayout = (LinearLayout) mInflater.inflate(R.layout.item_text, null, false);
 
             viewTag = new ViewTag();
             viewTag.index = (TextView) linearLayout.getChildAt(0);
