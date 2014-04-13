@@ -46,6 +46,7 @@ public class ChapterSelectionFragment extends Fragment {
 
     private BookExpandableListAdapter mBookListAdapter;
     private ExpandableListView mBookListView;
+    private int mLastExpandedGroup;
 
     @Override
     public void onAttach(Activity activity) {
@@ -87,6 +88,20 @@ public class ChapterSelectionFragment extends Fragment {
 
         mBookListView = (ExpandableListView) view.findViewById(R.id.book_list_view);
         mBookListView.setAdapter(mBookListAdapter);
+        mBookListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
+            @Override
+            public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
+                parent.smoothScrollToPosition(groupPosition);
+                if (parent.isGroupExpanded(groupPosition)) {
+                    parent.collapseGroup(groupPosition);
+                } else {
+                    parent.expandGroup(groupPosition);
+                    parent.collapseGroup(mLastExpandedGroup);
+                    mLastExpandedGroup = groupPosition;
+                }
+                return true;
+            }
+        });
     }
 
     @Override
@@ -103,6 +118,7 @@ public class ChapterSelectionFragment extends Fragment {
         mBookListAdapter.setSelected(currentBook, currentChapter);
         mBookListAdapter.notifyDataSetChanged();
 
+        mLastExpandedGroup = mCurrentBook;
         mBookListView.expandGroup(mCurrentBook);
         mBookListView.setSelectedGroup(mCurrentBook);
     }
@@ -132,6 +148,7 @@ public class ChapterSelectionFragment extends Fragment {
                         mBookListAdapter.setBookNames(strings);
                         mBookListAdapter.notifyDataSetChanged();
 
+                        mLastExpandedGroup = mCurrentBook;
                         mBookListView.expandGroup(mCurrentBook);
                         mBookListView.setSelectedGroup(mCurrentBook);
                     }
