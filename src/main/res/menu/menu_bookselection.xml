@@ -15,6 +15,10 @@
         android:title="@string/action_manage_translation"
         obadiah:showAsAction="never" />
     <item
+        android:id="@+id/action_reading_progress"
+        android:title="@string/action_reading_progress"
+        obadiah:showAsAction="never" />
+    <item
         android:id="@+id/action_settings"
         android:title="@string/action_settings"
         obadiah:showAsAction="never" />

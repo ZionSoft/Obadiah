@@ -38,8 +38,9 @@ import android.widget.Spinner;
 
 import net.zionsoft.obadiah.model.Analytics;
 import net.zionsoft.obadiah.model.Bible;
-import net.zionsoft.obadiah.model.ReadingProgressTracker;
+import net.zionsoft.obadiah.model.ReadingProgressManager;
 import net.zionsoft.obadiah.model.Settings;
+import net.zionsoft.obadiah.ui.activities.ReadingProgressActivity;
 import net.zionsoft.obadiah.ui.activities.SearchActivity;
 import net.zionsoft.obadiah.ui.activities.SettingsActivity;
 import net.zionsoft.obadiah.ui.activities.TranslationManagementActivity;
@@ -233,7 +234,7 @@ public class BookSelectionActivity extends ActionBarActivity
         setTitle(String.format("%s, %d", mBookNames.get(mCurrentBook), mCurrentChapter + 1));
 
         // TODO get an improved tracking algorithm, e.g. only consider as "read" if the user stays for a while
-        ReadingProgressTracker.getInstance().trackChapterReading(mCurrentBook, mCurrentChapter);
+        ReadingProgressManager.getInstance().trackChapterReading(mCurrentBook, mCurrentChapter);
     }
 
     @Override
@@ -280,11 +281,14 @@ public class BookSelectionActivity extends ActionBarActivity
             case R.id.action_search:
                 startActivity(new Intent(this, SearchActivity.class).setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
                 return true;
-            case R.id.action_settings:
-                startActivity(new Intent(this, SettingsActivity.class));
-                return true;
             case R.id.action_manage_translation:
                 startActivity(new Intent(this, TranslationManagementActivity.class));
+                return true;
+            case R.id.action_reading_progress:
+                startActivity(new Intent(this, ReadingProgressActivity.class));
+                return true;
+            case R.id.action_settings:
+                startActivity(new Intent(this, SettingsActivity.class));
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

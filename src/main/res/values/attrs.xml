@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="ProgressBar">
+        <attr name="maxProgress" format="integer|reference" />
+        <attr name="textSize" format="dimension" />
+        <attr name="textPadding" format="dimension" />
+    </declare-styleable>
+</resources>

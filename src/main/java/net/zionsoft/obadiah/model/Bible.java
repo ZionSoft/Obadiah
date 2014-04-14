@@ -63,10 +63,10 @@ public class Bible {
     }
 
     private static final int BOOK_COUNT = 66;
-    private static final int[] CHAPTER_COUNT = {50, 40, 27, 36, 34, 24, 21, 4, 31, 24, 22, 25, 29,
-            36, 10, 13, 10, 42, 150, 31, 12, 8, 66, 52, 5, 48, 12, 14, 3, 9, 1, 4, 7, 3, 3, 3, 2,
-            14, 4, 28, 16, 24, 21, 28, 16, 16, 13, 6, 6, 4, 4, 5, 3, 6, 4, 3, 1, 13, 5, 5, 3, 5, 1,
-            1, 1, 22};
+    private static final int TOTAL_CHAPTER_COUNT = 1189;
+    private static final int[] CHAPTER_COUNT = {50, 40, 27, 36, 34, 24, 21, 4, 31, 24, 22, 25, 29, 36,
+            10, 13, 10, 42, 150, 31, 12, 8, 66, 52, 5, 48, 12, 14, 3, 9, 1, 4, 7, 3, 3, 3, 2, 14, 4,
+            28, 16, 24, 21, 28, 16, 16, 13, 6, 6, 4, 4, 5, 3, 6, 4, 3, 1, 13, 5, 5, 3, 5, 1, 1, 1, 22};
 
     private static Bible sInstance;
 
@@ -122,6 +122,10 @@ public class Bible {
 
     public static int getBookCount() {
         return BOOK_COUNT;
+    }
+
+    public static int getTotalChapterCount() {
+        return TOTAL_CHAPTER_COUNT;
     }
 
     public static int getChapterCount(int book) {

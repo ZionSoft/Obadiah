@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:obadiah="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="@dimen/padding"
+    android:orientation="horizontal">
+
+    <TextView
+        android:layout_width="120dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical" />
+
+    <net.zionsoft.obadiah.ui.widget.ProgressBar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        obadiah:maxProgress="100"
+        obadiah:textPadding="@dimen/padding"
+        obadiah:textSize="@dimen/text_size_medium" />
+</LinearLayout>
