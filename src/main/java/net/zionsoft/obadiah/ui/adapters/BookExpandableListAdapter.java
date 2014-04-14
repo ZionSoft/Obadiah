@@ -19,6 +19,7 @@ package net.zionsoft.obadiah.ui.adapters;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
@@ -26,7 +27,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import net.zionsoft.obadiah.R;
-import net.zionsoft.obadiah.model.Obadiah;
+import net.zionsoft.obadiah.model.Bible;
 
 import java.util.List;
 
@@ -46,9 +47,9 @@ public class BookExpandableListAdapter extends BaseExpandableListAdapter {
 
     private static final int ROW_CHILD_COUNT = 5;
 
-    private final Context mContext;
     private final OnChapterClickListener mListener;
     private final View.OnClickListener mViewClickListener;
+    private final LayoutInflater mInflater;
 
     private List<String> mBookNames;
     private int mCurrentBook;
@@ -57,7 +58,6 @@ public class BookExpandableListAdapter extends BaseExpandableListAdapter {
     public BookExpandableListAdapter(Context context, OnChapterClickListener listener) {
         super();
 
-        mContext = context;
         mListener = listener;
         mViewClickListener = new View.OnClickListener() {
             @Override
@@ -66,11 +66,12 @@ public class BookExpandableListAdapter extends BaseExpandableListAdapter {
                 mListener.onChapterClicked(chapterTag.book, chapterTag.chapter);
             }
         };
+        mInflater = LayoutInflater.from(context);
     }
 
     @Override
     public int getGroupCount() {
-        return mBookNames == null ? 0 : Obadiah.getBookCount();
+        return mBookNames == null ? 0 : Bible.getBookCount();
     }
 
     @Override
@@ -78,7 +79,7 @@ public class BookExpandableListAdapter extends BaseExpandableListAdapter {
         if (mBookNames == null)
             return 0;
 
-        final int chapterCount = Obadiah.getChapterCount(groupPosition);
+        final int chapterCount = Bible.getChapterCount(groupPosition);
         return chapterCount / ROW_CHILD_COUNT + (chapterCount % ROW_CHILD_COUNT == 0 ? 0 : 1);
     }
 
@@ -110,7 +111,7 @@ public class BookExpandableListAdapter extends BaseExpandableListAdapter {
     @Override
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
         final TextView textView = (TextView) (convertView == null
-                ? View.inflate(mContext, R.layout.item_book_name, null) : convertView);
+                ? mInflater.inflate(R.layout.item_book_name, null, false) : convertView);
         textView.setText(mBookNames.get(groupPosition));
         return textView;
     }
@@ -120,7 +121,7 @@ public class BookExpandableListAdapter extends BaseExpandableListAdapter {
         final LinearLayout linearLayout;
         final ViewTag viewTag;
         if (convertView == null) {
-            linearLayout = (LinearLayout) View.inflate(mContext, R.layout.item_chapter_row, null);
+            linearLayout = (LinearLayout) mInflater.inflate(R.layout.item_chapter_row, null, false);
 
             viewTag = new ViewTag();
             viewTag.textViews = new TextView[ROW_CHILD_COUNT];
@@ -134,7 +135,7 @@ public class BookExpandableListAdapter extends BaseExpandableListAdapter {
             viewTag = (ViewTag) linearLayout.getTag();
         }
 
-        final int chapterCount = Obadiah.getChapterCount(groupPosition);
+        final int chapterCount = Bible.getChapterCount(groupPosition);
         for (int i = 0; i < ROW_CHILD_COUNT; ++i) {
             final int chapter = childPosition * ROW_CHILD_COUNT + i;
             final TextView textView = viewTag.textViews[i];

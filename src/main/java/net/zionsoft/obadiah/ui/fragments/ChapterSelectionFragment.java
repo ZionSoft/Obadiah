@@ -27,7 +27,7 @@ import android.view.ViewGroup;
 import android.widget.ExpandableListView;
 
 import net.zionsoft.obadiah.R;
-import net.zionsoft.obadiah.model.Obadiah;
+import net.zionsoft.obadiah.model.Bible;
 import net.zionsoft.obadiah.ui.adapters.BookExpandableListAdapter;
 import net.zionsoft.obadiah.ui.utils.DialogHelper;
 
@@ -38,7 +38,7 @@ public class ChapterSelectionFragment extends Fragment {
         public void onChapterSelected(int bookIndex, int chapterIndex);
     }
 
-    private Obadiah mObadiah;
+    private Bible mBible;
     private Listener mListener;
 
     private int mCurrentBook;
@@ -46,13 +46,14 @@ public class ChapterSelectionFragment extends Fragment {
 
     private BookExpandableListAdapter mBookListAdapter;
     private ExpandableListView mBookListView;
+    private int mLastExpandedGroup;
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
 
         setRetainInstance(true);
-        mObadiah = Obadiah.getInstance();
+        mBible = Bible.getInstance();
         mListener = (Listener) activity;
     }
 
@@ -87,6 +88,20 @@ public class ChapterSelectionFragment extends Fragment {
 
         mBookListView = (ExpandableListView) view.findViewById(R.id.book_list_view);
         mBookListView.setAdapter(mBookListAdapter);
+        mBookListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
+            @Override
+            public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
+                parent.smoothScrollToPosition(groupPosition);
+                if (parent.isGroupExpanded(groupPosition)) {
+                    parent.collapseGroup(groupPosition);
+                } else {
+                    parent.expandGroup(groupPosition);
+                    parent.collapseGroup(mLastExpandedGroup);
+                    mLastExpandedGroup = groupPosition;
+                }
+                return true;
+            }
+        });
     }
 
     @Override
@@ -103,6 +118,7 @@ public class ChapterSelectionFragment extends Fragment {
         mBookListAdapter.setSelected(currentBook, currentChapter);
         mBookListAdapter.notifyDataSetChanged();
 
+        mLastExpandedGroup = mCurrentBook;
         mBookListView.expandGroup(mCurrentBook);
         mBookListView.setSelectedGroup(mCurrentBook);
     }
@@ -113,7 +129,7 @@ public class ChapterSelectionFragment extends Fragment {
     }
 
     private void loadBookNames(final String translationShortName) {
-        mObadiah.loadBookNames(translationShortName, new Obadiah.OnStringsLoadedListener() {
+        mBible.loadBookNames(translationShortName, new Bible.OnStringsLoadedListener() {
                     @Override
                     public void onStringsLoaded(List<String> strings) {
                         if (strings == null || strings.size() == 0) {
@@ -132,6 +148,7 @@ public class ChapterSelectionFragment extends Fragment {
                         mBookListAdapter.setBookNames(strings);
                         mBookListAdapter.notifyDataSetChanged();
 
+                        mLastExpandedGroup = mCurrentBook;
                         mBookListView.expandGroup(mCurrentBook);
                         mBookListView.setSelectedGroup(mCurrentBook);
                     }

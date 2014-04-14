@@ -5,4 +5,4 @@
     android:gravity="center_vertical"
     android:padding="@dimen/padding"
     android:textColor="@android:color/white"
-    android:textSize="@dimen/text_size_medium" />
+    android:textSize="@dimen/text_size_small" />

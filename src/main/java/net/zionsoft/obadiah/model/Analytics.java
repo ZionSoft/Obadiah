@@ -53,7 +53,7 @@ public class Analytics {
                 .setLabel(Boolean.toString(isSuccessful))
                 .build());
         if (isSuccessful)
-            sTracker.send(new HitBuilders.TimingBuilder("network", "download_list", elapsedTime).build());
+            sTracker.send(new HitBuilders.TimingBuilder("download_translation_list", "", elapsedTime).build());
     }
 
     public static void trackTranslationDownload(String translation, boolean isSuccessful, long elapsedTime) {

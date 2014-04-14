@@ -20,7 +20,6 @@ package net.zionsoft.obadiah;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -33,11 +32,13 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.TextView;
+import android.widget.Spinner;
 
 import net.zionsoft.obadiah.model.Analytics;
-import net.zionsoft.obadiah.model.Obadiah;
+import net.zionsoft.obadiah.model.Bible;
+import net.zionsoft.obadiah.model.ReadingProgressTracker;
 import net.zionsoft.obadiah.model.Settings;
 import net.zionsoft.obadiah.ui.activities.SearchActivity;
 import net.zionsoft.obadiah.ui.activities.SettingsActivity;
@@ -51,7 +52,7 @@ import java.util.List;
 
 public class BookSelectionActivity extends ActionBarActivity
         implements ChapterSelectionFragment.Listener, TextFragment.Listener {
-    private Obadiah mObadiah;
+    private Bible mBible;
     private Settings mSettings;
     private SharedPreferences mPreferences;
 
@@ -65,7 +66,7 @@ public class BookSelectionActivity extends ActionBarActivity
 
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
-    private TextView mBookNameTextView;
+    private Spinner mTranslationsSpinner;
     private View mRootView;
 
     @Override
@@ -74,50 +75,11 @@ public class BookSelectionActivity extends ActionBarActivity
 
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 
-        mObadiah = Obadiah.getInstance();
+        mBible = Bible.getInstance();
         mSettings = Settings.getInstance();
         mPreferences = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE);
 
-        upgrade();
         initializeUi();
-    }
-
-    private void upgrade() {
-        final int version = mPreferences.getInt(Constants.PREF_KEY_CURRENT_APPLICATION_VERSION, 0);
-        final int applicationVersion;
-        try {
-            //noinspection ConstantConditions
-            applicationVersion = getPackageManager().getPackageInfo(getPackageName(), 0).versionCode;
-        } catch (PackageManager.NameNotFoundException e) {
-            // should never reach here
-            return;
-        }
-        if (version >= applicationVersion)
-            return;
-
-        if (version < 10500) {
-            // TODO remove everything in getFilesDir()
-            mPreferences.edit()
-                    .remove("selectedTranslation")
-                    .putInt(Constants.PREF_KEY_CURRENT_APPLICATION_VERSION, 10500)
-                    .apply();
-        }
-        if (version < 10700) {
-            mPreferences.edit()
-                    .remove("lastUpdated")
-                    .putInt(Constants.PREF_KEY_CURRENT_APPLICATION_VERSION, 10700)
-                    .apply();
-        }
-        if (version < 10800) {
-            mPreferences.edit()
-                    .remove("PREF_KEY_DOWNLOADING_TRANSLATION").remove("PREF_KEY_DOWNLOADING_TRANSLATION_LIST")
-                    .remove("PREF_KEY_REMOVING_TRANSLATION").remove("PREF_KEY_UPGRADING")
-                    .putInt(Constants.PREF_KEY_CURRENT_APPLICATION_VERSION, 10800)
-                    .apply();
-        }
-        mPreferences.edit()
-                .putInt(Constants.PREF_KEY_CURRENT_APPLICATION_VERSION, applicationVersion)
-                .apply();
     }
 
     private void initializeUi() {
@@ -125,7 +87,6 @@ public class BookSelectionActivity extends ActionBarActivity
         setContentView(R.layout.activity_book_selection);
 
         mRootView = getWindow().getDecorView();
-        mRootView.setKeepScreenOn(mPreferences.getBoolean(Constants.PREF_KEY_SCREEN_ON, false));
 
         final ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
@@ -156,6 +117,7 @@ public class BookSelectionActivity extends ActionBarActivity
 
     private void populateUi() {
         mSettings.refresh();
+        mRootView.setKeepScreenOn(mSettings.keepScreenOn());
         mRootView.setBackgroundColor(mSettings.getBackgroundColor());
 
         mCurrentTranslation = mPreferences.getString(Constants.PREF_KEY_LAST_READ_TRANSLATION, null);
@@ -185,7 +147,10 @@ public class BookSelectionActivity extends ActionBarActivity
     }
 
     private void loadTranslations() {
-        mObadiah.loadDownloadedTranslations(new Obadiah.OnStringsLoadedListener() {
+        if (mTranslationsSpinner == null)
+            return;
+
+        mBible.loadDownloadedTranslations(new Bible.OnStringsLoadedListener() {
             @Override
             public void onStringsLoaded(List<String> strings) {
                 if (strings == null || strings.size() == 0) {
@@ -200,46 +165,44 @@ public class BookSelectionActivity extends ActionBarActivity
                     return;
                 }
 
-                final ActionBar actionBar = getSupportActionBar();
-                actionBar.setDisplayShowTitleEnabled(false);
-                actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-
                 final List<String> translations = strings;
-                actionBar.setListNavigationCallbacks(
-                        new ArrayAdapter<String>(BookSelectionActivity.this, R.layout.item_drop_down, translations),
-                        new ActionBar.OnNavigationListener() {
-                            @Override
-                            public boolean onNavigationItemSelected(int itemPosition, long itemId) {
-                                final String selected = translations.get(itemPosition);
-                                if (!selected.equals(mCurrentTranslation)) {
-                                    Analytics.trackTranslationSelection(selected);
+                mTranslationsSpinner.setAdapter(new ArrayAdapter<String>(BookSelectionActivity.this,
+                        R.layout.item_drop_down, translations));
 
-                                    mCurrentTranslation = selected;
-                                    mPreferences.edit()
-                                            .putString(Constants.PREF_KEY_LAST_READ_TRANSLATION, selected)
-                                            .putInt(Constants.PREF_KEY_LAST_READ_VERSE, mTextFragment.getCurrentVerse())
-                                            .apply();
-
-                                    loadTexts();
-                                }
-                                return true;
-                            }
-                        }
-                );
-                int i = 0;
-                for (String translation : translations) {
-                    if (translation.equals(mCurrentTranslation)) {
-                        actionBar.setSelectedNavigationItem(i);
+                int selected = 0;
+                for (String translation : strings) {
+                    if (translation.equals(mCurrentTranslation))
                         break;
-                    }
-                    ++i;
+                    ++selected;
                 }
+                mTranslationsSpinner.setSelection(selected);
+                mTranslationsSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        final String selected = translations.get(position);
+                        if (selected.equals(mCurrentTranslation))
+                            return;
+
+                        mCurrentTranslation = selected;
+                        mPreferences.edit()
+                                .putString(Constants.PREF_KEY_LAST_READ_TRANSLATION, selected)
+                                .putInt(Constants.PREF_KEY_LAST_READ_VERSE, mTextFragment.getCurrentVerse())
+                                .apply();
+
+                        loadTexts();
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+                        // do nothing
+                    }
+                });
             }
         });
     }
 
     private void loadTexts() {
-        mObadiah.loadBookNames(mCurrentTranslation, new Obadiah.OnStringsLoadedListener() {
+        mBible.loadBookNames(mCurrentTranslation, new Bible.OnStringsLoadedListener() {
                     @Override
                     public void onStringsLoaded(List<String> strings) {
                         if (strings == null || strings.size() == 0) {
@@ -264,6 +227,13 @@ public class BookSelectionActivity extends ActionBarActivity
 
         mTextFragment.setSelected(mCurrentTranslation, mCurrentBook, mCurrentChapter,
                 mPreferences.getInt(Constants.PREF_KEY_LAST_READ_VERSE, 0));
+    }
+
+    private void updateTitle() {
+        setTitle(String.format("%s, %d", mBookNames.get(mCurrentBook), mCurrentChapter + 1));
+
+        // TODO get an improved tracking algorithm, e.g. only consider as "read" if the user stays for a while
+        ReadingProgressTracker.getInstance().trackChapterReading(mCurrentBook, mCurrentChapter);
     }
 
     @Override
@@ -295,20 +265,10 @@ public class BookSelectionActivity extends ActionBarActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_bookselection, menu);
 
-        mBookNameTextView = (TextView) MenuItemCompat.getActionView(menu.findItem(R.id.action_book_name));
-        updateTitle();
-
-        //noinspection ConstantConditions
-        menu.findItem(R.id.action_screen_on).setChecked(mPreferences.getBoolean(Constants.PREF_KEY_SCREEN_ON, false));
+        mTranslationsSpinner = (Spinner) MenuItemCompat.getActionView(menu.findItem(R.id.action_translations));
+        loadTranslations();
 
         return true;
-    }
-
-    private void updateTitle() {
-        // onCreateOptionsMenu() is invoked after onResume(), but we can't guarantee the loading of
-        // book names is finished before that
-        if (mBookNames != null && mBookNameTextView != null)
-            mBookNameTextView.setText(String.format("%s, %d", mBookNames.get(mCurrentBook), mCurrentChapter + 1));
     }
 
     @Override
@@ -319,12 +279,6 @@ public class BookSelectionActivity extends ActionBarActivity
         switch (item.getItemId()) {
             case R.id.action_search:
                 startActivity(new Intent(this, SearchActivity.class).setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
-                return true;
-            case R.id.action_screen_on:
-                final boolean screenOn = !item.isChecked();
-                item.setChecked(screenOn);
-                mRootView.setKeepScreenOn(screenOn);
-                mPreferences.edit().putBoolean(Constants.PREF_KEY_SCREEN_ON, screenOn).apply();
                 return true;
             case R.id.action_settings:
                 startActivity(new Intent(this, SettingsActivity.class));

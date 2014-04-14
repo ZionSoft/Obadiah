@@ -3,6 +3,11 @@
 
     <CheckBoxPreference
         android:defaultValue="false"
+        android:key="pref_screen_on"
+        android:title="@string/pref_screen_on" />
+
+    <CheckBoxPreference
+        android:defaultValue="false"
         android:key="pref_night_mode"
         android:title="@string/pref_night_mode" />
 

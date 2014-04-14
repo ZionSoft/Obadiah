@@ -42,7 +42,7 @@ import net.zionsoft.obadiah.BookSelectionActivity;
 import net.zionsoft.obadiah.Constants;
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.Analytics;
-import net.zionsoft.obadiah.model.Obadiah;
+import net.zionsoft.obadiah.model.Bible;
 import net.zionsoft.obadiah.model.Settings;
 import net.zionsoft.obadiah.model.Verse;
 import net.zionsoft.obadiah.ui.adapters.SearchResultListAdapter;
@@ -92,7 +92,6 @@ public class SearchActivity extends ActionBarActivity {
         setContentView(R.layout.activity_search);
 
         mRootView = getWindow().getDecorView();
-        mRootView.setKeepScreenOn(mPreferences.getBoolean(Constants.PREF_KEY_SCREEN_ON, false));
 
         mSearchText = (EditText) findViewById(R.id.search_edit_text);
         mSearchText.setOnEditorActionListener(new OnEditorActionListener() {
@@ -135,6 +134,7 @@ public class SearchActivity extends ActionBarActivity {
 
     private void populateUi() {
         mSettings.refresh();
+        mRootView.setKeepScreenOn(mSettings.keepScreenOn());
         mRootView.setBackgroundColor(mSettings.getBackgroundColor());
         mSearchText.setTextColor(mSettings.getTextColor());
         mSearchText.setTextSize(TypedValue.COMPLEX_UNIT_PX, mSettings.getTextSize());
@@ -178,8 +178,8 @@ public class SearchActivity extends ActionBarActivity {
         mLoadingSpinner.setVisibility(View.VISIBLE);
         mSearchResultListView.setVisibility(View.GONE);
 
-        Obadiah.getInstance().searchVerses(mData.currentTranslation, keyword,
-                new Obadiah.OnVersesLoadedListener() {
+        Bible.getInstance().searchVerses(mData.currentTranslation, keyword,
+                new Bible.OnVersesLoadedListener() {
                     @Override
                     public void onVersesLoaded(List<Verse> verses) {
                         if (verses == null) {

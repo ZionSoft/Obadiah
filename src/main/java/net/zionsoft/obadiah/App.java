@@ -19,8 +19,10 @@ package net.zionsoft.obadiah;
 
 import android.app.Application;
 
+import net.zionsoft.obadiah.legacy.Upgrader;
 import net.zionsoft.obadiah.model.Analytics;
-import net.zionsoft.obadiah.model.Obadiah;
+import net.zionsoft.obadiah.model.Bible;
+import net.zionsoft.obadiah.model.ReadingProgressTracker;
 import net.zionsoft.obadiah.model.Settings;
 
 public class App extends Application {
@@ -28,14 +30,17 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
 
+        Upgrader.upgrade(this);
+
         Analytics.initialize(this);
-        Obadiah.initialize(this);
+        Bible.initialize(this);
+        ReadingProgressTracker.initialize(this);
         Settings.initialize(this);
     }
 
     @Override
     public void onLowMemory() {
-        Obadiah.getInstance().clearCache();
+        Bible.getInstance().clearCache();
 
         super.onLowMemory();
     }
