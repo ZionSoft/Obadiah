@@ -87,6 +87,14 @@ public class TextFragment extends Fragment implements VersePagerAdapter.Listener
     }
 
     @Override
+    public void onStop() {
+        if (mActionMode != null)
+            mActionMode.finish();
+
+        super.onStop();
+    }
+
+    @Override
     public void onDetach() {
         mListener = null;
 
