@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Raamattu</string>
+
+    <string name="activity_manage_translation">Käännökset</string>
+    <string name="activity_reading_progress">Lukeminen Edistyminen</string>
+    <string name="activity_settings">Asetukset</string>
+
+    <string name="action_copy">Kopioida</string>
+    <string name="action_delete_translation">Poista</string>
+    <string name="action_manage_translation">Käännökset</string>
+    <string name="action_reading_progress">Lukeminen Edistyminen</string>
+    <string name="action_search">Hae</string>
+    <string name="action_settings">Asetukset</string>
+    <string name="action_share">Jakaa</string>
+
+    <string name="dialog_no_translation">Lataa käännökset?</string>
+    <string name="dialog_retry">Ei voi ladata, yritä uudelleen?</string>
+    <string name="dialog_translation_delete_confirm_message">Poista?</string>
+    <string name="dialog_translation_download_failure_message">Ei voi ladata, yritä uudelleen?</string>
+    <string name="dialog_translation_remove_failure_message">Ei voi poistaa, yritä uudelleen?</string>
+
+    <string name="pref_night_mode">Yökäyttötilassa</string>
+    <string name="pref_rate_me">Arvostele</string>
+    <string name="pref_screen_on">Näytön Aina Päällä</string>
+    <string name="pref_text_size_title">Tekstin Koko</string>
+    <string name="pref_text_size_dialog_title">Tekstin Koko</string>
+    <string-array name="pref_text_size_name">
+        <item>Erittäin Pieni</item>
+        <item>Pieni</item>
+        <item>Normaali</item>
+        <item>Suuri</item>
+        <item>Valtava</item>
+    </string-array>
+
+    <string name="progress_dialog_translation_deleting">Poistaminen&#8230;</string>
+    <string name="progress_dialog_translation_downloading">Lataaminen&#8230;</string>
+
+    <string name="text_available_translation_info">%1$s\nKoko: %2$d kt</string>
+
+    <string name="text_available_translation">Saatavilla Käännökset</string>
+    <string name="text_downloaded_translations">Ladattu Käännökset</string>
+    <string name="text_share_with">Jakoasetukset</string>
+
+    <string name="text_continuous_reading">Peräkkäisiä Lukeminen</string>
+    <string name="text_continuous_reading_count">%1$d päivää</string>
+    <string name="text_chapters_read">Lukua</string>
+    <string name="text_finished_books">Kirjat</string>
+    <string name="text_finished_old_testament">Vanha Testamentti</string>
+    <string name="text_finished_new_testament">Uusi Testamentti</string>
+
+    <string name="toast_translation_deleted">Poistettu.</string>
+    <string name="toast_translation_downloaded">Ladattu.</string>
+    <string name="toast_verses_copied">Kopioidaan.</string>
+    <string name="toast_verses_searched">Löytyi %1$d jaetta.</string>
+
+</resources>
