@@ -11,6 +11,7 @@
     <string name="action_delete_translation">删除</string>
     <string name="action_manage_translation">译本</string>
     <string name="action_reading_progress">读经进度</string>
+    <string name="action_remove_ads">移除广告</string>
     <string name="action_search">搜索</string>
     <string name="action_settings">设置</string>
     <string name="action_share">分享</string>
