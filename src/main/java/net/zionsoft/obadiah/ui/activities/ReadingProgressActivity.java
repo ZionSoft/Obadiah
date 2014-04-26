@@ -59,6 +59,9 @@ public class ReadingProgressActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
 
         initializeUi();
+
+        loadBookNames();
+        loadReadingProgress();
     }
 
     private void initializeUi() {
@@ -127,14 +130,6 @@ public class ReadingProgressActivity extends ActionBarActivity {
         // list adapter
         mReadingProgressAdapter = new ReadingProgressListAdapter(this, settings);
         mReadingProgressListView.setAdapter(mReadingProgressAdapter);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-        loadBookNames();
-        loadReadingProgress();
     }
 
     private void loadBookNames() {
