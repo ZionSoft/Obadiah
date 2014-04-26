@@ -19,7 +19,6 @@ package net.zionsoft.obadiah.ui.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -32,11 +31,8 @@ import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.Analytics;
 import net.zionsoft.obadiah.model.InAppBillingHelper;
 import net.zionsoft.obadiah.model.Settings;
-import net.zionsoft.obadiah.ui.fragments.TranslationListFragment;
 
 public class TranslationManagementActivity extends ActionBarActivity {
-    private static final String TAG_TRANSLATION_LIST_FRAGMENT = "net.zionsoft.obadiah.ui.activities.TranslationManagementActivity.TAG_TRANSLATION_LIST_FRAGMENT";
-
     private AdView mAdView;
     private MenuItem mRemoveAdsMenuItem;
 
@@ -56,14 +52,6 @@ public class TranslationManagementActivity extends ActionBarActivity {
         final View rootView = getWindow().getDecorView();
         rootView.setBackgroundColor(Settings.getInstance().getBackgroundColor());
         rootView.setKeepScreenOn(Settings.getInstance().keepScreenOn());
-
-        final FragmentManager fm = getSupportFragmentManager();
-        if (fm.findFragmentByTag(TAG_TRANSLATION_LIST_FRAGMENT) == null) {
-            // otherwise an extra fragment will be added in case of orientation change
-            fm.beginTransaction()
-                    .replace(R.id.container, TranslationListFragment.newInstance(), TAG_TRANSLATION_LIST_FRAGMENT)
-                    .commit();
-        }
 
         mAdView = (AdView) findViewById(R.id.ad_view);
     }
