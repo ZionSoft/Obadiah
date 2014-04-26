@@ -84,14 +84,6 @@ public class Analytics {
         trackUIEvent("share");
     }
 
-    public static void trackUISignIn() {
-        trackUIEvent("sign_in");
-    }
-
-    public static void trackUISignOut() {
-        trackUIEvent("sign_out");
-    }
-
     private static void trackUIEvent(String label) {
         sTracker.send(new HitBuilders.EventBuilder("ui", "button_click")
                 .setLabel(label)
