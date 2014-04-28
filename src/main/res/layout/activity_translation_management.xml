@@ -4,16 +4,18 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <FrameLayout
-        android:id="@+id/container"
+    <fragment
+        android:id="@+id/translation_list_fragment"
+        android:name="net.zionsoft.obadiah.ui.fragments.TranslationListFragment"
         android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_weight="1"/>
+        android:layout_height="0dp"
+        android:layout_weight="1" />
 
     <com.google.android.gms.ads.AdView xmlns:ads="http://schemas.android.com/apk/res-auto"
         android:id="@+id/ad_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:visibility="gone"
         ads:adUnitId="XXXXXXXX"
         ads:adSize="SMART_BANNER" />
 </LinearLayout>

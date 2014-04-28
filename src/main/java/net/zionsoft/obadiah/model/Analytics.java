@@ -43,6 +43,12 @@ public class Analytics {
                 .build());
     }
 
+    public static void trackBillingNotSupported(int reason) {
+        sTracker.send(new HitBuilders.EventBuilder("billing", "not_supported")
+                .setLabel(Integer.toString(reason))
+                .build());
+    }
+
     public static void trackScreen(String name) {
         sTracker.setScreenName(name);
         sTracker.send(new HitBuilders.AppViewBuilder().build());
@@ -82,6 +88,10 @@ public class Analytics {
 
     public static void trackUIShare() {
         trackUIEvent("share");
+    }
+
+    public static void trackUIRemoveAds() {
+        trackUIEvent("remove_ads");
     }
 
     private static void trackUIEvent(String label) {

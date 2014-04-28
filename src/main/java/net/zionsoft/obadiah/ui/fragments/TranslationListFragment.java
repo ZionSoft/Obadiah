@@ -59,10 +59,6 @@ public class TranslationListFragment extends Fragment {
     private View mLoadingSpinner;
     private ExpandableListView mTranslationListView;
 
-    public static TranslationListFragment newInstance() {
-        return new TranslationListFragment();
-    }
-
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);

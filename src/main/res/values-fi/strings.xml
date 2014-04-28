@@ -11,6 +11,7 @@
     <string name="action_delete_translation">Poista</string>
     <string name="action_manage_translation">Käännökset</string>
     <string name="action_reading_progress">Lukeminen Edistyminen</string>
+    <string name="action_remove_ads">Poista Mainokset</string>
     <string name="action_search">Hae</string>
     <string name="action_settings">Asetukset</string>
     <string name="action_share">Jakaa</string>
