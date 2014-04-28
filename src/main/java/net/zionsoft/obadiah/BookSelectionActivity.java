@@ -155,14 +155,16 @@ public class BookSelectionActivity extends ActionBarActivity
             @Override
             public void onStringsLoaded(List<String> strings) {
                 if (strings == null || strings.size() == 0) {
-                    DialogHelper.showDialog(BookSelectionActivity.this, false, R.string.dialog_retry,
-                            new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    loadTranslations();
-                                }
-                            }, null
-                    );
+                    if (mCurrentTranslation != null) {
+                        DialogHelper.showDialog(BookSelectionActivity.this, false, R.string.dialog_retry,
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        loadTranslations();
+                                    }
+                                }, null
+                        );
+                    }
                     return;
                 }
 
@@ -207,14 +209,16 @@ public class BookSelectionActivity extends ActionBarActivity
                     @Override
                     public void onStringsLoaded(List<String> strings) {
                         if (strings == null || strings.size() == 0) {
-                            DialogHelper.showDialog(BookSelectionActivity.this, false, R.string.dialog_retry,
-                                    new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            loadTexts();
-                                        }
-                                    }, null
-                            );
+                            if (mCurrentTranslation != null) {
+                                DialogHelper.showDialog(BookSelectionActivity.this, false, R.string.dialog_retry,
+                                        new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                loadTexts();
+                                            }
+                                        }, null
+                                );
+                            }
                             return;
                         }
 
