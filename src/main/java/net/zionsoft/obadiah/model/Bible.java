@@ -24,6 +24,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.SystemClock;
 import android.support.v4.util.LruCache;
+import android.text.TextUtils;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -159,13 +160,19 @@ public class Bible {
                     final List<TranslationInfo> available = new ArrayList<TranslationInfo>(length - mDownloadedTranslationShortNames.size());
                     for (int i = 0; i < length; ++i) {
                         final JSONObject translationObject = replyArray.getJSONObject(i);
-                        final TranslationInfo translationInfo = new TranslationInfo(
-                                translationObject.getString("name"), translationObject.getString("shortName"),
-                                translationObject.getString("language"), translationObject.getInt("size"));
+                        final String name = translationObject.getString("name");
+                        final String shortName = translationObject.getString("shortName");
+                        final String language = translationObject.getString("language");
+                        final int size = translationObject.getInt("size");
+                        if (TextUtils.isEmpty(name) || TextUtils.isEmpty(shortName)
+                                || TextUtils.isEmpty(language) || size <= 0) {
+                            throw new Exception("Illegal translation info.");
+                        }
+                        final TranslationInfo translationInfo = new TranslationInfo(name, shortName, language, size);
 
                         boolean isDownloaded = false;
-                        for (String shortName : mDownloadedTranslationShortNames) {
-                            if (translationInfo.shortName.equals(shortName)) {
+                        for (String translationShortName : mDownloadedTranslationShortNames) {
+                            if (translationInfo.shortName.equals(translationShortName)) {
                                 isDownloaded = true;
                                 break;
                             }
@@ -496,7 +503,12 @@ public class Bible {
                                 final JSONArray booksArray = booksInfoObject.getJSONArray("books");
                                 for (int i = 0; i < Bible.getBookCount(); ++i) {
                                     bookNamesValues.put(DatabaseHelper.COLUMN_BOOK_INDEX, i);
-                                    bookNamesValues.put(DatabaseHelper.COLUMN_BOOK_NAME, booksArray.getString(i));
+
+                                    final String bookName = booksArray.getString(i);
+                                    if (TextUtils.isEmpty(bookName))
+                                        throw new Exception("Illegal books.json file: " + translationShortName);
+                                    bookNamesValues.put(DatabaseHelper.COLUMN_BOOK_NAME, bookName);
+
                                     db.insert(DatabaseHelper.TABLE_BOOK_NAMES, null, bookNamesValues);
                                 }
                             } else {
@@ -511,10 +523,20 @@ public class Bible {
                                 final JSONObject jsonObject = new JSONObject(new String(bytes, "UTF8"));
                                 final JSONArray paragraphArray = jsonObject.getJSONArray("verses");
                                 final int paragraphCount = paragraphArray.length();
+                                boolean hasNonEmptyVerse = false;
                                 for (int verseIndex = 0; verseIndex < paragraphCount; ++verseIndex) {
                                     versesValues.put(DatabaseHelper.COLUMN_VERSE_INDEX, verseIndex);
-                                    versesValues.put(DatabaseHelper.COLUMN_TEXT, paragraphArray.getString(verseIndex));
+
+                                    final String verse = paragraphArray.getString(verseIndex);
+                                    if (!hasNonEmptyVerse && !TextUtils.isEmpty(verse))
+                                        hasNonEmptyVerse = true;
+                                    versesValues.put(DatabaseHelper.COLUMN_TEXT, verse);
+
                                     db.insert(translationShortName, null, versesValues);
+                                }
+                                if (!hasNonEmptyVerse) {
+                                    throw new Exception(String.format("Empty chapter: %s %d-%d",
+                                            translationShortName, bookIndex, chapterIndex));
                                 }
                             }
 
