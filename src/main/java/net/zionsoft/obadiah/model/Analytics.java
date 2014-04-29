@@ -49,6 +49,13 @@ public class Analytics {
                 .build());
     }
 
+    public static void trackBillingPurchase(String productId, String productName, String transactionId) {
+        sTracker.send(new HitBuilders.ItemBuilder()
+                .setName(productName).setSku(productId).setTransactionId(transactionId)
+                .setPrice(0).setQuantity(1)
+                .build());
+    }
+
     public static void trackScreen(String name) {
         sTracker.setScreenName(name);
         sTracker.send(new HitBuilders.AppViewBuilder().build());

@@ -173,13 +173,13 @@ public class InAppBillingHelper implements ServiceConnection {
         }
 
         try {
-            // TODO add analytics
-
             final JSONObject purchaseObject = new JSONObject(data.getStringExtra("INAPP_PURCHASE_DATA"));
-            mOnAdsRemovalPurchased.onAdsRemovalPurchased(
-                    purchaseObject.getString("productId").equals(mContext.getString(R.string.in_app_product_no_ads))
-                            && purchaseObject.getInt("purchaseState") == 0
-            );
+            final String productId = purchaseObject.getString("productId");
+            final boolean isPurchased = productId.equals(mContext.getString(R.string.in_app_product_no_ads))
+                    && purchaseObject.getInt("purchaseState") == 0;
+            if (isPurchased)
+                Analytics.trackBillingPurchase(productId, "remove_ads", purchaseObject.getString("orderId"));
+            mOnAdsRemovalPurchased.onAdsRemovalPurchased(isPurchased);
             mOnAdsRemovalPurchased = null;
         } catch (JSONException e) {
             Analytics.trackException("Failed to purchase ads removal - " + e.getMessage());
