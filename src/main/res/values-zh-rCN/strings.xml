@@ -50,6 +50,27 @@
     <string name="text_finished_books">已读完书本</string>
     <string name="text_finished_old_testament">旧约</string>
     <string name="text_finished_new_testament">新约</string>
+    <string name="text_last_read_chapter">您在%2$s阅读到第%1$d章。</string>
+
+    <!--
+        %1$d: date, %2$s: month, %3$d: year
+         -->
+    <string name="text_date">%3$d年%2$s月%1$d日</string>
+    <string name="text_date_without_year">%2$s月%1$d日</string>
+    <string-array name="text_months">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+        <item>10</item>
+        <item>11</item>
+        <item>12</item>
+    </string-array>
 
     <string name="toast_translation_deleted">已删除。</string>
     <string name="toast_translation_downloaded">已下载。</string>

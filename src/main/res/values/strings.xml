@@ -50,6 +50,27 @@
     <string name="text_finished_books">Books Finished</string>
     <string name="text_finished_old_testament">Old Testament</string>
     <string name="text_finished_new_testament">New Testament</string>
+    <string name="text_last_read_chapter">You last read chapter %1$d, on %2$s.</string>
+
+    <!--
+    %1$d: date, %2$s: month, %3$d: year
+     -->
+    <string name="text_date">%1$d %2$s, %3$d</string>
+    <string name="text_date_without_year">%1$d %2$s</string>
+    <string-array name="text_months">
+        <item>Jan</item>
+        <item>Feb</item>
+        <item>Mar</item>
+        <item>Apr</item>
+        <item>May</item>
+        <item>Jun</item>
+        <item>Jul</item>
+        <item>Aug</item>
+        <item>Sep</item>
+        <item>Oct</item>
+        <item>Nov</item>
+        <item>Dec</item>
+    </string-array>
 
     <string name="toast_translation_deleted">Deleted.</string>
     <string name="toast_translation_downloaded">Downloaded.</string>

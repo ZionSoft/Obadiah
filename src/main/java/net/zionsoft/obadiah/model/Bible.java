@@ -64,6 +64,8 @@ public class Bible {
     }
 
     private static final int BOOK_COUNT = 66;
+    private static final int OLD_TESTAMENT_COUNT = 39;
+    private static final int NEW_TESTAMENT_COUNT = 27;
     private static final int TOTAL_CHAPTER_COUNT = 1189;
     private static final int[] CHAPTER_COUNT = {50, 40, 27, 36, 34, 24, 21, 4, 31, 24, 22, 25, 29, 36,
             10, 13, 10, 42, 150, 31, 12, 8, 66, 52, 5, 48, 12, 14, 3, 9, 1, 4, 7, 3, 3, 3, 2, 14, 4,
@@ -123,6 +125,14 @@ public class Bible {
 
     public static int getBookCount() {
         return BOOK_COUNT;
+    }
+
+    public static int getOldTestamentBookCount() {
+        return OLD_TESTAMENT_COUNT;
+    }
+
+    public static int getNewTestamentBookCount() {
+        return NEW_TESTAMENT_COUNT;
     }
 
     public static int getTotalChapterCount() {

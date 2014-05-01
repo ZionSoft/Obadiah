@@ -17,6 +17,10 @@
 
 package net.zionsoft.obadiah.model;
 
+import android.util.Pair;
+import android.util.SparseArray;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class ReadingProgress {
@@ -26,34 +30,49 @@ public class ReadingProgress {
     private final int mFinishedNewTestament;
     private final int mContinuousReading;
     private final List<Integer> mChaptersReadPerBook;
+    private final List<Pair<Integer, Long>> mLastChapterReadPerBook;
 
-    ReadingProgress(List<Integer> chaptersReadPerBook, int continuousReading) {
+    ReadingProgress(List<SparseArray<Long>> chaptersReadPerBook, int continuousReading) {
         super();
 
-        int count = 0;
+        int totalChaptersRead = 0;
         int finishedBooks = 0;
         int finishedOldTestament = 0;
         int finishedNewTestament = 0;
         int i = 0;
-        for (Integer chaptersRead : chaptersReadPerBook) {
-            count += chaptersRead;
+        mChaptersReadPerBook = new ArrayList<Integer>(Bible.getBookCount());
+        mLastChapterReadPerBook = new ArrayList<Pair<Integer, Long>>(Bible.getBookCount());
+        for (SparseArray<Long> chaptersRead : chaptersReadPerBook) {
+            final int chaptersCount = Bible.getChapterCount(i);
+            int lastReadChapter = -1;
+            long lastReadTimestamp = 0L;
+            for (int j = 0; j < chaptersCount; ++j) {
+                final long timestamp = chaptersRead.get(j, 0L);
+                if (lastReadTimestamp < timestamp) {
+                    lastReadTimestamp = timestamp;
+                    lastReadChapter = j;
+                }
+            }
+            mLastChapterReadPerBook.add(new Pair<Integer, Long>(lastReadChapter, lastReadTimestamp));
 
-            if (chaptersRead == Bible.getChapterCount(i)) {
+            final int chaptersReadCount = chaptersRead.size();
+            mChaptersReadPerBook.add(chaptersReadCount);
+            totalChaptersRead += chaptersReadCount;
+
+            if (chaptersReadCount == Bible.getChapterCount(i)) {
                 ++finishedBooks;
-                if (i < 39)
+                if (i < Bible.getOldTestamentBookCount())
                     ++finishedOldTestament;
                 else
                     ++finishedNewTestament;
             }
             ++i;
         }
-        mTotalChaptersRead = count;
+        mTotalChaptersRead = totalChaptersRead;
         mFinishedBooks = finishedBooks;
         mFinishedOldTestament = finishedOldTestament;
         mFinishedNewTestament = finishedNewTestament;
-
         mContinuousReading = continuousReading;
-        mChaptersReadPerBook = chaptersReadPerBook;
     }
 
     public int getFinishedBooksCount() {
@@ -70,6 +89,10 @@ public class ReadingProgress {
 
     public int getTotalChapterRead() {
         return mTotalChaptersRead;
+    }
+
+    public Pair<Integer, Long> getLastReadChapter(int book) {
+        return mLastChapterReadPerBook.get(book);
     }
 
     public int getChapterRead(int book) {

@@ -18,17 +18,19 @@
 package net.zionsoft.obadiah.ui.adapters;
 
 import android.content.Context;
+import android.content.res.Resources;
+import android.util.Pair;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.ReadingProgress;
 import net.zionsoft.obadiah.model.Settings;
+import net.zionsoft.obadiah.model.utils.DateFormatter;
 import net.zionsoft.obadiah.ui.widget.ProgressBar;
 
 import java.util.List;
@@ -37,18 +39,28 @@ public class ReadingProgressListAdapter extends BaseAdapter {
     private static class ViewTag {
         TextView bookName;
         ProgressBar readingProgress;
+        TextView lastReadChapter;
     }
 
-    private final Settings mSettings;
+    private final int mTextColor;
+    private final float mSmallerTextSize;
+
+    private final DateFormatter mDateFormatter;
+    private final Resources mResources;
     private final LayoutInflater mInflater;
 
     private List<String> mBookNames;
     private ReadingProgress mReadingProgress;
 
-    public ReadingProgressListAdapter(Context context, Settings settings) {
+    public ReadingProgressListAdapter(Context context) {
         super();
 
-        mSettings = settings;
+        final Settings settings = Settings.getInstance();
+        mTextColor = settings.getTextColor();
+        mSmallerTextSize = settings.getSmallerTextSize();
+
+        mResources = context.getResources();
+        mDateFormatter = new DateFormatter(mResources);
         mInflater = LayoutInflater.from(context);
     }
 
@@ -69,22 +81,25 @@ public class ReadingProgressListAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        final LinearLayout rootView;
+        final View rootView;
         final ViewTag viewTag;
         if (convertView == null) {
-            rootView = (LinearLayout) mInflater.inflate(R.layout.item_reading_progress, parent, false);
+            rootView = mInflater.inflate(R.layout.item_reading_progress, parent, false);
 
             viewTag = new ViewTag();
-            viewTag.bookName = (TextView) rootView.getChildAt(0);
-            viewTag.readingProgress = (ProgressBar) rootView.getChildAt(1);
+            viewTag.bookName = (TextView) rootView.findViewById(R.id.book_name_text_view);
+            viewTag.bookName.setTextColor(mTextColor);
+            viewTag.bookName.setTextSize(TypedValue.COMPLEX_UNIT_PX, mSmallerTextSize);
+            viewTag.readingProgress = (ProgressBar) rootView.findViewById(R.id.reading_progress_bar);
+            viewTag.lastReadChapter = (TextView) rootView.findViewById(R.id.last_read_chapter_text_view);
+            viewTag.lastReadChapter.setTextColor(mTextColor);
+            viewTag.lastReadChapter.setTextSize(TypedValue.COMPLEX_UNIT_PX, mSmallerTextSize);
             rootView.setTag(viewTag);
         } else {
-            rootView = (LinearLayout) convertView;
+            rootView = convertView;
             viewTag = (ViewTag) rootView.getTag();
         }
 
-        viewTag.bookName.setTextColor(mSettings.getTextColor());
-        viewTag.bookName.setTextSize(TypedValue.COMPLEX_UNIT_PX, mSettings.getSmallerTextSize());
         viewTag.bookName.setText(mBookNames.get(position));
 
         final int chaptersRead = mReadingProgress.getChapterRead(position);
@@ -96,6 +111,15 @@ public class ReadingProgressListAdapter extends BaseAdapter {
         }
         viewTag.readingProgress.setProgress(progress);
         viewTag.readingProgress.setText(String.format("%d / %d", chaptersRead, chaptersCount));
+
+        if (chaptersRead > 0) {
+            final Pair<Integer, Long> lastReadChapter = mReadingProgress.getLastReadChapter(position);
+            viewTag.lastReadChapter.setText(mResources.getString(R.string.text_last_read_chapter,
+                    lastReadChapter.first + 1, mDateFormatter.format(lastReadChapter.second)));
+            viewTag.lastReadChapter.setVisibility(View.VISIBLE);
+        } else {
+            viewTag.lastReadChapter.setVisibility(View.GONE);
+        }
 
         return rootView;
     }

@@ -128,7 +128,7 @@ public class ReadingProgressActivity extends ActionBarActivity {
         mReadingProgressListView.addHeaderView(header);
 
         // list adapter
-        mReadingProgressAdapter = new ReadingProgressListAdapter(this, settings);
+        mReadingProgressAdapter = new ReadingProgressListAdapter(this);
         mReadingProgressListView.setAdapter(mReadingProgressAdapter);
     }
 

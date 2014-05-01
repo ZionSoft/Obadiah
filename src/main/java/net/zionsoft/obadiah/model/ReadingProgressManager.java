@@ -23,6 +23,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.text.format.DateUtils;
+import android.util.SparseArray;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -116,20 +117,27 @@ public class ReadingProgressManager {
                             return null;
 
                         cursor = db.query(DatabaseHelper.TABLE_READING_PROGRESS,
-                                new String[]{DatabaseHelper.COLUMN_BOOK_INDEX}, null, null, null, null, null);
+                                new String[]{DatabaseHelper.COLUMN_BOOK_INDEX, DatabaseHelper.COLUMN_CHAPTER_INDEX,
+                                        DatabaseHelper.COLUMN_LAST_READING_TIMESTAMP},
+                                null, null, null, null, null
+                        );
                         final int bookIndex = cursor.getColumnIndex(DatabaseHelper.COLUMN_BOOK_INDEX);
-                        final int[] chaptersReadPerBook = new int[Bible.getBookCount()];
+                        final int chapterIndex = cursor.getColumnIndex(DatabaseHelper.COLUMN_CHAPTER_INDEX);
+                        final int lastReadingTimestamp = cursor.getColumnIndex(DatabaseHelper.COLUMN_LAST_READING_TIMESTAMP);
+
+                        final int bookCount = Bible.getBookCount();
+                        final List<SparseArray<Long>> chaptersReadPerBook = new ArrayList<SparseArray<Long>>(bookCount);
+                        for (int i = 0; i < bookCount; ++i)
+                            chaptersReadPerBook.add(new SparseArray<Long>(Bible.getChapterCount(i)));
                         while (cursor.moveToNext()) {
-                            ++chaptersReadPerBook[cursor.getInt(bookIndex)];
+                            chaptersReadPerBook.get(cursor.getInt(bookIndex))
+                                    .append(cursor.getInt(chapterIndex), cursor.getLong(lastReadingTimestamp));
                         }
-                        final List<Integer> list = new ArrayList<Integer>(chaptersReadPerBook.length);
-                        for (int chaptersRead : chaptersReadPerBook)
-                            list.add(chaptersRead);
 
                         final int continuousReadingDays = Integer.parseInt(
                                 DatabaseHelper.getMetadata(db, DatabaseHelper.KEY_CONTINUOUS_READING_DAYS, "1"));
 
-                        return new ReadingProgress(list, continuousReadingDays);
+                        return new ReadingProgress(chaptersReadPerBook, continuousReadingDays);
                     } finally {
                         if (cursor != null)
                             cursor.close();
