@@ -34,6 +34,7 @@
         <item>大号</item>
         <item>超大号</item>
     </string-array>
+    <string name="pref_version">版本</string>
 
     <string name="progress_dialog_translation_deleting">删除中&#8230;</string>
     <string name="progress_dialog_translation_downloading">下载中&#8230;</string>

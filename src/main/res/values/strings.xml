@@ -34,6 +34,7 @@
         <item>Large</item>
         <item>Very Large</item>
     </string-array>
+    <string name="pref_version">Version</string>
 
     <string name="progress_dialog_translation_deleting">Deleting&#8230;</string>
     <string name="progress_dialog_translation_downloading">Downloading&#8230;</string>

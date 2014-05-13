@@ -25,4 +25,6 @@
             android:data="market://details?id=net.zionsoft.obadiah" />
     </Preference>
 
+    <net.zionsoft.obadiah.ui.preference.VersionPreference android:title="@string/pref_version" />
+
 </PreferenceScreen>

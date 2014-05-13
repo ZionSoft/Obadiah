@@ -34,6 +34,7 @@
         <item>Suuri</item>
         <item>Valtava</item>
     </string-array>
+    <string name="pref_version">Versio</string>
 
     <string name="progress_dialog_translation_deleting">Poistaminen&#8230;</string>
     <string name="progress_dialog_translation_downloading">Lataaminen&#8230;</string>
