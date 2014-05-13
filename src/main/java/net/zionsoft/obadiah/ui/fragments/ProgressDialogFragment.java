@@ -49,6 +49,10 @@ public class ProgressDialogFragment extends DialogFragment {
         return fragment;
     }
 
+    public ProgressDialogFragment() {
+        super();
+    }
+
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         final ProgressDialog dialog = new ProgressDialog(getActivity());

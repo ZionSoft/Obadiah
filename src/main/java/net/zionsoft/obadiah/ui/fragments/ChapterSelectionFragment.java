@@ -48,6 +48,10 @@ public class ChapterSelectionFragment extends Fragment {
     private ExpandableListView mBookListView;
     private int mLastExpandedGroup;
 
+    public ChapterSelectionFragment() {
+        super();
+    }
+
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);

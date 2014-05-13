@@ -37,6 +37,10 @@ public class TextFragment extends Fragment implements VersePagerAdapter.Listener
     @SuppressWarnings("deprecation")
     private ClipboardManager mClipboardManager;
 
+    public TextFragment() {
+        super();
+    }
+
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
