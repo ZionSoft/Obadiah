@@ -18,12 +18,14 @@
 package net.zionsoft.obadiah;
 
 import android.app.Application;
+import android.preference.PreferenceManager;
 
 import net.zionsoft.obadiah.legacy.Upgrader;
 import net.zionsoft.obadiah.model.Analytics;
 import net.zionsoft.obadiah.model.Bible;
 import net.zionsoft.obadiah.model.ReadingProgressManager;
 import net.zionsoft.obadiah.model.Settings;
+import net.zionsoft.obadiah.ui.utils.UIHelper;
 
 public class App extends Application {
     @Override
@@ -31,11 +33,14 @@ public class App extends Application {
         super.onCreate();
 
         Upgrader.upgrade(this);
+        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 
         Analytics.initialize(this);
         Bible.initialize(this);
         ReadingProgressManager.initialize(this);
         Settings.initialize(this);
+
+        UIHelper.forceActionBarOverflowMenu(this);
     }
 
     @Override

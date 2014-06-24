@@ -22,7 +22,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.MenuItemCompat;
@@ -47,7 +46,6 @@ import net.zionsoft.obadiah.ui.activities.TranslationManagementActivity;
 import net.zionsoft.obadiah.ui.fragments.ChapterSelectionFragment;
 import net.zionsoft.obadiah.ui.fragments.TextFragment;
 import net.zionsoft.obadiah.ui.utils.DialogHelper;
-import net.zionsoft.obadiah.ui.utils.UIHelper;
 
 import java.util.List;
 
@@ -74,8 +72,6 @@ public class BookSelectionActivity extends ActionBarActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
-
         mBible = Bible.getInstance();
         mSettings = Settings.getInstance();
         mPreferences = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE);
@@ -84,7 +80,6 @@ public class BookSelectionActivity extends ActionBarActivity
     }
 
     private void initializeUi() {
-        UIHelper.forceActionBarOverflowMenu(this);
         setContentView(R.layout.activity_book_selection);
 
         mRootView = getWindow().getDecorView();
