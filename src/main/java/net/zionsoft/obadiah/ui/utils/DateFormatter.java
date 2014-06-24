@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.model.utils;
+package net.zionsoft.obadiah.ui.utils;
 
 import android.content.res.Resources;
 
