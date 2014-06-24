@@ -136,6 +136,9 @@ public class ChapterSelectionFragment extends Fragment {
         mBible.loadBookNames(translationShortName, new Bible.OnStringsLoadedListener() {
                     @Override
                     public void onStringsLoaded(List<String> strings) {
+                        if (!isAdded())
+                            return;
+
                         if (strings == null || strings.size() == 0) {
                             DialogHelper.showDialog(getActivity(), false, R.string.dialog_retry,
                                     new DialogInterface.OnClickListener() {

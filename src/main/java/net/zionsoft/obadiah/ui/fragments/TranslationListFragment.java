@@ -120,6 +120,9 @@ public class TranslationListFragment extends Fragment {
         mBible.loadTranslations(forceRefresh, new Bible.OnTranslationsLoadedListener() {
             @Override
             public void onTranslationsLoaded(List<TranslationInfo> downloaded, List<TranslationInfo> available) {
+                if (!isAdded())
+                    return;
+
                 if (downloaded == null || available == null) {
                     DialogHelper.showDialog(getActivity(), false, R.string.dialog_retry,
                             new DialogInterface.OnClickListener() {
@@ -152,6 +155,9 @@ public class TranslationListFragment extends Fragment {
         mBible.downloadTranslation(translationShortName, new Bible.OnTranslationDownloadListener() {
             @Override
             public void onTranslationDownloaded(final String translation, boolean isSuccessful) {
+                if (!isAdded())
+                    return;
+
                 ((DialogFragment) getFragmentManager().findFragmentByTag(TAG_DOWNLOAD_DIALOG_FRAGMENT)).dismiss();
 
                 if (isSuccessful) {
@@ -179,6 +185,9 @@ public class TranslationListFragment extends Fragment {
 
             @Override
             public void onTranslationDownloadProgress(String translation, int progress) {
+                if (!isAdded())
+                    return;
+
                 final DialogFragment fragment = (DialogFragment) getFragmentManager()
                         .findFragmentByTag(TAG_DOWNLOAD_DIALOG_FRAGMENT);
                 ((ProgressDialog) fragment.getDialog()).setProgress(progress);
@@ -255,6 +264,9 @@ public class TranslationListFragment extends Fragment {
         mBible.removeTranslation(translationShortName, new Bible.OnTranslationRemovedListener() {
             @Override
             public void onTranslationRemoved(final String translation, boolean isSuccessful) {
+                if (!isAdded())
+                    return;
+
                 ((DialogFragment) getFragmentManager().findFragmentByTag(TAG_REMOVE_DIALOG_FRAGMENT)).dismiss();
 
                 if (isSuccessful) {
