@@ -11,10 +11,6 @@
         android:title="@string/action_search"
         obadiah:showAsAction="never" />
     <item
-        android:id="@+id/action_manage_translation"
-        android:title="@string/action_manage_translation"
-        obadiah:showAsAction="never" />
-    <item
         android:id="@+id/action_reading_progress"
         android:title="@string/action_reading_progress"
         obadiah:showAsAction="never" />

@@ -9,7 +9,6 @@
 
     <string name="action_copy">复制</string>
     <string name="action_delete_translation">删除</string>
-    <string name="action_manage_translation">译本</string>
     <string name="action_reading_progress">读经进度</string>
     <string name="action_remove_ads">移除广告</string>
     <string name="action_search">搜索</string>
@@ -43,6 +42,7 @@
 
     <string name="text_available_translation">可下载译本</string>
     <string name="text_downloaded_translations">已下载译本</string>
+    <string name="text_translations">译本</string>
     <string name="text_share_with">分享到&#8230;</string>
 
     <string name="text_continuous_reading">连续阅读</string>

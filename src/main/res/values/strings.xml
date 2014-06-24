@@ -9,7 +9,6 @@
 
     <string name="action_copy">Copy</string>
     <string name="action_delete_translation">Delete</string>
-    <string name="action_manage_translation">Translations</string>
     <string name="action_reading_progress">Reading Progress</string>
     <string name="action_remove_ads">Remove Ads</string>
     <string name="action_search">Search</string>
@@ -43,6 +42,7 @@
 
     <string name="text_available_translation">Available Translations</string>
     <string name="text_downloaded_translations">Downloaded Translations</string>
+    <string name="text_translations">Translations</string>
     <string name="text_share_with">Share with&#8230;</string>
 
     <string name="text_continuous_reading">Consecutive Reading</string>

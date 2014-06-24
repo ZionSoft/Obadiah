@@ -9,7 +9,6 @@
 
     <string name="action_copy">Kopioida</string>
     <string name="action_delete_translation">Poista</string>
-    <string name="action_manage_translation">Käännökset</string>
     <string name="action_reading_progress">Lukeminen Edistyminen</string>
     <string name="action_remove_ads">Poista Mainokset</string>
     <string name="action_search">Hae</string>
@@ -43,6 +42,7 @@
 
     <string name="text_available_translation">Saatavilla Käännökset</string>
     <string name="text_downloaded_translations">Ladattu Käännökset</string>
+    <string name="text_translations">Käännökset</string>
     <string name="text_share_with">Jakoasetukset</string>
 
     <string name="text_continuous_reading">Peräkkäisiä Lukeminen</string>

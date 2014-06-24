@@ -47,6 +47,7 @@ import net.zionsoft.obadiah.ui.fragments.ChapterSelectionFragment;
 import net.zionsoft.obadiah.ui.fragments.TextFragment;
 import net.zionsoft.obadiah.ui.utils.DialogHelper;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class BookSelectionActivity extends ActionBarActivity
@@ -163,7 +164,10 @@ public class BookSelectionActivity extends ActionBarActivity
                     return;
                 }
 
-                final List<String> translations = strings;
+                final int translationsCount = strings.size();
+                final List<String> translations = new ArrayList<String>(translationsCount + 1);
+                translations.addAll(strings);
+                translations.add(getResources().getString(R.string.text_translations));
                 mTranslationsSpinner.setAdapter(new ArrayAdapter<String>(BookSelectionActivity.this,
                         R.layout.item_drop_down, translations));
 
@@ -177,6 +181,11 @@ public class BookSelectionActivity extends ActionBarActivity
                 mTranslationsSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                     @Override
                     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        if (position == translationsCount) {
+                            startActivity(new Intent(BookSelectionActivity.this, TranslationManagementActivity.class));
+                            return;
+                        }
+
                         final String selected = translations.get(position);
                         if (selected.equals(mCurrentTranslation))
                             return;
@@ -279,9 +288,6 @@ public class BookSelectionActivity extends ActionBarActivity
         switch (item.getItemId()) {
             case R.id.action_search:
                 startActivity(new Intent(this, SearchActivity.class).setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
-                return true;
-            case R.id.action_manage_translation:
-                startActivity(new Intent(this, TranslationManagementActivity.class));
                 return true;
             case R.id.action_reading_progress:
                 startActivity(new Intent(this, ReadingProgressActivity.class));
