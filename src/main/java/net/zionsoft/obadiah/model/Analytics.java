@@ -50,6 +50,9 @@ public class Analytics {
     }
 
     public static void trackBillingPurchase(String productId, String productName, String transactionId) {
+        sTracker.send(new HitBuilders.EventBuilder("billing", "purchased")
+                .setLabel(productName)
+                .build());
         sTracker.send(new HitBuilders.ItemBuilder()
                 .setName(productName).setSku(productId).setTransactionId(transactionId)
                 .setPrice(0).setQuantity(1)
