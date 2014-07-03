@@ -168,8 +168,11 @@ public class SearchActivity extends ActionBarActivity {
         if (TextUtils.isEmpty(searchToken))
             return;
 
-        ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE))
-                .hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+        final View currentFocus = getCurrentFocus();
+        if (currentFocus != null) {
+            ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE))
+                    .hideSoftInputFromWindow(currentFocus.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+        }
 
         search(searchToken.toString());
     }

@@ -73,7 +73,7 @@ class VerseListAdapter extends BaseAdapter {
         final LinearLayout linearLayout;
         final ViewTag viewTag;
         if (convertView == null) {
-            linearLayout = (LinearLayout) mInflater.inflate(R.layout.item_text, null, false);
+            linearLayout = (LinearLayout) mInflater.inflate(R.layout.item_text, parent, false);
 
             viewTag = new ViewTag();
             viewTag.index = (TextView) linearLayout.getChildAt(0);

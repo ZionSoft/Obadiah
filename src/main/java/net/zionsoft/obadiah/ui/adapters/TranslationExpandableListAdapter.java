@@ -111,7 +111,7 @@ public class TranslationExpandableListAdapter extends BaseExpandableListAdapter 
     @Override
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
         final TextView textView = (TextView) (convertView == null
-                ? mInflater.inflate(R.layout.item_translation_section, null, false) : convertView);
+                ? mInflater.inflate(R.layout.item_translation_section, parent, false) : convertView);
         textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, mMediumTextSize);
         textView.setText(groupPosition == 0 ? R.string.text_downloaded_translations : R.string.text_available_translation);
         return textView;
@@ -120,7 +120,7 @@ public class TranslationExpandableListAdapter extends BaseExpandableListAdapter 
     @Override
     public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
         final TextView textView = (TextView) (convertView == null
-                ? mInflater.inflate(R.layout.item_translation, null, false) : convertView);
+                ? mInflater.inflate(R.layout.item_translation, parent, false) : convertView);
         if (groupPosition == DOWNLOADED_TRANSLATIONS_GROUP) {
             final TranslationInfo translationInfo = mDownloadedTranslations.get(childPosition);
             if (translationInfo.shortName.equals(mCurrentTranslation))

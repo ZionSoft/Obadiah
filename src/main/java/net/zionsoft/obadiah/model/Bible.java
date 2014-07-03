@@ -25,6 +25,7 @@ import android.os.AsyncTask;
 import android.os.SystemClock;
 import android.support.v4.util.LruCache;
 import android.text.TextUtils;
+import android.util.Pair;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -152,11 +153,11 @@ public class Bible {
         if (!forceRefresh && mDownloadedTranslations != null && mAvailableTranslations != null)
             listener.onTranslationsLoaded(mDownloadedTranslations, mAvailableTranslations);
 
-        new AsyncTask<Void, Void, List<TranslationInfo>[]>() {
+        new AsyncTask<Void, Void, Pair<List<TranslationInfo>, List<TranslationInfo>>>() {
             private final long mTimestamp = SystemClock.elapsedRealtime();
 
             @Override
-            protected List<TranslationInfo>[] doInBackground(Void... params) {
+            protected Pair<List<TranslationInfo>, List<TranslationInfo>> doInBackground(Void... params) {
                 try {
                     if (mDownloadedTranslationShortNames == null) {
                         // this should not happen, but just in case
@@ -216,7 +217,7 @@ public class Bible {
                         }
                     });
 
-                    return new List[]{downloaded, available};
+                    return new Pair<List<TranslationInfo>, List<TranslationInfo>>(downloaded, available);
                 } catch (Exception e) {
                     Analytics.trackException("Failed to load translations - " + e.getMessage());
                 }
@@ -224,13 +225,13 @@ public class Bible {
             }
 
             @Override
-            protected void onPostExecute(List<TranslationInfo>[] result) {
-                final boolean isSuccessful = result != null && result.length == 2;
+            protected void onPostExecute(Pair<List<TranslationInfo>, List<TranslationInfo>> result) {
+                final boolean isSuccessful = result != null;
                 Analytics.trackTranslationListDownloading(isSuccessful, SystemClock.elapsedRealtime() - mTimestamp);
 
                 if (isSuccessful) {
-                    mDownloadedTranslations = result[0];
-                    mAvailableTranslations = result[1];
+                    mDownloadedTranslations = result.first;
+                    mAvailableTranslations = result.second;
                 } else {
                     mDownloadedTranslations = null;
                     mAvailableTranslations = null;
@@ -428,7 +429,7 @@ public class Bible {
                         );
                         final int count = cursor.getCount();
                         if (count == 0)
-                            return Collections.EMPTY_LIST;
+                            return Collections.emptyList();
 
                         List<String> bookNames = mBookNameCache.get(translationShortName);
                         if (bookNames == null) {

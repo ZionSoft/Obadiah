@@ -88,7 +88,7 @@ public class VersePagerAdapter extends PagerAdapter {
 
         if (page == null) {
             page = new Page();
-            page.rootView = mInflater.inflate(R.layout.item_verse_pager, null, false);
+            page.rootView = mInflater.inflate(R.layout.item_verse_pager, container, false);
             page.loadingSpinner = page.rootView.findViewById(R.id.loading_spinner);
             page.verseListView = (ListView) page.rootView.findViewById(R.id.verse_list_view);
             final VerseListAdapter verseListAdapter = new VerseListAdapter(mContext);

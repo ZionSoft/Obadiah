@@ -111,7 +111,7 @@ public class BookExpandableListAdapter extends BaseExpandableListAdapter {
     @Override
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
         final TextView textView = (TextView) (convertView == null
-                ? mInflater.inflate(R.layout.item_book_name, null, false) : convertView);
+                ? mInflater.inflate(R.layout.item_book_name, parent, false) : convertView);
         textView.setText(mBookNames.get(groupPosition));
         return textView;
     }
@@ -121,7 +121,7 @@ public class BookExpandableListAdapter extends BaseExpandableListAdapter {
         final LinearLayout linearLayout;
         final ViewTag viewTag;
         if (convertView == null) {
-            linearLayout = (LinearLayout) mInflater.inflate(R.layout.item_chapter_row, null, false);
+            linearLayout = (LinearLayout) mInflater.inflate(R.layout.item_chapter_row, parent, false);
 
             viewTag = new ViewTag();
             viewTag.textViews = new TextView[ROW_CHILD_COUNT];

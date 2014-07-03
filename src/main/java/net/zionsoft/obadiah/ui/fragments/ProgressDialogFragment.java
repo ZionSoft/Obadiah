@@ -20,6 +20,7 @@ package net.zionsoft.obadiah.ui.fragments;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 
 public class ProgressDialogFragment extends DialogFragment {
@@ -49,11 +50,8 @@ public class ProgressDialogFragment extends DialogFragment {
         return fragment;
     }
 
-    public ProgressDialogFragment() {
-        super();
-    }
-
     @Override
+    @NonNull
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         final ProgressDialog dialog = new ProgressDialog(getActivity());
 

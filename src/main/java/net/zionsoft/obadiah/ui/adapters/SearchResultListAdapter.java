@@ -61,7 +61,7 @@ public class SearchResultListAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         final TextView textView = (TextView) (convertView == null
-                ? mInflater.inflate(R.layout.item_search_result, null, false) : convertView);
+                ? mInflater.inflate(R.layout.item_search_result, parent, false) : convertView);
 
         textView.setTextColor(mSettings.getTextColor());
         textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, mSettings.getTextSize());
