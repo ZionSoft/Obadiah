@@ -25,6 +25,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -45,7 +46,7 @@ import net.zionsoft.obadiah.ui.utils.DialogHelper;
 
 import java.util.List;
 
-public class TranslationListFragment extends Fragment {
+public class TranslationListFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
     private static final String TAG_DOWNLOAD_DIALOG_FRAGMENT = "net.zionsoft.obadiah.ui.fragments.TranslationListFragment.TAG_DOWNLOAD_DIALOG_FRAGMENT";
     private static final String TAG_REMOVE_DIALOG_FRAGMENT = "net.zionsoft.obadiah.ui.fragments.TranslationListFragment.TAG_REMOVE_DIALOG_FRAGMENT";
     private static final int CONTEXT_MENU_ITEM_DELETE = 0;
@@ -56,7 +57,7 @@ public class TranslationListFragment extends Fragment {
 
     private TranslationExpandableListAdapter mTranslationListAdapter;
 
-    private View mLoadingSpinner;
+    private SwipeRefreshLayout mSwipeContainer;
     private ExpandableListView mTranslationListView;
 
     public TranslationListFragment() {
@@ -74,8 +75,7 @@ public class TranslationListFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_translation_list, container, false);
     }
 
@@ -83,7 +83,10 @@ public class TranslationListFragment extends Fragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mLoadingSpinner = view.findViewById(R.id.loading_spinner);
+        mSwipeContainer = (SwipeRefreshLayout) view.findViewById(R.id.swipe_container);
+        mSwipeContainer.setColorSchemeResources(R.color.dark_cyan, R.color.dark_lime, R.color.dark_cyan, R.color.dark_lime);
+        mSwipeContainer.setOnRefreshListener(this);
+        mSwipeContainer.setRefreshing(true);
 
         mTranslationListView = (ExpandableListView) view.findViewById(R.id.translation_list_view);
         mTranslationListAdapter = new TranslationExpandableListAdapter(getActivity(), mCurrentTranslation);
@@ -114,7 +117,6 @@ public class TranslationListFragment extends Fragment {
     }
 
     private void loadTranslations(final boolean forceRefresh) {
-        mLoadingSpinner.setVisibility(View.VISIBLE);
         mTranslationListView.setVisibility(View.GONE);
 
         mBible.loadTranslations(forceRefresh, new Bible.OnTranslationsLoadedListener() {
@@ -135,7 +137,7 @@ public class TranslationListFragment extends Fragment {
                     return;
                 }
 
-                AnimationHelper.fadeOut(mLoadingSpinner);
+                mSwipeContainer.setRefreshing(false);
                 AnimationHelper.fadeIn(mTranslationListView);
 
                 mTranslationListAdapter.setTranslations(downloaded, available);
@@ -284,5 +286,10 @@ public class TranslationListFragment extends Fragment {
                 }
             }
         });
+    }
+
+    @Override
+    public void onRefresh() {
+        loadTranslations(true);
     }
 }
