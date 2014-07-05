@@ -23,7 +23,7 @@ public class TranslationInfo {
     public final String language;
     public final int size;
 
-    TranslationInfo(String name, String shortName, String language, int size) {
+    public TranslationInfo(String name, String shortName, String language, int size) {
         super();
 
         this.name = name;

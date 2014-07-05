@@ -27,6 +27,9 @@ import android.support.v4.util.LruCache;
 import android.text.TextUtils;
 import android.util.Pair;
 
+import net.zionsoft.obadiah.model.network.NetworkHelper;
+import net.zionsoft.obadiah.model.translations.TranslationHelper;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -150,78 +153,80 @@ public class Bible {
     }
 
     public void loadTranslations(boolean forceRefresh, final OnTranslationsLoadedListener listener) {
-        if (!forceRefresh && mDownloadedTranslations != null && mAvailableTranslations != null)
+        if (!forceRefresh && mDownloadedTranslations != null && mAvailableTranslations != null) {
             listener.onTranslationsLoaded(mDownloadedTranslations, mAvailableTranslations);
+            return;
+        }
 
         new AsyncTask<Void, Void, Pair<List<TranslationInfo>, List<TranslationInfo>>>() {
             private final long mTimestamp = SystemClock.elapsedRealtime();
 
             @Override
             protected Pair<List<TranslationInfo>, List<TranslationInfo>> doInBackground(Void... params) {
+                List<TranslationInfo> translations = null;
                 try {
-                    if (mDownloadedTranslationShortNames == null) {
-                        // this should not happen, but just in case
-                        mDownloadedTranslationShortNames = Collections.unmodifiableList(getDownloadedTranslations());
-                    }
-
-                    final JSONArray replyArray = new JSONArray(
-                            new String(NetworkHelper.get(NetworkHelper.TRANSLATIONS_LIST_URL), "UTF8"));
-                    final int length = replyArray.length();
-                    final List<TranslationInfo> downloaded = new ArrayList<TranslationInfo>(mDownloadedTranslationShortNames.size());
-                    final List<TranslationInfo> available = new ArrayList<TranslationInfo>(length - mDownloadedTranslationShortNames.size());
-                    for (int i = 0; i < length; ++i) {
-                        final JSONObject translationObject = replyArray.getJSONObject(i);
-                        final String name = translationObject.getString("name");
-                        final String shortName = translationObject.getString("shortName");
-                        final String language = translationObject.getString("language");
-                        final int size = translationObject.getInt("size");
-                        if (TextUtils.isEmpty(name) || TextUtils.isEmpty(shortName)
-                                || TextUtils.isEmpty(language) || size <= 0) {
-                            throw new Exception("Illegal translation info.");
-                        }
-                        final TranslationInfo translationInfo = new TranslationInfo(name, shortName, language, size);
-
-                        boolean isDownloaded = false;
-                        for (String translationShortName : mDownloadedTranslationShortNames) {
-                            if (translationInfo.shortName.equals(translationShortName)) {
-                                isDownloaded = true;
-                                break;
-                            }
-                        }
-                        if (isDownloaded)
-                            downloaded.add(translationInfo);
-                        else
-                            available.add(translationInfo);
-                    }
-
-                    Collections.sort(available, new Comparator<TranslationInfo>() {
-                        @Override
-                        public int compare(TranslationInfo translation1, TranslationInfo translation2) {
-                            // first compares with user's default locale
-                            final Locale userLocale = Locale.getDefault();
-                            final String userLanguage = userLocale.getLanguage().toLowerCase();
-                            final String userCountry = userLocale.getCountry().toLowerCase();
-                            final String[] fields1 = translation1.language.split("_");
-                            final String[] fields2 = translation2.language.split("_");
-                            final int score1 = compareLocale(fields1[0], fields1[1],
-                                    userLanguage, userCountry);
-                            final int score2 = compareLocale(fields2[0], fields2[1],
-                                    userLanguage, userCountry);
-                            int r = score2 - score1;
-                            if (r != 0)
-                                return r;
-
-                            // then sorts by language & name
-                            r = translation1.language.compareTo(translation2.language);
-                            return r == 0 ? translation1.name.compareTo(translation2.name) : r;
-                        }
-                    });
-
-                    return new Pair<List<TranslationInfo>, List<TranslationInfo>>(downloaded, available);
+                    translations = downloadTranslationList(NetworkHelper.PRIMARY_TRANSLATIONS_LIST_URL);
                 } catch (Exception e) {
-                    Analytics.trackException("Failed to load translations - " + e.getMessage());
+                    Analytics.trackException(String.format("Failed to download translation list from %s - %S",
+                            NetworkHelper.PRIMARY_TRANSLATIONS_LIST_URL, e.getMessage()));
                 }
-                return null;
+                if (translations == null) {
+                    try {
+                        translations = downloadTranslationList(NetworkHelper.SECONDARY_TRANSLATIONS_LIST_URL);
+                    } catch (Exception e) {
+                        Analytics.trackException(String.format("Failed to download translation list from %s - %S",
+                                NetworkHelper.PRIMARY_TRANSLATIONS_LIST_URL, e.getMessage()));
+                        return null;
+                    }
+                }
+
+                Collections.sort(translations, new Comparator<TranslationInfo>() {
+                    @Override
+                    public int compare(TranslationInfo translation1, TranslationInfo translation2) {
+                        // first compares with user's default locale
+                        final Locale userLocale = Locale.getDefault();
+                        final String userLanguage = userLocale.getLanguage().toLowerCase();
+                        final String userCountry = userLocale.getCountry().toLowerCase();
+                        final String[] fields1 = translation1.language.split("_");
+                        final String[] fields2 = translation2.language.split("_");
+                        final int score1 = compareLocale(fields1[0], fields1[1],
+                                userLanguage, userCountry);
+                        final int score2 = compareLocale(fields2[0], fields2[1],
+                                userLanguage, userCountry);
+                        int r = score2 - score1;
+                        if (r != 0)
+                            return r;
+
+                        // then sorts by language & name
+                        r = translation1.language.compareTo(translation2.language);
+                        return r == 0 ? translation1.name.compareTo(translation2.name) : r;
+                    }
+                });
+
+                if (mDownloadedTranslationShortNames == null) {
+                    // this should not happen, but just in case
+                    mDownloadedTranslationShortNames = Collections.unmodifiableList(getDownloadedTranslations());
+                }
+
+                final List<TranslationInfo> downloaded
+                        = new ArrayList<TranslationInfo>(mDownloadedTranslationShortNames.size());
+                final List<TranslationInfo> available
+                        = new ArrayList<TranslationInfo>(translations.size() - mDownloadedTranslationShortNames.size());
+                for (TranslationInfo translation : translations) {
+                    boolean isDownloaded = false;
+                    for (String translationShortName : mDownloadedTranslationShortNames) {
+                        if (translation.shortName.equals(translationShortName)) {
+                            isDownloaded = true;
+                            break;
+                        }
+                    }
+                    if (isDownloaded)
+                        downloaded.add(translation);
+                    else
+                        available.add(translation);
+                }
+
+                return new Pair<List<TranslationInfo>, List<TranslationInfo>>(downloaded, available);
             }
 
             @Override
@@ -265,6 +270,10 @@ public class Bible {
                     db.close();
             }
         }
+    }
+
+    private static List<TranslationInfo> downloadTranslationList(String url) throws Exception {
+        return TranslationHelper.toTranslationList(new JSONArray(new String(NetworkHelper.get(url), "UTF8")));
     }
 
     private static int compareLocale(String language, String country, String targetLanguage, String targetCountry) {
