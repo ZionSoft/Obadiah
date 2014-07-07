@@ -27,6 +27,7 @@ import android.support.v4.util.LruCache;
 import android.text.TextUtils;
 import android.util.Pair;
 
+import net.zionsoft.obadiah.model.database.DatabaseHelper;
 import net.zionsoft.obadiah.model.network.NetworkHelper;
 import net.zionsoft.obadiah.model.translations.TranslationHelper;
 
