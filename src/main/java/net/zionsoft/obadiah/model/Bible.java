@@ -18,7 +18,6 @@
 package net.zionsoft.obadiah.model;
 
 import android.content.Context;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.SystemClock;
@@ -26,8 +25,8 @@ import android.support.v4.util.LruCache;
 import android.util.Pair;
 
 import net.zionsoft.obadiah.model.database.DatabaseHelper;
-import net.zionsoft.obadiah.model.translations.TranslationHelper;
 import net.zionsoft.obadiah.model.network.NetworkHelper;
+import net.zionsoft.obadiah.model.translations.TranslationHelper;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -204,7 +203,7 @@ public class Bible {
 
                 if (mDownloadedTranslationShortNames == null) {
                     // this should not happen, but just in case
-                    mDownloadedTranslationShortNames = Collections.unmodifiableList(getDownloadedTranslations());
+                    mDownloadedTranslationShortNames = Collections.unmodifiableList(getDownloadedTranslationShortNames());
                 }
 
                 final List<TranslationInfo> downloaded
@@ -245,26 +244,15 @@ public class Bible {
         }.execute();
     }
 
-    private List<String> getDownloadedTranslations() {
+    private List<String> getDownloadedTranslationShortNames() {
         synchronized (mDatabaseHelper) {
             SQLiteDatabase db = null;
-            Cursor cursor = null;
             try {
                 db = mDatabaseHelper.getReadableDatabase();
                 if (db == null)
                     return null;
-                cursor = db.query(true, DatabaseHelper.TABLE_BOOK_NAMES,
-                        new String[]{DatabaseHelper.COLUMN_TRANSLATION_SHORT_NAME},
-                        null, null, null, null, null, null);
-                final int translationShortName = cursor.getColumnIndex(
-                        DatabaseHelper.COLUMN_TRANSLATION_SHORT_NAME);
-                final List<String> translations = new ArrayList<String>(cursor.getCount());
-                while (cursor.moveToNext())
-                    translations.add(cursor.getString(translationShortName));
-                return translations;
+                return TranslationHelper.getDownloadedTranslationShortNames(db);
             } finally {
-                if (cursor != null)
-                    cursor.close();
                 if (db != null)
                     db.close();
             }
@@ -290,7 +278,7 @@ public class Bible {
         new AsyncTask<Void, Void, List<String>>() {
             @Override
             protected List<String> doInBackground(Void... params) {
-                return getDownloadedTranslations();
+                return getDownloadedTranslationShortNames();
             }
 
             @Override
@@ -317,7 +305,7 @@ public class Bible {
                         db = mDatabaseHelper.getReadableDatabase();
                         if (db == null)
                             return null;
-                        return getBookNames(db, translationShortName);
+                        return TranslationHelper.getBookNames(db, translationShortName);
                     } finally {
                         if (db != null)
                             db.close();
@@ -334,25 +322,6 @@ public class Bible {
         }.execute();
     }
 
-    private static List<String> getBookNames(SQLiteDatabase db, String translationShortName) {
-        Cursor cursor = null;
-        try {
-            cursor = db.query(DatabaseHelper.TABLE_BOOK_NAMES,
-                    new String[]{DatabaseHelper.COLUMN_BOOK_NAME},
-                    String.format("%s = ?", DatabaseHelper.COLUMN_TRANSLATION_SHORT_NAME),
-                    new String[]{translationShortName}, null, null,
-                    String.format("%s ASC", DatabaseHelper.COLUMN_BOOK_INDEX));
-            final int bookName = cursor.getColumnIndex(DatabaseHelper.COLUMN_BOOK_NAME);
-            final List<String> bookNames = new ArrayList<String>(BOOK_COUNT);
-            while (cursor.moveToNext())
-                bookNames.add(cursor.getString(bookName));
-            return bookNames;
-        } finally {
-            if (cursor != null)
-                cursor.close();
-        }
-    }
-
     public void loadVerses(final String translationShortName, final int book, final int chapter,
                            final OnVersesLoadedListener listener) {
         final String key = buildVersesCacheKey(translationShortName, book, chapter);
@@ -367,7 +336,6 @@ public class Bible {
             protected List<Verse> doInBackground(Void... params) {
                 synchronized (mDatabaseHelper) {
                     SQLiteDatabase db = null;
-                    Cursor cursor = null;
                     try {
                         db = mDatabaseHelper.getReadableDatabase();
                         if (db == null)
@@ -376,27 +344,13 @@ public class Bible {
                         List<String> bookNames = mBookNameCache.get(translationShortName);
                         if (bookNames == null) {
                             // this should not happen, but just in case
-                            bookNames = Collections.unmodifiableList(getBookNames(db, translationShortName));
+                            bookNames = Collections.unmodifiableList(TranslationHelper.getBookNames(db, translationShortName));
                             mBookNameCache.put(translationShortName, bookNames);
                         }
-                        final String bookName = bookNames.get(book);
 
-                        cursor = db.query(translationShortName,
-                                new String[]{DatabaseHelper.COLUMN_TEXT},
-                                String.format("%s = ? AND %s = ?",
-                                        DatabaseHelper.COLUMN_BOOK_INDEX, DatabaseHelper.COLUMN_CHAPTER_INDEX),
-                                new String[]{Integer.toString(book), Integer.toString(chapter)},
-                                null, null, String.format("%s ASC", DatabaseHelper.COLUMN_VERSE_INDEX)
-                        );
-                        final int verse = cursor.getColumnIndex(DatabaseHelper.COLUMN_TEXT);
-                        final List<Verse> verses = new ArrayList<Verse>(cursor.getCount());
-                        int verseIndex = 0;
-                        while (cursor.moveToNext())
-                            verses.add(new Verse(book, chapter, verseIndex++, bookName, cursor.getString(verse)));
-                        return verses;
+                        return TranslationHelper.getVerses(db, translationShortName,
+                                bookNames.get(book), book, chapter);
                     } finally {
-                        if (cursor != null)
-                            cursor.close();
                         if (db != null)
                             db.close();
                     }
@@ -423,43 +377,18 @@ public class Bible {
             protected List<Verse> doInBackground(Void... params) {
                 synchronized (mDatabaseHelper) {
                     SQLiteDatabase db = null;
-                    Cursor cursor = null;
                     try {
                         db = mDatabaseHelper.getReadableDatabase();
                         if (db == null)
                             return null;
-                        cursor = db.query(translationShortName,
-                                new String[]{DatabaseHelper.COLUMN_BOOK_INDEX, DatabaseHelper.COLUMN_CHAPTER_INDEX,
-                                        DatabaseHelper.COLUMN_VERSE_INDEX, DatabaseHelper.COLUMN_TEXT},
-                                String.format("%s LIKE ?", DatabaseHelper.COLUMN_TEXT),
-                                new String[]{String.format("%%%s%%", keyword.trim().replaceAll("\\s+", "%"))},
-                                null, null, null
-                        );
-                        final int count = cursor.getCount();
-                        if (count == 0)
-                            return Collections.emptyList();
-
                         List<String> bookNames = mBookNameCache.get(translationShortName);
                         if (bookNames == null) {
                             // this should not happen, but just in case
-                            bookNames = Collections.unmodifiableList(getBookNames(db, translationShortName));
+                            bookNames = Collections.unmodifiableList(TranslationHelper.getBookNames(db, translationShortName));
                             mBookNameCache.put(translationShortName, bookNames);
                         }
-
-                        final int bookIndex = cursor.getColumnIndex(DatabaseHelper.COLUMN_BOOK_INDEX);
-                        final int chapterIndex = cursor.getColumnIndex(DatabaseHelper.COLUMN_CHAPTER_INDEX);
-                        final int verseIndex = cursor.getColumnIndex(DatabaseHelper.COLUMN_VERSE_INDEX);
-                        final int verseText = cursor.getColumnIndex(DatabaseHelper.COLUMN_TEXT);
-                        final List<Verse> verses = new ArrayList<Verse>(count);
-                        while (cursor.moveToNext()) {
-                            final int book = cursor.getInt(bookIndex);
-                            verses.add(new Verse(book, cursor.getInt(chapterIndex), cursor.getInt(verseIndex),
-                                    bookNames.get(book), cursor.getString(verseText)));
-                        }
-                        return verses;
+                        return TranslationHelper.searchVerses(db, translationShortName, bookNames, keyword);
                     } finally {
-                        if (cursor != null)
-                            cursor.close();
                         if (db != null)
                             db.close();
                     }
@@ -629,13 +558,7 @@ public class Bible {
 
                         db.beginTransaction();
 
-                        // deletes the translation table
-                        db.execSQL(String.format("DROP TABLE IF EXISTS %s", translationShortName));
-
-                        // deletes the book names
-                        db.delete(DatabaseHelper.TABLE_BOOK_NAMES,
-                                String.format("%s = ?", DatabaseHelper.COLUMN_TRANSLATION_SHORT_NAME),
-                                new String[]{translationShortName});
+                        TranslationHelper.removeTranslation(db, translationShortName);
 
                         db.setTransactionSuccessful();
 

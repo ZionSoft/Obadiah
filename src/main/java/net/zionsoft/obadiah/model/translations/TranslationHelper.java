@@ -18,17 +18,20 @@
 package net.zionsoft.obadiah.model.translations;
 
 import android.content.ContentValues;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.text.TextUtils;
 
 import net.zionsoft.obadiah.model.Bible;
 import net.zionsoft.obadiah.model.TranslationInfo;
+import net.zionsoft.obadiah.model.Verse;
 import net.zionsoft.obadiah.model.database.DatabaseHelper;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class TranslationHelper {
@@ -48,6 +51,98 @@ public class TranslationHelper {
             translations.add(new TranslationInfo(name, shortName, language, size));
         }
         return translations;
+    }
+
+    public static List<String> getDownloadedTranslationShortNames(SQLiteDatabase db) {
+        Cursor cursor = null;
+        try {
+            cursor = db.query(true, DatabaseHelper.TABLE_BOOK_NAMES,
+                    new String[]{DatabaseHelper.COLUMN_TRANSLATION_SHORT_NAME},
+                    null, null, null, null, null, null);
+            final int translationShortName = cursor.getColumnIndex(
+                    DatabaseHelper.COLUMN_TRANSLATION_SHORT_NAME);
+            final List<String> translations = new ArrayList<String>(cursor.getCount());
+            while (cursor.moveToNext())
+                translations.add(cursor.getString(translationShortName));
+            return translations;
+        } finally {
+            if (cursor != null)
+                cursor.close();
+        }
+    }
+
+    public static List<String> getBookNames(SQLiteDatabase db, String translationShortName) {
+        Cursor cursor = null;
+        try {
+            cursor = db.query(DatabaseHelper.TABLE_BOOK_NAMES,
+                    new String[]{DatabaseHelper.COLUMN_BOOK_NAME},
+                    String.format("%s = ?", DatabaseHelper.COLUMN_TRANSLATION_SHORT_NAME),
+                    new String[]{translationShortName}, null, null,
+                    String.format("%s ASC", DatabaseHelper.COLUMN_BOOK_INDEX));
+            final int bookName = cursor.getColumnIndex(DatabaseHelper.COLUMN_BOOK_NAME);
+            final List<String> bookNames = new ArrayList<String>(Bible.getBookCount());
+            while (cursor.moveToNext())
+                bookNames.add(cursor.getString(bookName));
+            return bookNames;
+        } finally {
+            if (cursor != null)
+                cursor.close();
+        }
+    }
+
+    public static List<Verse> getVerses(SQLiteDatabase db, String translationShortName,
+                                        String bookName, int book, int chapter) {
+        Cursor cursor = null;
+        try {
+            cursor = db.query(translationShortName,
+                    new String[]{DatabaseHelper.COLUMN_TEXT},
+                    String.format("%s = ? AND %s = ?",
+                            DatabaseHelper.COLUMN_BOOK_INDEX, DatabaseHelper.COLUMN_CHAPTER_INDEX),
+                    new String[]{Integer.toString(book), Integer.toString(chapter)},
+                    null, null, String.format("%s ASC", DatabaseHelper.COLUMN_VERSE_INDEX)
+            );
+            final int verse = cursor.getColumnIndex(DatabaseHelper.COLUMN_TEXT);
+            final List<Verse> verses = new ArrayList<Verse>(cursor.getCount());
+            int verseIndex = 0;
+            while (cursor.moveToNext())
+                verses.add(new Verse(book, chapter, verseIndex++, bookName, cursor.getString(verse)));
+            return verses;
+        } finally {
+            if (cursor != null)
+                cursor.close();
+        }
+    }
+
+    public static List<Verse> searchVerses(SQLiteDatabase db, String translationShortName,
+                                           List<String> bookNames, String keyword) {
+        Cursor cursor = null;
+        try {
+            cursor = db.query(translationShortName,
+                    new String[]{DatabaseHelper.COLUMN_BOOK_INDEX, DatabaseHelper.COLUMN_CHAPTER_INDEX,
+                            DatabaseHelper.COLUMN_VERSE_INDEX, DatabaseHelper.COLUMN_TEXT},
+                    String.format("%s LIKE ?", DatabaseHelper.COLUMN_TEXT),
+                    new String[]{String.format("%%%s%%", keyword.trim().replaceAll("\\s+", "%"))},
+                    null, null, null
+            );
+            final int count = cursor.getCount();
+            if (count == 0)
+                return Collections.emptyList();
+
+            final int bookIndex = cursor.getColumnIndex(DatabaseHelper.COLUMN_BOOK_INDEX);
+            final int chapterIndex = cursor.getColumnIndex(DatabaseHelper.COLUMN_CHAPTER_INDEX);
+            final int verseIndex = cursor.getColumnIndex(DatabaseHelper.COLUMN_VERSE_INDEX);
+            final int verseText = cursor.getColumnIndex(DatabaseHelper.COLUMN_TEXT);
+            final List<Verse> verses = new ArrayList<Verse>(count);
+            while (cursor.moveToNext()) {
+                final int book = cursor.getInt(bookIndex);
+                verses.add(new Verse(book, cursor.getInt(chapterIndex), cursor.getInt(verseIndex),
+                        bookNames.get(book), cursor.getString(verseText)));
+            }
+            return verses;
+        } finally {
+            if (cursor != null)
+                cursor.close();
+        }
     }
 
     public static void createTranslationTable(SQLiteDatabase db, String translationShortName) {
@@ -98,5 +193,13 @@ public class TranslationHelper {
             throw new Exception(String.format("Empty chapter: %s %d-%d",
                     translationShortName, bookIndex, chapterIndex));
         }
+    }
+
+    public static void removeTranslation(SQLiteDatabase db, String translationShortName) {
+        db.execSQL(String.format("DROP TABLE IF EXISTS %s", translationShortName));
+
+        db.delete(DatabaseHelper.TABLE_BOOK_NAMES,
+                String.format("%s = ?", DatabaseHelper.COLUMN_TRANSLATION_SHORT_NAME),
+                new String[]{translationShortName});
     }
 }
