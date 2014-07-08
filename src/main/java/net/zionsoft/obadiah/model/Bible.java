@@ -36,9 +36,7 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Locale;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -178,29 +176,6 @@ public class Bible {
                     }
                 }
 
-                Collections.sort(translations, new Comparator<TranslationInfo>() {
-                    @Override
-                    public int compare(TranslationInfo translation1, TranslationInfo translation2) {
-                        // first compares with user's default locale
-                        final Locale userLocale = Locale.getDefault();
-                        final String userLanguage = userLocale.getLanguage().toLowerCase();
-                        final String userCountry = userLocale.getCountry().toLowerCase();
-                        final String[] fields1 = translation1.language.split("_");
-                        final String[] fields2 = translation2.language.split("_");
-                        final int score1 = compareLocale(fields1[0], fields1[1],
-                                userLanguage, userCountry);
-                        final int score2 = compareLocale(fields2[0], fields2[1],
-                                userLanguage, userCountry);
-                        int r = score2 - score1;
-                        if (r != 0)
-                            return r;
-
-                        // then sorts by language & name
-                        r = translation1.language.compareTo(translation2.language);
-                        return r == 0 ? translation1.name.compareTo(translation2.name) : r;
-                    }
-                });
-
                 if (mDownloadedTranslationShortNames == null) {
                     // this should not happen, but just in case
                     mDownloadedTranslationShortNames = Collections.unmodifiableList(getDownloadedTranslationShortNames());
@@ -210,6 +185,7 @@ public class Bible {
                         = new ArrayList<TranslationInfo>(mDownloadedTranslationShortNames.size());
                 final List<TranslationInfo> available
                         = new ArrayList<TranslationInfo>(translations.size() - mDownloadedTranslationShortNames.size());
+                translations = TranslationHelper.sortByLocale(translations);
                 for (TranslationInfo translation : translations) {
                     boolean isDownloaded = false;
                     for (String translationShortName : mDownloadedTranslationShortNames) {
@@ -261,12 +237,6 @@ public class Bible {
 
     private static List<TranslationInfo> downloadTranslationList(String url) throws Exception {
         return TranslationHelper.toTranslationList(new JSONArray(new String(NetworkHelper.get(url), "UTF8")));
-    }
-
-    private static int compareLocale(String language, String country, String targetLanguage, String targetCountry) {
-        if (language.equals(targetLanguage))
-            return (country.equals(targetCountry)) ? 2 : 1;
-        return 0;
     }
 
     public void loadDownloadedTranslations(final OnStringsLoadedListener listener) {
@@ -555,11 +525,8 @@ public class Bible {
                         db = mDatabaseHelper.getWritableDatabase();
                         if (db == null)
                             return false;
-
                         db.beginTransaction();
-
                         TranslationHelper.removeTranslation(db, translationShortName);
-
                         db.setTransactionSuccessful();
 
                         return true;
