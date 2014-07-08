@@ -17,7 +17,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import net.zionsoft.obadiah.R;
-import net.zionsoft.obadiah.model.Analytics;
+import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.Verse;
 import net.zionsoft.obadiah.ui.adapters.VersePagerAdapter;
 

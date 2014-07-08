@@ -37,7 +37,7 @@ import android.widget.Toast;
 
 import net.zionsoft.obadiah.Constants;
 import net.zionsoft.obadiah.R;
-import net.zionsoft.obadiah.model.Analytics;
+import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.Bible;
 import net.zionsoft.obadiah.model.TranslationInfo;
 import net.zionsoft.obadiah.ui.adapters.TranslationExpandableListAdapter;

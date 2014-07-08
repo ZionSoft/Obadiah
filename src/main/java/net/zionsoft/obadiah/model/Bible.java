@@ -24,6 +24,7 @@ import android.os.SystemClock;
 import android.support.v4.util.LruCache;
 import android.util.Pair;
 
+import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.database.DatabaseHelper;
 import net.zionsoft.obadiah.model.network.NetworkHelper;
 import net.zionsoft.obadiah.model.translations.TranslationHelper;

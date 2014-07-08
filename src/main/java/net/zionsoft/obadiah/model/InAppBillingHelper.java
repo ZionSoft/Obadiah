@@ -31,6 +31,7 @@ import android.os.RemoteException;
 import com.android.vending.billing.IInAppBillingService;
 
 import net.zionsoft.obadiah.R;
+import net.zionsoft.obadiah.model.analytics.Analytics;
 
 import org.json.JSONException;
 import org.json.JSONObject;

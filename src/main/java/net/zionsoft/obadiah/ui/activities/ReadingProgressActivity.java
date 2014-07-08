@@ -28,7 +28,7 @@ import android.widget.TextView;
 
 import net.zionsoft.obadiah.Constants;
 import net.zionsoft.obadiah.R;
-import net.zionsoft.obadiah.model.Analytics;
+import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.Bible;
 import net.zionsoft.obadiah.model.ReadingProgress;
 import net.zionsoft.obadiah.model.ReadingProgressManager;

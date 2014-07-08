@@ -28,7 +28,7 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 
 import net.zionsoft.obadiah.R;
-import net.zionsoft.obadiah.model.Analytics;
+import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.InAppBillingHelper;
 import net.zionsoft.obadiah.model.Settings;
 

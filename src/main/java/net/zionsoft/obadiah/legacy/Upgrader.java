@@ -38,34 +38,26 @@ public class Upgrader {
         if (version >= applicationVersion)
             return;
 
+        final SharedPreferences.Editor editor = preferences.edit();
         if (version < 10500) {
             // TODO remove everything in getFilesDir()
-            preferences.edit()
-                    .remove("selectedTranslation")
-                    .putInt(Constants.PREF_KEY_CURRENT_APPLICATION_VERSION, 10500)
-                    .apply();
+            editor.remove("selectedTranslation")
+                    .putInt(Constants.PREF_KEY_CURRENT_APPLICATION_VERSION, 10500);
         }
         if (version < 10700) {
-            preferences.edit()
-                    .remove("lastUpdated")
-                    .putInt(Constants.PREF_KEY_CURRENT_APPLICATION_VERSION, 10700)
-                    .apply();
+            editor.remove("lastUpdated")
+                    .putInt(Constants.PREF_KEY_CURRENT_APPLICATION_VERSION, 10700);
         }
         if (version < 10800) {
-            preferences.edit()
-                    .remove("PREF_KEY_DOWNLOADING_TRANSLATION").remove("PREF_KEY_DOWNLOADING_TRANSLATION_LIST")
+            editor.remove("PREF_KEY_DOWNLOADING_TRANSLATION").remove("PREF_KEY_DOWNLOADING_TRANSLATION_LIST")
                     .remove("PREF_KEY_REMOVING_TRANSLATION").remove("PREF_KEY_UPGRADING")
-                    .putInt(Constants.PREF_KEY_CURRENT_APPLICATION_VERSION, 10800)
-                    .apply();
+                    .putInt(Constants.PREF_KEY_CURRENT_APPLICATION_VERSION, 10800);
         }
         if (version < 10802) {
-            preferences.edit()
-                    .remove("screenOn")
-                    .putInt(Constants.PREF_KEY_CURRENT_APPLICATION_VERSION, 10802)
-                    .apply();
+            editor.remove("screenOn")
+                    .putInt(Constants.PREF_KEY_CURRENT_APPLICATION_VERSION, 10802);
         }
-        preferences.edit()
-                .putInt(Constants.PREF_KEY_CURRENT_APPLICATION_VERSION, applicationVersion)
+        editor.putInt(Constants.PREF_KEY_CURRENT_APPLICATION_VERSION, applicationVersion)
                 .apply();
     }
 }
