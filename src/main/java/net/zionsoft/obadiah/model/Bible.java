@@ -17,15 +17,17 @@
 
 package net.zionsoft.obadiah.model;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.SystemClock;
 import android.support.v4.util.LruCache;
-import android.text.TextUtils;
 import android.util.Pair;
+
+import net.zionsoft.obadiah.model.database.DatabaseHelper;
+import net.zionsoft.obadiah.model.translations.TranslationHelper;
+import net.zionsoft.obadiah.model.network.NetworkHelper;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -150,78 +152,80 @@ public class Bible {
     }
 
     public void loadTranslations(boolean forceRefresh, final OnTranslationsLoadedListener listener) {
-        if (!forceRefresh && mDownloadedTranslations != null && mAvailableTranslations != null)
+        if (!forceRefresh && mDownloadedTranslations != null && mAvailableTranslations != null) {
             listener.onTranslationsLoaded(mDownloadedTranslations, mAvailableTranslations);
+            return;
+        }
 
         new AsyncTask<Void, Void, Pair<List<TranslationInfo>, List<TranslationInfo>>>() {
             private final long mTimestamp = SystemClock.elapsedRealtime();
 
             @Override
             protected Pair<List<TranslationInfo>, List<TranslationInfo>> doInBackground(Void... params) {
+                List<TranslationInfo> translations = null;
                 try {
-                    if (mDownloadedTranslationShortNames == null) {
-                        // this should not happen, but just in case
-                        mDownloadedTranslationShortNames = Collections.unmodifiableList(getDownloadedTranslations());
-                    }
-
-                    final JSONArray replyArray = new JSONArray(
-                            new String(NetworkHelper.get(NetworkHelper.TRANSLATIONS_LIST_URL), "UTF8"));
-                    final int length = replyArray.length();
-                    final List<TranslationInfo> downloaded = new ArrayList<TranslationInfo>(mDownloadedTranslationShortNames.size());
-                    final List<TranslationInfo> available = new ArrayList<TranslationInfo>(length - mDownloadedTranslationShortNames.size());
-                    for (int i = 0; i < length; ++i) {
-                        final JSONObject translationObject = replyArray.getJSONObject(i);
-                        final String name = translationObject.getString("name");
-                        final String shortName = translationObject.getString("shortName");
-                        final String language = translationObject.getString("language");
-                        final int size = translationObject.getInt("size");
-                        if (TextUtils.isEmpty(name) || TextUtils.isEmpty(shortName)
-                                || TextUtils.isEmpty(language) || size <= 0) {
-                            throw new Exception("Illegal translation info.");
-                        }
-                        final TranslationInfo translationInfo = new TranslationInfo(name, shortName, language, size);
-
-                        boolean isDownloaded = false;
-                        for (String translationShortName : mDownloadedTranslationShortNames) {
-                            if (translationInfo.shortName.equals(translationShortName)) {
-                                isDownloaded = true;
-                                break;
-                            }
-                        }
-                        if (isDownloaded)
-                            downloaded.add(translationInfo);
-                        else
-                            available.add(translationInfo);
-                    }
-
-                    Collections.sort(available, new Comparator<TranslationInfo>() {
-                        @Override
-                        public int compare(TranslationInfo translation1, TranslationInfo translation2) {
-                            // first compares with user's default locale
-                            final Locale userLocale = Locale.getDefault();
-                            final String userLanguage = userLocale.getLanguage().toLowerCase();
-                            final String userCountry = userLocale.getCountry().toLowerCase();
-                            final String[] fields1 = translation1.language.split("_");
-                            final String[] fields2 = translation2.language.split("_");
-                            final int score1 = compareLocale(fields1[0], fields1[1],
-                                    userLanguage, userCountry);
-                            final int score2 = compareLocale(fields2[0], fields2[1],
-                                    userLanguage, userCountry);
-                            int r = score2 - score1;
-                            if (r != 0)
-                                return r;
-
-                            // then sorts by language & name
-                            r = translation1.language.compareTo(translation2.language);
-                            return r == 0 ? translation1.name.compareTo(translation2.name) : r;
-                        }
-                    });
-
-                    return new Pair<List<TranslationInfo>, List<TranslationInfo>>(downloaded, available);
+                    translations = downloadTranslationList(NetworkHelper.PRIMARY_TRANSLATIONS_LIST_URL);
                 } catch (Exception e) {
-                    Analytics.trackException("Failed to load translations - " + e.getMessage());
+                    Analytics.trackException(String.format("Failed to download translation list from %s - %s",
+                            NetworkHelper.PRIMARY_TRANSLATIONS_LIST_URL, e.getMessage()));
                 }
-                return null;
+                if (translations == null) {
+                    try {
+                        translations = downloadTranslationList(NetworkHelper.SECONDARY_TRANSLATIONS_LIST_URL);
+                    } catch (Exception e) {
+                        Analytics.trackException(String.format("Failed to download translation list from %s - %s",
+                                NetworkHelper.PRIMARY_TRANSLATIONS_LIST_URL, e.getMessage()));
+                        return null;
+                    }
+                }
+
+                Collections.sort(translations, new Comparator<TranslationInfo>() {
+                    @Override
+                    public int compare(TranslationInfo translation1, TranslationInfo translation2) {
+                        // first compares with user's default locale
+                        final Locale userLocale = Locale.getDefault();
+                        final String userLanguage = userLocale.getLanguage().toLowerCase();
+                        final String userCountry = userLocale.getCountry().toLowerCase();
+                        final String[] fields1 = translation1.language.split("_");
+                        final String[] fields2 = translation2.language.split("_");
+                        final int score1 = compareLocale(fields1[0], fields1[1],
+                                userLanguage, userCountry);
+                        final int score2 = compareLocale(fields2[0], fields2[1],
+                                userLanguage, userCountry);
+                        int r = score2 - score1;
+                        if (r != 0)
+                            return r;
+
+                        // then sorts by language & name
+                        r = translation1.language.compareTo(translation2.language);
+                        return r == 0 ? translation1.name.compareTo(translation2.name) : r;
+                    }
+                });
+
+                if (mDownloadedTranslationShortNames == null) {
+                    // this should not happen, but just in case
+                    mDownloadedTranslationShortNames = Collections.unmodifiableList(getDownloadedTranslations());
+                }
+
+                final List<TranslationInfo> downloaded
+                        = new ArrayList<TranslationInfo>(mDownloadedTranslationShortNames.size());
+                final List<TranslationInfo> available
+                        = new ArrayList<TranslationInfo>(translations.size() - mDownloadedTranslationShortNames.size());
+                for (TranslationInfo translation : translations) {
+                    boolean isDownloaded = false;
+                    for (String translationShortName : mDownloadedTranslationShortNames) {
+                        if (translation.shortName.equals(translationShortName)) {
+                            isDownloaded = true;
+                            break;
+                        }
+                    }
+                    if (isDownloaded)
+                        downloaded.add(translation);
+                    else
+                        available.add(translation);
+                }
+
+                return new Pair<List<TranslationInfo>, List<TranslationInfo>>(downloaded, available);
             }
 
             @Override
@@ -265,6 +269,10 @@ public class Bible {
                     db.close();
             }
         }
+    }
+
+    private static List<TranslationInfo> downloadTranslationList(String url) throws Exception {
+        return TranslationHelper.toTranslationList(new JSONArray(new String(NetworkHelper.get(url), "UTF8")));
     }
 
     private static int compareLocale(String language, String country, String targetLanguage, String targetCountry) {
@@ -472,109 +480,37 @@ public class Bible {
             @Override
             protected Boolean doInBackground(Void... params) {
                 synchronized (mDatabaseHelper) {
-                    ZipInputStream zis = null;
-                    SQLiteDatabase db = null;
+                    final OnDownloadProgressListener onProgress = new OnDownloadProgressListener() {
+                        @Override
+                        public void onProgress(int progress) {
+                            publishProgress(progress);
+                        }
+                    };
+                    boolean downloaded = false;
+                    String url = null;
                     try {
-                        db = mDatabaseHelper.getWritableDatabase();
-                        if (db == null)
-                            return false;
-                        db.beginTransaction();
-
-                        // creates a translation table
-                        db.execSQL(String.format("CREATE TABLE %s (%s INTEGER NOT NULL, %s INTEGER NOT NULL, %s INTEGER NOT NULL, %s TEXT NOT NULL);",
-                                translationShortName, DatabaseHelper.COLUMN_BOOK_INDEX, DatabaseHelper.COLUMN_CHAPTER_INDEX,
-                                DatabaseHelper.COLUMN_VERSE_INDEX, DatabaseHelper.COLUMN_TEXT));
-                        db.execSQL(String.format("CREATE INDEX INDEX_%s ON %s (%s, %s, %s);",
-                                translationShortName, translationShortName, DatabaseHelper.COLUMN_BOOK_INDEX,
-                                DatabaseHelper.COLUMN_CHAPTER_INDEX, DatabaseHelper.COLUMN_VERSE_INDEX));
-
-                        zis = new ZipInputStream(NetworkHelper.getStream(String.format(
-                                NetworkHelper.TRANSLATION_URL_TEMPLATE, URLEncoder.encode(translationShortName, "UTF-8"))));
-
-                        final byte buffer[] = new byte[2048];
-                        final ByteArrayOutputStream os = new ByteArrayOutputStream();
-                        final ContentValues versesValues = new ContentValues(4);
-                        int downloaded = 0;
-                        int read;
-                        ZipEntry entry;
-                        while ((entry = zis.getNextEntry()) != null) {
-                            os.reset();
-                            while ((read = zis.read(buffer, 0, 2048)) != -1)
-                                os.write(buffer, 0, read);
-                            final byte[] bytes = os.toByteArray();
-                            String fileName = entry.getName();
-                            fileName = fileName.substring(0, fileName.length() - 5); // removes the trailing ".json"
-                            if (fileName.equals("books")) {
-                                // writes the book names table
-
-                                final ContentValues bookNamesValues = new ContentValues(3);
-                                bookNamesValues.put(DatabaseHelper.COLUMN_TRANSLATION_SHORT_NAME, translationShortName);
-
-                                final JSONObject booksInfoObject = new JSONObject(new String(bytes, "UTF8"));
-                                final JSONArray booksArray = booksInfoObject.getJSONArray("books");
-                                for (int i = 0; i < Bible.getBookCount(); ++i) {
-                                    bookNamesValues.put(DatabaseHelper.COLUMN_BOOK_INDEX, i);
-
-                                    final String bookName = booksArray.getString(i);
-                                    if (TextUtils.isEmpty(bookName))
-                                        throw new Exception("Illegal books.json file: " + translationShortName);
-                                    bookNamesValues.put(DatabaseHelper.COLUMN_BOOK_NAME, bookName);
-
-                                    db.insert(DatabaseHelper.TABLE_BOOK_NAMES, null, bookNamesValues);
-                                }
-                            } else {
-                                // writes the verses
-
-                                final String[] parts = fileName.split("-");
-                                final int bookIndex = Integer.parseInt(parts[0]);
-                                final int chapterIndex = Integer.parseInt(parts[1]);
-                                versesValues.put(DatabaseHelper.COLUMN_BOOK_INDEX, bookIndex);
-                                versesValues.put(DatabaseHelper.COLUMN_CHAPTER_INDEX, chapterIndex);
-
-                                final JSONObject jsonObject = new JSONObject(new String(bytes, "UTF8"));
-                                final JSONArray paragraphArray = jsonObject.getJSONArray("verses");
-                                final int paragraphCount = paragraphArray.length();
-                                boolean hasNonEmptyVerse = false;
-                                for (int verseIndex = 0; verseIndex < paragraphCount; ++verseIndex) {
-                                    versesValues.put(DatabaseHelper.COLUMN_VERSE_INDEX, verseIndex);
-
-                                    final String verse = paragraphArray.getString(verseIndex);
-                                    if (!hasNonEmptyVerse && !TextUtils.isEmpty(verse))
-                                        hasNonEmptyVerse = true;
-                                    versesValues.put(DatabaseHelper.COLUMN_TEXT, verse);
-
-                                    db.insert(translationShortName, null, versesValues);
-                                }
-                                if (!hasNonEmptyVerse) {
-                                    throw new Exception(String.format("Empty chapter: %s %d-%d",
-                                            translationShortName, bookIndex, chapterIndex));
-                                }
-                            }
-
-                            // broadcasts progress
-                            publishProgress(++downloaded / 12);
-                        }
-
-                        db.setTransactionSuccessful();
-
-                        return true;
+                        url = String.format(NetworkHelper.PRIMARY_TRANSLATION_URL_TEMPLATE,
+                                URLEncoder.encode(translationShortName, "UTF-8"));
+                        downloadTranslation(url, translationShortName, onProgress);
+                        downloaded = true;
                     } catch (Exception e) {
-                        Analytics.trackException("Failed to download translations - " + e.getMessage());
-                        return false;
-                    } finally {
-                        if (db != null) {
-                            if (db.inTransaction())
-                                db.endTransaction();
-                            db.close();
-                        }
-                        if (zis != null) {
-                            try {
-                                zis.close();
-                            } catch (IOException e) {
-                                // we can't do much here
-                            }
+                        Analytics.trackException(String.format("Failed to download translation from %s - %s",
+                                url, e.getMessage()));
+                    }
+                    if (!downloaded) {
+                        try {
+                            // TODO if downloading from primary server fails with a non-zero progress,
+                            // it starts from zero again
+                            url = String.format(NetworkHelper.SECONDARY_TRANSLATION_URL_TEMPLATE,
+                                    URLEncoder.encode(translationShortName, "UTF-8"));
+                            downloadTranslation(url, translationShortName, onProgress);
+                            downloaded = true;
+                        } catch (Exception e) {
+                            Analytics.trackException(String.format("Failed to download translation from %s - %s",
+                                    url, e.getMessage()));
                         }
                     }
+                    return downloaded;
                 }
             }
 
@@ -602,6 +538,66 @@ public class Bible {
                 listener.onTranslationDownloaded(translationShortName, result);
             }
         }.execute();
+    }
+
+    private static interface OnDownloadProgressListener {
+        public void onProgress(int progress);
+    }
+
+    private void downloadTranslation(String url, String translationShortName,
+                                     OnDownloadProgressListener onProgress) throws Exception {
+        ZipInputStream zis = null;
+        SQLiteDatabase db = null;
+        try {
+            db = mDatabaseHelper.getWritableDatabase();
+            if (db == null)
+                throw new Exception("Failed to open database for writing");
+            db.beginTransaction();
+
+            TranslationHelper.createTranslationTable(db, translationShortName);
+
+            zis = new ZipInputStream(NetworkHelper.getStream(url));
+
+            final byte buffer[] = new byte[2048];
+            final ByteArrayOutputStream os = new ByteArrayOutputStream();
+            int downloaded = 0;
+            int read;
+            ZipEntry entry;
+            while ((entry = zis.getNextEntry()) != null) {
+                os.reset();
+                while ((read = zis.read(buffer, 0, 2048)) != -1)
+                    os.write(buffer, 0, read);
+                final byte[] bytes = os.toByteArray();
+                String fileName = entry.getName();
+                fileName = fileName.substring(0, fileName.length() - 5); // removes the trailing ".json"
+                if (fileName.equals("books")) {
+                    TranslationHelper.saveBookNames(db, new JSONObject(new String(bytes, "UTF8")));
+                } else {
+                    final String[] parts = fileName.split("-");
+                    final int bookIndex = Integer.parseInt(parts[0]);
+                    final int chapterIndex = Integer.parseInt(parts[1]);
+                    TranslationHelper.saveVerses(db, translationShortName,
+                            bookIndex, chapterIndex, new JSONObject(new String(bytes, "UTF8")));
+                }
+
+                onProgress.onProgress(++downloaded / 12);
+            }
+
+            db.setTransactionSuccessful();
+        } finally {
+            if (db != null) {
+                if (db.inTransaction())
+                    db.endTransaction();
+                db.close();
+            }
+            if (zis != null) {
+                try {
+                    zis.close();
+                } catch (IOException e) {
+                    // we can't do much here
+                }
+            }
+        }
     }
 
     private static <T> List<T> unmodifiableAppend(List<T> original, T toAppend) {

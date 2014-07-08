@@ -15,18 +15,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.model;
+package net.zionsoft.obadiah.model.network;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-class NetworkHelper {
-    static final String TRANSLATIONS_LIST_URL = "http://bible.zionsoft.net/translations/list.json";
-    static final String TRANSLATION_URL_TEMPLATE = "http://bible.zionsoft.net/translations/%s.zip";
+public class NetworkHelper {
+    public static final String PRIMARY_TRANSLATIONS_LIST_URL = "https://z-bible.appspot.com/v1/translations";
+    public static final String PRIMARY_TRANSLATION_URL_TEMPLATE = "https://z-bible.appspot.com/v1/translation?blobKey=%s";
 
-    static byte[] get(String url) throws IOException {
+    public static final String SECONDARY_TRANSLATIONS_LIST_URL = "http://bible.zionsoft.net/translations/list.json";
+    public static final String SECONDARY_TRANSLATION_URL_TEMPLATE = "http://bible.zionsoft.net/translations/%s.zip";
+
+    public static byte[] get(String url) throws IOException {
         BufferedInputStream bis = null;
         try {
             bis = getStream(url);
@@ -48,7 +51,7 @@ class NetworkHelper {
         }
     }
 
-    static BufferedInputStream getStream(String url) throws IOException {
+    public static BufferedInputStream getStream(String url) throws IOException {
         final HttpURLConnection httpConnection = (HttpURLConnection) new URL(url).openConnection();
         return new BufferedInputStream(httpConnection.getInputStream());
     }

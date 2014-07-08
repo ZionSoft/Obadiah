@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.model;
+package net.zionsoft.obadiah.model.database;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -23,31 +23,33 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-class DatabaseHelper extends SQLiteOpenHelper {
-    static final String TABLE_BOOK_NAMES = "TABLE_BOOK_NAMES";
-    static final String TABLE_READING_PROGRESS = "TABLE_READING_PROGRESS";
+import net.zionsoft.obadiah.model.Bible;
+
+public class DatabaseHelper extends SQLiteOpenHelper {
+    public static final String TABLE_BOOK_NAMES = "TABLE_BOOK_NAMES";
+    public static final String TABLE_READING_PROGRESS = "TABLE_READING_PROGRESS";
     private static final String TABLE_METADATA = "TABLE_METADATA";
     private static final String INDEX_TABLE_BOOK_NAMES = "INDEX_TABLE_BOOK_NAMES";
 
-    static final String COLUMN_TRANSLATION_SHORT_NAME = "COLUMN_TRANSLATION_SHORTNAME";
-    static final String COLUMN_BOOK_INDEX = "COLUMN_BOOK_INDEX";
-    static final String COLUMN_CHAPTER_INDEX = "COLUMN_CHAPTER_INDEX";
-    static final String COLUMN_VERSE_INDEX = "COLUMN_VERSE_INDEX";
-    static final String COLUMN_BOOK_NAME = "COLUMN_BOOK_NAME";
-    static final String COLUMN_TEXT = "COLUMN_TEXT";
-    static final String COLUMN_LAST_READING_TIMESTAMP = "COLUMN_LAST_READING_TIMESTAMP";
+    public static final String COLUMN_TRANSLATION_SHORT_NAME = "COLUMN_TRANSLATION_SHORTNAME";
+    public static final String COLUMN_BOOK_INDEX = "COLUMN_BOOK_INDEX";
+    public static final String COLUMN_CHAPTER_INDEX = "COLUMN_CHAPTER_INDEX";
+    public static final String COLUMN_VERSE_INDEX = "COLUMN_VERSE_INDEX";
+    public static final String COLUMN_BOOK_NAME = "COLUMN_BOOK_NAME";
+    public static final String COLUMN_TEXT = "COLUMN_TEXT";
+    public static final String COLUMN_LAST_READING_TIMESTAMP = "COLUMN_LAST_READING_TIMESTAMP";
     private static final String COLUMN_KEY = "COLUMN_KEY";
     private static final String COLUMN_VALUE = "COLUMN_VALUE";
 
-    static final String KEY_LAST_READING_TIMESTAMP = "KEY_LAST_READING_TIMESTAMP";
-    static final String KEY_CONTINUOUS_READING_DAYS = "KEY_CONTINUOUS_READING_DAYS";
+    public static final String KEY_LAST_READING_TIMESTAMP = "KEY_LAST_READING_TIMESTAMP";
+    public static final String KEY_CONTINUOUS_READING_DAYS = "KEY_CONTINUOUS_READING_DAYS";
 
     private static final int DATABASE_VERSION = 5;
     private static final String DATABASE_NAME = "DB_OBADIAH";
 
     private static DatabaseHelper sInstance;
 
-    static DatabaseHelper getInstance(Context context) {
+    public static DatabaseHelper getInstance(Context context) {
         if (sInstance == null) {
             synchronized (Bible.class) {
                 if (sInstance == null)
@@ -116,14 +118,14 @@ class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    static void setMetadata(SQLiteDatabase db, String key, String value) {
+    public static void setMetadata(SQLiteDatabase db, String key, String value) {
         final ContentValues values = new ContentValues(2);
         values.put(COLUMN_KEY, key);
         values.put(COLUMN_VALUE, value);
         db.insertWithOnConflict(TABLE_METADATA, null, values, SQLiteDatabase.CONFLICT_REPLACE);
     }
 
-    static String getMetadata(SQLiteDatabase db, String key, String defaultValue) {
+    public static String getMetadata(SQLiteDatabase db, String key, String defaultValue) {
         Cursor cursor = null;
         try {
             cursor = db.query(TABLE_METADATA, new String[]{COLUMN_VALUE},

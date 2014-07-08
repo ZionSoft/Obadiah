@@ -25,6 +25,8 @@ import android.os.AsyncTask;
 import android.text.format.DateUtils;
 import android.util.SparseArray;
 
+import net.zionsoft.obadiah.model.database.DatabaseHelper;
+
 import java.util.ArrayList;
 import java.util.List;
 
