@@ -28,9 +28,9 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 
 import net.zionsoft.obadiah.R;
-import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.InAppBillingHelper;
 import net.zionsoft.obadiah.model.Settings;
+import net.zionsoft.obadiah.model.analytics.Analytics;
 
 public class TranslationManagementActivity extends ActionBarActivity {
     private AdView mAdView;
@@ -73,6 +73,10 @@ public class TranslationManagementActivity extends ActionBarActivity {
                     });
                 } else {
                     showAds();
+
+                    // billing can't be initialized, then makes no sense to show the menu item
+                    if (mRemoveAdsMenuItem != null)
+                        mRemoveAdsMenuItem.setVisible(false);
                 }
             }
         });
@@ -136,6 +140,8 @@ public class TranslationManagementActivity extends ActionBarActivity {
             public void onAdsRemovalPurchased(boolean isSuccessful) {
                 if (isSuccessful)
                     hideAds();
+
+                // TODO error handling
             }
         });
     }

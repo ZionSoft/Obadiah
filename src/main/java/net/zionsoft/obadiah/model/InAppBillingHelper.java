@@ -126,8 +126,11 @@ public class InAppBillingHelper implements ServiceConnection {
     }
 
     public void purchaseAdsRemoval(final OnAdsRemovalPurchasedListener onPurchased) {
-        if (mStatus != Status.INITIALIZED)
+        if (mStatus != Status.INITIALIZED) {
+            Analytics.trackException("Failed to purchase ads removal - Not initialized");
+            onPurchased.onAdsRemovalPurchased(false);
             return;
+        }
 
         try {
             // TODO verifies signature
