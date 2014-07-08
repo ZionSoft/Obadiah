@@ -24,8 +24,10 @@ import java.net.URL;
 
 public class NetworkHelper {
     public static final String PRIMARY_TRANSLATIONS_LIST_URL = "https://z-bible.appspot.com/v1/translations";
+    public static final String PRIMARY_TRANSLATION_URL_TEMPLATE = "https://z-bible.appspot.com/v1/translation?blobKey=%s";
+
     public static final String SECONDARY_TRANSLATIONS_LIST_URL = "http://bible.zionsoft.net/translations/list.json";
-    public static final String TRANSLATION_URL_TEMPLATE = "http://bible.zionsoft.net/translations/%s.zip";
+    public static final String SECONDARY_TRANSLATION_URL_TEMPLATE = "http://bible.zionsoft.net/translations/%s.zip";
 
     public static byte[] get(String url) throws IOException {
         BufferedInputStream bis = null;
