@@ -40,6 +40,7 @@ import net.zionsoft.obadiah.model.Bible;
 import net.zionsoft.obadiah.model.ReadingProgressManager;
 import net.zionsoft.obadiah.model.Settings;
 import net.zionsoft.obadiah.model.analytics.Analytics;
+import net.zionsoft.obadiah.model.appindexing.AppIndexingManager;
 import net.zionsoft.obadiah.ui.activities.ReadingProgressActivity;
 import net.zionsoft.obadiah.ui.activities.SearchActivity;
 import net.zionsoft.obadiah.ui.activities.SettingsActivity;
@@ -53,6 +54,7 @@ import java.util.List;
 
 public class BookSelectionActivity extends ActionBarActivity
         implements ChapterSelectionFragment.Listener, TextFragment.Listener {
+    private AppIndexingManager mAppIndexingManager;
     private Bible mBible;
     private Settings mSettings;
     private SharedPreferences mPreferences;
@@ -74,6 +76,7 @@ public class BookSelectionActivity extends ActionBarActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        mAppIndexingManager = new AppIndexingManager(this);
         mBible = Bible.getInstance();
         mSettings = Settings.getInstance();
         mPreferences = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE);
@@ -136,6 +139,7 @@ public class BookSelectionActivity extends ActionBarActivity
     protected void onStart() {
         super.onStart();
 
+        mAppIndexingManager.onStart();
         populateUi();
     }
 
@@ -266,7 +270,9 @@ public class BookSelectionActivity extends ActionBarActivity
     }
 
     private void updateTitle() {
-        setTitle(String.format("%s, %d", mBookNames.get(mCurrentBook), mCurrentChapter + 1));
+        final String bookName = mBookNames.get(mCurrentBook);
+        setTitle(String.format("%s, %d", bookName, mCurrentChapter + 1));
+        mAppIndexingManager.onView(mCurrentTranslation, bookName, mCurrentBook, mCurrentChapter);
 
         // TODO get an improved tracking algorithm, e.g. only consider as "read" if the user stays for a while
         ReadingProgressManager.getInstance().trackChapterReading(mCurrentBook, mCurrentChapter);
@@ -286,6 +292,7 @@ public class BookSelectionActivity extends ActionBarActivity
                 .putInt(Constants.PREF_KEY_LAST_READ_CHAPTER, mCurrentChapter)
                 .putInt(Constants.PREF_KEY_LAST_READ_VERSE, mTextFragment.getCurrentVerse())
                 .apply();
+        mAppIndexingManager.onStop();
 
         super.onStop();
     }
