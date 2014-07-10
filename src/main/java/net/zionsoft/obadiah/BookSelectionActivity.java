@@ -21,6 +21,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.FragmentManager;
@@ -35,10 +36,11 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
-import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.Bible;
 import net.zionsoft.obadiah.model.ReadingProgressManager;
 import net.zionsoft.obadiah.model.Settings;
+import net.zionsoft.obadiah.model.analytics.Analytics;
+import net.zionsoft.obadiah.model.appindexing.AppIndexingManager;
 import net.zionsoft.obadiah.ui.activities.ReadingProgressActivity;
 import net.zionsoft.obadiah.ui.activities.SearchActivity;
 import net.zionsoft.obadiah.ui.activities.SettingsActivity;
@@ -52,6 +54,7 @@ import java.util.List;
 
 public class BookSelectionActivity extends ActionBarActivity
         implements ChapterSelectionFragment.Listener, TextFragment.Listener {
+    private AppIndexingManager mAppIndexingManager;
     private Bible mBible;
     private Settings mSettings;
     private SharedPreferences mPreferences;
@@ -73,11 +76,13 @@ public class BookSelectionActivity extends ActionBarActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        mAppIndexingManager = new AppIndexingManager(this);
         mBible = Bible.getInstance();
         mSettings = Settings.getInstance();
         mPreferences = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE);
 
         initializeUi();
+        checkDeepLink();
     }
 
     private void initializeUi() {
@@ -98,6 +103,31 @@ public class BookSelectionActivity extends ActionBarActivity
         mTextFragment = (TextFragment) fm.findFragmentById(R.id.text_fragment);
     }
 
+    private void checkDeepLink() {
+        final Uri uri = getIntent().getData();
+        if (uri == null)
+            return;
+
+        // format: /bible/<translation-short-name>/<book-index>/<chapter-index>
+        final String[] parts = uri.getPath().split("/");
+        if (parts.length < 5)
+            return;
+
+        try {
+            final String translationShortName = parts[2];
+            final int bookIndex = Integer.parseInt(parts[3]);
+            final int chapterIndex = Integer.parseInt(parts[4]);
+            mPreferences.edit()
+                    .putString(Constants.PREF_KEY_LAST_READ_TRANSLATION, translationShortName)
+                    .putInt(Constants.PREF_KEY_LAST_READ_BOOK, bookIndex)
+                    .putInt(Constants.PREF_KEY_LAST_READ_CHAPTER, chapterIndex)
+                    .putInt(Constants.PREF_KEY_LAST_READ_VERSE, 0)
+                    .apply();
+        } catch (Exception e) {
+            Analytics.trackException("Invalid URI: " + uri.toString());
+        }
+    }
+
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
@@ -109,6 +139,7 @@ public class BookSelectionActivity extends ActionBarActivity
     protected void onStart() {
         super.onStart();
 
+        mAppIndexingManager.onStart();
         populateUi();
     }
 
@@ -239,7 +270,9 @@ public class BookSelectionActivity extends ActionBarActivity
     }
 
     private void updateTitle() {
-        setTitle(String.format("%s, %d", mBookNames.get(mCurrentBook), mCurrentChapter + 1));
+        final String bookName = mBookNames.get(mCurrentBook);
+        setTitle(String.format("%s, %d", bookName, mCurrentChapter + 1));
+        mAppIndexingManager.onView(mCurrentTranslation, bookName, mCurrentBook, mCurrentChapter);
 
         // TODO get an improved tracking algorithm, e.g. only consider as "read" if the user stays for a while
         ReadingProgressManager.getInstance().trackChapterReading(mCurrentBook, mCurrentChapter);
@@ -259,6 +292,7 @@ public class BookSelectionActivity extends ActionBarActivity
                 .putInt(Constants.PREF_KEY_LAST_READ_CHAPTER, mCurrentChapter)
                 .putInt(Constants.PREF_KEY_LAST_READ_VERSE, mTextFragment.getCurrentVerse())
                 .apply();
+        mAppIndexingManager.onStop();
 
         super.onStop();
     }
