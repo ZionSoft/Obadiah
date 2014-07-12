@@ -389,10 +389,15 @@ public class Bible {
                     boolean downloaded = false;
                     String url = null;
                     try {
-                        url = String.format(NetworkHelper.PRIMARY_TRANSLATION_URL_TEMPLATE,
-                                URLEncoder.encode(translationShortName, "UTF-8"));
-                        downloadTranslation(url, translationShortName, onProgress);
-                        downloaded = true;
+                        for (TranslationInfo translationInfo : mAvailableTranslations) {
+                            if (translationInfo.shortName.equals(translationShortName)) {
+                                url = String.format(NetworkHelper.PRIMARY_TRANSLATION_URL_TEMPLATE,
+                                        URLEncoder.encode(translationInfo.blobKey, "UTF-8"));
+                                downloadTranslation(url, translationShortName, onProgress);
+                                downloaded = true;
+                                break;
+                            }
+                        }
                     } catch (Exception e) {
                         Analytics.trackException(String.format("Failed to download translation from %s - %s",
                                 url, e.getMessage()));

@@ -21,14 +21,16 @@ public class TranslationInfo {
     public final String name;
     public final String shortName;
     public final String language;
+    public final String blobKey;
     public final int size;
 
-    public TranslationInfo(String name, String shortName, String language, int size) {
+    public TranslationInfo(String name, String shortName, String language, String blobKey, int size) {
         super();
 
         this.name = name;
         this.shortName = shortName;
         this.language = language;
+        this.blobKey = blobKey;
         this.size = size;
     }
 }

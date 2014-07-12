@@ -45,12 +45,13 @@ public class TranslationHelper {
             final String name = translationObject.getString("name");
             final String shortName = translationObject.getString("shortName");
             final String language = translationObject.getString("language");
+            final String blobKey = translationObject.optString("blobKey", null);
             final int size = translationObject.getInt("size");
             if (TextUtils.isEmpty(name) || TextUtils.isEmpty(shortName)
                     || TextUtils.isEmpty(language) || size <= 0) {
                 throw new Exception("Illegal translation info.");
             }
-            translations.add(new TranslationInfo(name, shortName, language, size));
+            translations.add(new TranslationInfo(name, shortName, language, blobKey, size));
         }
         return translations;
     }
