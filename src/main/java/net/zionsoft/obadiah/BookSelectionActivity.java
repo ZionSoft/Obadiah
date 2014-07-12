@@ -29,6 +29,7 @@ import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -114,15 +115,28 @@ public class BookSelectionActivity extends ActionBarActivity
             return;
 
         try {
+            final SharedPreferences.Editor editor = mPreferences.edit();
+
+            // validity of translation short name will be checked later
             final String translationShortName = parts[2];
+            if (TextUtils.isEmpty(translationShortName))
+                editor.putString(Constants.PREF_KEY_LAST_READ_TRANSLATION, translationShortName);
+            else
+                return;
+
             final int bookIndex = Integer.parseInt(parts[3]);
+            if (bookIndex >= 0 && bookIndex < Bible.getBookCount())
+                editor.putInt(Constants.PREF_KEY_LAST_READ_BOOK, bookIndex);
+            else
+                return;
+
             final int chapterIndex = Integer.parseInt(parts[4]);
-            mPreferences.edit()
-                    .putString(Constants.PREF_KEY_LAST_READ_TRANSLATION, translationShortName)
-                    .putInt(Constants.PREF_KEY_LAST_READ_BOOK, bookIndex)
-                    .putInt(Constants.PREF_KEY_LAST_READ_CHAPTER, chapterIndex)
-                    .putInt(Constants.PREF_KEY_LAST_READ_VERSE, 0)
-                    .apply();
+            if (chapterIndex >= 0 && chapterIndex < Bible.getChapterCount(bookIndex))
+                editor.putInt(Constants.PREF_KEY_LAST_READ_CHAPTER, chapterIndex);
+            else
+                return;
+
+            editor.putInt(Constants.PREF_KEY_LAST_READ_VERSE, 0).apply();
         } catch (Exception e) {
             Analytics.trackException("Invalid URI: " + uri.toString());
         }
@@ -171,7 +185,6 @@ public class BookSelectionActivity extends ActionBarActivity
         mCurrentChapter = mPreferences.getInt(Constants.PREF_KEY_LAST_READ_CHAPTER, 0);
 
         loadTranslations();
-        loadTexts();
     }
 
     private void loadTranslations() {
@@ -195,19 +208,30 @@ public class BookSelectionActivity extends ActionBarActivity
                     return;
                 }
 
+                int selected = 0;
+                boolean hasSelectedTranslation = false;
+                for (String translation : strings) {
+                    if (translation.equals(mCurrentTranslation)) {
+                        hasSelectedTranslation = true;
+                        break;
+                    }
+                    ++selected;
+                }
+                if (!hasSelectedTranslation) {
+                    // the requested translation is not available
+                    mCurrentTranslation = strings.get(0);
+                    selected = 0;
+                    mPreferences.edit()
+                            .putString(Constants.PREF_KEY_LAST_READ_TRANSLATION, mCurrentTranslation)
+                            .apply();
+                }
+
                 final int translationsCount = strings.size();
                 final List<String> translations = new ArrayList<String>(translationsCount + 1);
                 translations.addAll(strings);
                 translations.add(getResources().getString(R.string.text_translations));
                 mTranslationsSpinner.setAdapter(new ArrayAdapter<String>(BookSelectionActivity.this,
                         R.layout.item_drop_down, translations));
-
-                int selected = 0;
-                for (String translation : strings) {
-                    if (translation.equals(mCurrentTranslation))
-                        break;
-                    ++selected;
-                }
                 mTranslationsSpinner.setSelection(selected);
                 mTranslationsSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                     @Override
@@ -235,6 +259,8 @@ public class BookSelectionActivity extends ActionBarActivity
                         // do nothing
                     }
                 });
+
+                loadTexts();
             }
         });
     }
