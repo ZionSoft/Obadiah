@@ -172,7 +172,7 @@ public class Bible {
                         translations = downloadTranslationList(NetworkHelper.SECONDARY_TRANSLATIONS_LIST_URL);
                     } catch (Exception e) {
                         Analytics.trackException(String.format("Failed to download translation list from %s - %s",
-                                NetworkHelper.PRIMARY_TRANSLATIONS_LIST_URL, e.getMessage()));
+                                NetworkHelper.SECONDARY_TRANSLATIONS_LIST_URL, e.getMessage()));
                         return null;
                     }
                 }
