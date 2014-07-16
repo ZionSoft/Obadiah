@@ -250,7 +250,6 @@ public class BookSelectionActivity extends ActionBarActivity
 
         mCurrentTranslation = mPreferences.getString(Constants.PREF_KEY_LAST_READ_TRANSLATION, null);
         if (mCurrentTranslation == null) {
-            // TODO before 1.7.0, there is a bug that set last read translation
             DialogHelper.showDialog(this, false, R.string.dialog_no_translation,
                     new DialogInterface.OnClickListener() {
                         @Override

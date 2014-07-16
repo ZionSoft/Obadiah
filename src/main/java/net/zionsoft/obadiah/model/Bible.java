@@ -380,6 +380,10 @@ public class Bible {
             @Override
             protected Boolean doInBackground(Void... params) {
                 synchronized (mDatabaseHelper) {
+                    // before 1.7.0, there is a bug that set last read translation, so we try to remove
+                    // the translation first
+                    removeTranslation(translationShortName);
+
                     final OnDownloadProgressListener onProgress = new OnDownloadProgressListener() {
                         @Override
                         public void onProgress(int progress) {
@@ -526,23 +530,7 @@ public class Bible {
             @Override
             protected Boolean doInBackground(Void... params) {
                 synchronized (mDatabaseHelper) {
-                    SQLiteDatabase db = null;
-                    try {
-                        db = mDatabaseHelper.getWritableDatabase();
-                        if (db == null)
-                            return false;
-                        db.beginTransaction();
-                        TranslationHelper.removeTranslation(db, translationShortName);
-                        db.setTransactionSuccessful();
-
-                        return true;
-                    } finally {
-                        if (db != null) {
-                            if (db.inTransaction())
-                                db.endTransaction();
-                            db.close();
-                        }
-                    }
+                    return removeTranslation(translationShortName);
                 }
             }
 
@@ -565,5 +553,25 @@ public class Bible {
                 listener.onTranslationRemoved(translationShortName, result);
             }
         }.execute();
+    }
+
+    private boolean removeTranslation(String translationShortName) {
+        SQLiteDatabase db = null;
+        try {
+            db = mDatabaseHelper.getWritableDatabase();
+            if (db == null)
+                return false;
+            db.beginTransaction();
+            TranslationHelper.removeTranslation(db, translationShortName);
+            db.setTransactionSuccessful();
+
+            return true;
+        } finally {
+            if (db != null) {
+                if (db.inTransaction())
+                    db.endTransaction();
+                db.close();
+            }
+        }
     }
 }
