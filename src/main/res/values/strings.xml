@@ -17,6 +17,7 @@
 
     <string name="dialog_no_translation">No translation available, download now?</string>
     <string name="dialog_retry">Fail to load, retry?</string>
+    <string name="dialog_new_version_available_message">A new version is available, download now?</string>
     <string name="dialog_translation_delete_confirm_message">Are you sure to delete this translation?</string>
     <string name="dialog_translation_download_failure_message">Failed to download the translation, try again?</string>
     <string name="dialog_translation_remove_failure_message">Failed to remove the translation, try again?</string>

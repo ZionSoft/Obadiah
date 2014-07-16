@@ -21,10 +21,10 @@ import android.app.Application;
 import android.preference.PreferenceManager;
 
 import net.zionsoft.obadiah.legacy.Upgrader;
-import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.Bible;
 import net.zionsoft.obadiah.model.ReadingProgressManager;
 import net.zionsoft.obadiah.model.Settings;
+import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.ui.utils.UIHelper;
 
 public class App extends Application {

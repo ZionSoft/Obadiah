@@ -24,4 +24,6 @@ public class Constants {
     public static final String PREF_KEY_LAST_READ_BOOK = "currentBook";
     public static final String PREF_KEY_LAST_READ_CHAPTER = "currentChapter";
     public static final String PREF_KEY_LAST_READ_VERSE = "currentVerse";
+    public static final String PREF_KEY_CHECKED_APPLICATION_VERSION = "checkedApplicationVersion";
+    public static final String PREF_KEY_CHECKED_APPLICATION_VERSION_TIMESTAMP = "checkedApplicationVersionTimestamp";
 }

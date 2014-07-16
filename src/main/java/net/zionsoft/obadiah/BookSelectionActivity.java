@@ -17,11 +17,16 @@
 
 package net.zionsoft.obadiah;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.FragmentManager;
@@ -30,6 +35,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
+import android.text.format.DateUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -42,6 +48,7 @@ import net.zionsoft.obadiah.model.ReadingProgressManager;
 import net.zionsoft.obadiah.model.Settings;
 import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.appindexing.AppIndexingManager;
+import net.zionsoft.obadiah.model.network.NetworkHelper;
 import net.zionsoft.obadiah.ui.activities.ReadingProgressActivity;
 import net.zionsoft.obadiah.ui.activities.SearchActivity;
 import net.zionsoft.obadiah.ui.activities.SettingsActivity;
@@ -50,8 +57,11 @@ import net.zionsoft.obadiah.ui.fragments.ChapterSelectionFragment;
 import net.zionsoft.obadiah.ui.fragments.TextFragment;
 import net.zionsoft.obadiah.ui.utils.DialogHelper;
 
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.RejectedExecutionException;
 
 public class BookSelectionActivity extends ActionBarActivity
         implements ChapterSelectionFragment.Listener, TextFragment.Listener {
@@ -84,6 +94,7 @@ public class BookSelectionActivity extends ActionBarActivity
 
         initializeUi();
         checkDeepLink();
+        checkClientVersion();
     }
 
     private void initializeUi() {
@@ -139,6 +150,81 @@ public class BookSelectionActivity extends ActionBarActivity
             editor.putInt(Constants.PREF_KEY_LAST_READ_VERSE, 0).apply();
         } catch (Exception e) {
             Analytics.trackException("Invalid URI: " + uri.toString());
+        }
+    }
+
+    private void checkClientVersion() {
+        final AsyncTask<Void, Void, Boolean> asyncTask = new AsyncTask<Void, Void, Boolean>() {
+            @Override
+            protected Boolean doInBackground(Void... params) {
+                try {
+                    // we only check if at least 24 hours is passed
+                    final SharedPreferences preferences = getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+                    final long now = System.currentTimeMillis();
+                    final long lastCheckedTimestamp = preferences.getLong(
+                            Constants.PREF_KEY_CHECKED_APPLICATION_VERSION_TIMESTAMP, 0);
+                    if (now - lastCheckedTimestamp < DateUtils.DAY_IN_MILLIS)
+                        return false;
+                    preferences.edit().putLong(Constants.PREF_KEY_CHECKED_APPLICATION_VERSION_TIMESTAMP, now).apply();
+
+                    // we only check if the user has active WiFi or WiMAX
+                    final NetworkInfo networkInfo = ((ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE))
+                            .getActiveNetworkInfo();
+                    if (networkInfo == null || !networkInfo.isConnected())
+                        return false;
+                    final int networkType = networkInfo.getType();
+                    if (networkType != ConnectivityManager.TYPE_WIFI
+                            && networkType != ConnectivityManager.TYPE_WIMAX) {
+                        return false;
+                    }
+
+                    final String response = new String(NetworkHelper.get(NetworkHelper.CLIENT_VERSION_URL), "UTF-8");
+                    final JSONObject versionObject = new JSONObject(response);
+                    final int latestVersion = versionObject.getInt("versionCode");
+
+                    // for each new version, we only ask once
+                    if (latestVersion == preferences.getInt(Constants.PREF_KEY_CHECKED_APPLICATION_VERSION, 0))
+                        return false;
+                    preferences.edit().putInt(Constants.PREF_KEY_CHECKED_APPLICATION_VERSION, latestVersion).apply();
+
+                    return getPackageManager().getPackageInfo(getPackageName(), 0).versionCode < latestVersion;
+                } catch (Exception e) {
+                    Analytics.trackException("Failed to check client version - " + e.getMessage());
+                    return false;
+                }
+            }
+
+            @Override
+            protected void onPostExecute(Boolean newVersionAvailable) {
+                if (newVersionAvailable) {
+                    DialogHelper.showDialog(BookSelectionActivity.this, false,
+                            R.string.dialog_new_version_available_message,
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri
+                                            .parse("market://details?id=net.zionsoft.obadiah")));
+                                    Analytics.trackUIUpgradeApp();
+                                }
+                            },
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    Analytics.trackUIIgnoreUpgradeApp();
+                                }
+                            }
+                    );
+                }
+            }
+        };
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            try {
+                asyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            } catch (RejectedExecutionException e) {
+                Analytics.trackException("Failed to execute AsyncTask - " + e.getMessage());
+            }
+        } else {
+            asyncTask.execute();
         }
     }
 

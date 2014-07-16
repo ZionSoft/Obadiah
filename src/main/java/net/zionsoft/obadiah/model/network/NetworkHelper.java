@@ -23,6 +23,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 public class NetworkHelper {
+    public static final String CLIENT_VERSION_URL = "https://z-bible.appspot.com/v1/clientVersion";
+
     public static final String PRIMARY_TRANSLATIONS_LIST_URL = "https://z-bible.appspot.com/v1/translations";
     public static final String PRIMARY_TRANSLATION_URL_TEMPLATE = "https://z-bible.appspot.com/v1/translation?blobKey=%s";
 

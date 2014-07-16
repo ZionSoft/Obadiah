@@ -17,6 +17,7 @@
 
     <string name="dialog_no_translation">沒有可用譯本，現在下載？</string>
     <string name="dialog_retry">讀取失敗，重試？</string>
+    <string name="dialog_new_version_available_message">有版本更新，現在下載？</string>
     <string name="dialog_translation_delete_confirm_message">確定刪除該譯本？</string>
     <string name="dialog_translation_download_failure_message">下載譯本失敗，請重試。</string>
     <string name="dialog_translation_remove_failure_message">刪除譯本失敗，請重試。</string>
