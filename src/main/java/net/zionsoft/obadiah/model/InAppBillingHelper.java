@@ -182,7 +182,7 @@ public class InAppBillingHelper implements ServiceConnection {
             final boolean isPurchased = productId.equals(mContext.getString(R.string.in_app_product_no_ads))
                     && purchaseObject.getInt("purchaseState") == 0;
             if (isPurchased)
-                Analytics.trackBillingPurchase(productId, "remove_ads", purchaseObject.getString("orderId"));
+                Analytics.trackBillingPurchase("remove_ads");
             mOnAdsRemovalPurchased.onAdsRemovalPurchased(isPurchased);
             mOnAdsRemovalPurchased = null;
         } catch (JSONException e) {

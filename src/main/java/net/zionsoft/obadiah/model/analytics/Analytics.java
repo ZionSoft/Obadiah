@@ -49,7 +49,7 @@ public class Analytics {
                 .build());
     }
 
-    public static void trackBillingPurchase(String productId, String productName, String transactionId) {
+    public static void trackBillingPurchase(String productName) {
         sTracker.send(new HitBuilders.EventBuilder("billing", "purchased")
                 .setLabel(productName)
                 .build());
