@@ -373,7 +373,7 @@ public class Bible {
         }.execute();
     }
 
-    public void downloadTranslation(final String translationShortName, final OnTranslationDownloadListener listener) {
+    public void downloadTranslation(final TranslationInfo translationInfo, final OnTranslationDownloadListener listener) {
         new AsyncTask<Void, Integer, Boolean>() {
             private final long mTimestamp = SystemClock.elapsedRealtime();
 
@@ -382,7 +382,7 @@ public class Bible {
                 synchronized (mDatabaseHelper) {
                     // before 1.7.0, there is a bug that set last read translation, so we try to remove
                     // the translation first
-                    removeTranslation(translationShortName);
+                    removeTranslation(translationInfo.shortName);
 
                     final OnDownloadProgressListener onProgress = new OnDownloadProgressListener() {
                         @Override
@@ -390,29 +390,26 @@ public class Bible {
                             publishProgress(progress);
                         }
                     };
+
                     boolean downloaded = false;
                     String url = null;
                     try {
-                        for (TranslationInfo translationInfo : mAvailableTranslations) {
-                            if (translationInfo.shortName.equals(translationShortName)) {
-                                url = String.format(NetworkHelper.PRIMARY_TRANSLATION_URL_TEMPLATE,
-                                        URLEncoder.encode(translationInfo.blobKey, "UTF-8"));
-                                downloadTranslation(url, translationShortName, onProgress);
-                                downloaded = true;
-                                break;
-                            }
-                        }
+                        url = String.format(NetworkHelper.PRIMARY_TRANSLATION_URL_TEMPLATE,
+                                URLEncoder.encode(translationInfo.blobKey, "UTF-8"));
+                        downloadTranslation(url, translationInfo.shortName, onProgress);
+                        downloaded = true;
                     } catch (Exception e) {
                         Analytics.trackException(String.format("Failed to download translation from %s - %s",
                                 url, e.getMessage()));
                     }
+
                     if (!downloaded) {
                         try {
                             // TODO if downloading from primary server fails with a non-zero progress,
                             // it starts from zero again
                             url = String.format(NetworkHelper.SECONDARY_TRANSLATION_URL_TEMPLATE,
-                                    URLEncoder.encode(translationShortName, "UTF-8"));
-                            downloadTranslation(url, translationShortName, onProgress);
+                                    URLEncoder.encode(translationInfo.shortName, "UTF-8"));
+                            downloadTranslation(url, translationInfo.shortName, onProgress);
                             downloaded = true;
                         } catch (Exception e) {
                             Analytics.trackException(String.format("Failed to download translation from %s - %s",
@@ -425,18 +422,18 @@ public class Bible {
 
             @Override
             protected void onProgressUpdate(Integer... values) {
-                listener.onTranslationDownloadProgress(translationShortName, values[0]);
+                listener.onTranslationDownloadProgress(translationInfo.shortName, values[0]);
             }
 
             @Override
             protected void onPostExecute(Boolean result) {
-                Analytics.trackTranslationDownload(translationShortName, result, SystemClock.elapsedRealtime() - mTimestamp);
+                Analytics.trackTranslationDownload(translationInfo.shortName, result, SystemClock.elapsedRealtime() - mTimestamp);
 
-                mDownloadedTranslationShortNames = unmodifiableAppend(mDownloadedTranslationShortNames, translationShortName);
+                mDownloadedTranslationShortNames = unmodifiableAppend(mDownloadedTranslationShortNames, translationInfo.shortName);
 
                 TranslationInfo downloaded = null;
                 for (TranslationInfo available : mAvailableTranslations) {
-                    if (available.shortName.equals(translationShortName)) {
+                    if (available.shortName.equals(translationInfo.shortName)) {
                         downloaded = available;
                         break;
                     }
@@ -444,7 +441,7 @@ public class Bible {
                 mDownloadedTranslations = unmodifiableAppend(mDownloadedTranslations, downloaded);
                 mAvailableTranslations = unmodifiableRemove(mAvailableTranslations, downloaded);
 
-                listener.onTranslationDownloaded(translationShortName, result);
+                listener.onTranslationDownloaded(translationInfo.shortName, result);
             }
         }.execute();
     }

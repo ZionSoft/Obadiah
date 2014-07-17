@@ -106,7 +106,7 @@ public class TranslationListFragment extends Fragment implements SwipeRefreshLay
                             .apply();
                     getActivity().finish();
                 } else if (groupPosition == TranslationExpandableListAdapter.AVAILABLE_TRANSLATIONS_GROUP) {
-                    downloadTranslation(translationInfo.shortName);
+                    downloadTranslation(translationInfo);
                 }
                 return true;
             }
@@ -150,13 +150,13 @@ public class TranslationListFragment extends Fragment implements SwipeRefreshLay
         });
     }
 
-    private void downloadTranslation(String translationShortName) {
+    private void downloadTranslation(final TranslationInfo translationInfo) {
         ProgressDialogFragment.newInstance(R.string.progress_dialog_translation_downloading, 100)
                 .show(getFragmentManager(), TAG_DOWNLOAD_DIALOG_FRAGMENT);
 
-        mBible.downloadTranslation(translationShortName, new Bible.OnTranslationDownloadListener() {
+        mBible.downloadTranslation(translationInfo, new Bible.OnTranslationDownloadListener() {
             @Override
-            public void onTranslationDownloaded(final String translation, boolean isSuccessful) {
+            public void onTranslationDownloaded(String translation, boolean isSuccessful) {
                 if (!isAdded())
                     return;
 
@@ -178,7 +178,7 @@ public class TranslationListFragment extends Fragment implements SwipeRefreshLay
                             R.string.dialog_translation_download_failure_message,
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
-                                    downloadTranslation(translation);
+                                    downloadTranslation(translationInfo);
                                 }
                             }, null
                     );
