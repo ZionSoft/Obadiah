@@ -74,6 +74,7 @@ public class Bible {
 
     private static Bible sInstance;
 
+    private final Context mContext;
     private final DatabaseHelper mDatabaseHelper;
 
     private final LruCache<String, List<String>> mBookNameCache;
@@ -94,6 +95,7 @@ public class Bible {
     private Bible(Context context) {
         super();
 
+        mContext = context;
         mDatabaseHelper = DatabaseHelper.getInstance(context);
 
         final long maxMemory = Runtime.getRuntime().maxMemory();
@@ -152,6 +154,12 @@ public class Bible {
     public void loadTranslations(boolean forceRefresh, final OnTranslationsLoadedListener listener) {
         if (!forceRefresh && mDownloadedTranslations != null && mAvailableTranslations != null) {
             listener.onTranslationsLoaded(mDownloadedTranslations, mAvailableTranslations);
+            return;
+        }
+
+        if (!NetworkHelper.isOnline(mContext)) {
+            // do nothing if network is not available
+            listener.onTranslationsLoaded(null, null);
             return;
         }
 
@@ -374,6 +382,12 @@ public class Bible {
     }
 
     public void downloadTranslation(final TranslationInfo translationInfo, final OnTranslationDownloadListener listener) {
+        if (!NetworkHelper.isOnline(mContext)) {
+            // do nothing if network is not available
+            listener.onTranslationDownloaded(translationInfo.shortName, false);
+            return;
+        }
+
         new AsyncTask<Void, Integer, Boolean>() {
             private final long mTimestamp = SystemClock.elapsedRealtime();
 

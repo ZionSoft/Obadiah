@@ -17,9 +17,9 @@
 
     <string name="dialog_no_translation">没有可用译本，现在下载？</string>
     <string name="dialog_retry">读取失败，重试？</string>
+    <string name="dialog_retry_network">读取失败，请检查网络连接并重试。</string>
     <string name="dialog_new_version_available_message">有版本更新，现在下载？</string>
     <string name="dialog_translation_delete_confirm_message">确定删除该译本？</string>
-    <string name="dialog_translation_download_failure_message">下载译本失败，请重试。</string>
     <string name="dialog_translation_remove_failure_message">删除译本失败，请重试。</string>
 
     <string name="pref_night_mode">夜间模式</string>

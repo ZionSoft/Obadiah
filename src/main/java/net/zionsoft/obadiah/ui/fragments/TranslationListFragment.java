@@ -126,7 +126,7 @@ public class TranslationListFragment extends Fragment implements SwipeRefreshLay
                     return;
 
                 if (downloaded == null || available == null) {
-                    DialogHelper.showDialog(getActivity(), false, R.string.dialog_retry,
+                    DialogHelper.showDialog(getActivity(), false, R.string.dialog_retry_network,
                             new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
@@ -174,8 +174,7 @@ public class TranslationListFragment extends Fragment implements SwipeRefreshLay
                     }
                     loadTranslations(false);
                 } else {
-                    DialogHelper.showDialog(getActivity(), true,
-                            R.string.dialog_translation_download_failure_message,
+                    DialogHelper.showDialog(getActivity(), true, R.string.dialog_retry_network,
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
                                     downloadTranslation(translationInfo);
