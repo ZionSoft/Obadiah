@@ -56,6 +56,7 @@ public class InAppBillingHelper implements ServiceConnection {
     private static final int BILLING_VERSION = 3;
 
     private static final int BILLING_RESPONSE_RESULT_OK = 0;
+    private static final int BILLING_RESPONSE_RESULT_ITEM_ALREADY_OWNED = 7;
 
     private static final int REQUEST_PURCHASE = 8964;
 
@@ -139,6 +140,10 @@ public class InAppBillingHelper implements ServiceConnection {
                     mContext.getPackageName(), mContext.getString(R.string.in_app_product_no_ads),
                     ITEM_TYPE_INAPP, null);
             final int response = buyIntent.getInt("RESPONSE_CODE");
+            if (response == BILLING_RESPONSE_RESULT_ITEM_ALREADY_OWNED) {
+                onPurchased.onAdsRemovalPurchased(true);
+                return;
+            }
             if (response != BILLING_RESPONSE_RESULT_OK) {
                 Analytics.trackException("Failed to purchase ads removal - " + response);
                 onPurchased.onAdsRemovalPurchased(false);
@@ -169,7 +174,8 @@ public class InAppBillingHelper implements ServiceConnection {
         }
 
         final int response = data.getIntExtra("RESPONSE_CODE", 0);
-        if (response != BILLING_RESPONSE_RESULT_OK) {
+        if (response != BILLING_RESPONSE_RESULT_OK
+                && response != BILLING_RESPONSE_RESULT_ITEM_ALREADY_OWNED) {
             Analytics.trackException("Failed to purchase ads removal - " + response);
             mOnAdsRemovalPurchased.onAdsRemovalPurchased(false);
             mOnAdsRemovalPurchased = null;
