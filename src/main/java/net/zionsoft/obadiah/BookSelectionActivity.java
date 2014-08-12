@@ -165,7 +165,6 @@ public class BookSelectionActivity extends ActionBarActivity
                             Constants.PREF_KEY_CHECKED_APPLICATION_VERSION_TIMESTAMP, 0);
                     if (now - lastCheckedTimestamp < DateUtils.DAY_IN_MILLIS)
                         return false;
-                    preferences.edit().putLong(Constants.PREF_KEY_CHECKED_APPLICATION_VERSION_TIMESTAMP, now).apply();
 
                     // we only check if the user has active WiFi or WiMAX
                     final NetworkInfo networkInfo = ((ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE))
@@ -181,6 +180,7 @@ public class BookSelectionActivity extends ActionBarActivity
                     final String response = new String(NetworkHelper.get(NetworkHelper.CLIENT_VERSION_URL), "UTF-8");
                     final JSONObject versionObject = new JSONObject(response);
                     final int latestVersion = versionObject.getInt("versionCode");
+                    preferences.edit().putLong(Constants.PREF_KEY_CHECKED_APPLICATION_VERSION_TIMESTAMP, now).apply();
 
                     // for each new version, we only ask once
                     if (latestVersion == preferences.getInt(Constants.PREF_KEY_CHECKED_APPLICATION_VERSION, 0))
