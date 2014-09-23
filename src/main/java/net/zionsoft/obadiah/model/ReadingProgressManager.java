@@ -18,13 +18,13 @@
 package net.zionsoft.obadiah.model;
 
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.text.format.DateUtils;
 import android.util.SparseArray;
 
+import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.database.DatabaseHelper;
 
 import java.util.ArrayList;
@@ -35,24 +35,7 @@ public class ReadingProgressManager {
         public void onReadingProgressLoaded(ReadingProgress readingProgress);
     }
 
-    private static ReadingProgressManager sInstance;
-
-    private final DatabaseHelper mDatabaseHelper;
-
-    public static void initialize(Context context) {
-        if (sInstance == null) {
-            synchronized (Bible.class) {
-                if (sInstance == null)
-                    sInstance = new ReadingProgressManager(context.getApplicationContext());
-            }
-        }
-    }
-
-    private ReadingProgressManager(Context context) {
-        super();
-
-        mDatabaseHelper = DatabaseHelper.getInstance(context);
-    }
+    private static final ReadingProgressManager sInstance = new ReadingProgressManager();
 
     public static ReadingProgressManager getInstance() {
         return sInstance;
@@ -62,43 +45,44 @@ public class ReadingProgressManager {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
-                synchronized (mDatabaseHelper) {
-                    SQLiteDatabase db = null;
-                    try {
-                        db = mDatabaseHelper.getWritableDatabase();
-                        if (db == null)
-                            return null;
-                        db.beginTransaction();
+                SQLiteDatabase db = null;
+                try {
+                    db = DatabaseHelper.openDatabase();
+                    if (db == null) {
+                        Analytics.trackException("Failed to open database.");
+                        return null;
+                    }
+                    db.beginTransaction();
 
-                        final ContentValues values = new ContentValues(3);
-                        values.put(DatabaseHelper.COLUMN_BOOK_INDEX, book);
-                        values.put(DatabaseHelper.COLUMN_CHAPTER_INDEX, chapter);
-                        values.put(DatabaseHelper.COLUMN_LAST_READING_TIMESTAMP, System.currentTimeMillis());
-                        db.insertWithOnConflict(DatabaseHelper.TABLE_READING_PROGRESS,
-                                null, values, SQLiteDatabase.CONFLICT_REPLACE);
+                    final ContentValues values = new ContentValues(3);
+                    values.put(DatabaseHelper.COLUMN_BOOK_INDEX, book);
+                    values.put(DatabaseHelper.COLUMN_CHAPTER_INDEX, chapter);
+                    values.put(DatabaseHelper.COLUMN_LAST_READING_TIMESTAMP, System.currentTimeMillis());
+                    db.insertWithOnConflict(DatabaseHelper.TABLE_READING_PROGRESS,
+                            null, values, SQLiteDatabase.CONFLICT_REPLACE);
 
-                        final long lastReadingDay = Long.parseLong(DatabaseHelper.getMetadata(
-                                db, DatabaseHelper.KEY_LAST_READING_TIMESTAMP, "0")) / DateUtils.DAY_IN_MILLIS;
-                        final long now = System.currentTimeMillis();
-                        final long today = now / DateUtils.DAY_IN_MILLIS;
-                        final long diff = today - lastReadingDay;
-                        if (diff == 1) {
-                            final int continuousReadingDays = Integer.parseInt(
-                                    DatabaseHelper.getMetadata(db, DatabaseHelper.KEY_CONTINUOUS_READING_DAYS, "0"));
-                            DatabaseHelper.setMetadata(db, DatabaseHelper.KEY_CONTINUOUS_READING_DAYS,
-                                    Integer.toString(continuousReadingDays + 1));
-                        } else if (diff > 2) {
-                            DatabaseHelper.setMetadata(db, DatabaseHelper.KEY_CONTINUOUS_READING_DAYS, "1");
+                    final long lastReadingDay = Long.parseLong(DatabaseHelper.getMetadata(
+                            db, DatabaseHelper.KEY_LAST_READING_TIMESTAMP, "0")) / DateUtils.DAY_IN_MILLIS;
+                    final long now = System.currentTimeMillis();
+                    final long today = now / DateUtils.DAY_IN_MILLIS;
+                    final long diff = today - lastReadingDay;
+                    if (diff == 1) {
+                        final int continuousReadingDays = Integer.parseInt(
+                                DatabaseHelper.getMetadata(db, DatabaseHelper.KEY_CONTINUOUS_READING_DAYS, "0"));
+                        DatabaseHelper.setMetadata(db, DatabaseHelper.KEY_CONTINUOUS_READING_DAYS,
+                                Integer.toString(continuousReadingDays + 1));
+                    } else if (diff > 2) {
+                        DatabaseHelper.setMetadata(db, DatabaseHelper.KEY_CONTINUOUS_READING_DAYS, "1");
+                    }
+                    DatabaseHelper.setMetadata(db, DatabaseHelper.KEY_LAST_READING_TIMESTAMP, Long.toString(now));
+
+                    db.setTransactionSuccessful();
+                } finally {
+                    if (db != null) {
+                        if (db.inTransaction()) {
+                            db.endTransaction();
                         }
-                        DatabaseHelper.setMetadata(db, DatabaseHelper.KEY_LAST_READING_TIMESTAMP, Long.toString(now));
-
-                        db.setTransactionSuccessful();
-                    } finally {
-                        if (db != null) {
-                            if (db.inTransaction())
-                                db.endTransaction();
-                            db.close();
-                        }
+                        DatabaseHelper.closeDatabase();
                     }
                 }
                 return null;
@@ -110,41 +94,43 @@ public class ReadingProgressManager {
         new AsyncTask<Void, Void, ReadingProgress>() {
             @Override
             protected ReadingProgress doInBackground(Void... params) {
-                synchronized (mDatabaseHelper) {
-                    SQLiteDatabase db = null;
-                    Cursor cursor = null;
-                    try {
-                        db = mDatabaseHelper.getReadableDatabase();
-                        if (db == null)
-                            return null;
+                SQLiteDatabase db = null;
+                Cursor cursor = null;
+                try {
+                    db = DatabaseHelper.openDatabase();
+                    if (db == null) {
+                        Analytics.trackException("Failed to open database.");
+                        return null;
+                    }
 
-                        cursor = db.query(DatabaseHelper.TABLE_READING_PROGRESS,
-                                new String[]{DatabaseHelper.COLUMN_BOOK_INDEX, DatabaseHelper.COLUMN_CHAPTER_INDEX,
-                                        DatabaseHelper.COLUMN_LAST_READING_TIMESTAMP},
-                                null, null, null, null, null
-                        );
-                        final int bookIndex = cursor.getColumnIndex(DatabaseHelper.COLUMN_BOOK_INDEX);
-                        final int chapterIndex = cursor.getColumnIndex(DatabaseHelper.COLUMN_CHAPTER_INDEX);
-                        final int lastReadingTimestamp = cursor.getColumnIndex(DatabaseHelper.COLUMN_LAST_READING_TIMESTAMP);
+                    cursor = db.query(DatabaseHelper.TABLE_READING_PROGRESS,
+                            new String[]{DatabaseHelper.COLUMN_BOOK_INDEX, DatabaseHelper.COLUMN_CHAPTER_INDEX,
+                                    DatabaseHelper.COLUMN_LAST_READING_TIMESTAMP},
+                            null, null, null, null, null
+                    );
+                    final int bookIndex = cursor.getColumnIndex(DatabaseHelper.COLUMN_BOOK_INDEX);
+                    final int chapterIndex = cursor.getColumnIndex(DatabaseHelper.COLUMN_CHAPTER_INDEX);
+                    final int lastReadingTimestamp = cursor.getColumnIndex(DatabaseHelper.COLUMN_LAST_READING_TIMESTAMP);
 
-                        final int bookCount = Bible.getBookCount();
-                        final List<SparseArray<Long>> chaptersReadPerBook = new ArrayList<SparseArray<Long>>(bookCount);
-                        for (int i = 0; i < bookCount; ++i)
-                            chaptersReadPerBook.add(new SparseArray<Long>(Bible.getChapterCount(i)));
-                        while (cursor.moveToNext()) {
-                            chaptersReadPerBook.get(cursor.getInt(bookIndex))
-                                    .append(cursor.getInt(chapterIndex), cursor.getLong(lastReadingTimestamp));
-                        }
+                    final int bookCount = Bible.getBookCount();
+                    final List<SparseArray<Long>> chaptersReadPerBook = new ArrayList<SparseArray<Long>>(bookCount);
+                    for (int i = 0; i < bookCount; ++i)
+                        chaptersReadPerBook.add(new SparseArray<Long>(Bible.getChapterCount(i)));
+                    while (cursor.moveToNext()) {
+                        chaptersReadPerBook.get(cursor.getInt(bookIndex))
+                                .append(cursor.getInt(chapterIndex), cursor.getLong(lastReadingTimestamp));
+                    }
 
-                        final int continuousReadingDays = Integer.parseInt(
-                                DatabaseHelper.getMetadata(db, DatabaseHelper.KEY_CONTINUOUS_READING_DAYS, "1"));
+                    final int continuousReadingDays = Integer.parseInt(
+                            DatabaseHelper.getMetadata(db, DatabaseHelper.KEY_CONTINUOUS_READING_DAYS, "1"));
 
-                        return new ReadingProgress(chaptersReadPerBook, continuousReadingDays);
-                    } finally {
-                        if (cursor != null)
-                            cursor.close();
-                        if (db != null)
-                            db.close();
+                    return new ReadingProgress(chaptersReadPerBook, continuousReadingDays);
+                } finally {
+                    if (cursor != null) {
+                        cursor.close();
+                    }
+                    if (db != null) {
+                        DatabaseHelper.closeDatabase();
                     }
                 }
             }

@@ -23,7 +23,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import net.zionsoft.obadiah.model.Bible;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String TABLE_BOOK_NAMES = "TABLE_BOOK_NAMES";
@@ -49,18 +49,37 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static DatabaseHelper sInstance;
 
-    public static DatabaseHelper getInstance(Context context) {
+    private AtomicInteger mCounter;
+    private SQLiteDatabase mDatabase;
+
+    public static void initialize(Context context) {
         if (sInstance == null) {
-            synchronized (Bible.class) {
-                if (sInstance == null)
+            synchronized (DatabaseHelper.class) {
+                if (sInstance == null) {
                     sInstance = new DatabaseHelper(context.getApplicationContext());
+                }
             }
         }
-        return sInstance;
     }
 
     private DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+
+        mCounter = new AtomicInteger();
+    }
+
+    public static synchronized SQLiteDatabase openDatabase() {
+        if (sInstance.mCounter.incrementAndGet() == 1) {
+            sInstance.mDatabase = sInstance.getWritableDatabase();
+        }
+        return sInstance.mDatabase;
+    }
+
+    public static synchronized void closeDatabase() {
+        if (sInstance.mCounter.decrementAndGet() == 0) {
+            sInstance.mDatabase.close();
+            sInstance.mDatabase = null;
+        }
     }
 
     @Override

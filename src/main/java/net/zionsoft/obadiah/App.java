@@ -22,9 +22,9 @@ import android.preference.PreferenceManager;
 
 import net.zionsoft.obadiah.legacy.Upgrader;
 import net.zionsoft.obadiah.model.Bible;
-import net.zionsoft.obadiah.model.ReadingProgressManager;
 import net.zionsoft.obadiah.model.Settings;
 import net.zionsoft.obadiah.model.analytics.Analytics;
+import net.zionsoft.obadiah.model.database.DatabaseHelper;
 import net.zionsoft.obadiah.ui.utils.UIHelper;
 
 public class App extends Application {
@@ -32,12 +32,13 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
 
+        Analytics.initialize(this);
+        DatabaseHelper.initialize(this);
+
         Upgrader.upgrade(this);
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 
-        Analytics.initialize(this);
         Bible.initialize(this);
-        ReadingProgressManager.initialize(this);
         Settings.initialize(this);
 
         UIHelper.forceActionBarOverflowMenu(this);

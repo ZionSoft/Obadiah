@@ -75,7 +75,6 @@ public class Bible {
     private static Bible sInstance;
 
     private final Context mContext;
-    private final DatabaseHelper mDatabaseHelper;
 
     private final LruCache<String, List<String>> mBookNameCache;
     private final LruCache<String, List<Verse>> mVerseCache;
@@ -96,7 +95,6 @@ public class Bible {
         super();
 
         mContext = context;
-        mDatabaseHelper = DatabaseHelper.getInstance(context);
 
         final long maxMemory = Runtime.getRuntime().maxMemory();
         mBookNameCache = new LruCache<String, List<String>>((int) (maxMemory / 16L)) {
@@ -230,16 +228,17 @@ public class Bible {
     }
 
     private List<String> getDownloadedTranslationShortNames() {
-        synchronized (mDatabaseHelper) {
-            SQLiteDatabase db = null;
-            try {
-                db = mDatabaseHelper.getReadableDatabase();
-                if (db == null)
-                    return null;
-                return TranslationHelper.getDownloadedTranslationShortNames(db);
-            } finally {
-                if (db != null)
-                    db.close();
+        SQLiteDatabase db = null;
+        try {
+            db = DatabaseHelper.openDatabase();
+            if (db == null) {
+                Analytics.trackException("Failed to open database.");
+                return null;
+            }
+            return TranslationHelper.getDownloadedTranslationShortNames(db);
+        } finally {
+            if (db != null) {
+                DatabaseHelper.closeDatabase();
             }
         }
     }
@@ -278,16 +277,17 @@ public class Bible {
         new AsyncTask<Void, Void, List<String>>() {
             @Override
             protected List<String> doInBackground(Void... params) {
-                synchronized (mDatabaseHelper) {
-                    SQLiteDatabase db = null;
-                    try {
-                        db = mDatabaseHelper.getReadableDatabase();
-                        if (db == null)
-                            return null;
-                        return TranslationHelper.getBookNames(db, translationShortName);
-                    } finally {
-                        if (db != null)
-                            db.close();
+                SQLiteDatabase db = null;
+                try {
+                    db = DatabaseHelper.openDatabase();
+                    if (db == null) {
+                        Analytics.trackException("Failed to open database.");
+                        return null;
+                    }
+                    return TranslationHelper.getBookNames(db, translationShortName);
+                } finally {
+                    if (db != null) {
+                        DatabaseHelper.closeDatabase();
                     }
                 }
             }
@@ -313,25 +313,26 @@ public class Bible {
         new AsyncTask<Void, Void, List<Verse>>() {
             @Override
             protected List<Verse> doInBackground(Void... params) {
-                synchronized (mDatabaseHelper) {
-                    SQLiteDatabase db = null;
-                    try {
-                        db = mDatabaseHelper.getReadableDatabase();
-                        if (db == null)
-                            return null;
+                SQLiteDatabase db = null;
+                try {
+                    db = DatabaseHelper.openDatabase();
+                    if (db == null) {
+                        Analytics.trackException("Failed to open database.");
+                        return null;
+                    }
 
-                        List<String> bookNames = mBookNameCache.get(translationShortName);
-                        if (bookNames == null) {
-                            // this should not happen, but just in case
-                            bookNames = Collections.unmodifiableList(TranslationHelper.getBookNames(db, translationShortName));
-                            mBookNameCache.put(translationShortName, bookNames);
-                        }
+                    List<String> bookNames = mBookNameCache.get(translationShortName);
+                    if (bookNames == null) {
+                        // this should not happen, but just in case
+                        bookNames = Collections.unmodifiableList(TranslationHelper.getBookNames(db, translationShortName));
+                        mBookNameCache.put(translationShortName, bookNames);
+                    }
 
-                        return TranslationHelper.getVerses(db, translationShortName,
-                                bookNames.get(book), book, chapter);
-                    } finally {
-                        if (db != null)
-                            db.close();
+                    return TranslationHelper.getVerses(db, translationShortName,
+                            bookNames.get(book), book, chapter);
+                } finally {
+                    if (db != null) {
+                        DatabaseHelper.closeDatabase();
                     }
                 }
             }
@@ -354,22 +355,23 @@ public class Bible {
         new AsyncTask<Void, Void, List<Verse>>() {
             @Override
             protected List<Verse> doInBackground(Void... params) {
-                synchronized (mDatabaseHelper) {
-                    SQLiteDatabase db = null;
-                    try {
-                        db = mDatabaseHelper.getReadableDatabase();
-                        if (db == null)
-                            return null;
-                        List<String> bookNames = mBookNameCache.get(translationShortName);
-                        if (bookNames == null) {
-                            // this should not happen, but just in case
-                            bookNames = Collections.unmodifiableList(TranslationHelper.getBookNames(db, translationShortName));
-                            mBookNameCache.put(translationShortName, bookNames);
-                        }
-                        return TranslationHelper.searchVerses(db, translationShortName, bookNames, keyword);
-                    } finally {
-                        if (db != null)
-                            db.close();
+                SQLiteDatabase db = null;
+                try {
+                    db = DatabaseHelper.openDatabase();
+                    if (db == null) {
+                        Analytics.trackException("Failed to open database.");
+                        return null;
+                    }
+                    List<String> bookNames = mBookNameCache.get(translationShortName);
+                    if (bookNames == null) {
+                        // this should not happen, but just in case
+                        bookNames = Collections.unmodifiableList(TranslationHelper.getBookNames(db, translationShortName));
+                        mBookNameCache.put(translationShortName, bookNames);
+                    }
+                    return TranslationHelper.searchVerses(db, translationShortName, bookNames, keyword);
+                } finally {
+                    if (db != null) {
+                        DatabaseHelper.closeDatabase();
                     }
                 }
             }
@@ -393,45 +395,43 @@ public class Bible {
 
             @Override
             protected Boolean doInBackground(Void... params) {
-                synchronized (mDatabaseHelper) {
-                    // before 1.7.0, there is a bug that set last read translation, so we try to remove
-                    // the translation first
-                    removeTranslation(translationInfo.shortName);
+                // before 1.7.0, there is a bug that set last read translation, so we try to remove
+                // the translation first
+                removeTranslation(translationInfo.shortName);
 
-                    final OnDownloadProgressListener onProgress = new OnDownloadProgressListener() {
-                        @Override
-                        public void onProgress(int progress) {
-                            publishProgress(progress);
-                        }
-                    };
+                final OnDownloadProgressListener onProgress = new OnDownloadProgressListener() {
+                    @Override
+                    public void onProgress(int progress) {
+                        publishProgress(progress);
+                    }
+                };
 
-                    boolean downloaded = false;
-                    String url = null;
+                boolean downloaded = false;
+                String url = null;
+                try {
+                    url = String.format(NetworkHelper.PRIMARY_TRANSLATION_URL_TEMPLATE,
+                            URLEncoder.encode(translationInfo.blobKey, "UTF-8"));
+                    downloadTranslation(url, translationInfo.shortName, onProgress);
+                    downloaded = true;
+                } catch (Exception e) {
+                    Analytics.trackException(String.format("Failed to download translation from %s - %s",
+                            url, e.getMessage()));
+                }
+
+                if (!downloaded) {
                     try {
-                        url = String.format(NetworkHelper.PRIMARY_TRANSLATION_URL_TEMPLATE,
-                                URLEncoder.encode(translationInfo.blobKey, "UTF-8"));
+                        // TODO if downloading from primary server fails with a non-zero progress,
+                        // it starts from zero again
+                        url = String.format(NetworkHelper.SECONDARY_TRANSLATION_URL_TEMPLATE,
+                                URLEncoder.encode(translationInfo.shortName, "UTF-8"));
                         downloadTranslation(url, translationInfo.shortName, onProgress);
                         downloaded = true;
                     } catch (Exception e) {
                         Analytics.trackException(String.format("Failed to download translation from %s - %s",
                                 url, e.getMessage()));
                     }
-
-                    if (!downloaded) {
-                        try {
-                            // TODO if downloading from primary server fails with a non-zero progress,
-                            // it starts from zero again
-                            url = String.format(NetworkHelper.SECONDARY_TRANSLATION_URL_TEMPLATE,
-                                    URLEncoder.encode(translationInfo.shortName, "UTF-8"));
-                            downloadTranslation(url, translationInfo.shortName, onProgress);
-                            downloaded = true;
-                        } catch (Exception e) {
-                            Analytics.trackException(String.format("Failed to download translation from %s - %s",
-                                    url, e.getMessage()));
-                        }
-                    }
-                    return downloaded;
                 }
+                return downloaded;
             }
 
             @Override
@@ -469,9 +469,11 @@ public class Bible {
         ZipInputStream zis = null;
         SQLiteDatabase db = null;
         try {
-            db = mDatabaseHelper.getWritableDatabase();
-            if (db == null)
+            db = DatabaseHelper.openDatabase();
+            if (db == null) {
+                Analytics.trackException("Failed to open database.");
                 throw new Exception("Failed to open database for writing");
+            }
             db.beginTransaction();
 
             TranslationHelper.createTranslationTable(db, translationShortName);
@@ -506,9 +508,10 @@ public class Bible {
             db.setTransactionSuccessful();
         } finally {
             if (db != null) {
-                if (db.inTransaction())
+                if (db.inTransaction()) {
                     db.endTransaction();
-                db.close();
+                }
+                DatabaseHelper.closeDatabase();
             }
             if (zis != null) {
                 try {
@@ -540,9 +543,7 @@ public class Bible {
         new AsyncTask<Void, Void, Boolean>() {
             @Override
             protected Boolean doInBackground(Void... params) {
-                synchronized (mDatabaseHelper) {
-                    return removeTranslation(translationShortName);
-                }
+                return removeTranslation(translationShortName);
             }
 
             @Override
@@ -569,9 +570,11 @@ public class Bible {
     private boolean removeTranslation(String translationShortName) {
         SQLiteDatabase db = null;
         try {
-            db = mDatabaseHelper.getWritableDatabase();
-            if (db == null)
+            db = DatabaseHelper.openDatabase();
+            if (db == null) {
+                Analytics.trackException("Failed to open database.");
                 return false;
+            }
             db.beginTransaction();
             TranslationHelper.removeTranslation(db, translationShortName);
             db.setTransactionSuccessful();
@@ -579,9 +582,10 @@ public class Bible {
             return true;
         } finally {
             if (db != null) {
-                if (db.inTransaction())
+                if (db.inTransaction()) {
                     db.endTransaction();
-                db.close();
+                }
+                DatabaseHelper.closeDatabase();
             }
         }
     }
