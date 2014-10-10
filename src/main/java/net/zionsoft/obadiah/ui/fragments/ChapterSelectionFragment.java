@@ -100,8 +100,10 @@ public class ChapterSelectionFragment extends Fragment {
                     parent.collapseGroup(groupPosition);
                 } else {
                     parent.expandGroup(groupPosition);
-                    parent.collapseGroup(mLastExpandedGroup);
-                    mLastExpandedGroup = groupPosition;
+                    if (mLastExpandedGroup != groupPosition) {
+                        parent.collapseGroup(mLastExpandedGroup);
+                        mLastExpandedGroup = groupPosition;
+                    }
                 }
                 return true;
             }
