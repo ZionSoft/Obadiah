@@ -202,6 +202,12 @@ public class SearchActivity extends ActionBarActivity {
 
                         mSearchResultListAdapter.setVerses(verses);
                         mSearchResultListAdapter.notifyDataSetChanged();
+                        mSearchResultListView.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                mSearchResultListView.setSelection(0);
+                            }
+                        });
 
                         mData.verses = verses;
 
