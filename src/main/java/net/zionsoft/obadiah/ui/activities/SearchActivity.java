@@ -124,7 +124,8 @@ public class SearchActivity extends ActionBarActivity {
                         .putInt(Constants.PREF_KEY_LAST_READ_VERSE, verse.verseIndex)
                         .apply();
 
-                startActivity(BookSelectionActivity.newStartReorderToTopIntent(SearchActivity.this));
+                AnimationHelper.slideIn(SearchActivity.this,
+                        BookSelectionActivity.newStartReorderToTopIntent(SearchActivity.this));
             }
         });
     }
