@@ -30,7 +30,7 @@ public class ShortcutActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         setResult(RESULT_OK, new Intent()
-                .putExtra(Intent.EXTRA_SHORTCUT_INTENT, new Intent(this, BookSelectionActivity.class))
+                .putExtra(Intent.EXTRA_SHORTCUT_INTENT, BookSelectionActivity.newStartIntent(this))
                 .putExtra(Intent.EXTRA_SHORTCUT_NAME, getString(R.string.app_name))
                 .putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE, Intent.ShortcutIconResource.fromContext(this, R.drawable.ic_launcher)));
         finish();

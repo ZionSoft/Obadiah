@@ -104,7 +104,10 @@ public class TranslationListFragment extends Fragment implements SwipeRefreshLay
                     mPreferences.edit()
                             .putString(Constants.PREF_KEY_LAST_READ_TRANSLATION, translationInfo.shortName)
                             .apply();
-                    getActivity().finish();
+
+                    Activity activity = getActivity();
+                    activity.finish();
+                    activity.overridePendingTransition(R.anim.fade_in, R.anim.slide_out_left_to_right);
                 } else if (groupPosition == TranslationExpandableListAdapter.AVAILABLE_TRANSLATIONS_GROUP) {
                     downloadTranslation(translationInfo);
                 }

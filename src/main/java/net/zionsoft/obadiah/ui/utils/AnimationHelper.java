@@ -20,12 +20,21 @@ package net.zionsoft.obadiah.ui.utils;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.annotation.TargetApi;
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Build;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 
+import net.zionsoft.obadiah.R;
+
 public class AnimationHelper {
+    public static void slideIn(Activity activity, Intent startIntent) {
+        activity.startActivity(startIntent);
+        activity.overridePendingTransition(R.anim.slide_in_right_to_left, R.anim.fade_out);
+    }
+
     public static void fadeIn(View view) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
             fadeInHoneyComb(view);

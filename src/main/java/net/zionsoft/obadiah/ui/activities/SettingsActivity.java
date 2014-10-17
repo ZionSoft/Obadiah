@@ -17,6 +17,8 @@
 
 package net.zionsoft.obadiah.ui.activities;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 
@@ -25,6 +27,10 @@ import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.Settings;
 
 public class SettingsActivity extends PreferenceActivity {
+    public static Intent newStartIntent(Context context) {
+        return new Intent(context, SettingsActivity.class);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,5 +46,11 @@ public class SettingsActivity extends PreferenceActivity {
         super.onResume();
 
         Analytics.trackScreen(SettingsActivity.class.getSimpleName());
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        overridePendingTransition(R.anim.fade_in, R.anim.slide_out_left_to_right);
     }
 }

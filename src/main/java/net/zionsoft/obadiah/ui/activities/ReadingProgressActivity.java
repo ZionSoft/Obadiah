@@ -17,7 +17,9 @@
 
 package net.zionsoft.obadiah.ui.activities;
 
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.TypedValue;
@@ -28,11 +30,11 @@ import android.widget.TextView;
 
 import net.zionsoft.obadiah.Constants;
 import net.zionsoft.obadiah.R;
-import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.Bible;
 import net.zionsoft.obadiah.model.ReadingProgress;
 import net.zionsoft.obadiah.model.ReadingProgressManager;
 import net.zionsoft.obadiah.model.Settings;
+import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.ui.adapters.ReadingProgressListAdapter;
 import net.zionsoft.obadiah.ui.utils.AnimationHelper;
 import net.zionsoft.obadiah.ui.utils.DialogHelper;
@@ -40,6 +42,10 @@ import net.zionsoft.obadiah.ui.utils.DialogHelper;
 import java.util.List;
 
 public class ReadingProgressActivity extends ActionBarActivity {
+    public static Intent newStartIntent(Context context) {
+        return new Intent(context, ReadingProgressActivity.class);
+    }
+
     private List<String> mBookNames;
     private ReadingProgress mReadingProgress;
 
@@ -207,5 +213,11 @@ public class ReadingProgressActivity extends ActionBarActivity {
         super.onResume();
 
         Analytics.trackScreen(ReadingProgressActivity.class.getSimpleName());
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        overridePendingTransition(R.anim.fade_in, R.anim.slide_out_left_to_right);
     }
 }

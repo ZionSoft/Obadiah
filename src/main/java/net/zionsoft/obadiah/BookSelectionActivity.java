@@ -17,6 +17,7 @@
 
 package net.zionsoft.obadiah;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -49,6 +50,7 @@ import net.zionsoft.obadiah.ui.activities.SettingsActivity;
 import net.zionsoft.obadiah.ui.activities.TranslationManagementActivity;
 import net.zionsoft.obadiah.ui.fragments.ChapterSelectionFragment;
 import net.zionsoft.obadiah.ui.fragments.TextFragment;
+import net.zionsoft.obadiah.ui.utils.AnimationHelper;
 import net.zionsoft.obadiah.ui.utils.DialogHelper;
 
 import java.util.ArrayList;
@@ -56,6 +58,14 @@ import java.util.List;
 
 public class BookSelectionActivity extends ActionBarActivity
         implements ChapterSelectionFragment.Listener, TextFragment.Listener {
+    public static Intent newStartReorderToTopIntent(Context context) {
+        return newStartIntent(context).setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+    }
+
+    public static Intent newStartIntent(Context context) {
+        return new Intent(context, BookSelectionActivity.class);
+    }
+
     private AppIndexingManager mAppIndexingManager;
     private Bible mBible;
     private Settings mSettings;
@@ -197,7 +207,8 @@ public class BookSelectionActivity extends ActionBarActivity
                     new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            startActivity(new Intent(BookSelectionActivity.this, TranslationManagementActivity.class));
+                            AnimationHelper.slideIn(BookSelectionActivity.this,
+                                    TranslationManagementActivity.newStartIntent(BookSelectionActivity.this));
                         }
                     }, new DialogInterface.OnClickListener() {
                         @Override
@@ -265,7 +276,8 @@ public class BookSelectionActivity extends ActionBarActivity
                     @Override
                     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                         if (position == translationsCount) {
-                            startActivity(new Intent(BookSelectionActivity.this, TranslationManagementActivity.class));
+                            AnimationHelper.slideIn(BookSelectionActivity.this,
+                                    TranslationManagementActivity.newStartIntent(BookSelectionActivity.this));
                             return;
                         }
 
@@ -375,13 +387,13 @@ public class BookSelectionActivity extends ActionBarActivity
 
         switch (item.getItemId()) {
             case R.id.action_search:
-                startActivity(new Intent(this, SearchActivity.class).setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
+                AnimationHelper.slideIn(this, SearchActivity.newStartReorderToTopIntent(this));
                 return true;
             case R.id.action_reading_progress:
-                startActivity(new Intent(this, ReadingProgressActivity.class));
+                AnimationHelper.slideIn(this, ReadingProgressActivity.newStartIntent(this));
                 return true;
             case R.id.action_settings:
-                startActivity(new Intent(this, SettingsActivity.class));
+                AnimationHelper.slideIn(this, SettingsActivity.newStartIntent(this));
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

@@ -52,6 +52,11 @@ import net.zionsoft.obadiah.ui.utils.DialogHelper;
 import java.util.List;
 
 public class SearchActivity extends ActionBarActivity {
+    public static Intent newStartReorderToTopIntent(Context context) {
+        return new Intent(context, SearchActivity.class)
+                .setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+    }
+
     private static class NonConfigurationData {
         Editable searchText;
         String currentTranslation;
@@ -119,8 +124,7 @@ public class SearchActivity extends ActionBarActivity {
                         .putInt(Constants.PREF_KEY_LAST_READ_VERSE, verse.verseIndex)
                         .apply();
 
-                startActivity(new Intent(SearchActivity.this, BookSelectionActivity.class)
-                        .setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
+                startActivity(BookSelectionActivity.newStartReorderToTopIntent(SearchActivity.this));
             }
         });
     }
@@ -155,6 +159,12 @@ public class SearchActivity extends ActionBarActivity {
         super.onResume();
 
         Analytics.trackScreen(SearchActivity.class.getSimpleName());
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        overridePendingTransition(R.anim.fade_in, R.anim.slide_out_left_to_right);
     }
 
     @Override

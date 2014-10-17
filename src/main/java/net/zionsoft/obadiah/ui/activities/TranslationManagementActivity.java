@@ -17,6 +17,7 @@
 
 package net.zionsoft.obadiah.ui.activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
@@ -33,6 +34,10 @@ import net.zionsoft.obadiah.model.Settings;
 import net.zionsoft.obadiah.model.analytics.Analytics;
 
 public class TranslationManagementActivity extends ActionBarActivity {
+    public static Intent newStartIntent(Context context) {
+        return new Intent(context, TranslationManagementActivity.class);
+    }
+
     private AdView mAdView;
     private MenuItem mRemoveAdsMenuItem;
 
@@ -150,5 +155,11 @@ public class TranslationManagementActivity extends ActionBarActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (!mInAppBillingHelper.handleActivityResult(requestCode, resultCode, data))
             super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        overridePendingTransition(R.anim.fade_in, R.anim.slide_out_left_to_right);
     }
 }
