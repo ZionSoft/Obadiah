@@ -15,7 +15,7 @@ dependencies {
 
 android {
     compileSdkVersion 21
-    buildToolsVersion "21"
+    buildToolsVersion "21.0.1"
 
     defaultConfig {
         versionName "1.10.4"
