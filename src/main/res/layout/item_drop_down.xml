@@ -4,6 +4,6 @@
     android:layout_height="wrap_content"
     android:gravity="center_vertical"
     android:padding="@dimen/padding"
-    android:background="@color/blue"
+    android:background="@drawable/background_item_drop_down"
     android:textColor="@android:color/white"
-    android:textSize="@dimen/text_size_small" />
+    android:textSize="@dimen/text_size_medium" />
