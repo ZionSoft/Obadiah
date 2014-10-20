@@ -18,7 +18,6 @@
 package net.zionsoft.obadiah.ui.adapters;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -42,6 +41,7 @@ class VerseListAdapter extends BaseAdapter {
 
     private final LayoutInflater mInflater;
     private final Settings mSettings;
+
     private List<Verse> mVerses;
     private boolean[] mSelected;
     private int mSelectedCount;
@@ -84,7 +84,9 @@ class VerseListAdapter extends BaseAdapter {
             viewTag = (ViewTag) linearLayout.getTag();
         }
 
-        linearLayout.setBackgroundColor(mSelected[position] ? Color.LTGRAY : Color.TRANSPARENT);
+        final boolean selected = mSelected[position];
+        viewTag.text.setSelected(selected);
+        viewTag.index.setSelected(selected);
 
         final int textColor = mSettings.getTextColor();
         final float textSize = mSettings.getTextSize();
