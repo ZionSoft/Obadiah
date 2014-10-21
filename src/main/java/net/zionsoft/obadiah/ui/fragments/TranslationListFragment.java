@@ -84,7 +84,7 @@ public class TranslationListFragment extends Fragment implements SwipeRefreshLay
         super.onViewCreated(view, savedInstanceState);
 
         mSwipeContainer = (SwipeRefreshLayout) view.findViewById(R.id.swipe_container);
-        mSwipeContainer.setColorSchemeResources(R.color.dark_cyan, R.color.dark_lime, R.color.dark_cyan, R.color.dark_lime);
+        mSwipeContainer.setColorSchemeResources(R.color.dark_cyan, R.color.dark_lime, R.color.blue, R.color.dark_blue);
         mSwipeContainer.setOnRefreshListener(this);
         mSwipeContainer.setRefreshing(true);
 
