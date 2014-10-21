@@ -3,11 +3,12 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    <TextView
         android:id="@+id/translation_text_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="@dimen/padding"
-        android:gravity="left"
+        android:minHeight="56dp"
+        android:paddingLeft="?android:attr/expandableListPreferredItemPaddingLeft"
+        android:gravity="left|center_vertical"
         android:background="@drawable/background_item_translation" />
 </FrameLayout>
