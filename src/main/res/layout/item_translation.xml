@@ -7,7 +7,7 @@
         android:id="@+id/translation_text_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:minHeight="56dp"
+        android:minHeight="@dimen/item_height"
         android:paddingLeft="?android:attr/expandableListPreferredItemPaddingLeft"
         android:gravity="left|center_vertical"
         android:background="@drawable/background_item_translation" />
