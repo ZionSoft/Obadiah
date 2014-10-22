@@ -75,7 +75,9 @@ public class InAppBillingHelper implements ServiceConnection {
 
         mContext = context;
         mOnInitializationFinished = onInitializationFinished;
-        mContext.bindService(new Intent("com.android.vending.billing.InAppBillingService.BIND"), this, Context.BIND_AUTO_CREATE);
+        mContext.bindService(new Intent("com.android.vending.billing.InAppBillingService.BIND")
+                        .setPackage("com.android.vending"),
+                this, Context.BIND_AUTO_CREATE);
     }
 
     public void cleanup() {
