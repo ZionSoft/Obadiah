@@ -15,6 +15,7 @@
     <string name="action_settings">Settings</string>
     <string name="action_share">Share</string>
 
+    <string name="dialog_unknown_error">Unknown error.</string>
     <string name="dialog_no_translation">No translation available, download now?</string>
     <string name="dialog_retry">Fail to load, retry?</string>
     <string name="dialog_retry_network">Fail to load, please check your network connection and retry.</string>

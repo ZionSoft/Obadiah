@@ -20,8 +20,18 @@ package net.zionsoft.obadiah.ui.utils;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.support.annotation.StringRes;
 
 public class DialogHelper {
+    public static void showDialog(Context context, @StringRes int message,
+                                  DialogInterface.OnClickListener onClicked) {
+        new AlertDialog.Builder(context)
+                .setCancelable(false)
+                .setPositiveButton(android.R.string.yes, onClicked)
+                .setMessage(message)
+                .create().show();
+    }
+
     public static void showDialog(Context context, boolean cancelable, int message,
                                   DialogInterface.OnClickListener onPositive,
                                   DialogInterface.OnClickListener onNegative) {

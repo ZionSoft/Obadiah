@@ -17,12 +17,14 @@
 
 package net.zionsoft.obadiah;
 
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.MenuItemCompat;
@@ -164,9 +166,16 @@ public class BookSelectionActivity extends ActionBarActivity
                             new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri
-                                            .parse("market://details?id=net.zionsoft.obadiah")));
-                                    Analytics.trackUIUpgradeApp();
+                                    try {
+                                        startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri
+                                                .parse("market://details?id=net.zionsoft.obadiah")));
+                                        Analytics.trackUIUpgradeApp();
+                                    } catch (ActivityNotFoundException e) {
+                                        DialogHelper.showDialog(BookSelectionActivity.this,
+                                                R.string.dialog_unknown_error, null);
+                                        Analytics.trackException("Failed to open activity for updating: "
+                                                + Build.MANUFACTURER + ", " + Build.MODEL);
+                                    }
                                 }
                             },
                             new DialogInterface.OnClickListener() {

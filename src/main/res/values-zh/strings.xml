@@ -15,6 +15,7 @@
     <string name="action_settings">設置</string>
     <string name="action_share">分享</string>
 
+    <string name="dialog_unknown_error">未知錯誤。</string>
     <string name="dialog_no_translation">沒有可用譯本，現在下載？</string>
     <string name="dialog_retry">讀取失敗，重試？</string>
     <string name="dialog_retry_network">讀取失敗，請檢查網路連接並重試。</string>

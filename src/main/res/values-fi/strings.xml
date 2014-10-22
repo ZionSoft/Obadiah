@@ -15,6 +15,7 @@
     <string name="action_settings">Asetukset</string>
     <string name="action_share">Jakaa</string>
 
+    <string name="dialog_unknown_error">Tuntematon virhe.</string>
     <string name="dialog_no_translation">Lataa käännökset?</string>
     <string name="dialog_retry">Ei voi ladata, yritä uudelleen?</string>
     <string name="dialog_retry_network">Ei voi ladata, tarkista verkkoyhteys ja yritä uudelleen.</string>
