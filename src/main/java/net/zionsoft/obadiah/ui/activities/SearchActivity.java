@@ -22,30 +22,26 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBarActivity;
-import android.text.Editable;
+import android.support.v7.widget.SearchView;
 import android.text.TextUtils;
-import android.util.TypedValue;
-import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
-import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 
 import net.zionsoft.obadiah.BookSelectionActivity;
 import net.zionsoft.obadiah.Constants;
 import net.zionsoft.obadiah.R;
-import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.Bible;
 import net.zionsoft.obadiah.model.Settings;
 import net.zionsoft.obadiah.model.Verse;
+import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.ui.adapters.SearchResultListAdapter;
 import net.zionsoft.obadiah.ui.utils.AnimationHelper;
 import net.zionsoft.obadiah.ui.utils.DialogHelper;
@@ -59,7 +55,6 @@ public class SearchActivity extends ActionBarActivity {
     }
 
     private static class NonConfigurationData {
-        Editable searchText;
         String currentTranslation;
         List<Verse> verses;
     }
@@ -72,8 +67,6 @@ public class SearchActivity extends ActionBarActivity {
     private SearchResultListAdapter mSearchResultListAdapter;
 
     private View mRootView;
-    private EditText mSearchText;
-    private ImageView mSearchButton;
     private View mLoadingSpinner;
     private ListView mSearchResultListView;
 
@@ -90,7 +83,6 @@ public class SearchActivity extends ActionBarActivity {
         if (mData == null) {
             mData = new NonConfigurationData();
         } else {
-            mSearchText.setText(mData.searchText);
             mSearchResultListAdapter.setVerses(mData.verses);
         }
     }
@@ -99,25 +91,6 @@ public class SearchActivity extends ActionBarActivity {
         setContentView(R.layout.activity_search);
 
         mRootView = getWindow().getDecorView();
-
-        mSearchButton = (ImageView) findViewById(R.id.search_button);
-        mSearchButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                search();
-            }
-        });
-
-        mSearchText = (EditText) findViewById(R.id.search_edit_text);
-        mSearchText.setOnEditorActionListener(new OnEditorActionListener() {
-            public boolean onEditorAction(TextView view, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                    search();
-                    return true;
-                }
-                return false;
-            }
-        });
 
         mLoadingSpinner = findViewById(R.id.loading_spinner);
         mLoadingSpinner.setVisibility(View.GONE);
@@ -151,17 +124,12 @@ public class SearchActivity extends ActionBarActivity {
         mSettings.refresh();
         mRootView.setKeepScreenOn(mSettings.keepScreenOn());
         mRootView.setBackgroundColor(mSettings.getBackgroundColor());
-        mSearchText.setTextColor(mSettings.getTextColor());
-        mSearchText.setTextSize(TypedValue.COMPLEX_UNIT_PX, mSettings.getTextSize());
-        mSearchButton.setImageResource(mSettings.isNightMode()
-                ? R.drawable.ic_action_search_white : R.drawable.ic_action_search);
 
         final String selected = mPreferences.getString(Constants.PREF_KEY_LAST_READ_TRANSLATION, null);
         setTitle(selected);
         if (!selected.equals(mData.currentTranslation)) {
             mData.currentTranslation = selected;
 
-            mSearchText.setText(null);
             mSearchResultListAdapter.setVerses(null);
         }
         mSearchResultListAdapter.notifyDataSetChanged();
@@ -175,6 +143,30 @@ public class SearchActivity extends ActionBarActivity {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_search, menu);
+
+        final MenuItem searchMenuItem = menu.findItem(R.id.action_search);
+        MenuItemCompat.expandActionView(searchMenuItem);
+        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchMenuItem);
+        searchView.setIconified(false);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                search(query);
+                return true;
+            }
+        });
+
+        return true;
+    }
+
+    @Override
     public void onBackPressed() {
         super.onBackPressed();
         overridePendingTransition(R.anim.fade_in, R.anim.slide_out_left_to_right);
@@ -182,25 +174,20 @@ public class SearchActivity extends ActionBarActivity {
 
     @Override
     public Object onRetainCustomNonConfigurationInstance() {
-        mData.searchText = mSearchText.getText();
         return mData;
     }
 
-    private void search() {
-        final Editable searchToken = mSearchText.getText();
-        if (TextUtils.isEmpty(searchToken))
+    private void search(final String keyword) {
+        if (TextUtils.isEmpty(keyword)) {
             return;
+        }
 
         final View currentFocus = getCurrentFocus();
         if (currentFocus != null) {
-            ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE))
+            ((InputMethodManager) getSystemService(INPUT_METHOD_SERVICE))
                     .hideSoftInputFromWindow(currentFocus.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
         }
 
-        search(searchToken.toString());
-    }
-
-    private void search(final String keyword) {
         mLoadingSpinner.setVisibility(View.VISIBLE);
         mSearchResultListView.setVisibility(View.GONE);
 
