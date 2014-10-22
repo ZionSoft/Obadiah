@@ -8,15 +8,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <ImageButton
+        <ImageView
             android:id="@+id/search_button"
             android:contentDescription="@null"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:onClick="onSearchClicked"
-            android:src="@drawable/ic_action_search" />
+            android:padding="@dimen/padding"
+            android:background="@drawable/background_button" />
 
         <EditText
             android:id="@+id/search_edit_text"
@@ -39,9 +39,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:divider="@null"
-            android:dividerHeight="7dp"
-            android:paddingLeft="@dimen/padding"
-            android:paddingRight="@dimen/padding" />
+            android:dividerHeight="7dp" />
 
         <ProgressBar
             android:id="@+id/loading_spinner"

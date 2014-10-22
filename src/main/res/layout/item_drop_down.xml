@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="48dp"
     android:gravity="center_vertical"
     android:padding="@dimen/padding"
-    android:textColor="@color/dark_gray"
-    android:textSize="@dimen/text_size_small" />
+    android:background="@drawable/background_item_drop_down"
+    android:textColor="@android:color/white"
+    android:textSize="@dimen/text_size_medium" />

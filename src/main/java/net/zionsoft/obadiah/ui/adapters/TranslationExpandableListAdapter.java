@@ -18,7 +18,6 @@
 package net.zionsoft.obadiah.ui.adapters;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.text.SpannableStringBuilder;
 import android.text.style.AbsoluteSizeSpan;
 import android.util.TypedValue;
@@ -119,22 +118,20 @@ public class TranslationExpandableListAdapter extends BaseExpandableListAdapter 
 
     @Override
     public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
-        final TextView textView = (TextView) (convertView == null
-                ? mInflater.inflate(R.layout.item_translation, parent, false) : convertView);
+        final View rootView = convertView == null
+                ? mInflater.inflate(R.layout.item_translation, parent, false) : convertView;
+        final TextView textView = (TextView) rootView.findViewById(R.id.translation_text_view);
         if (groupPosition == DOWNLOADED_TRANSLATIONS_GROUP) {
             final TranslationInfo translationInfo = mDownloadedTranslations.get(childPosition);
-            if (translationInfo.shortName.equals(mCurrentTranslation))
-                textView.setBackgroundColor(Color.LTGRAY);
-            else
-                textView.setBackgroundResource(R.drawable.background_item_translation);
+            textView.setSelected(translationInfo.shortName.equals(mCurrentTranslation));
             textView.setText(translationInfo.name);
             textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, mMediumTextSize);
         } else if (groupPosition == AVAILABLE_TRANSLATIONS_GROUP) {
-            textView.setBackgroundResource(R.drawable.background_item_translation);
+            textView.setSelected(false);
             textView.setText(mAvailableTranslationTexts[childPosition]);
         }
         textView.setTextColor(mTextColor);
-        return textView;
+        return rootView;
     }
 
     @Override

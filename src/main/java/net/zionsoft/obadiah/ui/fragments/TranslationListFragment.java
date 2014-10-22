@@ -26,6 +26,7 @@ import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.util.TypedValue;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -37,9 +38,9 @@ import android.widget.Toast;
 
 import net.zionsoft.obadiah.Constants;
 import net.zionsoft.obadiah.R;
-import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.Bible;
 import net.zionsoft.obadiah.model.TranslationInfo;
+import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.ui.adapters.TranslationExpandableListAdapter;
 import net.zionsoft.obadiah.ui.utils.AnimationHelper;
 import net.zionsoft.obadiah.ui.utils.DialogHelper;
@@ -84,8 +85,12 @@ public class TranslationListFragment extends Fragment implements SwipeRefreshLay
         super.onViewCreated(view, savedInstanceState);
 
         mSwipeContainer = (SwipeRefreshLayout) view.findViewById(R.id.swipe_container);
-        mSwipeContainer.setColorSchemeResources(R.color.dark_cyan, R.color.dark_lime, R.color.dark_cyan, R.color.dark_lime);
+        mSwipeContainer.setColorSchemeResources(R.color.dark_cyan, R.color.dark_lime, R.color.blue, R.color.dark_blue);
         mSwipeContainer.setOnRefreshListener(this);
+
+        // workaround for https://code.google.com/p/android/issues/detail?id=77712
+        mSwipeContainer.setProgressViewOffset(false, 0,
+                (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24, getResources().getDisplayMetrics()));
         mSwipeContainer.setRefreshing(true);
 
         mTranslationListView = (ExpandableListView) view.findViewById(R.id.translation_list_view);

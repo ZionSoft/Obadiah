@@ -93,6 +93,10 @@ public class Settings {
         return mScreenOn;
     }
 
+    public boolean isNightMode() {
+        return mNightMode;
+    }
+
     public int getBackgroundColor() {
         return mNightMode ? Color.BLACK : Color.WHITE;
     }

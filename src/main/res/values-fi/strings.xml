@@ -43,7 +43,7 @@
 
     <string name="text_available_translation">Saatavilla Käännökset</string>
     <string name="text_downloaded_translations">Ladattu Käännökset</string>
-    <string name="text_translations">Käännökset</string>
+    <string name="text_more_translations">Lisää</string>
     <string name="text_share_with">Jakoasetukset</string>
 
     <string name="text_continuous_reading">Peräkkäisiä Lukeminen</string>

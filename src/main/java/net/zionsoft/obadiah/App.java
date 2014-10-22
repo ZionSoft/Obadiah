@@ -25,6 +25,7 @@ import net.zionsoft.obadiah.model.Bible;
 import net.zionsoft.obadiah.model.Settings;
 import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.database.DatabaseHelper;
+import net.zionsoft.obadiah.ui.utils.UiHelper;
 
 public class App extends Application {
     @Override
@@ -39,6 +40,8 @@ public class App extends Application {
 
         Bible.initialize(this);
         Settings.initialize(this);
+
+        UiHelper.forceActionBarOverflowMenu(this);
     }
 
     @Override

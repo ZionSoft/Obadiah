@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="actionModeBackground">@color/blue</item>
+        <item name="colorPrimary">@color/blue</item>
+        <item name="android:dropDownListViewStyle">@style/AppSpinnerStyle</item>
+    </style>
+
+    <style name="AppSpinnerStyle" parent="android:style/Widget.ListView.DropDown">
+        <item name="android:divider">@color/dark_gray</item>
+        <item name="android:dividerHeight">1dp</item>
+    </style>
+</resources>

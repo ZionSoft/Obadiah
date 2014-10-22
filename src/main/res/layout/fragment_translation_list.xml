@@ -8,7 +8,7 @@
         android:id="@+id/translation_list_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:divider="@null"
-        android:dividerHeight="0dp" />
+        android:divider="@android:color/darker_gray"
+        android:dividerHeight="1dp" />
 
 </android.support.v4.widget.SwipeRefreshLayout>

@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:paddingStart="?android:attr/expandableListPreferredItemPaddingLeft"
-    android:paddingTop="@dimen/padding"
-    android:paddingBottom="@dimen/padding"
-    android:background="@android:color/darker_gray"
+    android:layout_height="@dimen/header_height"
+    android:paddingLeft="?android:attr/expandableListPreferredItemPaddingLeft"
+    android:gravity="center_vertical"
+    android:textColor="@color/blue"
     android:textStyle="bold" />

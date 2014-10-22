@@ -33,6 +33,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
@@ -72,6 +73,7 @@ public class SearchActivity extends ActionBarActivity {
 
     private View mRootView;
     private EditText mSearchText;
+    private ImageView mSearchButton;
     private View mLoadingSpinner;
     private ListView mSearchResultListView;
 
@@ -98,11 +100,19 @@ public class SearchActivity extends ActionBarActivity {
 
         mRootView = getWindow().getDecorView();
 
+        mSearchButton = (ImageView) findViewById(R.id.search_button);
+        mSearchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                search();
+            }
+        });
+
         mSearchText = (EditText) findViewById(R.id.search_edit_text);
         mSearchText.setOnEditorActionListener(new OnEditorActionListener() {
             public boolean onEditorAction(TextView view, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                    onSearchClicked(null);
+                    search();
                     return true;
                 }
                 return false;
@@ -143,6 +153,8 @@ public class SearchActivity extends ActionBarActivity {
         mRootView.setBackgroundColor(mSettings.getBackgroundColor());
         mSearchText.setTextColor(mSettings.getTextColor());
         mSearchText.setTextSize(TypedValue.COMPLEX_UNIT_PX, mSettings.getTextSize());
+        mSearchButton.setImageResource(mSettings.isNightMode()
+                ? R.drawable.ic_action_search_white : R.drawable.ic_action_search);
 
         final String selected = mPreferences.getString(Constants.PREF_KEY_LAST_READ_TRANSLATION, null);
         setTitle(selected);
@@ -174,7 +186,7 @@ public class SearchActivity extends ActionBarActivity {
         return mData;
     }
 
-    public void onSearchClicked(View view) {
+    private void search() {
         final Editable searchToken = mSearchText.getText();
         if (TextUtils.isEmpty(searchToken))
             return;

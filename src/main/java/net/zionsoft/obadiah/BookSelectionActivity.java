@@ -268,9 +268,9 @@ public class BookSelectionActivity extends ActionBarActivity
                 final int translationsCount = strings.size();
                 final List<String> translations = new ArrayList<String>(translationsCount + 1);
                 translations.addAll(strings);
-                translations.add(getResources().getString(R.string.text_translations));
-                mTranslationsSpinner.setAdapter(new ArrayAdapter<String>(BookSelectionActivity.this,
-                        R.layout.item_drop_down, translations));
+                translations.add(getResources().getString(R.string.text_more_translations));
+                mTranslationsSpinner.setAdapter(new ArrayAdapter<String>(
+                        getSupportActionBar().getThemedContext(), R.layout.item_drop_down, translations));
                 mTranslationsSpinner.setSelection(selected);
                 mTranslationsSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                     @Override
