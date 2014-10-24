@@ -157,6 +157,11 @@ public class BookSelectionActivity extends ActionBarActivity
     }
 
     private void checkClientVersion() {
+        if (TextUtils.isEmpty(mPreferences.getString(Constants.PREF_KEY_LAST_READ_TRANSLATION, null))) {
+            // do nothing if there's no translation installed (most likely it's the 1st time use)
+            return;
+        }
+
         AppUpdateChecker.checkAppUpdate(this, new AppUpdateChecker.OnAppUpdateCheckListener() {
             @Override
             public void onAppUpdateChecked(boolean needsUpdate) {
