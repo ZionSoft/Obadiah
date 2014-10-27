@@ -18,6 +18,7 @@
 package net.zionsoft.obadiah.ui.adapters;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -77,6 +78,7 @@ class VerseListAdapter extends BaseAdapter {
 
             viewTag = new ViewTag();
             viewTag.index = (TextView) linearLayout.getChildAt(0);
+            viewTag.index.setTypeface(Typeface.MONOSPACE);
             viewTag.text = (TextView) linearLayout.getChildAt(1);
             linearLayout.setTag(viewTag);
         } else {
@@ -92,7 +94,16 @@ class VerseListAdapter extends BaseAdapter {
         final float textSize = mSettings.getTextSize();
         viewTag.index.setTextColor(textColor);
         viewTag.index.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
-        viewTag.index.setText(Integer.toString(position + 1));
+
+        final int count = getCount();
+        if (count < 10) {
+            viewTag.index.setText(Integer.toString(position + 1));
+        } else if (count < 100) {
+            viewTag.index.setText(String.format("%2d", position + 1));
+        } else {
+            viewTag.index.setText(String.format("%3d", position + 1));
+        }
+
         viewTag.text.setTextColor(textColor);
         viewTag.text.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
         viewTag.text.setText(mVerses.get(position).verseText);
