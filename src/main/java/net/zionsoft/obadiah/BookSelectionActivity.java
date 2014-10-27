@@ -176,10 +176,12 @@ public class BookSelectionActivity extends ActionBarActivity
                                                 .parse("market://details?id=net.zionsoft.obadiah")));
                                         Analytics.trackUIUpgradeApp();
                                     } catch (ActivityNotFoundException e) {
-                                        DialogHelper.showDialog(BookSelectionActivity.this,
-                                                R.string.dialog_unknown_error, null);
-                                        Analytics.trackException("Failed to open activity for updating: "
+                                        Analytics.trackException("Failed to open market for updating: "
                                                 + Build.MANUFACTURER + ", " + Build.MODEL);
+
+                                        // falls back to open a link in browser
+                                        startActivity(new Intent(Intent.ACTION_VIEW).setData(
+                                                Uri.parse("http://www.zionsoft.net/bible-reader/")));
                                     }
                                 }
                             },
