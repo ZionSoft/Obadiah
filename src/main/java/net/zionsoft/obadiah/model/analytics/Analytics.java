@@ -18,6 +18,7 @@
 package net.zionsoft.obadiah.model.analytics;
 
 import android.content.Context;
+import android.os.Build;
 
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
@@ -45,7 +46,8 @@ public class Analytics {
 
     public static void trackBillingNotSupported(int reason) {
         sTracker.send(new HitBuilders.EventBuilder("billing", "not_supported")
-                .setLabel(Integer.toString(reason))
+                .setLabel(String.format("Manufacturer: %s, Model: %s, Reason: %d",
+                        Build.MANUFACTURER, Build.MODEL, reason))
                 .build());
     }
 
