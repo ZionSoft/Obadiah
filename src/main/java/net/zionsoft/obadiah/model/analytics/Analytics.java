@@ -85,8 +85,7 @@ public class Analytics {
     }
 
     public static void trackTranslationSelection(String translation) {
-        sTracker.send(new HitBuilders.EventBuilder("select_translation", "")
-                .setLabel(translation)
+        sTracker.send(new HitBuilders.EventBuilder("select_translation", translation)
                 .build());
     }
 

@@ -300,6 +300,7 @@ public class BookSelectionActivity extends ActionBarActivity
                         if (selected.equals(mCurrentTranslation))
                             return;
 
+                        Analytics.trackTranslationSelection(selected);
                         mCurrentTranslation = selected;
                         mPreferences.edit()
                                 .putString(Constants.PREF_KEY_LAST_READ_TRANSLATION, selected)
