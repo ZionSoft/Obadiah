@@ -20,6 +20,7 @@ package net.zionsoft.obadiah.ui.activities;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -91,8 +92,10 @@ public class ReadingProgressActivity extends ActionBarActivity {
 
         // list view header
         final int textColor = settings.getTextColor();
-        final float textSize = settings.getTextSize();
-        final float smallerTextSize = settings.getSmallerTextSize();
+
+        final Resources resources = getResources();
+        final float textSize = resources.getDimension(settings.getTextSize().textSize);
+        final float smallerTextSize = resources.getDimension(settings.getTextSize().smallerTextSize);
         final View header = LayoutInflater.from(this).inflate(R.layout.item_reading_progress_header,
                 mReadingProgressListView, false);
 

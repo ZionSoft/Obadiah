@@ -18,7 +18,6 @@
 package net.zionsoft.obadiah;
 
 import android.app.Application;
-import android.preference.PreferenceManager;
 
 import net.zionsoft.obadiah.legacy.Upgrader;
 import net.zionsoft.obadiah.model.Bible;
@@ -36,7 +35,6 @@ public class App extends Application {
         DatabaseHelper.initialize(this);
 
         Upgrader.upgrade(this);
-        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 
         Bible.initialize(this);
         Settings.initialize(this);

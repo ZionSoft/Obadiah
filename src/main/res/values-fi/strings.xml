@@ -26,15 +26,13 @@
     <string name="pref_night_mode">Yökäyttötilassa</string>
     <string name="pref_rate_me">Arvostele</string>
     <string name="pref_screen_on">Näytön Aina Päällä</string>
-    <string name="pref_text_size_title">Tekstin Koko</string>
+    <string name="pref_text_size">Tekstin Koko</string>
     <string name="pref_text_size_dialog_title">Tekstin Koko</string>
-    <string-array name="pref_text_size_name">
-        <item>Erittäin Pieni</item>
-        <item>Pieni</item>
-        <item>Normaali</item>
-        <item>Suuri</item>
-        <item>Valtava</item>
-    </string-array>
+    <string name="pref_text_size_very_small">Erittäin Pieni</string>
+    <string name="pref_text_size_small">Pieni</string>
+    <string name="pref_text_size_medium">Normaali</string>
+    <string name="pref_text_size_large">Suuri</string>
+    <string name="pref_text_size_very_large">Valtava</string>
     <string name="pref_version">Versio</string>
 
     <string name="progress_dialog_translation_deleting">Poistaminen&#8230;</string>

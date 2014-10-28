@@ -18,6 +18,7 @@
 package net.zionsoft.obadiah.ui.adapters;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.text.SpannableStringBuilder;
 import android.text.style.AbsoluteSizeSpan;
 import android.util.TypedValue;
@@ -59,9 +60,12 @@ public class TranslationExpandableListAdapter extends BaseExpandableListAdapter 
 
         final Settings settings = Settings.getInstance();
         mTextColor = settings.getTextColor();
-        mMediumTextSize = settings.getTextSize();
+
+        final Resources resources = context.getResources();
+        mMediumTextSize = resources.getDimension(settings.getTextSize().textSize);
         mMediumSizeSpan = new AbsoluteSizeSpan((int) mMediumTextSize);
-        mSmallSizeSpan = new AbsoluteSizeSpan((int) settings.getSmallerTextSize());
+        mSmallSizeSpan = new AbsoluteSizeSpan(
+                (int) resources.getDimension(settings.getTextSize().smallerTextSize));
     }
 
     @Override

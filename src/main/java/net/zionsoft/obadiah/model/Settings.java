@@ -19,32 +19,70 @@ package net.zionsoft.obadiah.model;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.graphics.Color;
 import android.preference.PreferenceManager;
+import android.support.annotation.DimenRes;
+import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 
 import net.zionsoft.obadiah.R;
 
 public class Settings {
-    private static final String SETTING_KEY_NIGHT_MODE = "pref_night_mode";
-    private static final String SETTING_KEY_SCREEN_ONS = "pref_screen_on";
-    private static final String SETTING_KEY_TEXT_SIZE = "pref_text_size";
+    public enum TextSize {
+        VERY_SMALL("very_small", R.string.pref_text_size_very_small,
+                R.dimen.text_size_very_small, R.dimen.smaller_text_size_very_small),
+        SMALL("small", R.string.pref_text_size_small,
+                R.dimen.text_size_small, R.dimen.smaller_text_size_small),
+        MEDIUM("medium", R.string.pref_text_size_medium,
+                R.dimen.text_size_medium, R.dimen.smaller_text_size_medium),
+        LARGE("large", R.string.pref_text_size_large,
+                R.dimen.text_size_large, R.dimen.smaller_text_size_large),
+        VERY_LARGE("very_large", R.string.pref_text_size_very_large,
+                R.dimen.text_size_very_large, R.dimen.smaller_text_size_very_large);
 
-    private static final String TEXT_SIZE_VERY_SMALL = "very_small";
-    private static final String TEXT_SIZE_SMALL = "small";
-    private static final String TEXT_SIZE_MEDIUM = "medium";
-    private static final String TEXT_SIZE_LARGE = "large";
-    private static final String TEXT_SIZE_VERY_LARGE = "very_large";
+        private final String mSettingKey;
+
+        @StringRes
+        public final int title;
+
+        @DimenRes
+        public final int textSize;
+
+        @DimenRes
+        public final int smallerTextSize;
+
+        private TextSize(String settingKey, @StringRes int title,
+                         @DimenRes int textSize, @DimenRes int smallerTextSize) {
+            mSettingKey = settingKey;
+            this.title = title;
+            this.textSize = textSize;
+            this.smallerTextSize = smallerTextSize;
+        }
+
+        private static final TextSize DEFAULT = MEDIUM;
+
+        public static TextSize fromSettingKey(@Nullable String settingKey) {
+            for (TextSize textSize : TextSize.values()) {
+                if (textSize.mSettingKey.equals(settingKey)) {
+                    return textSize;
+                }
+            }
+
+            return DEFAULT;
+        }
+    }
+
+    private static final String SETTING_KEY_NIGHT_MODE = "pref_night_mode";
+    private static final String SETTING_KEY_SCREEN_ON = "pref_screen_on";
+    private static final String SETTING_KEY_TEXT_SIZE = "pref_text_size";
 
     private static Settings sInstance;
 
     private final SharedPreferences mSharedPreferences;
-    private final Resources mResources;
 
     private boolean mNightMode;
     private boolean mScreenOn;
-    private float mTextSize;
-    private float mSmallerTextSize;
+    private TextSize mTextSize;
 
     public static void initialize(Context context) {
         if (sInstance == null) {
@@ -59,7 +97,6 @@ public class Settings {
         super();
 
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        mResources = context.getResources();
     }
 
     public static Settings getInstance() {
@@ -68,33 +105,31 @@ public class Settings {
 
     public void refresh() {
         mNightMode = mSharedPreferences.getBoolean(SETTING_KEY_NIGHT_MODE, false);
-        mScreenOn = mSharedPreferences.getBoolean(SETTING_KEY_SCREEN_ONS, false);
+        mScreenOn = mSharedPreferences.getBoolean(SETTING_KEY_SCREEN_ON, false);
 
-        final String textSize = mSharedPreferences.getString(SETTING_KEY_TEXT_SIZE, TEXT_SIZE_MEDIUM);
-        if (textSize.equals(TEXT_SIZE_VERY_SMALL)) {
-            mTextSize = mResources.getDimension(R.dimen.text_size_very_small);
-            mSmallerTextSize = mResources.getDimension(R.dimen.smaller_text_size_very_small);
-        } else if (textSize.equals(TEXT_SIZE_SMALL)) {
-            mTextSize = mResources.getDimension(R.dimen.text_size_small);
-            mSmallerTextSize = mResources.getDimension(R.dimen.smaller_text_size_small);
-        } else if (textSize.equals(TEXT_SIZE_LARGE)) {
-            mTextSize = mResources.getDimension(R.dimen.text_size_large);
-            mSmallerTextSize = mResources.getDimension(R.dimen.smaller_text_size_large);
-        } else if (textSize.equals(TEXT_SIZE_VERY_LARGE)) {
-            mTextSize = mResources.getDimension(R.dimen.text_size_very_large);
-            mSmallerTextSize = mResources.getDimension(R.dimen.smaller_text_size_very_large);
-        } else {
-            mTextSize = mResources.getDimension(R.dimen.text_size_medium);
-            mSmallerTextSize = mResources.getDimension(R.dimen.smaller_text_size_medium);
-        }
+        mTextSize = TextSize.fromSettingKey(mSharedPreferences.getString(SETTING_KEY_TEXT_SIZE, null));
     }
 
     public boolean keepScreenOn() {
         return mScreenOn;
     }
 
+    public void setKeepScreenOn(boolean keepScreenOn) {
+        mScreenOn = keepScreenOn;
+        mSharedPreferences.edit()
+                .putBoolean(SETTING_KEY_SCREEN_ON, keepScreenOn)
+                .apply();
+    }
+
     public boolean isNightMode() {
         return mNightMode;
+    }
+
+    public void setNightMode(boolean isNightMode) {
+        mNightMode = isNightMode;
+        mSharedPreferences.edit()
+                .putBoolean(SETTING_KEY_NIGHT_MODE, isNightMode)
+                .apply();
     }
 
     public int getBackgroundColor() {
@@ -105,11 +140,14 @@ public class Settings {
         return mNightMode ? Color.WHITE : Color.BLACK;
     }
 
-    public float getTextSize() {
+    public TextSize getTextSize() {
         return mTextSize;
     }
 
-    public float getSmallerTextSize() {
-        return mSmallerTextSize;
+    public void setTextSize(TextSize textSize) {
+        mTextSize = textSize;
+        mSharedPreferences.edit()
+                .putString(SETTING_KEY_TEXT_SIZE, textSize.mSettingKey)
+                .apply();
     }
 }

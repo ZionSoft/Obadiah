@@ -90,27 +90,7 @@ public class Analytics {
                 .build());
     }
 
-    public static void trackUICopy() {
-        trackUIEvent("copy");
-    }
-
-    public static void trackUIShare() {
-        trackUIEvent("share");
-    }
-
-    public static void trackUIRemoveAds() {
-        trackUIEvent("remove_ads");
-    }
-
-    public static void trackUIUpgradeApp() {
-        trackUIEvent("upgrade_app");
-    }
-
-    public static void trackUIIgnoreUpgradeApp() {
-        trackUIEvent("ignore_upgrade_app");
-    }
-
-    private static void trackUIEvent(String label) {
+    public static void trackUIEvent(String label) {
         sTracker.send(new HitBuilders.EventBuilder("ui", "button_click")
                 .setLabel(label)
                 .build());

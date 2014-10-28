@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <android.support.v7.widget.SwitchCompat
+        android:id="@+id/screen_on_switch"
+        android:background="@drawable/background_text"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/item_height"
+        android:paddingLeft="@dimen/padding"
+        android:paddingRight="@dimen/padding"
+        android:text="@string/pref_screen_on" />
+
+    <View style="@style/Divider.Horizontal" />
+
+    <android.support.v7.widget.SwitchCompat
+        android:id="@+id/night_mode_switch"
+        android:background="@drawable/background_text"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/item_height"
+        android:paddingLeft="@dimen/padding"
+        android:paddingRight="@dimen/padding"
+        android:text="@string/pref_night_mode" />
+
+    <View style="@style/Divider.Horizontal" />
+
+    <LinearLayout
+        android:id="@+id/text_size_section"
+        android:background="@drawable/background_text"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/item_height"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/text_size_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="@dimen/padding"
+            android:gravity="center_vertical"
+            android:text="@string/pref_text_size" />
+
+        <TextView
+            android:id="@+id/text_size_value_text_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingRight="@dimen/padding"
+            android:gravity="center_vertical|right"
+            android:textColor="@color/dark_gray" />
+    </LinearLayout>
+
+    <View style="@style/Divider.Horizontal" />
+
+    <TextView
+        android:id="@+id/rate_me_text_view"
+        android:background="@drawable/background_text"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/item_height"
+        android:paddingLeft="@dimen/padding"
+        android:gravity="center_vertical"
+        android:text="@string/pref_rate_me" />
+
+    <View style="@style/Divider.Horizontal" />
+
+    <LinearLayout
+        android:background="@drawable/background_text"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/item_height"
+        android:clickable="true"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/version_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="@dimen/padding"
+            android:gravity="center_vertical"
+            android:text="@string/pref_version" />
+
+        <TextView
+            android:id="@+id/version_value_text_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingRight="@dimen/padding"
+            android:gravity="center_vertical|right"
+            android:textColor="@color/dark_gray" />
+    </LinearLayout>
+
+    <View style="@style/Divider.Horizontal" />
+
+</LinearLayout>

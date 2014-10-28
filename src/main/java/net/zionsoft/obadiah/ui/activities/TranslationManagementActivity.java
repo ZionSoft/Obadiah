@@ -138,7 +138,7 @@ public class TranslationManagementActivity extends ActionBarActivity {
     }
 
     private void removeAds() {
-        Analytics.trackUIRemoveAds();
+        Analytics.trackUIEvent("remove_ads");
 
         mInAppBillingHelper.purchaseAdsRemoval(new InAppBillingHelper.OnAdsRemovalPurchasedListener() {
             @Override

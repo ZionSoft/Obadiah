@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="pref_text_size_default" translatable="false">medium</string>
     <string-array name="pref_text_size_value" translatable="false">
-        <item>very_small</item>
-        <item>small</item>
-        <item>medium</item>
-        <item>large</item>
-        <item>very_large</item>
+        <item>@string/pref_text_size_very_small</item>
+        <item>@string/pref_text_size_small</item>
+        <item>@string/pref_text_size_medium</item>
+        <item>@string/pref_text_size_large</item>
+        <item>@string/pref_text_size_very_large</item>
     </string-array>
 
     <string name="text_chapters_read_count" translatable="false">%1$d / 1189</string>

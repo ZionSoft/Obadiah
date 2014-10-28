@@ -17,6 +17,8 @@
 
 package net.zionsoft.obadiah;
 
+import android.net.Uri;
+
 public class Constants {
     public static final String PREF_NAME = "settings";
     public static final String PREF_KEY_CURRENT_APPLICATION_VERSION = "currentApplicationVersion";
@@ -26,4 +28,6 @@ public class Constants {
     public static final String PREF_KEY_LAST_READ_VERSE = "currentVerse";
     public static final String PREF_KEY_CHECKED_APPLICATION_VERSION = "checkedApplicationVersion";
     public static final String PREF_KEY_CHECKED_APPLICATION_VERSION_TIMESTAMP = "checkedApplicationVersionTimestamp";
+
+    public static final Uri GOOGLE_PLAY_URI = Uri.parse("market://details?id=net.zionsoft.obadiah");
 }

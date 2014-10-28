@@ -172,9 +172,8 @@ public class BookSelectionActivity extends ActionBarActivity
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     try {
-                                        startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri
-                                                .parse("market://details?id=net.zionsoft.obadiah")));
-                                        Analytics.trackUIUpgradeApp();
+                                        startActivity(new Intent(Intent.ACTION_VIEW).setData(Constants.GOOGLE_PLAY_URI));
+                                        Analytics.trackUIEvent("upgrade_app");
                                     } catch (ActivityNotFoundException e) {
                                         Analytics.trackException("Failed to open market for updating: "
                                                 + Build.MANUFACTURER + ", " + Build.MODEL);
@@ -188,7 +187,7 @@ public class BookSelectionActivity extends ActionBarActivity
                             new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    Analytics.trackUIIgnoreUpgradeApp();
+                                    Analytics.trackUIEvent("ignore_upgrade_app");
                                 }
                             }
                     );

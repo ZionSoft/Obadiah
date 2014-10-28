@@ -18,6 +18,7 @@
 package net.zionsoft.obadiah.ui.adapters;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,6 +34,7 @@ import java.util.List;
 
 public class SearchResultListAdapter extends BaseAdapter {
     private final LayoutInflater mInflater;
+    private final Resources mResources;
     private final Settings mSettings;
     private List<Verse> mVerses;
 
@@ -40,6 +42,7 @@ public class SearchResultListAdapter extends BaseAdapter {
         super();
 
         mInflater = LayoutInflater.from(context);
+        mResources = context.getResources();
         mSettings = Settings.getInstance();
     }
 
@@ -64,7 +67,8 @@ public class SearchResultListAdapter extends BaseAdapter {
                 ? mInflater.inflate(R.layout.item_search_result, parent, false) : convertView);
 
         textView.setTextColor(mSettings.getTextColor());
-        textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, mSettings.getTextSize());
+        textView.setTextSize(TypedValue.COMPLEX_UNIT_PX,
+                mResources.getDimension(mSettings.getTextSize().textSize));
 
         final Verse verse = mVerses.get(position);
         textView.setText(String.format("%s %d:%d\n%s", verse.bookName,

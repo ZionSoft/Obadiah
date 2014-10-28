@@ -57,7 +57,7 @@ public class ReadingProgressListAdapter extends BaseAdapter {
 
         final Settings settings = Settings.getInstance();
         mTextColor = settings.getTextColor();
-        mSmallerTextSize = settings.getSmallerTextSize();
+        mSmallerTextSize = context.getResources().getDimension(settings.getTextSize().smallerTextSize);
 
         mResources = context.getResources();
         mDateFormatter = new DateFormatter(mResources);

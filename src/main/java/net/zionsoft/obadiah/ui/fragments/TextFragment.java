@@ -126,7 +126,7 @@ public class TextFragment extends Fragment implements VersePagerAdapter.Listener
                 public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
                     switch (menuItem.getItemId()) {
                         case R.id.action_copy:
-                            Analytics.trackUICopy();
+                            Analytics.trackUIEvent("copy");
 
                             final Activity activity = getActivity();
                             if (mClipboardManager == null) {
@@ -138,7 +138,7 @@ public class TextFragment extends Fragment implements VersePagerAdapter.Listener
                             actionMode.finish();
                             return true;
                         case R.id.action_share:
-                            Analytics.trackUIShare();
+                            Analytics.trackUIEvent("share");
 
                             startActivity(Intent.createChooser(new Intent().setAction(Intent.ACTION_SEND).setType("text/plain")
                                             .putExtra(Intent.EXTRA_TEXT,

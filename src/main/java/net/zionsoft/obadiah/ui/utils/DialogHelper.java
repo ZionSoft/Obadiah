@@ -20,9 +20,19 @@ package net.zionsoft.obadiah.ui.utils;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.support.annotation.ArrayRes;
 import android.support.annotation.StringRes;
 
 public class DialogHelper {
+    public static void showDialog(Context context, @StringRes int title, @ArrayRes int items, int selected,
+                                  DialogInterface.OnClickListener onClicked) {
+        new AlertDialog.Builder(context)
+                .setCancelable(true)
+                .setSingleChoiceItems(items, selected, onClicked)
+                .setTitle(title)
+                .create().show();
+    }
+
     public static void showDialog(Context context, @StringRes int message,
                                   DialogInterface.OnClickListener onClicked) {
         new AlertDialog.Builder(context)

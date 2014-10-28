@@ -18,6 +18,7 @@
 package net.zionsoft.obadiah.ui.adapters;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Typeface;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -41,6 +42,7 @@ class VerseListAdapter extends BaseAdapter {
     }
 
     private final LayoutInflater mInflater;
+    private final Resources mResources;
     private final Settings mSettings;
 
     private List<Verse> mVerses;
@@ -51,6 +53,7 @@ class VerseListAdapter extends BaseAdapter {
         super();
 
         mInflater = LayoutInflater.from(context);
+        mResources = context.getResources();
         mSettings = Settings.getInstance();
     }
 
@@ -91,7 +94,7 @@ class VerseListAdapter extends BaseAdapter {
         viewTag.index.setSelected(selected);
 
         final int textColor = mSettings.getTextColor();
-        final float textSize = mSettings.getTextSize();
+        final float textSize = mResources.getDimension(mSettings.getTextSize().textSize);
         viewTag.index.setTextColor(textColor);
         viewTag.index.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
 
