@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:minHeight="@dimen/item_height"
-    android:paddingLeft="@dimen/padding"
-    android:paddingRight="@dimen/padding"
+    android:paddingLeft="@dimen/paddingLeft"
+    android:paddingRight="@dimen/paddingRight"
     android:gravity="left|center_vertical"
     android:background="@drawable/background_item_translation" />

@@ -2,7 +2,10 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="@dimen/padding">
+    android:paddingTop="@dimen/padding"
+    android:paddingBottom="@dimen/padding"
+    android:paddingLeft="@dimen/paddingLeft"
+    android:paddingRight="@dimen/paddingRight">
 
     <TextView
         android:id="@+id/continuous_reading_text_view"
@@ -56,7 +59,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/finished_books_text_view"
-        android:layout_marginLeft="@dimen/padding"
+        android:layout_marginLeft="@dimen/paddingLeft"
         android:text="@string/text_finished_old_testament" />
 
     <TextView
@@ -72,7 +75,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/finished_old_testament_text_view"
-        android:layout_marginLeft="@dimen/padding"
+        android:layout_marginLeft="@dimen/paddingLeft"
         android:text="@string/text_finished_new_testament" />
 
     <TextView

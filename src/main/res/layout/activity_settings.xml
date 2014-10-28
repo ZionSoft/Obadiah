@@ -9,8 +9,8 @@
         android:background="@drawable/background_text"
         android:layout_width="match_parent"
         android:layout_height="@dimen/item_height"
-        android:paddingLeft="@dimen/padding"
-        android:paddingRight="@dimen/padding"
+        android:paddingLeft="@dimen/paddingLeft"
+        android:paddingRight="@dimen/paddingRight"
         android:text="@string/pref_screen_on" />
 
     <View style="@style/Divider.Horizontal" />
@@ -20,8 +20,8 @@
         android:background="@drawable/background_text"
         android:layout_width="match_parent"
         android:layout_height="@dimen/item_height"
-        android:paddingLeft="@dimen/padding"
-        android:paddingRight="@dimen/padding"
+        android:paddingLeft="@dimen/paddingLeft"
+        android:paddingRight="@dimen/paddingRight"
         android:text="@string/pref_night_mode" />
 
     <View style="@style/Divider.Horizontal" />
@@ -31,6 +31,8 @@
         android:background="@drawable/background_text"
         android:layout_width="match_parent"
         android:layout_height="@dimen/item_height"
+        android:paddingLeft="@dimen/paddingLeft"
+        android:paddingRight="@dimen/paddingRight"
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
@@ -38,7 +40,6 @@
             android:id="@+id/text_size_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingLeft="@dimen/padding"
             android:gravity="center_vertical"
             android:text="@string/pref_text_size" />
 
@@ -46,7 +47,6 @@
             android:id="@+id/text_size_value_text_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingRight="@dimen/padding"
             android:gravity="center_vertical|right"
             android:textColor="@color/dark_gray" />
     </LinearLayout>
@@ -58,7 +58,7 @@
         android:background="@drawable/background_text"
         android:layout_width="match_parent"
         android:layout_height="@dimen/item_height"
-        android:paddingLeft="@dimen/padding"
+        android:paddingLeft="@dimen/paddingLeft"
         android:gravity="center_vertical"
         android:text="@string/pref_rate_me" />
 
@@ -68,6 +68,8 @@
         android:background="@drawable/background_text"
         android:layout_width="match_parent"
         android:layout_height="@dimen/item_height"
+        android:paddingLeft="@dimen/paddingLeft"
+        android:paddingRight="@dimen/paddingRight"
         android:clickable="true"
         android:gravity="center_vertical"
         android:orientation="horizontal">
@@ -76,7 +78,6 @@
             android:id="@+id/version_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingLeft="@dimen/padding"
             android:gravity="center_vertical"
             android:text="@string/pref_version" />
 
@@ -84,7 +85,6 @@
             android:id="@+id/version_value_text_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingRight="@dimen/padding"
             android:gravity="center_vertical|right"
             android:textColor="@color/dark_gray" />
     </LinearLayout>
