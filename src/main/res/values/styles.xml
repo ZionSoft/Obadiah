@@ -4,6 +4,7 @@
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="actionModeBackground">@color/blue</item>
         <item name="colorPrimary">@color/blue</item>
+        <item name="colorPrimaryDark">@color/dark_blue</item>
         <item name="android:dropDownListViewStyle">@style/AppSpinnerStyle</item>
     </style>
 
