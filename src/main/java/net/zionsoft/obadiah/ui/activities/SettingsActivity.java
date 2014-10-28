@@ -17,6 +17,9 @@
 
 package net.zionsoft.obadiah.ui.activities;
 
+import android.animation.ArgbEvaluator;
+import android.animation.ValueAnimator;
+import android.annotation.TargetApi;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -44,8 +47,11 @@ public class SettingsActivity extends ActionBarActivity {
         return new Intent(context, SettingsActivity.class);
     }
 
+    private static final long ANIMATION_DURATION = 300L;
+
     private Settings mSettings;
 
+    private View mRootView;
     private SwitchCompat mScreenOnSwitch;
     private SwitchCompat mNightModeSwitch;
     private TextView mTextSizeTextView;
@@ -61,35 +67,45 @@ public class SettingsActivity extends ActionBarActivity {
         mSettings = Settings.getInstance();
 
         initializeUi();
-        populateUi();
     }
 
     private void initializeUi() {
         setContentView(R.layout.activity_settings);
+
+        mRootView = getWindow().getDecorView();
 
         final ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayShowHomeEnabled(true);
         actionBar.setIcon(R.drawable.ic_action_bar);
 
         mScreenOnSwitch = (SwitchCompat) findViewById(R.id.screen_on_switch);
+        mNightModeSwitch = (SwitchCompat) findViewById(R.id.night_mode_switch);
+        mRateMeTextView = (TextView) findViewById(R.id.rate_me_text_view);
+        mTextSizeTextView = (TextView) findViewById(R.id.text_size_text_view);
+        mTextSizeValueTextView = (TextView) findViewById(R.id.text_size_value_text_view);
+        mVersionTextView = (TextView) findViewById(R.id.version_text_view);
+        mVersionValueTextView = (TextView) findViewById(R.id.version_value_text_view);
+
+        // must call this before setting the listeners, otherwise all the listeners will be
+        // immediately triggered
+        populateUi(false);
+
         mScreenOnSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 mSettings.setKeepScreenOn(isChecked);
-                populateUi();
+                populateUi(false);
             }
         });
 
-        mNightModeSwitch = (SwitchCompat) findViewById(R.id.night_mode_switch);
         mNightModeSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 mSettings.setNightMode(isChecked);
-                populateUi();
+                populateUi(true);
             }
         });
 
-        mRateMeTextView = (TextView) findViewById(R.id.rate_me_text_view);
         mRateMeTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -114,17 +130,13 @@ public class SettingsActivity extends ActionBarActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 mSettings.setTextSize(Settings.TextSize.values()[which]);
-                                populateUi();
+                                populateUi(false);
                                 dialog.dismiss();
                             }
                         });
             }
         });
-        mTextSizeTextView = (TextView) findViewById(R.id.text_size_text_view);
-        mTextSizeValueTextView = (TextView) findViewById(R.id.text_size_value_text_view);
 
-        mVersionTextView = (TextView) findViewById(R.id.version_text_view);
-        mVersionValueTextView = (TextView) findViewById(R.id.version_value_text_view);
         try {
             mVersionValueTextView.setText(getPackageManager().getPackageInfo(getPackageName(), 0).versionName);
         } catch (PackageManager.NameNotFoundException e) {
@@ -132,37 +144,62 @@ public class SettingsActivity extends ActionBarActivity {
         }
     }
 
-    private void populateUi() {
-        final View rootView = getWindow().getDecorView();
-        rootView.setKeepScreenOn(mSettings.keepScreenOn());
-        rootView.setBackgroundColor(mSettings.getBackgroundColor());
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    private void populateUi(boolean animateColor) {
+        mRootView.setKeepScreenOn(mSettings.keepScreenOn());
 
+        final int backgroundColor = mSettings.getBackgroundColor();
         final int textColor = mSettings.getTextColor();
+        if (animateColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            // TODO adds animation for old devices
+            ValueAnimator colorAnimator = ValueAnimator.ofObject(new ArgbEvaluator(), textColor, backgroundColor);
+            colorAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator animator) {
+                    mRootView.setBackgroundColor((Integer) animator.getAnimatedValue());
+                }
+            });
+            colorAnimator.setDuration(ANIMATION_DURATION).start();
+
+            colorAnimator = ValueAnimator.ofObject(new ArgbEvaluator(), backgroundColor, textColor);
+            colorAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator animator) {
+                    final int animatedColorValue = (Integer) animator.getAnimatedValue();
+                    mScreenOnSwitch.setTextColor(animatedColorValue);
+                    mNightModeSwitch.setTextColor(animatedColorValue);
+                    mTextSizeTextView.setTextColor(animatedColorValue);
+                    mRateMeTextView.setTextColor(animatedColorValue);
+                    mVersionTextView.setTextColor(animatedColorValue);
+                }
+            });
+            colorAnimator.setDuration(ANIMATION_DURATION).start();
+        } else {
+            mRootView.setBackgroundColor(backgroundColor);
+            mScreenOnSwitch.setTextColor(textColor);
+            mNightModeSwitch.setTextColor(textColor);
+            mTextSizeTextView.setTextColor(textColor);
+            mRateMeTextView.setTextColor(textColor);
+            mVersionTextView.setTextColor(textColor);
+        }
+
         final Settings.TextSize textSizeSetting = mSettings.getTextSize();
         final Resources resources = getResources();
         final float textSize = resources.getDimension(textSizeSetting.textSize);
         final float smallerTextSize = resources.getDimension(textSizeSetting.smallerTextSize);
 
         mScreenOnSwitch.setChecked(mSettings.keepScreenOn());
-        mScreenOnSwitch.setTextColor(textColor);
         mScreenOnSwitch.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
 
         mNightModeSwitch.setChecked(mSettings.isNightMode());
-        mNightModeSwitch.setTextColor(textColor);
         mNightModeSwitch.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
 
-        mTextSizeTextView.setTextColor(textColor);
         mTextSizeTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
-
         mTextSizeValueTextView.setText(textSizeSetting.title);
         mTextSizeValueTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, smallerTextSize);
 
-        mRateMeTextView.setTextColor(textColor);
         mRateMeTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
-
-        mVersionTextView.setTextColor(textColor);
         mVersionTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
-
         mVersionValueTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, smallerTextSize);
     }
 
