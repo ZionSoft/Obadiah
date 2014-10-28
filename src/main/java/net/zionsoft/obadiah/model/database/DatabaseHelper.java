@@ -49,7 +49,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static DatabaseHelper sInstance;
 
-    private AtomicInteger mCounter;
+    private final AtomicInteger mCounter;
     private SQLiteDatabase mDatabase;
 
     public static void initialize(Context context) {
