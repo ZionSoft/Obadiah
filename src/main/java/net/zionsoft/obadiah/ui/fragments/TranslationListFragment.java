@@ -23,8 +23,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.support.v4.util.Pair;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.TypedValue;
 import android.view.ContextMenu;
@@ -33,7 +35,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ExpandableListView;
+import android.widget.AdapterView;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import net.zionsoft.obadiah.Constants;
@@ -41,7 +44,7 @@ import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.Bible;
 import net.zionsoft.obadiah.model.TranslationInfo;
 import net.zionsoft.obadiah.model.analytics.Analytics;
-import net.zionsoft.obadiah.ui.adapters.TranslationExpandableListAdapter;
+import net.zionsoft.obadiah.ui.adapters.TranslationListAdapter;
 import net.zionsoft.obadiah.ui.utils.AnimationHelper;
 import net.zionsoft.obadiah.ui.utils.DialogHelper;
 
@@ -56,10 +59,10 @@ public class TranslationListFragment extends Fragment implements SwipeRefreshLay
     private SharedPreferences mPreferences;
     private String mCurrentTranslation;
 
-    private TranslationExpandableListAdapter mTranslationListAdapter;
+    private TranslationListAdapter mTranslationListAdapter;
 
     private SwipeRefreshLayout mSwipeContainer;
-    private ExpandableListView mTranslationListView;
+    private ListView mTranslationListView;
 
     public TranslationListFragment() {
         super();
@@ -93,30 +96,31 @@ public class TranslationListFragment extends Fragment implements SwipeRefreshLay
                 (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24, getResources().getDisplayMetrics()));
         mSwipeContainer.setRefreshing(true);
 
-        mTranslationListView = (ExpandableListView) view.findViewById(R.id.translation_list_view);
-        mTranslationListAdapter = new TranslationExpandableListAdapter(getActivity(), mCurrentTranslation);
+        mTranslationListView = (ListView) view.findViewById(R.id.translation_list_view);
+        mTranslationListAdapter = new TranslationListAdapter(getActivity(), mCurrentTranslation);
         mTranslationListView.setAdapter(mTranslationListAdapter);
-        mTranslationListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+        mTranslationListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-                final TranslationInfo translationInfo = mTranslationListAdapter.getChild(groupPosition, childPosition);
-                if (translationInfo == null)
-                    return false;
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                final Pair<TranslationInfo, Boolean> translation
+                        = mTranslationListAdapter.getTranslation(position);
+                if (translation == null) {
+                    return;
+                }
 
-                if (groupPosition == TranslationExpandableListAdapter.DOWNLOADED_TRANSLATIONS_GROUP) {
-                    Analytics.trackTranslationSelection(translationInfo.shortName);
+                if (translation.second) {
+                    Analytics.trackTranslationSelection(translation.first.shortName);
 
                     mPreferences.edit()
-                            .putString(Constants.PREF_KEY_LAST_READ_TRANSLATION, translationInfo.shortName)
+                            .putString(Constants.PREF_KEY_LAST_READ_TRANSLATION, translation.first.shortName)
                             .apply();
 
                     Activity activity = getActivity();
                     activity.finish();
                     activity.overridePendingTransition(R.anim.fade_in, R.anim.slide_out_left_to_right);
-                } else if (groupPosition == TranslationExpandableListAdapter.AVAILABLE_TRANSLATIONS_GROUP) {
-                    downloadTranslation(translationInfo);
+                } else {
+                    downloadTranslation(translation.first);
                 }
-                return true;
             }
         });
         registerForContextMenu(mTranslationListView);
@@ -150,10 +154,6 @@ public class TranslationListFragment extends Fragment implements SwipeRefreshLay
 
                 mTranslationListAdapter.setTranslations(downloaded, available);
                 mTranslationListAdapter.notifyDataSetChanged();
-
-                final int groupCount = mTranslationListAdapter.getGroupCount();
-                for (int i = 0; i < groupCount; ++i)
-                    mTranslationListView.expandGroup(i);
             }
         });
     }
@@ -218,9 +218,11 @@ public class TranslationListFragment extends Fragment implements SwipeRefreshLay
             return;
         }
 
-        final TranslationInfo translationInfo = getTranslationInfo((ExpandableListView.ExpandableListContextMenuInfo) menuInfo);
-        if (translationInfo == null || mCurrentTranslation.equals(translationInfo.name))
+        final TranslationInfo translationInfo
+                = getTranslationInfo((AdapterView.AdapterContextMenuInfo) menuInfo);
+        if (translationInfo == null || mCurrentTranslation.equals(translationInfo.name)) {
             return;
+        }
 
         menu.setHeaderTitle(translationInfo.name);
         menu.add(Menu.NONE, CONTEXT_MENU_ITEM_DELETE, Menu.NONE, R.string.action_delete_translation);
@@ -228,14 +230,15 @@ public class TranslationListFragment extends Fragment implements SwipeRefreshLay
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        ExpandableListView.ExpandableListContextMenuInfo contextMenuInfo
-                = (ExpandableListView.ExpandableListContextMenuInfo) item.getMenuInfo();
+        AdapterView.AdapterContextMenuInfo contextMenuInfo
+                = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         if (contextMenuInfo == null)
             return super.onContextItemSelected(item);
 
         final TranslationInfo translationInfo = getTranslationInfo(contextMenuInfo);
-        if (translationInfo == null)
+        if (translationInfo == null) {
             return super.onContextItemSelected(item);
+        }
 
         switch (item.getItemId()) {
             case CONTEXT_MENU_ITEM_DELETE:
@@ -252,18 +255,11 @@ public class TranslationListFragment extends Fragment implements SwipeRefreshLay
         }
     }
 
-    private TranslationInfo getTranslationInfo(ExpandableListView.ExpandableListContextMenuInfo contextMenuInfo) {
-        if (ExpandableListView.getPackedPositionType(contextMenuInfo.packedPosition)
-                != ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
-            return null;
-        }
-
-        final int group = ExpandableListView.getPackedPositionGroup(contextMenuInfo.packedPosition);
-        if (group != TranslationExpandableListAdapter.DOWNLOADED_TRANSLATIONS_GROUP)
-            return null;
-
-        return mTranslationListAdapter.getChild(
-                group, ExpandableListView.getPackedPositionChild(contextMenuInfo.packedPosition));
+    @Nullable
+    private TranslationInfo getTranslationInfo(AdapterView.AdapterContextMenuInfo contextMenuInfo) {
+        final Pair<TranslationInfo, Boolean> translation
+                = mTranslationListAdapter.getTranslation(contextMenuInfo.position);
+        return translation != null && translation.second ? translation.first : null;
     }
 
     private void removeTranslation(String translationShortName) {

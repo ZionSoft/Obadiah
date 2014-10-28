@@ -1,14 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
-
-    <TextView
-        android:id="@+id/translation_text_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:minHeight="@dimen/item_height"
-        android:paddingLeft="?android:attr/expandableListPreferredItemPaddingLeft"
-        android:gravity="left|center_vertical"
-        android:background="@drawable/background_item_translation" />
-</FrameLayout>
+    android:layout_height="wrap_content"
+    android:minHeight="@dimen/item_height"
+    android:paddingLeft="@dimen/padding"
+    android:paddingRight="@dimen/padding"
+    android:gravity="left|center_vertical"
+    android:background="@drawable/background_item_translation" />

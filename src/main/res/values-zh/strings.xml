@@ -40,7 +40,6 @@
 
     <string name="text_available_translation_info">%1$s\n檔案大小%2$d KB</string>
 
-    <string name="text_available_translation">可下載譯本</string>
     <string name="text_downloaded_translations">已下載譯本</string>
     <string name="text_more_translations">更多譯本</string>
     <string name="text_share_with">分享到&#8230;</string>

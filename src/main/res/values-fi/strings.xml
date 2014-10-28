@@ -40,7 +40,6 @@
 
     <string name="text_available_translation_info">%1$s\nKoko: %2$d kt</string>
 
-    <string name="text_available_translation">Saatavilla Käännökset</string>
     <string name="text_downloaded_translations">Ladattu Käännökset</string>
     <string name="text_more_translations">Lisää</string>
     <string name="text_share_with">Jakoasetukset</string>
