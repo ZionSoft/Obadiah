@@ -35,7 +35,18 @@
         <activity
             android:name=".ui.activities.ReadingProgressActivity"
             android:label="@string/activity_reading_progress" />
-        <activity android:name=".ui.activities.SearchActivity" />
+        <activity
+            android:name=".ui.activities.SearchActivity"
+            android:launchMode="singleTop">
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable" />
+        </activity>
         <activity android:name=".ui.activities.ShortcutActivity">
             <intent-filter>
                 <action android:name="android.intent.action.CREATE_SHORTCUT" />
@@ -53,6 +64,11 @@
         <activity
             android:name="com.google.android.gms.ads.AdActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize" />
+
+        <provider
+            android:name=".model.search.RecentSearchProvider"
+            android:authorities="net.zionsoft.obadiah.model.search.RecentSearchProvider"
+            android:exported="false" />
 
         <meta-data
             android:name="com.google.android.gms.version"
