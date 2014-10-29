@@ -211,8 +211,8 @@ public class SearchActivity extends ActionBarActivity {
         return mData;
     }
 
-    private void search(final String keyword) {
-        if (TextUtils.isEmpty(keyword)) {
+    private void search(final String query) {
+        if (TextUtils.isEmpty(query)) {
             return;
         }
 
@@ -225,8 +225,8 @@ public class SearchActivity extends ActionBarActivity {
         mLoadingSpinner.setVisibility(View.VISIBLE);
         mSearchResultListView.setVisibility(View.GONE);
 
-        mRecentSearches.saveRecentQuery(keyword, null);
-        Bible.getInstance().searchVerses(mData.currentTranslation, keyword,
+        mRecentSearches.saveRecentQuery(query, null);
+        Bible.getInstance().searchVerses(mData.currentTranslation, query,
                 new Bible.OnVersesLoadedListener() {
                     @Override
                     public void onVersesLoaded(List<Verse> verses) {
@@ -235,7 +235,7 @@ public class SearchActivity extends ActionBarActivity {
                                     new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
-                                            search(keyword);
+                                            search(query);
                                         }
                                     }, null
                             );
