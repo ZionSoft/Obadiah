@@ -3,4 +3,5 @@
     android:label="@string/app_name"
     android:hint="@string/action_search"
     android:searchSuggestAuthority="net.zionsoft.obadiah.model.search.RecentSearchProvider"
-    android:searchSuggestSelection=" ?" />
+    android:searchSuggestSelection=" ?"
+    android:voiceSearchMode="showVoiceSearchButton|launchRecognizer" />
