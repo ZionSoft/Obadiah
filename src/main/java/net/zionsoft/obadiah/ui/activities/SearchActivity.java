@@ -128,7 +128,10 @@ public class SearchActivity extends ActionBarActivity {
     }
 
     private void handleStartIntent(Intent intent) {
-        if (Intent.ACTION_SEARCH.equals(intent.getAction()) && mSearchView != null) {
+        final String action = intent.getAction();
+        if (mSearchView != null
+                && ("com.google.android.gms.actions.SEARCH_ACTION".equals(action)
+                || Intent.ACTION_SEARCH.equals(action))) {
             final String query = intent.getStringExtra(SearchManager.QUERY);
             if (!TextUtils.isEmpty(query)) {
                 mSearchView.setQuery(query, true);
@@ -196,6 +199,8 @@ public class SearchActivity extends ActionBarActivity {
                 return true;
             }
         });
+
+        handleStartIntent(getIntent());
 
         return true;
     }
