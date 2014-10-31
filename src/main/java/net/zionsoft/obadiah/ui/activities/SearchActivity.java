@@ -17,11 +17,13 @@
 
 package net.zionsoft.obadiah.ui.activities;
 
+import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.provider.SearchRecentSuggestions;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -43,6 +45,7 @@ import net.zionsoft.obadiah.model.Bible;
 import net.zionsoft.obadiah.model.Settings;
 import net.zionsoft.obadiah.model.Verse;
 import net.zionsoft.obadiah.model.analytics.Analytics;
+import net.zionsoft.obadiah.model.search.RecentSearchProvider;
 import net.zionsoft.obadiah.ui.adapters.SearchResultListAdapter;
 import net.zionsoft.obadiah.ui.utils.AnimationHelper;
 import net.zionsoft.obadiah.ui.utils.DialogHelper;
@@ -64,12 +67,14 @@ public class SearchActivity extends ActionBarActivity {
 
     private Settings mSettings;
     private SharedPreferences mPreferences;
+    private SearchRecentSuggestions mRecentSearches;
 
     private SearchResultListAdapter mSearchResultListAdapter;
 
     private View mRootView;
     private View mLoadingSpinner;
     private ListView mSearchResultListView;
+    private SearchView mSearchView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,6 +82,8 @@ public class SearchActivity extends ActionBarActivity {
 
         mSettings = Settings.getInstance();
         mPreferences = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE);
+        mRecentSearches = new SearchRecentSuggestions(this,
+                RecentSearchProvider.AUTHORITY, RecentSearchProvider.MODE);
 
         initializeUi();
 
@@ -86,6 +93,8 @@ public class SearchActivity extends ActionBarActivity {
         } else {
             mSearchResultListAdapter.setVerses(mData.verses);
         }
+
+        handleStartIntent(getIntent());
     }
 
     private void initializeUi() {
@@ -116,6 +125,26 @@ public class SearchActivity extends ActionBarActivity {
                         BookSelectionActivity.newStartReorderToTopIntent(SearchActivity.this));
             }
         });
+    }
+
+    private void handleStartIntent(Intent intent) {
+        final String action = intent.getAction();
+        if (mSearchView != null
+                && ("com.google.android.gms.actions.SEARCH_ACTION".equals(action)
+                || Intent.ACTION_SEARCH.equals(action))) {
+            final String query = intent.getStringExtra(SearchManager.QUERY);
+            if (!TextUtils.isEmpty(query)) {
+                mSearchView.setQuery(query, true);
+            }
+        }
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+
+        setIntent(intent);
+        handleStartIntent(intent);
     }
 
     @Override
@@ -153,9 +182,12 @@ public class SearchActivity extends ActionBarActivity {
 
         final MenuItem searchMenuItem = menu.findItem(R.id.action_search);
         MenuItemCompat.expandActionView(searchMenuItem);
-        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchMenuItem);
-        searchView.setIconified(false);
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+        mSearchView = (SearchView) MenuItemCompat.getActionView(searchMenuItem);
+        mSearchView.setSearchableInfo(((SearchManager) getSystemService(SEARCH_SERVICE))
+                .getSearchableInfo(getComponentName()));
+        mSearchView.setQueryRefinementEnabled(true);
+        mSearchView.setIconified(false);
+        mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextChange(String newText) {
                 return false;
@@ -167,6 +199,8 @@ public class SearchActivity extends ActionBarActivity {
                 return true;
             }
         });
+
+        handleStartIntent(getIntent());
 
         return true;
     }
@@ -182,8 +216,8 @@ public class SearchActivity extends ActionBarActivity {
         return mData;
     }
 
-    private void search(final String keyword) {
-        if (TextUtils.isEmpty(keyword)) {
+    private void search(final String query) {
+        if (TextUtils.isEmpty(query)) {
             return;
         }
 
@@ -196,7 +230,8 @@ public class SearchActivity extends ActionBarActivity {
         mLoadingSpinner.setVisibility(View.VISIBLE);
         mSearchResultListView.setVisibility(View.GONE);
 
-        Bible.getInstance().searchVerses(mData.currentTranslation, keyword,
+        mRecentSearches.saveRecentQuery(query, null);
+        Bible.getInstance().searchVerses(mData.currentTranslation, query,
                 new Bible.OnVersesLoadedListener() {
                     @Override
                     public void onVersesLoaded(List<Verse> verses) {
@@ -205,7 +240,7 @@ public class SearchActivity extends ActionBarActivity {
                                     new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
-                                            search(keyword);
+                                            search(query);
                                         }
                                     }, null
                             );
