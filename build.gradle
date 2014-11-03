@@ -27,9 +27,9 @@ android {
     signingConfigs {
         release {
             storeFile file("zionsoft.keystore")
-            storePassword "TODO"
+            storePassword KEYSTORE_PASSWORD
             keyAlias "zionsoft"
-            keyPassword "TODO"
+            keyPassword KEY_PASSWORD
         }
     }
 
