@@ -168,7 +168,7 @@ public class TranslationListFragment extends Fragment implements SwipeRefreshLay
                 if (!isAdded())
                     return;
 
-                ((DialogFragment) getFragmentManager().findFragmentByTag(TAG_DOWNLOAD_DIALOG_FRAGMENT)).dismiss();
+                ((DialogFragment) getFragmentManager().findFragmentByTag(TAG_DOWNLOAD_DIALOG_FRAGMENT)).dismissAllowingStateLoss();
 
                 if (isSuccessful) {
                     Toast.makeText(getActivity(), R.string.toast_translation_downloaded, Toast.LENGTH_SHORT).show();
@@ -272,7 +272,7 @@ public class TranslationListFragment extends Fragment implements SwipeRefreshLay
                 if (!isAdded())
                     return;
 
-                ((DialogFragment) getFragmentManager().findFragmentByTag(TAG_REMOVE_DIALOG_FRAGMENT)).dismiss();
+                ((DialogFragment) getFragmentManager().findFragmentByTag(TAG_REMOVE_DIALOG_FRAGMENT)).dismissAllowingStateLoss();
 
                 if (isSuccessful) {
                     Toast.makeText(getActivity(), R.string.toast_translation_deleted, Toast.LENGTH_SHORT).show();
