@@ -38,6 +38,8 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.google.android.gms.actions.SearchIntents;
+
 import net.zionsoft.obadiah.BookSelectionActivity;
 import net.zionsoft.obadiah.Constants;
 import net.zionsoft.obadiah.R;
@@ -130,8 +132,7 @@ public class SearchActivity extends ActionBarActivity {
     private void handleStartIntent(Intent intent) {
         final String action = intent.getAction();
         if (mSearchView != null
-                && ("com.google.android.gms.actions.SEARCH_ACTION".equals(action)
-                || Intent.ACTION_SEARCH.equals(action))) {
+                && (SearchIntents.ACTION_SEARCH.equals(action) || Intent.ACTION_SEARCH.equals(action))) {
             final String query = intent.getStringExtra(SearchManager.QUERY);
             if (!TextUtils.isEmpty(query)) {
                 mSearchView.setQuery(query, true);
