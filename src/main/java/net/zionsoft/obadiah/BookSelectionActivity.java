@@ -46,6 +46,7 @@ import net.zionsoft.obadiah.model.Settings;
 import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.appindexing.AppIndexingManager;
 import net.zionsoft.obadiah.model.utils.AppUpdateChecker;
+import net.zionsoft.obadiah.model.utils.UriHelper;
 import net.zionsoft.obadiah.ui.activities.ReadingProgressActivity;
 import net.zionsoft.obadiah.ui.activities.SearchActivity;
 import net.zionsoft.obadiah.ui.activities.SettingsActivity;
@@ -96,7 +97,7 @@ public class BookSelectionActivity extends ActionBarActivity
         mPreferences = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE);
 
         initializeUi();
-        checkDeepLink();
+        UriHelper.checkDeepLink(mPreferences, getIntent().getData());
         checkClientVersion();
     }
 
@@ -116,44 +117,6 @@ public class BookSelectionActivity extends ActionBarActivity
         final FragmentManager fm = getSupportFragmentManager();
         mChapterSelectionFragment = (ChapterSelectionFragment) fm.findFragmentById(R.id.left_drawer);
         mTextFragment = (TextFragment) fm.findFragmentById(R.id.text_fragment);
-    }
-
-    private void checkDeepLink() {
-        final Uri uri = getIntent().getData();
-        if (uri == null)
-            return;
-
-        // format: /bible/<translation-short-name>/<book-index>/<chapter-index>
-        final String[] parts = uri.getPath().split("/");
-        if (parts.length < 5)
-            return;
-
-        try {
-            final SharedPreferences.Editor editor = mPreferences.edit();
-
-            // validity of translation short name will be checked later
-            final String translationShortName = parts[2];
-            if (TextUtils.isEmpty(translationShortName))
-                editor.putString(Constants.PREF_KEY_LAST_READ_TRANSLATION, translationShortName);
-            else
-                return;
-
-            final int bookIndex = Integer.parseInt(parts[3]);
-            if (bookIndex >= 0 && bookIndex < Bible.getBookCount())
-                editor.putInt(Constants.PREF_KEY_LAST_READ_BOOK, bookIndex);
-            else
-                return;
-
-            final int chapterIndex = Integer.parseInt(parts[4]);
-            if (chapterIndex >= 0 && chapterIndex < Bible.getChapterCount(bookIndex))
-                editor.putInt(Constants.PREF_KEY_LAST_READ_CHAPTER, chapterIndex);
-            else
-                return;
-
-            editor.putInt(Constants.PREF_KEY_LAST_READ_VERSE, 0).apply();
-        } catch (Exception e) {
-            Analytics.trackException("Invalid URI: " + uri.toString());
-        }
     }
 
     private void checkClientVersion() {

@@ -89,6 +89,11 @@ public class Analytics {
                 .build());
     }
 
+    public static void trackDeepLink() {
+        sTracker.send(new HitBuilders.EventBuilder("deep_link", "open")
+                .build());
+    }
+
     public static void trackUIEvent(String label) {
         sTracker.send(new HitBuilders.EventBuilder("ui", "button_click")
                 .setLabel(label)
