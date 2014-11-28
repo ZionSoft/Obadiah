@@ -17,7 +17,6 @@
 
 -keep class com.android.vending.billing.**
 
-# workaround for https://code.google.com/p/android/issues/detail?id=78377
-# as suggested in comment 150
--keep class !android.support.v7.internal.view.menu.MenuBuilder
--keep class !android.support.v7.internal.view.menu.SubMenuBuilder
+-dontwarn android.support.v7.**
+-keep class android.support.v7.** { *; }
+-keep interface android.support.v7.** { *; }
