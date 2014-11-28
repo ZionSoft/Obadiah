@@ -157,8 +157,8 @@ public class TranslationHelper {
                             DatabaseHelper.COLUMN_VERSE_INDEX, DatabaseHelper.COLUMN_TEXT},
                     String.format("%s LIKE ?", DatabaseHelper.COLUMN_TEXT),
                     new String[]{String.format("%%%s%%", keyword.trim().replaceAll("\\s+", "%"))},
-                    null, null, null
-            );
+                    null, null, String.format(" %s ASC, %s ASC, %s ASC", DatabaseHelper.COLUMN_BOOK_INDEX,
+                            DatabaseHelper.COLUMN_CHAPTER_INDEX, DatabaseHelper.COLUMN_VERSE_INDEX));
             final int count = cursor.getCount();
             if (count == 0)
                 return Collections.emptyList();
