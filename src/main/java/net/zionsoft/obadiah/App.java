@@ -19,6 +19,8 @@ package net.zionsoft.obadiah;
 
 import android.app.Application;
 
+import com.crashlytics.android.Crashlytics;
+
 import net.zionsoft.obadiah.legacy.Upgrader;
 import net.zionsoft.obadiah.model.Bible;
 import net.zionsoft.obadiah.model.Settings;
@@ -26,10 +28,13 @@ import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.database.DatabaseHelper;
 import net.zionsoft.obadiah.ui.utils.UiHelper;
 
+import io.fabric.sdk.android.Fabric;
+
 public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        Fabric.with(this, new Crashlytics());
 
         Analytics.initialize(this);
         DatabaseHelper.initialize(this);
