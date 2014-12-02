@@ -30,3 +30,4 @@ IInAppBillingService.aidl
 
 # Crashlytics
 crashlytics.properties
+com_crashlytics_export_strings.xml

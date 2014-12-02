@@ -57,3 +57,13 @@ android {
         }
     }
 }
+
+/**
+ * Crashlytic - http://support.crashlytics.com/knowledgebase/articles/202938-gradle
+ */
+// Android Manifest
+crashlytics.manifestPath = "src/main/AndroidManifest.xml"
+// Res folder
+crashlytics.resPath = "src/main/res"
+// Assets folder
+// crashlytics.assetsPath = "src/main/assets"
