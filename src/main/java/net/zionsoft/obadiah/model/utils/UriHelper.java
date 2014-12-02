@@ -23,6 +23,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
+import com.crashlytics.android.Crashlytics;
+
 import net.zionsoft.obadiah.Constants;
 import net.zionsoft.obadiah.model.Bible;
 import net.zionsoft.obadiah.model.analytics.Analytics;
@@ -72,7 +74,7 @@ public class UriHelper {
             editor.putInt(Constants.PREF_KEY_LAST_READ_VERSE, 0).apply();
             Analytics.trackDeepLink();
         } catch (Exception e) {
-            Analytics.trackException("Invalid URI: " + uri.toString());
+            Crashlytics.logException(e);
         }
     }
 }

@@ -8,8 +8,9 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.text.format.DateUtils;
 
+import com.crashlytics.android.Crashlytics;
+
 import net.zionsoft.obadiah.Constants;
-import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.network.NetworkHelper;
 
 import org.json.JSONObject;
@@ -58,7 +59,7 @@ public class AppUpdateChecker {
 
                     return context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionCode < latestVersion;
                 } catch (Exception e) {
-                    Analytics.trackException("Failed to check client version - " + e.getMessage());
+                    Crashlytics.logException(e);
                     return false;
                 }
             }
@@ -72,7 +73,7 @@ public class AppUpdateChecker {
             try {
                 asyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
             } catch (RejectedExecutionException e) {
-                Analytics.trackException("Failed to execute AsyncTask - " + e.getMessage());
+                Crashlytics.logException(e);
             }
         } else {
             asyncTask.execute();

@@ -24,6 +24,8 @@ import android.os.SystemClock;
 import android.support.v4.util.LruCache;
 import android.util.Pair;
 
+import com.crashlytics.android.Crashlytics;
+
 import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.database.DatabaseHelper;
 import net.zionsoft.obadiah.model.network.NetworkHelper;
@@ -170,15 +172,13 @@ public class Bible {
                 try {
                     translations = downloadTranslationList(NetworkHelper.PRIMARY_TRANSLATIONS_LIST_URL);
                 } catch (Exception e) {
-                    Analytics.trackException(String.format("Failed to download translation list from %s - %s",
-                            NetworkHelper.PRIMARY_TRANSLATIONS_LIST_URL, e.getMessage()));
+                    Crashlytics.logException(e);
                 }
                 if (translations == null) {
                     try {
                         translations = downloadTranslationList(NetworkHelper.SECONDARY_TRANSLATIONS_LIST_URL);
                     } catch (Exception e) {
-                        Analytics.trackException(String.format("Failed to download translation list from %s - %s",
-                                NetworkHelper.SECONDARY_TRANSLATIONS_LIST_URL, e.getMessage()));
+                        Crashlytics.logException(e);
                         return null;
                     }
                 }
@@ -407,28 +407,25 @@ public class Bible {
                 };
 
                 boolean downloaded = false;
-                String url = null;
                 try {
-                    url = String.format(NetworkHelper.PRIMARY_TRANSLATION_URL_TEMPLATE,
+                    final String url = String.format(NetworkHelper.PRIMARY_TRANSLATION_URL_TEMPLATE,
                             URLEncoder.encode(translationInfo.blobKey, "UTF-8"));
                     downloadTranslation(url, translationInfo.shortName, onProgress);
                     downloaded = true;
                 } catch (Exception e) {
-                    Analytics.trackException(String.format("Failed to download translation from %s - %s",
-                            url, e.getMessage()));
+                    Crashlytics.logException(e);
                 }
 
                 if (!downloaded) {
                     try {
                         // TODO if downloading from primary server fails with a non-zero progress,
                         // it starts from zero again
-                        url = String.format(NetworkHelper.SECONDARY_TRANSLATION_URL_TEMPLATE,
+                        final String url = String.format(NetworkHelper.SECONDARY_TRANSLATION_URL_TEMPLATE,
                                 URLEncoder.encode(translationInfo.shortName, "UTF-8"));
                         downloadTranslation(url, translationInfo.shortName, onProgress);
                         downloaded = true;
                     } catch (Exception e) {
-                        Analytics.trackException(String.format("Failed to download translation from %s - %s",
-                                url, e.getMessage()));
+                        Crashlytics.logException(e);
                     }
                 }
                 return downloaded;

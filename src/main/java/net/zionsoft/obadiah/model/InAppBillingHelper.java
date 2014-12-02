@@ -29,6 +29,7 @@ import android.os.IBinder;
 import android.os.RemoteException;
 
 import com.android.vending.billing.IInAppBillingService;
+import com.crashlytics.android.Crashlytics;
 
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.analytics.Analytics;
@@ -113,7 +114,7 @@ public class InAppBillingHelper implements ServiceConnection {
                     }
                     return false;
                 } catch (Exception e) {
-                    Analytics.trackException("Failed to load purchases - " + e.getMessage());
+                    Crashlytics.logException(e);
                     return false;
                 }
             }
@@ -157,7 +158,7 @@ public class InAppBillingHelper implements ServiceConnection {
             mContext.startIntentSenderForResult(pendingIntent.getIntentSender(),
                     REQUEST_PURCHASE, new Intent(), 0, 0, 0);
         } catch (Exception e) {
-            Analytics.trackException("Failed to purchase ads removal - " + e.getMessage());
+            Crashlytics.logException(e);
             onPurchased.onAdsRemovalPurchased(false);
         }
     }
@@ -194,7 +195,7 @@ public class InAppBillingHelper implements ServiceConnection {
             mOnAdsRemovalPurchased.onAdsRemovalPurchased(isPurchased);
             mOnAdsRemovalPurchased = null;
         } catch (JSONException e) {
-            Analytics.trackException("Failed to purchase ads removal - " + e.getMessage());
+            Crashlytics.logException(e);
             mOnAdsRemovalPurchased.onAdsRemovalPurchased(false);
             mOnAdsRemovalPurchased = null;
         }
@@ -218,7 +219,7 @@ public class InAppBillingHelper implements ServiceConnection {
             else
                 Analytics.trackBillingNotSupported(response);
         } catch (RemoteException e) {
-            Analytics.trackException("Failed to check billing support - " + e.getMessage());
+            Crashlytics.logException(e);
         }
         mOnInitializationFinished.onInitializationFinished(result);
         mOnInitializationFinished = null;
