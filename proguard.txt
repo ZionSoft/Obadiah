@@ -20,3 +20,7 @@
 -dontwarn android.support.v7.**
 -keep class android.support.v7.** { *; }
 -keep interface android.support.v7.** { *; }
+
+# Crashlytics
+# http://support.crashlytics.com/knowledgebase/articles/202926-android-studio-and-intellij-with-proguard
+-keepattributes SourceFile,LineNumberTable
