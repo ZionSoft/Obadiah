@@ -26,8 +26,15 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.analytics.Analytics;
+import net.zionsoft.obadiah.model.network.NetworkHelper;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
 
 public class PushNotificationRegister extends IntentService {
     public static void register(Context context) {
@@ -46,9 +53,13 @@ public class PushNotificationRegister extends IntentService {
             final String registrationId = gcm.register(getString(R.string.google_cloud_messaging_sender_id));
             Analytics.trackNotificationEvent("device_registered", null);
 
-            // TODO sends registration ID to backend
-            System.out.println("--> registration ID: " + registrationId);
-        } catch (IOException e) {
+            final JSONObject jsonObject = new JSONObject();
+            jsonObject.put("pushNotificationId", registrationId);
+            jsonObject.put("utcOffset", TimeZone.getDefault().getOffset(new Date().getTime()) / 1000);
+            jsonObject.put("locale", Locale.getDefault().toString().toLowerCase());
+            NetworkHelper.post(NetworkHelper.DEVICE_ACCOUNT_URL, jsonObject.toString());
+        } catch (IOException | JSONException e) {
+            e.printStackTrace();
             Crashlytics.logException(e);
         } finally {
             if (gcm != null) {
