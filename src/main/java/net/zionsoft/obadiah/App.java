@@ -26,6 +26,7 @@ import net.zionsoft.obadiah.model.Bible;
 import net.zionsoft.obadiah.model.Settings;
 import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.database.DatabaseHelper;
+import net.zionsoft.obadiah.model.notification.PushNotificationRegister;
 import net.zionsoft.obadiah.ui.utils.UiHelper;
 
 import io.fabric.sdk.android.Fabric;
@@ -38,6 +39,7 @@ public class App extends Application {
 
         Analytics.initialize(this);
         DatabaseHelper.initialize(this);
+        PushNotificationRegister.register(this);
 
         Upgrader.upgrade(this);
 
