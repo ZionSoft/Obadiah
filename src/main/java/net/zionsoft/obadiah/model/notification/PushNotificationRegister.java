@@ -51,15 +51,15 @@ public class PushNotificationRegister extends IntentService {
         try {
             gcm = GoogleCloudMessaging.getInstance(this);
             final String registrationId = gcm.register(getString(R.string.google_cloud_messaging_sender_id));
-            Analytics.trackNotificationEvent("device_registered", null);
 
             final JSONObject jsonObject = new JSONObject();
             jsonObject.put("pushNotificationId", registrationId);
             jsonObject.put("utcOffset", TimeZone.getDefault().getOffset(new Date().getTime()) / 1000);
             jsonObject.put("locale", Locale.getDefault().toString().toLowerCase());
             NetworkHelper.post(NetworkHelper.DEVICE_ACCOUNT_URL, jsonObject.toString());
+
+            Analytics.trackNotificationEvent("device_registered", null);
         } catch (IOException | JSONException e) {
-            e.printStackTrace();
             Crashlytics.logException(e);
         } finally {
             if (gcm != null) {

@@ -88,6 +88,7 @@
             </intent-filter>
         </receiver>
 
+        <service android:name=".model.notification.PushNotificationHandler" />
         <service android:name=".model.notification.PushNotificationRegister" />
 
         <meta-data

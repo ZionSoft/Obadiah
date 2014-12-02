@@ -21,26 +21,18 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import com.google.android.gms.gcm.GoogleCloudMessaging;
+import net.zionsoft.obadiah.model.analytics.Analytics;
 
-public class PushNotificationReceiver extends BroadcastReceiver {
+public class PushDismissedReceiver extends BroadcastReceiver {
+    private static final String KEY_MESSAGE_TYPE = "net.zionsoft.obadiah.model.notification.PushDismissedReceiver.KEY_MESSAGE_TYPE";
+
+    public static Intent newStartIntent(Context context, String messageType) {
+        return new Intent(context, PushDismissedReceiver.class)
+                .putExtra(KEY_MESSAGE_TYPE, messageType);
+    }
+
     @Override
     public void onReceive(Context context, Intent intent) {
-        GoogleCloudMessaging gcm = null;
-        try {
-            gcm = GoogleCloudMessaging.getInstance(context);
-            final String messageType = gcm.getMessageType(intent);
-            if (GoogleCloudMessaging.MESSAGE_TYPE_SEND_ERROR.equals(messageType)) {
-                // TODO
-            } else if (GoogleCloudMessaging.MESSAGE_TYPE_DELETED.equals(messageType)) {
-                // TODO
-            } else if (GoogleCloudMessaging.MESSAGE_TYPE_MESSAGE.equals(messageType)) {
-                context.startService(PushNotificationHandler.newStartIntent(context, intent.getExtras()));
-            }
-        } finally {
-            if (gcm != null) {
-                gcm.close();
-            }
-        }
+        Analytics.trackNotificationEvent("notification_dismissed", intent.getStringExtra(KEY_MESSAGE_TYPE));
     }
 }

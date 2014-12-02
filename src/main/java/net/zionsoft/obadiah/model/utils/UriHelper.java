@@ -20,7 +20,6 @@ package net.zionsoft.obadiah.model.utils;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.crashlytics.android.Crashlytics;
@@ -30,11 +29,7 @@ import net.zionsoft.obadiah.model.Bible;
 import net.zionsoft.obadiah.model.analytics.Analytics;
 
 public class UriHelper {
-    public static void checkDeepLink(@NonNull SharedPreferences preferences, @Nullable Uri uri) {
-        if (uri == null) {
-            return;
-        }
-
+    public static void checkDeepLink(@NonNull SharedPreferences preferences, @NonNull Uri uri) {
         final String path = uri.getPath();
         if (TextUtils.isEmpty(path)) {
             return;

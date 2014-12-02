@@ -20,6 +20,7 @@ package net.zionsoft.obadiah.model.translations;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import net.zionsoft.obadiah.model.Bible;
@@ -119,6 +120,28 @@ public class TranslationHelper {
             while (cursor.moveToNext())
                 bookNames.add(cursor.getString(bookName));
             return bookNames;
+        } finally {
+            if (cursor != null)
+                cursor.close();
+        }
+    }
+
+    @Nullable
+    public static Verse getVerse(SQLiteDatabase db, String translationShortName,
+                                 String bookName, int book, int chapter, int verse) {
+        Cursor cursor = null;
+        try {
+            cursor = db.query(translationShortName,
+                    new String[]{DatabaseHelper.COLUMN_TEXT},
+                    String.format("%s = ? AND %s = ? AND %s = ?", DatabaseHelper.COLUMN_BOOK_INDEX,
+                            DatabaseHelper.COLUMN_CHAPTER_INDEX, DatabaseHelper.COLUMN_VERSE_INDEX),
+                    new String[]{Integer.toString(book), Integer.toString(chapter), Integer.toString(verse)},
+                    null, null, null);
+            if (cursor.moveToFirst()) {
+                return new Verse(book, chapter, verse, bookName, cursor.getString(0));
+            } else {
+                return null;
+            }
         } finally {
             if (cursor != null)
                 cursor.close();
