@@ -34,7 +34,7 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        Fabric.with(this, new Crashlytics());
+        Fabric.with(this, new Crashlytics.Builder().disabled(BuildConfig.DEBUG).build());
 
         Analytics.initialize(this);
         DatabaseHelper.initialize(this);
