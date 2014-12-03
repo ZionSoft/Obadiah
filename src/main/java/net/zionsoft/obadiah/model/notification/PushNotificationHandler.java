@@ -28,6 +28,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
+import android.text.TextUtils;
 
 import com.crashlytics.android.Crashlytics;
 
@@ -38,7 +39,9 @@ import net.zionsoft.obadiah.model.Verse;
 import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.database.DatabaseHelper;
 import net.zionsoft.obadiah.model.translations.TranslationHelper;
+import net.zionsoft.obadiah.ui.activities.TranslationManagementActivity;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 public class PushNotificationHandler extends IntentService {
@@ -50,8 +53,10 @@ public class PushNotificationHandler extends IntentService {
     }
 
     private static final int NOTIFICATION_ID_VERSE = 1;
+    private static final int NOTIFICATION_ID_NEW_TRANSLATION = 2;
 
     private static final String MESSAGE_TYPE_VERSE = "verse";
+    private static final String MESSAGE_TYPE_NEW_TRANSLATION = "newTranslation";
 
     public PushNotificationHandler() {
         super("net.zionsoft.obadiah.model.notification.PushNotificationHandler");
@@ -68,6 +73,11 @@ public class PushNotificationHandler extends IntentService {
         if (MESSAGE_TYPE_VERSE.equals(messageType)) {
             notificationId = NOTIFICATION_ID_VERSE;
             if (!prepareForVerse(this, builder, messageType, messageAttrs)) {
+                return;
+            }
+        } else if (MESSAGE_TYPE_NEW_TRANSLATION.equals(messageType)) {
+            notificationId = NOTIFICATION_ID_NEW_TRANSLATION;
+            if (!prepareForNewTranslation(this, builder, messageType, messageAttrs)) {
                 return;
             }
         } else {
@@ -133,6 +143,31 @@ public class PushNotificationHandler extends IntentService {
                 DatabaseHelper.closeDatabase();
             }
         }
+        return true;
+    }
+
+    private static boolean prepareForNewTranslation(Context context, NotificationCompat.Builder builder,
+                                                    String messageType, String messageAttrs) {
+        try {
+            final JSONObject jsonObject = new JSONObject(messageAttrs);
+            final String translationName = jsonObject.getString("translationName");
+            if (TextUtils.isEmpty(translationName)) {
+                throw new JSONException("Malformed push message: " + messageAttrs);
+            }
+
+            final String contentText = context.getString(R.string.text_new_translation_available,
+                    translationName);
+            builder.setContentIntent(PendingIntent.getActivity(context, 0,
+                    TranslationManagementActivity.newStartReorderToTopIntent(context, messageType),
+                    PendingIntent.FLAG_UPDATE_CURRENT))
+                    .setContentTitle(context.getString(R.string.text_new_translation))
+                    .setContentText(contentText)
+                    .setStyle(new NotificationCompat.BigTextStyle().bigText(contentText));
+        } catch (Exception e) {
+            Crashlytics.logException(e);
+            return false;
+        }
+
         return true;
     }
 }

@@ -21,6 +21,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -34,6 +35,13 @@ import net.zionsoft.obadiah.model.Settings;
 import net.zionsoft.obadiah.model.analytics.Analytics;
 
 public class TranslationManagementActivity extends ActionBarActivity {
+    private static final String KEY_MESSAGE_TYPE = "net.zionsoft.obadiah.ui.activities.TranslationManagementActivity.KEY_MESSAGE_TYPE";
+
+    public static Intent newStartReorderToTopIntent(Context context, String messageType) {
+        return newStartIntent(context).setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+                .putExtra(KEY_MESSAGE_TYPE, messageType);
+    }
+
     public static Intent newStartIntent(Context context) {
         return new Intent(context, TranslationManagementActivity.class);
     }
@@ -49,6 +57,7 @@ public class TranslationManagementActivity extends ActionBarActivity {
 
         initializeUi();
         initializeInAppBillingHelper();
+        checkDeepLink();
     }
 
     private void initializeUi() {
@@ -85,6 +94,15 @@ public class TranslationManagementActivity extends ActionBarActivity {
                 }
             }
         });
+    }
+
+    private void checkDeepLink() {
+        final Intent startIntent = getIntent();
+        final String messageType = startIntent.getStringExtra(KEY_MESSAGE_TYPE);
+        if (TextUtils.isEmpty(messageType)) {
+            return;
+        }
+        Analytics.trackNotificationEvent("notification_opened", messageType);
     }
 
     private void hideAds() {
