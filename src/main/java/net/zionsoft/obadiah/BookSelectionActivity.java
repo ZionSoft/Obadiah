@@ -61,6 +61,20 @@ import java.util.List;
 
 public class BookSelectionActivity extends ActionBarActivity
         implements ChapterSelectionFragment.Listener, TextFragment.Listener {
+    private static final String KEY_MESSAGE_TYPE = "net.zionsoft.obadiah.BookSelectionActivity.KEY_MESSAGE_TYPE";
+    private static final String KEY_BOOK_INDEX = "net.zionsoft.obadiah.BookSelectionActivity.KEY_BOOK_INDEX";
+    private static final String KEY_CHAPTER_INDEX = "net.zionsoft.obadiah.BookSelectionActivity.KEY_CHAPTER_INDEX";
+    private static final String KEY_VERSE_INDEX = "net.zionsoft.obadiah.BookSelectionActivity.KEY_VERSE_INDEX";
+
+    public static Intent newStartReorderToTopIntent(Context context, String messageType,
+                                                    int book, int chapter, int verse) {
+        return newStartIntent(context).setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+                .putExtra(KEY_MESSAGE_TYPE, messageType)
+                .putExtra(KEY_BOOK_INDEX, book)
+                .putExtra(KEY_CHAPTER_INDEX, chapter)
+                .putExtra(KEY_VERSE_INDEX, verse);
+    }
+
     public static Intent newStartReorderToTopIntent(Context context) {
         return newStartIntent(context).setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
     }
@@ -97,7 +111,7 @@ public class BookSelectionActivity extends ActionBarActivity
         mPreferences = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE);
 
         initializeUi();
-        UriHelper.checkDeepLink(mPreferences, getIntent().getData());
+        checkDeepLink();
         checkClientVersion();
     }
 
@@ -117,6 +131,39 @@ public class BookSelectionActivity extends ActionBarActivity
         final FragmentManager fm = getSupportFragmentManager();
         mChapterSelectionFragment = (ChapterSelectionFragment) fm.findFragmentById(R.id.left_drawer);
         mTextFragment = (TextFragment) fm.findFragmentById(R.id.text_fragment);
+    }
+
+    private void checkDeepLink() {
+        final Intent startIntent = getIntent();
+        final Uri uri = startIntent.getData();
+        if (uri != null) {
+            UriHelper.checkDeepLink(mPreferences, uri);
+        } else {
+            final String messageType = startIntent.getStringExtra(KEY_MESSAGE_TYPE);
+            if (TextUtils.isEmpty(messageType)) {
+                return;
+            }
+            final int bookIndex = startIntent.getIntExtra(KEY_BOOK_INDEX, -1);
+            if (bookIndex < 0) {
+                return;
+            }
+            final int chapterIndex = startIntent.getIntExtra(KEY_CHAPTER_INDEX, -1);
+            if (chapterIndex < 0) {
+                return;
+            }
+            final int verseIndex = startIntent.getIntExtra(KEY_VERSE_INDEX, -1);
+            if (verseIndex < 0) {
+                return;
+            }
+
+            mPreferences.edit()
+                    .putInt(Constants.PREF_KEY_LAST_READ_BOOK, bookIndex)
+                    .putInt(Constants.PREF_KEY_LAST_READ_CHAPTER, chapterIndex)
+                    .putInt(Constants.PREF_KEY_LAST_READ_VERSE, verseIndex)
+                    .apply();
+
+            Analytics.trackNotificationEvent("notification_opened", messageType);
+        }
     }
 
     private void checkClientVersion() {

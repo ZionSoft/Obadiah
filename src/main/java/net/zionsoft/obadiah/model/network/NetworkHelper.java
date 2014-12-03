@@ -20,8 +20,12 @@ package net.zionsoft.obadiah.model.network;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.text.TextUtils;
+
+import com.crashlytics.android.Crashlytics;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -35,6 +39,8 @@ public class NetworkHelper {
     public static final String SECONDARY_TRANSLATIONS_LIST_URL = "http://bible.zionsoft.net/translations/list.json";
     public static final String SECONDARY_TRANSLATION_URL_TEMPLATE = "http://bible.zionsoft.net/translations/%s.zip";
 
+    public static final String DEVICE_ACCOUNT_URL = "https://z-bible.appspot.com/v1/account/device";
+
     public static boolean isOnline(Context context) {
         final ConnectivityManager connectivityManager
                 = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -46,18 +52,7 @@ public class NetworkHelper {
         BufferedInputStream bis = null;
         try {
             bis = getStream(url);
-
-            int read;
-            byte[] response = new byte[0];
-            final byte[] buffer = new byte[2048];
-            while ((read = bis.read(buffer)) > -1) {
-                byte[] tmp = new byte[response.length + read];
-                System.arraycopy(response, 0, tmp, 0, response.length);
-                System.arraycopy(buffer, 0, tmp, response.length, read);
-                response = tmp;
-            }
-
-            return response;
+            return readStream(bis);
         } finally {
             if (bis != null)
                 bis.close();
@@ -67,5 +62,46 @@ public class NetworkHelper {
     public static BufferedInputStream getStream(String url) throws IOException {
         final HttpURLConnection httpConnection = (HttpURLConnection) new URL(url).openConnection();
         return new BufferedInputStream(httpConnection.getInputStream());
+    }
+
+    private static byte[] readStream(BufferedInputStream bis) throws IOException {
+        int read;
+        byte[] result = new byte[0];
+        final byte[] buffer = new byte[2048];
+        while ((read = bis.read(buffer)) > -1) {
+            byte[] tmp = new byte[result.length + read];
+            System.arraycopy(result, 0, tmp, 0, result.length);
+            System.arraycopy(buffer, 0, tmp, result.length, read);
+            result = tmp;
+        }
+        return result;
+    }
+
+    public static void post(String url, String body) throws IOException {
+        final HttpURLConnection httpConnection = (HttpURLConnection) new URL(url).openConnection();
+        httpConnection.setRequestMethod("POST");
+
+        BufferedOutputStream bos = null;
+        try {
+            if (!TextUtils.isEmpty(body)) {
+                httpConnection.setDoOutput(true);
+
+                final byte[] output = body.getBytes();
+                httpConnection.setFixedLengthStreamingMode(output.length);
+                bos = new BufferedOutputStream(httpConnection.getOutputStream());
+                bos.write(output);
+                bos.flush();
+            }
+        } finally {
+            if (bos != null) {
+                try {
+                    bos.close();
+                } catch (IOException e) {
+                    // not much we can do
+                    Crashlytics.logException(e);
+                }
+            }
+            httpConnection.disconnect();
+        }
     }
 }

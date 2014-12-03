@@ -99,4 +99,10 @@ public class Analytics {
                 .setLabel(label)
                 .build());
     }
+
+    public static void trackNotificationEvent(String action, String label) {
+        sTracker.send(new HitBuilders.EventBuilder("notification", action)
+                .setLabel(label)
+                .build());
+    }
 }

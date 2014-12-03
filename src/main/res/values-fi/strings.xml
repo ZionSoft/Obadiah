@@ -42,6 +42,8 @@
 
     <string name="text_downloaded_translations">Ladattu Käännökset</string>
     <string name="text_more_translations">Lisää</string>
+    <string name="text_new_translation">Uusi käännös</string>
+    <string name="text_new_translation_available">%1$s on nyt saatavilla!</string>
     <string name="text_share_with">Jakoasetukset</string>
 
     <string name="text_continuous_reading">Peräkkäisiä Lukeminen</string>
