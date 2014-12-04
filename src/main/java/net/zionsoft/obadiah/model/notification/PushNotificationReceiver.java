@@ -23,6 +23,8 @@ import android.content.Intent;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
+import net.zionsoft.obadiah.model.analytics.Analytics;
+
 public class PushNotificationReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -30,11 +32,8 @@ public class PushNotificationReceiver extends BroadcastReceiver {
         try {
             gcm = GoogleCloudMessaging.getInstance(context);
             final String messageType = gcm.getMessageType(intent);
-            if (GoogleCloudMessaging.MESSAGE_TYPE_SEND_ERROR.equals(messageType)) {
-                // TODO
-            } else if (GoogleCloudMessaging.MESSAGE_TYPE_DELETED.equals(messageType)) {
-                // TODO
-            } else if (GoogleCloudMessaging.MESSAGE_TYPE_MESSAGE.equals(messageType)) {
+            Analytics.trackNotificationEvent("notification_received", messageType);
+            if (GoogleCloudMessaging.MESSAGE_TYPE_MESSAGE.equals(messageType)) {
                 context.startService(PushNotificationHandler.newStartIntent(context, intent.getExtras()));
             }
         } finally {
