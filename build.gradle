@@ -19,7 +19,7 @@ repositories {
 }
 
 dependencies {
-    compile "com.android.support:appcompat-v7:21.0.2"
+    compile "com.android.support:appcompat-v7:21.0.3"
     compile "com.google.android.gms:play-services-ads:6.5.87"
     compile "com.google.android.gms:play-services-appindexing:6.5.87"
     compile('com.crashlytics.sdk.android:crashlytics:2.1.0@aar') {
@@ -29,7 +29,7 @@ dependencies {
 
 android {
     compileSdkVersion 21
-    buildToolsVersion "21.1.1"
+    buildToolsVersion "21.1.2"
 
     defaultConfig {
         versionName "1.12.0"
