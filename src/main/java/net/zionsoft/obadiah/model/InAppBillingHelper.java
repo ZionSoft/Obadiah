@@ -221,8 +221,10 @@ public class InAppBillingHelper implements ServiceConnection {
         } catch (RemoteException e) {
             Crashlytics.logException(e);
         }
-        mOnInitializationFinished.onInitializationFinished(result);
-        mOnInitializationFinished = null;
+        if (mOnInitializationFinished != null) {
+            mOnInitializationFinished.onInitializationFinished(result);
+            mOnInitializationFinished = null;
+        }
     }
 
     @Override
