@@ -22,6 +22,8 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.crashlytics.android.Crashlytics;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 import net.zionsoft.obadiah.R;
@@ -38,6 +40,10 @@ import java.util.TimeZone;
 
 public class PushNotificationRegister extends IntentService {
     public static void register(Context context) {
+        if (GooglePlayServicesUtil.isGooglePlayServicesAvailable(context) != ConnectionResult.SUCCESS) {
+            return;
+        }
+
         context.startService(new Intent(context, PushNotificationRegister.class));
     }
 
