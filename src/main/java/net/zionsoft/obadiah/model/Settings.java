@@ -97,6 +97,7 @@ public class Settings {
         super();
 
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        refresh();
     }
 
     public static Settings getInstance() {
