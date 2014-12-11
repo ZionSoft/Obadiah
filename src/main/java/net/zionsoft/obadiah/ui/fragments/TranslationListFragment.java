@@ -26,6 +26,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.util.Pair;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.TypedValue;
@@ -170,8 +171,9 @@ public class TranslationListFragment extends Fragment implements SwipeRefreshLay
     }
 
     private void downloadTranslation(final TranslationInfo translationInfo) {
-        ProgressDialogFragment.newInstance(R.string.progress_dialog_translation_downloading, 100)
-                .show(getFragmentManager(), TAG_DOWNLOAD_DIALOG_FRAGMENT);
+        final FragmentManager fm = getChildFragmentManager();
+        ProgressDialogFragment.newInstance(R.string.progress_dialog_translation_downloading, 100).show(fm, TAG_DOWNLOAD_DIALOG_FRAGMENT);
+        fm.executePendingTransactions();
 
         mBible.downloadTranslation(translationInfo, new Bible.OnTranslationDownloadListener() {
             @Override
@@ -179,7 +181,8 @@ public class TranslationListFragment extends Fragment implements SwipeRefreshLay
                 if (!isAdded())
                     return;
 
-                ((DialogFragment) getFragmentManager().findFragmentByTag(TAG_DOWNLOAD_DIALOG_FRAGMENT)).dismissAllowingStateLoss();
+                ((DialogFragment) getChildFragmentManager().findFragmentByTag(TAG_DOWNLOAD_DIALOG_FRAGMENT))
+                        .dismissAllowingStateLoss();
 
                 if (isSuccessful) {
                     Toast.makeText(getActivity(), R.string.toast_translation_downloaded, Toast.LENGTH_SHORT).show();
@@ -207,7 +210,7 @@ public class TranslationListFragment extends Fragment implements SwipeRefreshLay
                 if (!isAdded())
                     return;
 
-                final DialogFragment fragment = (DialogFragment) getFragmentManager()
+                final DialogFragment fragment = (DialogFragment) getChildFragmentManager()
                         .findFragmentByTag(TAG_DOWNLOAD_DIALOG_FRAGMENT);
                 ((ProgressDialog) fragment.getDialog()).setProgress(progress);
             }
@@ -273,8 +276,9 @@ public class TranslationListFragment extends Fragment implements SwipeRefreshLay
     }
 
     private void removeTranslation(String translationShortName) {
-        ProgressDialogFragment.newInstance(R.string.progress_dialog_translation_deleting)
-                .show(getFragmentManager(), TAG_REMOVE_DIALOG_FRAGMENT);
+        final FragmentManager fm = getChildFragmentManager();
+        ProgressDialogFragment.newInstance(R.string.progress_dialog_translation_deleting).show(fm, TAG_REMOVE_DIALOG_FRAGMENT);
+        fm.executePendingTransactions();
 
         mBible.removeTranslation(translationShortName, new Bible.OnTranslationRemovedListener() {
             @Override
@@ -282,7 +286,8 @@ public class TranslationListFragment extends Fragment implements SwipeRefreshLay
                 if (!isAdded())
                     return;
 
-                ((DialogFragment) getFragmentManager().findFragmentByTag(TAG_REMOVE_DIALOG_FRAGMENT)).dismissAllowingStateLoss();
+                ((DialogFragment) getChildFragmentManager().findFragmentByTag(TAG_REMOVE_DIALOG_FRAGMENT))
+                        .dismissAllowingStateLoss();
 
                 if (isSuccessful) {
                     Toast.makeText(getActivity(), R.string.toast_translation_deleted, Toast.LENGTH_SHORT).show();
