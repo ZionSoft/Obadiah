@@ -134,10 +134,19 @@ public class TranslationManagementActivity extends ActionBarActivity {
         super.onResume();
 
         Analytics.trackScreen(TranslationManagementActivity.class.getSimpleName());
+        mAdView.resume();
+    }
+
+    @Override
+    protected void onPause() {
+        mAdView.pause();
+
+        super.onPause();
     }
 
     @Override
     public void onDestroy() {
+        mAdView.destroy();
         mInAppBillingHelper.cleanup();
 
         super.onDestroy();
