@@ -29,13 +29,14 @@ import net.zionsoft.obadiah.model.database.DatabaseHelper;
 import net.zionsoft.obadiah.model.notification.PushNotificationRegister;
 import net.zionsoft.obadiah.ui.utils.UiHelper;
 
-import io.fabric.sdk.android.Fabric;
-
 public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        Fabric.with(this, new Crashlytics.Builder().disabled(BuildConfig.DEBUG).build());
+
+        if (!BuildConfig.DEBUG) {
+            Crashlytics.start(this);
+        }
 
         Analytics.initialize(this);
         DatabaseHelper.initialize(this);
