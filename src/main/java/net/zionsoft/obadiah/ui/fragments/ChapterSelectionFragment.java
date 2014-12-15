@@ -20,7 +20,6 @@ package net.zionsoft.obadiah.ui.fragments;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,7 +35,9 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-public class ChapterSelectionFragment extends Fragment {
+import butterknife.InjectView;
+
+public class ChapterSelectionFragment extends BaseFragment {
     public static interface Listener {
         public void onChapterSelected(int bookIndex, int chapterIndex);
     }
@@ -44,13 +45,15 @@ public class ChapterSelectionFragment extends Fragment {
     @Inject
     Bible mBible;
 
+    @InjectView(R.id.book_list_view)
+    ExpandableListView mBookListView;
+
     private Listener mListener;
 
     private int mCurrentBook;
     private int mCurrentChapter;
 
     private BookExpandableListAdapter mBookListAdapter;
-    private ExpandableListView mBookListView;
     private int mLastExpandedGroup;
 
     public ChapterSelectionFragment() {
@@ -94,7 +97,6 @@ public class ChapterSelectionFragment extends Fragment {
                 }
         );
 
-        mBookListView = (ExpandableListView) view.findViewById(R.id.book_list_view);
         mBookListView.setAdapter(mBookListAdapter);
         mBookListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
             @Override

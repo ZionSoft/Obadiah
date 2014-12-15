@@ -54,6 +54,8 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import butterknife.InjectView;
+
 public class TranslationListFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
     private static final String TAG_DOWNLOAD_DIALOG_FRAGMENT = "net.zionsoft.obadiah.ui.fragments.TranslationListFragment.TAG_DOWNLOAD_DIALOG_FRAGMENT";
     private static final String TAG_REMOVE_DIALOG_FRAGMENT = "net.zionsoft.obadiah.ui.fragments.TranslationListFragment.TAG_REMOVE_DIALOG_FRAGMENT";
@@ -62,13 +64,16 @@ public class TranslationListFragment extends Fragment implements SwipeRefreshLay
     @Inject
     Bible mBible;
 
+    @InjectView(R.id.swipe_container)
+    SwipeRefreshLayout mSwipeContainer;
+
+    @InjectView(R.id.translation_list_view)
+    ListView mTranslationListView;
+
     private SharedPreferences mPreferences;
     private String mCurrentTranslation;
 
     private TranslationListAdapter mTranslationListAdapter;
-
-    private SwipeRefreshLayout mSwipeContainer;
-    private ListView mTranslationListView;
 
     public TranslationListFragment() {
         super();
@@ -92,7 +97,6 @@ public class TranslationListFragment extends Fragment implements SwipeRefreshLay
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mSwipeContainer = (SwipeRefreshLayout) view.findViewById(R.id.swipe_container);
         mSwipeContainer.setColorSchemeResources(R.color.dark_cyan, R.color.dark_lime, R.color.blue, R.color.dark_blue);
         mSwipeContainer.setOnRefreshListener(this);
 
@@ -101,7 +105,6 @@ public class TranslationListFragment extends Fragment implements SwipeRefreshLay
                 (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24, getResources().getDisplayMetrics()));
         mSwipeContainer.setRefreshing(true);
 
-        mTranslationListView = (ListView) view.findViewById(R.id.translation_list_view);
         mTranslationListAdapter = new TranslationListAdapter(getActivity(), mCurrentTranslation);
         mTranslationListView.setAdapter(mTranslationListAdapter);
         mTranslationListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
