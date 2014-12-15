@@ -26,6 +26,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ExpandableListView;
 
+import net.zionsoft.obadiah.App;
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.Bible;
 import net.zionsoft.obadiah.ui.adapters.BookExpandableListAdapter;
@@ -33,12 +34,16 @@ import net.zionsoft.obadiah.ui.utils.DialogHelper;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 public class ChapterSelectionFragment extends Fragment {
     public static interface Listener {
         public void onChapterSelected(int bookIndex, int chapterIndex);
     }
 
-    private Bible mBible;
+    @Inject
+    Bible mBible;
+
     private Listener mListener;
 
     private int mCurrentBook;
@@ -57,7 +62,6 @@ public class ChapterSelectionFragment extends Fragment {
         super.onAttach(activity);
 
         setRetainInstance(true);
-        mBible = Bible.getInstance();
         mListener = (Listener) activity;
     }
 
@@ -108,6 +112,12 @@ public class ChapterSelectionFragment extends Fragment {
                 return true;
             }
         });
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        App.get(getActivity()).getInjectionComponent().inject(this);
     }
 
     @Override

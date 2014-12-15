@@ -86,10 +86,12 @@ public class BookSelectionActivity extends ActionBarActivity
     }
 
     @Inject
+    Bible mBible;
+
+    @Inject
     Settings mSettings;
 
     private AppIndexingManager mAppIndexingManager;
-    private Bible mBible;
     private SharedPreferences mPreferences;
 
     private String mCurrentTranslation;
@@ -111,7 +113,6 @@ public class BookSelectionActivity extends ActionBarActivity
         App.get(this).getInjectionComponent().inject(this);
 
         mAppIndexingManager = new AppIndexingManager(this);
-        mBible = Bible.getInstance();
         mPreferences = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE);
 
         initializeUi();

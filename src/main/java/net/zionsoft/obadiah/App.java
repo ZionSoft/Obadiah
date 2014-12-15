@@ -32,7 +32,12 @@ import net.zionsoft.obadiah.model.database.DatabaseHelper;
 import net.zionsoft.obadiah.model.notification.PushNotificationRegister;
 import net.zionsoft.obadiah.ui.utils.UiHelper;
 
+import javax.inject.Inject;
+
 public class App extends Application {
+    @Inject
+    Bible mBible;
+
     private InjectionComponent mInjectionComponent;
 
     public static App get(Context context) {
@@ -54,6 +59,7 @@ public class App extends Application {
         mInjectionComponent = Dagger_InjectionComponent.builder()
                 .injectionModule(new InjectionModule(this))
                 .build();
+        mInjectionComponent.inject(this);
 
         Analytics.initialize(this);
         DatabaseHelper.initialize(this);
@@ -61,14 +67,12 @@ public class App extends Application {
 
         Upgrader.upgrade(this);
 
-        Bible.initialize(this);
-
         UiHelper.forceActionBarOverflowMenu(this);
     }
 
     @Override
     public void onLowMemory() {
-        Bible.getInstance().clearCache();
+        mBible.clearCache();
 
         super.onLowMemory();
     }

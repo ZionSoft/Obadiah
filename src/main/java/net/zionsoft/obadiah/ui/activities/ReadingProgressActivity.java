@@ -52,6 +52,9 @@ public class ReadingProgressActivity extends ActionBarActivity {
     }
 
     @Inject
+    Bible mBible;
+
+    @Inject
     Settings mSettings;
 
     private List<String> mBookNames;
@@ -153,7 +156,7 @@ public class ReadingProgressActivity extends ActionBarActivity {
     }
 
     private void loadBookNames() {
-        Bible.getInstance().loadBookNames(getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE)
+        mBible.loadBookNames(getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE)
                         .getString(Constants.PREF_KEY_LAST_READ_TRANSLATION, null),
                 new Bible.OnStringsLoadedListener() {
                     @Override

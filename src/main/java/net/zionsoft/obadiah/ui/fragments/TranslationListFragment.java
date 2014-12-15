@@ -40,6 +40,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import net.zionsoft.obadiah.App;
 import net.zionsoft.obadiah.Constants;
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.Bible;
@@ -51,12 +52,16 @@ import net.zionsoft.obadiah.ui.utils.DialogHelper;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 public class TranslationListFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
     private static final String TAG_DOWNLOAD_DIALOG_FRAGMENT = "net.zionsoft.obadiah.ui.fragments.TranslationListFragment.TAG_DOWNLOAD_DIALOG_FRAGMENT";
     private static final String TAG_REMOVE_DIALOG_FRAGMENT = "net.zionsoft.obadiah.ui.fragments.TranslationListFragment.TAG_REMOVE_DIALOG_FRAGMENT";
     private static final int CONTEXT_MENU_ITEM_DELETE = 0;
 
-    private Bible mBible;
+    @Inject
+    Bible mBible;
+
     private SharedPreferences mPreferences;
     private String mCurrentTranslation;
 
@@ -74,7 +79,6 @@ public class TranslationListFragment extends Fragment implements SwipeRefreshLay
         super.onAttach(activity);
 
         setRetainInstance(true);
-        mBible = Bible.getInstance();
         mPreferences = activity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
         mCurrentTranslation = mPreferences.getString(Constants.PREF_KEY_LAST_READ_TRANSLATION, null);
     }
@@ -129,6 +133,12 @@ public class TranslationListFragment extends Fragment implements SwipeRefreshLay
             }
         });
         registerForContextMenu(mTranslationListView);
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        App.get(getActivity()).getInjectionComponent().inject(this);
 
         loadTranslations(true);
     }

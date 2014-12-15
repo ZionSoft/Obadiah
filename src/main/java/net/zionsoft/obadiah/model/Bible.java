@@ -43,6 +43,10 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+@Singleton
 public class Bible {
     public static interface OnStringsLoadedListener {
         public void onStringsLoaded(List<String> strings);
@@ -74,8 +78,6 @@ public class Bible {
             10, 13, 10, 42, 150, 31, 12, 8, 66, 52, 5, 48, 12, 14, 3, 9, 1, 4, 7, 3, 3, 3, 2, 14, 4,
             28, 16, 24, 21, 28, 16, 16, 13, 6, 6, 4, 4, 5, 3, 6, 4, 3, 1, 13, 5, 5, 3, 5, 1, 1, 1, 22};
 
-    private static Bible sInstance;
-
     private final Context mContext;
 
     private final LruCache<String, List<String>> mBookNameCache;
@@ -84,16 +86,8 @@ public class Bible {
     private List<TranslationInfo> mDownloadedTranslations;
     private List<TranslationInfo> mAvailableTranslations;
 
-    public static void initialize(Context context) {
-        if (sInstance == null) {
-            synchronized (Bible.class) {
-                if (sInstance == null)
-                    sInstance = new Bible(context.getApplicationContext());
-            }
-        }
-    }
-
-    private Bible(Context context) {
+    @Inject
+    public Bible(Context context) {
         super();
 
         mContext = context;
@@ -120,10 +114,6 @@ public class Bible {
                 return length;
             }
         };
-    }
-
-    public static Bible getInstance() {
-        return sInstance;
     }
 
     public static int getBookCount() {

@@ -69,6 +69,9 @@ public class SearchActivity extends ActionBarActivity {
     }
 
     @Inject
+    Bible mBible;
+
+    @Inject
     Settings mSettings;
 
     private NonConfigurationData mData;
@@ -237,7 +240,7 @@ public class SearchActivity extends ActionBarActivity {
         mSearchResultListView.setVisibility(View.GONE);
 
         mRecentSearches.saveRecentQuery(query, null);
-        Bible.getInstance().searchVerses(mData.currentTranslation, query,
+        mBible.searchVerses(mData.currentTranslation, query,
                 new Bible.OnVersesLoadedListener() {
                     @Override
                     public void onVersesLoaded(List<Verse> verses) {
