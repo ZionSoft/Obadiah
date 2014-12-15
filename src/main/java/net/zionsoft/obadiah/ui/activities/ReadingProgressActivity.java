@@ -45,11 +45,48 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import butterknife.ButterKnife;
 import butterknife.InjectView;
 
 public class ReadingProgressActivity extends BaseActionBarActivity {
     public static Intent newStartIntent(Context context) {
         return new Intent(context, ReadingProgressActivity.class);
+    }
+
+    static class HeaderViewHolder {
+        @InjectView(R.id.continuous_reading_text_view)
+        TextView continuousReading;
+
+        @InjectView(R.id.continuous_reading_count_text_view)
+        TextView continuousReadingCount;
+
+        @InjectView(R.id.chapter_read_text_view)
+        TextView chapterRead;
+
+        @InjectView(R.id.chapter_read_count_text_view)
+        TextView chapterReadCount;
+
+        @InjectView(R.id.finished_books_text_view)
+        TextView finishedBooks;
+
+        @InjectView(R.id.finished_books_count_text_view)
+        TextView finishedBooksCount;
+
+        @InjectView(R.id.finished_old_testament_text_view)
+        TextView finishedOldTestament;
+
+        @InjectView(R.id.finished_old_testament_count_text_view)
+        TextView finishedOldTestamentCount;
+
+        @InjectView(R.id.finished_new_testament_text_view)
+        TextView finishedNewTestament;
+
+        @InjectView(R.id.finished_new_testament_count_text_view)
+        TextView finishedNewTestamentCount;
+
+        HeaderViewHolder(View view) {
+            ButterKnife.inject(this, view);
+        }
     }
 
     @Inject
@@ -72,11 +109,7 @@ public class ReadingProgressActivity extends BaseActionBarActivity {
 
     private ReadingProgressListAdapter mReadingProgressAdapter;
 
-    private TextView mContinuousReadingCountTextView;
-    private TextView mChapterReadCountTextView;
-    private TextView mFinishedBooksCountTextView;
-    private TextView mFinishedOldTestamentCountTextView;
-    private TextView mFinishedNewTestamentCountTextView;
+    private HeaderViewHolder mHeaderViewHolder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,48 +142,40 @@ public class ReadingProgressActivity extends BaseActionBarActivity {
         final Resources resources = getResources();
         final float textSize = resources.getDimension(mSettings.getTextSize().textSize);
         final float smallerTextSize = resources.getDimension(mSettings.getTextSize().smallerTextSize);
+
         final View header = LayoutInflater.from(this).inflate(R.layout.item_reading_progress_header,
                 mReadingProgressListView, false);
+        mHeaderViewHolder = new HeaderViewHolder(header);
 
-        final TextView continuousReadingTextView = (TextView) header.findViewById(R.id.continuous_reading_text_view);
-        continuousReadingTextView.setTextColor(textColor);
-        continuousReadingTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+        mHeaderViewHolder.continuousReading.setTextColor(textColor);
+        mHeaderViewHolder.continuousReading.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
 
-        mContinuousReadingCountTextView = (TextView) header.findViewById(R.id.continuous_reading_count_text_view);
-        mContinuousReadingCountTextView.setTextColor(textColor);
-        mContinuousReadingCountTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+        mHeaderViewHolder.continuousReadingCount.setTextColor(textColor);
+        mHeaderViewHolder.continuousReadingCount.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
 
-        final TextView chapterReadTextView = (TextView) header.findViewById(R.id.chapter_read_text_view);
-        chapterReadTextView.setTextColor(textColor);
-        chapterReadTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+        mHeaderViewHolder.chapterRead.setTextColor(textColor);
+        mHeaderViewHolder.chapterRead.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
 
-        mChapterReadCountTextView = (TextView) header.findViewById(R.id.chapter_read_count_text_view);
-        mChapterReadCountTextView.setTextColor(textColor);
-        mChapterReadCountTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+        mHeaderViewHolder.chapterReadCount.setTextColor(textColor);
+        mHeaderViewHolder.chapterReadCount.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
 
-        final TextView finishedBooksTextView = (TextView) header.findViewById(R.id.finished_books_text_view);
-        finishedBooksTextView.setTextColor(textColor);
-        finishedBooksTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+        mHeaderViewHolder.finishedBooks.setTextColor(textColor);
+        mHeaderViewHolder.finishedBooks.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
 
-        mFinishedBooksCountTextView = (TextView) header.findViewById(R.id.finished_books_count_text_view);
-        mFinishedBooksCountTextView.setTextColor(textColor);
-        mFinishedBooksCountTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+        mHeaderViewHolder.finishedBooksCount.setTextColor(textColor);
+        mHeaderViewHolder.finishedBooksCount.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
 
-        final TextView finishedOldTestamentTextView = (TextView) header.findViewById(R.id.finished_old_testament_text_view);
-        finishedOldTestamentTextView.setTextColor(textColor);
-        finishedOldTestamentTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, smallerTextSize);
+        mHeaderViewHolder.finishedOldTestament.setTextColor(textColor);
+        mHeaderViewHolder.finishedOldTestament.setTextSize(TypedValue.COMPLEX_UNIT_PX, smallerTextSize);
 
-        mFinishedOldTestamentCountTextView = (TextView) header.findViewById(R.id.finished_old_testament_count_text_view);
-        mFinishedOldTestamentCountTextView.setTextColor(textColor);
-        mFinishedOldTestamentCountTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, smallerTextSize);
+        mHeaderViewHolder.finishedOldTestamentCount.setTextColor(textColor);
+        mHeaderViewHolder.finishedOldTestamentCount.setTextSize(TypedValue.COMPLEX_UNIT_PX, smallerTextSize);
 
-        final TextView finishedNewTestamentTextView = (TextView) header.findViewById(R.id.finished_new_testament_text_view);
-        finishedNewTestamentTextView.setTextColor(textColor);
-        finishedNewTestamentTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, smallerTextSize);
+        mHeaderViewHolder.finishedNewTestament.setTextColor(textColor);
+        mHeaderViewHolder.finishedNewTestament.setTextSize(TypedValue.COMPLEX_UNIT_PX, smallerTextSize);
 
-        mFinishedNewTestamentCountTextView = (TextView) header.findViewById(R.id.finished_new_testament_count_text_view);
-        mFinishedNewTestamentCountTextView.setTextColor(textColor);
-        mFinishedNewTestamentCountTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, smallerTextSize);
+        mHeaderViewHolder.finishedNewTestamentCount.setTextColor(textColor);
+        mHeaderViewHolder.finishedNewTestamentCount.setTextSize(TypedValue.COMPLEX_UNIT_PX, smallerTextSize);
 
         mReadingProgressListView.addHeaderView(header);
 
@@ -200,17 +225,17 @@ public class ReadingProgressActivity extends BaseActionBarActivity {
                     return;
                 }
 
-                mContinuousReadingCountTextView.setText(getString(R.string.text_continuous_reading_count,
+                mHeaderViewHolder.continuousReadingCount.setText(getString(R.string.text_continuous_reading_count,
                         readingProgress.getContinuousReadingDays()));
 
-                mChapterReadCountTextView.setText(getString(R.string.text_chapters_read_count,
+                mHeaderViewHolder.chapterReadCount.setText(getString(R.string.text_chapters_read_count,
                         readingProgress.getTotalChapterRead()));
 
-                mFinishedBooksCountTextView.setText(getString(R.string.text_finished_books_count,
+                mHeaderViewHolder.finishedBooksCount.setText(getString(R.string.text_finished_books_count,
                         readingProgress.getFinishedBooksCount()));
-                mFinishedOldTestamentCountTextView.setText(getString(R.string.text_finished_old_testament_count,
+                mHeaderViewHolder.finishedOldTestamentCount.setText(getString(R.string.text_finished_old_testament_count,
                         readingProgress.getFinishedOldTestamentCount()));
-                mFinishedNewTestamentCountTextView.setText(getString(R.string.text_finished_new_testament_count,
+                mHeaderViewHolder.finishedNewTestamentCount.setText(getString(R.string.text_finished_new_testament_count,
                         readingProgress.getFinishedNewTestamentCount()));
 
                 mReadingProgress = readingProgress;
