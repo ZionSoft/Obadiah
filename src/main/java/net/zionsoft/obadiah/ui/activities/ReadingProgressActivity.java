@@ -23,7 +23,6 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -46,7 +45,9 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-public class ReadingProgressActivity extends ActionBarActivity {
+import butterknife.InjectView;
+
+public class ReadingProgressActivity extends BaseActionBarActivity {
     public static Intent newStartIntent(Context context) {
         return new Intent(context, ReadingProgressActivity.class);
     }
@@ -60,13 +61,16 @@ public class ReadingProgressActivity extends ActionBarActivity {
     @Inject
     Settings mSettings;
 
+    @InjectView(R.id.loading_spinner)
+    View mLoadingSpinner;
+
+    @InjectView(R.id.reading_progress_list_view)
+    ListView mReadingProgressListView;
+
     private List<String> mBookNames;
     private ReadingProgress mReadingProgress;
 
     private ReadingProgressListAdapter mReadingProgressAdapter;
-
-    private View mLoadingSpinner;
-    private ListView mReadingProgressListView;
 
     private TextView mContinuousReadingCountTextView;
     private TextView mChapterReadCountTextView;
@@ -96,10 +100,7 @@ public class ReadingProgressActivity extends ActionBarActivity {
         actionBar.setDisplayShowHomeEnabled(true);
         actionBar.setIcon(R.drawable.ic_action_bar);
 
-        mLoadingSpinner = findViewById(R.id.loading_spinner);
         mLoadingSpinner.setVisibility(View.VISIBLE);
-
-        mReadingProgressListView = (ListView) findViewById(R.id.reading_progress_list_view);
         mReadingProgressListView.setVisibility(View.GONE);
 
         // list view header
