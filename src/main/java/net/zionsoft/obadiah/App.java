@@ -18,9 +18,13 @@
 package net.zionsoft.obadiah;
 
 import android.app.Application;
+import android.content.Context;
 
 import com.crashlytics.android.Crashlytics;
 
+import net.zionsoft.obadiah.injection.Dagger_InjectionComponent;
+import net.zionsoft.obadiah.injection.InjectionComponent;
+import net.zionsoft.obadiah.injection.InjectionModule;
 import net.zionsoft.obadiah.legacy.Upgrader;
 import net.zionsoft.obadiah.model.Bible;
 import net.zionsoft.obadiah.model.Settings;
@@ -30,6 +34,16 @@ import net.zionsoft.obadiah.model.notification.PushNotificationRegister;
 import net.zionsoft.obadiah.ui.utils.UiHelper;
 
 public class App extends Application {
+    private InjectionComponent mInjectionComponent;
+
+    public static App get(Context context) {
+        return (App) context.getApplicationContext();
+    }
+
+    public InjectionComponent getInjectionComponent() {
+        return mInjectionComponent;
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -37,6 +51,10 @@ public class App extends Application {
         if (!BuildConfig.DEBUG) {
             Crashlytics.start(this);
         }
+
+        mInjectionComponent = Dagger_InjectionComponent.builder()
+                .injectionModule(new InjectionModule(this))
+                .build();
 
         Analytics.initialize(this);
         DatabaseHelper.initialize(this);
