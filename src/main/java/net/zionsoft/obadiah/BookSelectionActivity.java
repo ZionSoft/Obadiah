@@ -89,6 +89,9 @@ public class BookSelectionActivity extends ActionBarActivity
     Bible mBible;
 
     @Inject
+    ReadingProgressManager mReadingProgressManager;
+
+    @Inject
     Settings mSettings;
 
     private AppIndexingManager mAppIndexingManager;
@@ -372,7 +375,7 @@ public class BookSelectionActivity extends ActionBarActivity
         mAppIndexingManager.onView(mCurrentTranslation, bookName, mCurrentBook, mCurrentChapter);
 
         // TODO get an improved tracking algorithm, e.g. only consider as "read" if the user stays for a while
-        ReadingProgressManager.getInstance().trackChapterReading(mCurrentBook, mCurrentChapter);
+        mReadingProgressManager.trackChapterReading(mCurrentBook, mCurrentChapter);
     }
 
     @Override

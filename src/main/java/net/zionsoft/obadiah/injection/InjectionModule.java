@@ -2,6 +2,7 @@ package net.zionsoft.obadiah.injection;
 
 import net.zionsoft.obadiah.App;
 import net.zionsoft.obadiah.model.Bible;
+import net.zionsoft.obadiah.model.ReadingProgressManager;
 import net.zionsoft.obadiah.model.Settings;
 
 import javax.inject.Singleton;
@@ -27,6 +28,12 @@ public final class InjectionModule {
     @Singleton
     public Bible provideBible() {
         return new Bible(mApplication);
+    }
+
+    @Provides
+    @Singleton
+    public ReadingProgressManager provideReadingProgressManager() {
+        return new ReadingProgressManager();
     }
 
     @Provides

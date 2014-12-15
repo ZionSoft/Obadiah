@@ -30,15 +30,17 @@ import net.zionsoft.obadiah.model.database.DatabaseHelper;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+@Singleton
 public class ReadingProgressManager {
     public static interface OnReadingProgressLoadedListener {
         public void onReadingProgressLoaded(ReadingProgress readingProgress);
     }
 
-    private static final ReadingProgressManager sInstance = new ReadingProgressManager();
-
-    public static ReadingProgressManager getInstance() {
-        return sInstance;
+    @Inject
+    public ReadingProgressManager() {
     }
 
     public void trackChapterReading(final int book, final int chapter) {

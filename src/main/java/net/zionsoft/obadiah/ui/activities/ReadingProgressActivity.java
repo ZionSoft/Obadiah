@@ -55,6 +55,9 @@ public class ReadingProgressActivity extends ActionBarActivity {
     Bible mBible;
 
     @Inject
+    ReadingProgressManager mReadingProgressManager;
+
+    @Inject
     Settings mSettings;
 
     private List<String> mBookNames;
@@ -181,7 +184,7 @@ public class ReadingProgressActivity extends ActionBarActivity {
     }
 
     private void loadReadingProgress() {
-        ReadingProgressManager.getInstance().loadReadingProgress(new ReadingProgressManager.OnReadingProgressLoadedListener() {
+        mReadingProgressManager.loadReadingProgress(new ReadingProgressManager.OnReadingProgressLoadedListener() {
             @Override
             public void onReadingProgressLoaded(ReadingProgress readingProgress) {
                 if (readingProgress == null) {
