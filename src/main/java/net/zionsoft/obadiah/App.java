@@ -28,7 +28,6 @@ import net.zionsoft.obadiah.injection.InjectionModule;
 import net.zionsoft.obadiah.legacy.Upgrader;
 import net.zionsoft.obadiah.model.Bible;
 import net.zionsoft.obadiah.model.analytics.Analytics;
-import net.zionsoft.obadiah.model.database.DatabaseHelper;
 import net.zionsoft.obadiah.model.notification.PushNotificationRegister;
 import net.zionsoft.obadiah.ui.utils.UiHelper;
 
@@ -62,7 +61,6 @@ public class App extends Application {
         mInjectionComponent.inject(this);
 
         Analytics.initialize(this);
-        DatabaseHelper.initialize(this);
         PushNotificationRegister.register(this);
 
         Upgrader.upgrade(this);

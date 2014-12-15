@@ -2,6 +2,9 @@ package net.zionsoft.obadiah.injection;
 
 import net.zionsoft.obadiah.App;
 import net.zionsoft.obadiah.BookSelectionActivity;
+import net.zionsoft.obadiah.model.Bible;
+import net.zionsoft.obadiah.model.ReadingProgressManager;
+import net.zionsoft.obadiah.model.notification.PushNotificationHandler;
 import net.zionsoft.obadiah.ui.activities.ReadingProgressActivity;
 import net.zionsoft.obadiah.ui.activities.SearchActivity;
 import net.zionsoft.obadiah.ui.activities.SettingsActivity;
@@ -46,4 +49,10 @@ public interface InjectionComponent {
     public void inject(VerseListAdapter verseListAdapter);
 
     public void inject(VersePagerAdapter versePagerAdapter);
+
+    public void inject(PushNotificationHandler pushNotificationHandler);
+
+    public void inject(Bible bible);
+
+    public void inject(ReadingProgressManager readingProgressManager);
 }

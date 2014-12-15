@@ -23,8 +23,10 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import java.util.concurrent.atomic.AtomicInteger;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
+@Singleton
 public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String TABLE_BOOK_NAMES = "TABLE_BOOK_NAMES";
     public static final String TABLE_READING_PROGRESS = "TABLE_READING_PROGRESS";
@@ -47,38 +49,29 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 5;
     private static final String DATABASE_NAME = "DB_OBADIAH";
 
-    private static DatabaseHelper sInstance;
-
-    private final AtomicInteger mCounter;
+    private int mCounter;
     private SQLiteDatabase mDatabase;
 
-    public static void initialize(Context context) {
-        if (sInstance == null) {
-            synchronized (DatabaseHelper.class) {
-                if (sInstance == null) {
-                    sInstance = new DatabaseHelper(context.getApplicationContext());
-                }
-            }
-        }
-    }
-
-    private DatabaseHelper(Context context) {
+    @Inject
+    public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
-
-        mCounter = new AtomicInteger();
     }
 
-    public static synchronized SQLiteDatabase openDatabase() {
-        if (sInstance.mCounter.incrementAndGet() == 1) {
-            sInstance.mDatabase = sInstance.getWritableDatabase();
+    public SQLiteDatabase openDatabase() {
+        synchronized (this) {
+            if (++mCounter == 1) {
+                mDatabase = getWritableDatabase();
+            }
+            return mDatabase;
         }
-        return sInstance.mDatabase;
     }
 
-    public static synchronized void closeDatabase() {
-        if (sInstance.mCounter.decrementAndGet() == 0) {
-            sInstance.mDatabase.close();
-            sInstance.mDatabase = null;
+    public void closeDatabase() {
+        synchronized (this) {
+            if (--mCounter == 0) {
+                mDatabase.close();
+                mDatabase = null;
+            }
         }
     }
 

@@ -26,6 +26,7 @@ import android.util.Pair;
 
 import com.crashlytics.android.Crashlytics;
 
+import net.zionsoft.obadiah.App;
 import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.database.DatabaseHelper;
 import net.zionsoft.obadiah.model.network.NetworkHelper;
@@ -78,6 +79,9 @@ public class Bible {
             10, 13, 10, 42, 150, 31, 12, 8, 66, 52, 5, 48, 12, 14, 3, 9, 1, 4, 7, 3, 3, 3, 2, 14, 4,
             28, 16, 24, 21, 28, 16, 16, 13, 6, 6, 4, 4, 5, 3, 6, 4, 3, 1, 13, 5, 5, 3, 5, 1, 1, 1, 22};
 
+    @Inject
+    DatabaseHelper mDatabaseHelper;
+
     private final Context mContext;
 
     private final LruCache<String, List<String>> mBookNameCache;
@@ -89,6 +93,7 @@ public class Bible {
     @Inject
     public Bible(Context context) {
         super();
+        App.get(context).getInjectionComponent().inject(this);
 
         mContext = context;
 
@@ -220,7 +225,7 @@ public class Bible {
     private List<String> getDownloadedTranslationShortNames() {
         SQLiteDatabase db = null;
         try {
-            db = DatabaseHelper.openDatabase();
+            db = mDatabaseHelper.openDatabase();
             if (db == null) {
                 Analytics.trackException("Failed to open database.");
                 return null;
@@ -228,7 +233,7 @@ public class Bible {
             return TranslationHelper.getDownloadedTranslationShortNames(db);
         } finally {
             if (db != null) {
-                DatabaseHelper.closeDatabase();
+                mDatabaseHelper.closeDatabase();
             }
         }
     }
@@ -269,7 +274,7 @@ public class Bible {
             protected List<String> doInBackground(Void... params) {
                 SQLiteDatabase db = null;
                 try {
-                    db = DatabaseHelper.openDatabase();
+                    db = mDatabaseHelper.openDatabase();
                     if (db == null) {
                         Analytics.trackException("Failed to open database.");
                         return null;
@@ -277,7 +282,7 @@ public class Bible {
                     return TranslationHelper.getBookNames(db, translationShortName);
                 } finally {
                     if (db != null) {
-                        DatabaseHelper.closeDatabase();
+                        mDatabaseHelper.closeDatabase();
                     }
                 }
             }
@@ -305,7 +310,7 @@ public class Bible {
             protected List<Verse> doInBackground(Void... params) {
                 SQLiteDatabase db = null;
                 try {
-                    db = DatabaseHelper.openDatabase();
+                    db = mDatabaseHelper.openDatabase();
                     if (db == null) {
                         Analytics.trackException("Failed to open database.");
                         return null;
@@ -322,7 +327,7 @@ public class Bible {
                             bookNames.get(book), book, chapter);
                 } finally {
                     if (db != null) {
-                        DatabaseHelper.closeDatabase();
+                        mDatabaseHelper.closeDatabase();
                     }
                 }
             }
@@ -347,7 +352,7 @@ public class Bible {
             protected List<Verse> doInBackground(Void... params) {
                 SQLiteDatabase db = null;
                 try {
-                    db = DatabaseHelper.openDatabase();
+                    db = mDatabaseHelper.openDatabase();
                     if (db == null) {
                         Analytics.trackException("Failed to open database.");
                         return null;
@@ -361,7 +366,7 @@ public class Bible {
                     return TranslationHelper.searchVerses(db, translationShortName, bookNames, keyword);
                 } finally {
                     if (db != null) {
-                        DatabaseHelper.closeDatabase();
+                        mDatabaseHelper.closeDatabase();
                     }
                 }
             }
@@ -456,7 +461,7 @@ public class Bible {
         ZipInputStream zis = null;
         SQLiteDatabase db = null;
         try {
-            db = DatabaseHelper.openDatabase();
+            db = mDatabaseHelper.openDatabase();
             if (db == null) {
                 Analytics.trackException("Failed to open database.");
                 throw new Exception("Failed to open database for writing");
@@ -498,7 +503,7 @@ public class Bible {
                 if (db.inTransaction()) {
                     db.endTransaction();
                 }
-                DatabaseHelper.closeDatabase();
+                mDatabaseHelper.closeDatabase();
             }
             if (zis != null) {
                 try {
@@ -557,7 +562,7 @@ public class Bible {
     private boolean removeTranslation(String translationShortName) {
         SQLiteDatabase db = null;
         try {
-            db = DatabaseHelper.openDatabase();
+            db = mDatabaseHelper.openDatabase();
             if (db == null) {
                 Analytics.trackException("Failed to open database.");
                 return false;
@@ -572,7 +577,7 @@ public class Bible {
                 if (db.inTransaction()) {
                     db.endTransaction();
                 }
-                DatabaseHelper.closeDatabase();
+                mDatabaseHelper.closeDatabase();
             }
         }
     }
