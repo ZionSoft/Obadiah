@@ -24,3 +24,8 @@
 # Crashlytics
 # http://support.crashlytics.com/knowledgebase/articles/202926-android-studio-and-intellij-with-proguard
 -keepattributes SourceFile,LineNumberTable
+
+# Butter Knife
+-dontwarn butterknife.internal.**
+-keep class **$$ViewInjector { *; }
+-keepnames class * { @butterknife.InjectView *;}
