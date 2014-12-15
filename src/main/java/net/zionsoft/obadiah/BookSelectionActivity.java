@@ -59,6 +59,8 @@ import net.zionsoft.obadiah.ui.utils.DialogHelper;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+
 public class BookSelectionActivity extends ActionBarActivity
         implements ChapterSelectionFragment.Listener, TextFragment.Listener {
     private static final String KEY_MESSAGE_TYPE = "net.zionsoft.obadiah.BookSelectionActivity.KEY_MESSAGE_TYPE";
@@ -83,9 +85,11 @@ public class BookSelectionActivity extends ActionBarActivity
         return new Intent(context, BookSelectionActivity.class);
     }
 
+    @Inject
+    Settings mSettings;
+
     private AppIndexingManager mAppIndexingManager;
     private Bible mBible;
-    private Settings mSettings;
     private SharedPreferences mPreferences;
 
     private String mCurrentTranslation;
@@ -104,10 +108,10 @@ public class BookSelectionActivity extends ActionBarActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        App.get(this).getInjectionComponent().inject(this);
 
         mAppIndexingManager = new AppIndexingManager(this);
         mBible = Bible.getInstance();
-        mSettings = Settings.getInstance();
         mPreferences = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE);
 
         initializeUi();

@@ -29,10 +29,13 @@ import android.view.View;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 
+import net.zionsoft.obadiah.App;
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.InAppBillingHelper;
 import net.zionsoft.obadiah.model.Settings;
 import net.zionsoft.obadiah.model.analytics.Analytics;
+
+import javax.inject.Inject;
 
 public class TranslationManagementActivity extends ActionBarActivity {
     private static final String KEY_MESSAGE_TYPE = "net.zionsoft.obadiah.ui.activities.TranslationManagementActivity.KEY_MESSAGE_TYPE";
@@ -46,6 +49,9 @@ public class TranslationManagementActivity extends ActionBarActivity {
         return new Intent(context, TranslationManagementActivity.class);
     }
 
+    @Inject
+    Settings mSettings;
+
     private AdView mAdView;
     private MenuItem mRemoveAdsMenuItem;
 
@@ -54,6 +60,7 @@ public class TranslationManagementActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        App.get(this).getInjectionComponent().inject(this);
 
         initializeUi();
         initializeInAppBillingHelper();
@@ -64,8 +71,8 @@ public class TranslationManagementActivity extends ActionBarActivity {
         setContentView(R.layout.activity_translation_management);
 
         final View rootView = getWindow().getDecorView();
-        rootView.setBackgroundColor(Settings.getInstance().getBackgroundColor());
-        rootView.setKeepScreenOn(Settings.getInstance().keepScreenOn());
+        rootView.setBackgroundColor(mSettings.getBackgroundColor());
+        rootView.setKeepScreenOn(mSettings.keepScreenOn());
 
         mAdView = (AdView) findViewById(R.id.ad_view);
     }

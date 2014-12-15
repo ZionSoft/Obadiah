@@ -1,6 +1,7 @@
 package net.zionsoft.obadiah.injection;
 
 import net.zionsoft.obadiah.App;
+import net.zionsoft.obadiah.model.Settings;
 
 import javax.inject.Singleton;
 
@@ -19,5 +20,11 @@ public final class InjectionModule {
     @Singleton
     public App provideApplication() {
         return mApplication;
+    }
+
+    @Provides
+    @Singleton
+    public Settings provideSettings() {
+        return new Settings(mApplication);
     }
 }

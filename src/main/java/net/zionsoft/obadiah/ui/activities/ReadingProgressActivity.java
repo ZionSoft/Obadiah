@@ -30,6 +30,7 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import net.zionsoft.obadiah.App;
 import net.zionsoft.obadiah.Constants;
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.Bible;
@@ -43,10 +44,15 @@ import net.zionsoft.obadiah.ui.utils.DialogHelper;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 public class ReadingProgressActivity extends ActionBarActivity {
     public static Intent newStartIntent(Context context) {
         return new Intent(context, ReadingProgressActivity.class);
     }
+
+    @Inject
+    Settings mSettings;
 
     private List<String> mBookNames;
     private ReadingProgress mReadingProgress;
@@ -65,6 +71,7 @@ public class ReadingProgressActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        App.get(this).getInjectionComponent().inject(this);
 
         initializeUi();
 
@@ -75,10 +82,9 @@ public class ReadingProgressActivity extends ActionBarActivity {
     private void initializeUi() {
         setContentView(R.layout.activity_reading_progress);
 
-        final Settings settings = Settings.getInstance();
         final View rootView = getWindow().getDecorView();
-        rootView.setKeepScreenOn(settings.keepScreenOn());
-        rootView.setBackgroundColor(settings.getBackgroundColor());
+        rootView.setKeepScreenOn(mSettings.keepScreenOn());
+        rootView.setBackgroundColor(mSettings.getBackgroundColor());
 
         final ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayShowHomeEnabled(true);
@@ -91,11 +97,11 @@ public class ReadingProgressActivity extends ActionBarActivity {
         mReadingProgressListView.setVisibility(View.GONE);
 
         // list view header
-        final int textColor = settings.getTextColor();
+        final int textColor = mSettings.getTextColor();
 
         final Resources resources = getResources();
-        final float textSize = resources.getDimension(settings.getTextSize().textSize);
-        final float smallerTextSize = resources.getDimension(settings.getTextSize().smallerTextSize);
+        final float textSize = resources.getDimension(mSettings.getTextSize().textSize);
+        final float smallerTextSize = resources.getDimension(mSettings.getTextSize().smallerTextSize);
         final View header = LayoutInflater.from(this).inflate(R.layout.item_reading_progress_header,
                 mReadingProgressListView, false);
 

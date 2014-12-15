@@ -36,11 +36,14 @@ import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.TextView;
 
+import net.zionsoft.obadiah.App;
 import net.zionsoft.obadiah.Constants;
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.Settings;
 import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.ui.utils.DialogHelper;
+
+import javax.inject.Inject;
 
 public class SettingsActivity extends ActionBarActivity {
     public static Intent newStartIntent(Context context) {
@@ -49,7 +52,8 @@ public class SettingsActivity extends ActionBarActivity {
 
     private static final long ANIMATION_DURATION = 300L;
 
-    private Settings mSettings;
+    @Inject
+    Settings mSettings;
 
     private View mRootView;
     private SwitchCompat mScreenOnSwitch;
@@ -63,8 +67,7 @@ public class SettingsActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        mSettings = Settings.getInstance();
+        App.get(this).getInjectionComponent().inject(this);
 
         initializeUi();
     }

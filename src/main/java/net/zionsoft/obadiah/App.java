@@ -27,7 +27,6 @@ import net.zionsoft.obadiah.injection.InjectionComponent;
 import net.zionsoft.obadiah.injection.InjectionModule;
 import net.zionsoft.obadiah.legacy.Upgrader;
 import net.zionsoft.obadiah.model.Bible;
-import net.zionsoft.obadiah.model.Settings;
 import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.database.DatabaseHelper;
 import net.zionsoft.obadiah.model.notification.PushNotificationRegister;
@@ -63,7 +62,6 @@ public class App extends Application {
         Upgrader.upgrade(this);
 
         Bible.initialize(this);
-        Settings.initialize(this);
 
         UiHelper.forceActionBarOverflowMenu(this);
     }

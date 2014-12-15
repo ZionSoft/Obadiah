@@ -40,6 +40,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.actions.SearchIntents;
 
+import net.zionsoft.obadiah.App;
 import net.zionsoft.obadiah.BookSelectionActivity;
 import net.zionsoft.obadiah.Constants;
 import net.zionsoft.obadiah.R;
@@ -54,6 +55,8 @@ import net.zionsoft.obadiah.ui.utils.DialogHelper;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 public class SearchActivity extends ActionBarActivity {
     public static Intent newStartReorderToTopIntent(Context context) {
         return new Intent(context, SearchActivity.class)
@@ -65,9 +68,11 @@ public class SearchActivity extends ActionBarActivity {
         List<Verse> verses;
     }
 
+    @Inject
+    Settings mSettings;
+
     private NonConfigurationData mData;
 
-    private Settings mSettings;
     private SharedPreferences mPreferences;
     private SearchRecentSuggestions mRecentSearches;
 
@@ -81,8 +86,8 @@ public class SearchActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        App.get(this).getInjectionComponent().inject(this);
 
-        mSettings = Settings.getInstance();
         mPreferences = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE);
         mRecentSearches = new SearchRecentSuggestions(this,
                 RecentSearchProvider.AUTHORITY, RecentSearchProvider.MODE);
