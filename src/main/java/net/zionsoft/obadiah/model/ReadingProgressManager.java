@@ -18,27 +18,35 @@
 package net.zionsoft.obadiah.model;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.text.format.DateUtils;
 import android.util.SparseArray;
 
+import net.zionsoft.obadiah.App;
 import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.database.DatabaseHelper;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+@Singleton
 public class ReadingProgressManager {
     public static interface OnReadingProgressLoadedListener {
         public void onReadingProgressLoaded(ReadingProgress readingProgress);
     }
 
-    private static final ReadingProgressManager sInstance = new ReadingProgressManager();
+    @Inject
+    DatabaseHelper mDatabaseHelper;
 
-    public static ReadingProgressManager getInstance() {
-        return sInstance;
+    @Inject
+    public ReadingProgressManager(Context context) {
+        App.get(context).getInjectionComponent().inject(this);
     }
 
     public void trackChapterReading(final int book, final int chapter) {
@@ -47,7 +55,7 @@ public class ReadingProgressManager {
             protected Void doInBackground(Void... params) {
                 SQLiteDatabase db = null;
                 try {
-                    db = DatabaseHelper.openDatabase();
+                    db = mDatabaseHelper.openDatabase();
                     if (db == null) {
                         Analytics.trackException("Failed to open database.");
                         return null;
@@ -82,7 +90,7 @@ public class ReadingProgressManager {
                         if (db.inTransaction()) {
                             db.endTransaction();
                         }
-                        DatabaseHelper.closeDatabase();
+                        mDatabaseHelper.closeDatabase();
                     }
                 }
                 return null;
@@ -97,7 +105,7 @@ public class ReadingProgressManager {
                 SQLiteDatabase db = null;
                 Cursor cursor = null;
                 try {
-                    db = DatabaseHelper.openDatabase();
+                    db = mDatabaseHelper.openDatabase();
                     if (db == null) {
                         Analytics.trackException("Failed to open database.");
                         return null;
@@ -130,7 +138,7 @@ public class ReadingProgressManager {
                         cursor.close();
                     }
                     if (db != null) {
-                        DatabaseHelper.closeDatabase();
+                        mDatabaseHelper.closeDatabase();
                     }
                 }
             }

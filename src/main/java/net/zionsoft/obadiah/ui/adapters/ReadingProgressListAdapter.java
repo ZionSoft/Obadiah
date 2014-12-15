@@ -27,6 +27,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import net.zionsoft.obadiah.App;
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.ReadingProgress;
 import net.zionsoft.obadiah.model.Settings;
@@ -35,12 +36,17 @@ import net.zionsoft.obadiah.ui.widget.ProgressBar;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 public class ReadingProgressListAdapter extends BaseAdapter {
     private static class ViewTag {
         TextView bookName;
         ProgressBar readingProgress;
         TextView lastReadChapter;
     }
+
+    @Inject
+    Settings mSettings;
 
     private final int mTextColor;
     private final float mSmallerTextSize;
@@ -54,10 +60,10 @@ public class ReadingProgressListAdapter extends BaseAdapter {
 
     public ReadingProgressListAdapter(Context context) {
         super();
+        App.get(context).getInjectionComponent().inject(this);
 
-        final Settings settings = Settings.getInstance();
-        mTextColor = settings.getTextColor();
-        mSmallerTextSize = context.getResources().getDimension(settings.getTextSize().smallerTextSize);
+        mTextColor = mSettings.getTextColor();
+        mSmallerTextSize = context.getResources().getDimension(mSettings.getTextSize().smallerTextSize);
 
         mResources = context.getResources();
         mDateFormatter = new DateFormatter(mResources);

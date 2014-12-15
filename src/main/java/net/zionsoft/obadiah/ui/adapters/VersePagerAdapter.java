@@ -26,6 +26,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import net.zionsoft.obadiah.App;
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.Bible;
 import net.zionsoft.obadiah.model.Verse;
@@ -34,6 +35,8 @@ import net.zionsoft.obadiah.ui.utils.DialogHelper;
 
 import java.util.LinkedList;
 import java.util.List;
+
+import javax.inject.Inject;
 
 public class VersePagerAdapter extends PagerAdapter {
     public static interface Listener {
@@ -50,10 +53,12 @@ public class VersePagerAdapter extends PagerAdapter {
         ListView verseListView;
     }
 
+    @Inject
+    Bible mBible;
+
     private final Context mContext;
     private final Listener mListener;
     private final LayoutInflater mInflater;
-    private final Bible mBible;
     private final List<Page> mPages;
 
     private String mTranslationShortName;
@@ -63,12 +68,12 @@ public class VersePagerAdapter extends PagerAdapter {
 
     public VersePagerAdapter(Context context, Listener listener) {
         super();
+        App.get(context).getInjectionComponent().inject(this);
 
         mContext = context;
         mListener = listener;
         mInflater = LayoutInflater.from(context);
-        mBible = Bible.getInstance();
-        mPages = new LinkedList<Page>();
+        mPages = new LinkedList<>();
     }
 
     @Override

@@ -27,6 +27,7 @@ import android.widget.BaseAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import net.zionsoft.obadiah.App;
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.Settings;
 import net.zionsoft.obadiah.model.Verse;
@@ -34,26 +35,29 @@ import net.zionsoft.obadiah.model.Verse;
 import java.util.ArrayList;
 import java.util.List;
 
-class VerseListAdapter extends BaseAdapter {
+import javax.inject.Inject;
+
+public class VerseListAdapter extends BaseAdapter {
     private static class ViewTag {
         TextView index;
         TextView text;
     }
 
+    @Inject
+    Settings mSettings;
+
     private final LayoutInflater mInflater;
     private final Resources mResources;
-    private final Settings mSettings;
 
     private List<Verse> mVerses;
     private boolean[] mSelected;
     private int mSelectedCount;
 
-    VerseListAdapter(Context context) {
-        super();
+    public VerseListAdapter(Context context) {
+        App.get(context).getInjectionComponent().inject(this);
 
         mInflater = LayoutInflater.from(context);
         mResources = context.getResources();
-        mSettings = Settings.getInstance();
     }
 
     @Override
