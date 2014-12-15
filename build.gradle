@@ -31,6 +31,8 @@ dependencies {
     apt 'com.google.dagger:dagger-compiler:2.0-SNAPSHOT'
     provided 'org.glassfish:javax.annotation:10.0-b28'
 
+    compile 'com.jakewharton:butterknife:6.0.0'
+
     compile 'com.crashlytics.android:crashlytics:1.+'
 }
 

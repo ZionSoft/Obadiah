@@ -38,19 +38,31 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import butterknife.ButterKnife;
+import butterknife.InjectView;
+
 public class VersePagerAdapter extends PagerAdapter {
     public static interface Listener {
         public void onVersesSelectionChanged(boolean hasSelected);
     }
 
-    private static class Page {
+    static class Page {
         boolean inUse;
         int position;
         VerseListAdapter verseListAdapter;
 
         View rootView;
+
+        @InjectView(R.id.loading_spinner)
         View loadingSpinner;
+
+        @InjectView(R.id.verse_list_view)
         ListView verseListView;
+
+        Page(View view) {
+            ButterKnife.inject(this, view);
+            rootView = view;
+        }
     }
 
     @Inject
@@ -92,10 +104,7 @@ public class VersePagerAdapter extends PagerAdapter {
         }
 
         if (page == null) {
-            page = new Page();
-            page.rootView = mInflater.inflate(R.layout.item_verse_pager, container, false);
-            page.loadingSpinner = page.rootView.findViewById(R.id.loading_spinner);
-            page.verseListView = (ListView) page.rootView.findViewById(R.id.verse_list_view);
+            page = new Page(mInflater.inflate(R.layout.item_verse_pager, container, false));
             final VerseListAdapter verseListAdapter = new VerseListAdapter(mContext);
             page.verseListAdapter = verseListAdapter;
             page.verseListView.setAdapter(verseListAdapter);

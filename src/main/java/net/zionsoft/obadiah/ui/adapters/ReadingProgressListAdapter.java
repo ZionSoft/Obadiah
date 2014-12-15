@@ -38,11 +38,23 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import butterknife.ButterKnife;
+import butterknife.InjectView;
+
 public class ReadingProgressListAdapter extends BaseAdapter {
-    private static class ViewTag {
+    static class ViewTag {
+        @InjectView(R.id.book_name_text_view)
         TextView bookName;
+
+        @InjectView(R.id.reading_progress_bar)
         ProgressBar readingProgress;
+
+        @InjectView(R.id.last_read_chapter_text_view)
         TextView lastReadChapter;
+
+        ViewTag(View view) {
+            ButterKnife.inject(this, view);
+        }
     }
 
     @Inject
@@ -92,12 +104,9 @@ public class ReadingProgressListAdapter extends BaseAdapter {
         if (convertView == null) {
             rootView = mInflater.inflate(R.layout.item_reading_progress, parent, false);
 
-            viewTag = new ViewTag();
-            viewTag.bookName = (TextView) rootView.findViewById(R.id.book_name_text_view);
+            viewTag = new ViewTag(rootView);
             viewTag.bookName.setTextColor(mTextColor);
             viewTag.bookName.setTextSize(TypedValue.COMPLEX_UNIT_PX, mSmallerTextSize);
-            viewTag.readingProgress = (ProgressBar) rootView.findViewById(R.id.reading_progress_bar);
-            viewTag.lastReadChapter = (TextView) rootView.findViewById(R.id.last_read_chapter_text_view);
             viewTag.lastReadChapter.setTextColor(mTextColor);
             viewTag.lastReadChapter.setTextSize(TypedValue.COMPLEX_UNIT_PX, mSmallerTextSize);
             rootView.setTag(viewTag);

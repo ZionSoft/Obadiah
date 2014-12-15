@@ -20,7 +20,6 @@ package net.zionsoft.obadiah.ui.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -37,7 +36,9 @@ import net.zionsoft.obadiah.model.analytics.Analytics;
 
 import javax.inject.Inject;
 
-public class TranslationManagementActivity extends ActionBarActivity {
+import butterknife.InjectView;
+
+public class TranslationManagementActivity extends BaseActionBarActivity {
     private static final String KEY_MESSAGE_TYPE = "net.zionsoft.obadiah.ui.activities.TranslationManagementActivity.KEY_MESSAGE_TYPE";
 
     public static Intent newStartReorderToTopIntent(Context context, String messageType) {
@@ -52,7 +53,9 @@ public class TranslationManagementActivity extends ActionBarActivity {
     @Inject
     Settings mSettings;
 
-    private AdView mAdView;
+    @InjectView(R.id.ad_view)
+    AdView mAdView;
+
     private MenuItem mRemoveAdsMenuItem;
 
     private InAppBillingHelper mInAppBillingHelper;
@@ -73,8 +76,6 @@ public class TranslationManagementActivity extends ActionBarActivity {
         final View rootView = getWindow().getDecorView();
         rootView.setBackgroundColor(mSettings.getBackgroundColor());
         rootView.setKeepScreenOn(mSettings.keepScreenOn());
-
-        mAdView = (AdView) findViewById(R.id.ad_view);
     }
 
     private void initializeInAppBillingHelper() {

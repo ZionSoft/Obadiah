@@ -26,7 +26,6 @@ import android.os.Bundle;
 import android.provider.SearchRecentSuggestions;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.SearchView;
 import android.text.TextUtils;
 import android.view.Menu;
@@ -57,7 +56,9 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-public class SearchActivity extends ActionBarActivity {
+import butterknife.InjectView;
+
+public class SearchActivity extends BaseActionBarActivity {
     public static Intent newStartReorderToTopIntent(Context context) {
         return new Intent(context, SearchActivity.class)
                 .setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
@@ -74,6 +75,12 @@ public class SearchActivity extends ActionBarActivity {
     @Inject
     Settings mSettings;
 
+    @InjectView(R.id.loading_spinner)
+    View mLoadingSpinner;
+
+    @InjectView(R.id.search_result_list_view)
+    ListView mSearchResultListView;
+
     private NonConfigurationData mData;
 
     private SharedPreferences mPreferences;
@@ -82,8 +89,7 @@ public class SearchActivity extends ActionBarActivity {
     private SearchResultListAdapter mSearchResultListAdapter;
 
     private View mRootView;
-    private View mLoadingSpinner;
-    private ListView mSearchResultListView;
+
     private SearchView mSearchView;
 
     @Override
@@ -116,10 +122,8 @@ public class SearchActivity extends ActionBarActivity {
         actionBar.setDisplayShowHomeEnabled(true);
         actionBar.setIcon(R.drawable.ic_action_bar);
 
-        mLoadingSpinner = findViewById(R.id.loading_spinner);
         mLoadingSpinner.setVisibility(View.GONE);
 
-        mSearchResultListView = (ListView) findViewById(R.id.search_result_list_view);
         mSearchResultListAdapter = new SearchResultListAdapter(this);
         mSearchResultListView.setAdapter(mSearchResultListAdapter);
         mSearchResultListView.setOnItemClickListener(new OnItemClickListener() {
