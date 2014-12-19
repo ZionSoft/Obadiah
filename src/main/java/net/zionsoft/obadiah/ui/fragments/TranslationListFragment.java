@@ -25,7 +25,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.util.Pair;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -56,7 +55,7 @@ import javax.inject.Inject;
 
 import butterknife.InjectView;
 
-public class TranslationListFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
+public class TranslationListFragment extends BaseFragment implements SwipeRefreshLayout.OnRefreshListener {
     private static final String TAG_DOWNLOAD_DIALOG_FRAGMENT = "net.zionsoft.obadiah.ui.fragments.TranslationListFragment.TAG_DOWNLOAD_DIALOG_FRAGMENT";
     private static final String TAG_REMOVE_DIALOG_FRAGMENT = "net.zionsoft.obadiah.ui.fragments.TranslationListFragment.TAG_REMOVE_DIALOG_FRAGMENT";
     private static final int CONTEXT_MENU_ITEM_DELETE = 0;
