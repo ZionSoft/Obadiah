@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.view.ActionMode;
@@ -17,21 +16,25 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import net.zionsoft.obadiah.R;
-import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.Verse;
+import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.ui.adapters.VersePagerAdapter;
 
 import java.util.List;
 
-public class TextFragment extends Fragment implements VersePagerAdapter.Listener {
+import butterknife.InjectView;
+
+public class TextFragment extends BaseFragment implements VersePagerAdapter.Listener {
     public static interface Listener {
         public void onChapterSelected(int chapterIndex);
     }
 
+    @InjectView(R.id.verse_view_pager)
+    ViewPager mVerseViewPager;
+
     private Listener mListener;
 
     private VersePagerAdapter mVersePagerAdapter;
-    private ViewPager mVerseViewPager;
 
     private ActionMode mActionMode;
     @SuppressWarnings("deprecation")
@@ -61,7 +64,6 @@ public class TextFragment extends Fragment implements VersePagerAdapter.Listener
 
         mVersePagerAdapter = new VersePagerAdapter(getActivity(), this);
 
-        mVerseViewPager = (ViewPager) view.findViewById(R.id.verse_view_pager);
         mVerseViewPager.setAdapter(mVersePagerAdapter);
         mVerseViewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             public void onPageScrollStateChanged(int state) {

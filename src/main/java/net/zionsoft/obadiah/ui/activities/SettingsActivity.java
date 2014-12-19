@@ -29,42 +29,64 @@ import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.SwitchCompat;
 import android.util.TypedValue;
 import android.view.View;
 import android.widget.CompoundButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import net.zionsoft.obadiah.App;
 import net.zionsoft.obadiah.Constants;
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.Settings;
 import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.ui.utils.DialogHelper;
 
-public class SettingsActivity extends ActionBarActivity {
+import javax.inject.Inject;
+
+import butterknife.InjectView;
+
+public class SettingsActivity extends BaseActionBarActivity {
     public static Intent newStartIntent(Context context) {
         return new Intent(context, SettingsActivity.class);
     }
 
     private static final long ANIMATION_DURATION = 300L;
 
-    private Settings mSettings;
+    @Inject
+    Settings mSettings;
+
+    @InjectView(R.id.screen_on_switch)
+    SwitchCompat mScreenOnSwitch;
+
+    @InjectView(R.id.night_mode_switch)
+    SwitchCompat mNightModeSwitch;
+
+    @InjectView(R.id.text_size_text_view)
+    TextView mTextSizeTextView;
+
+    @InjectView(R.id.text_size_value_text_view)
+    TextView mTextSizeValueTextView;
+
+    @InjectView(R.id.rate_me_text_view)
+    TextView mRateMeTextView;
+
+    @InjectView(R.id.version_text_view)
+    TextView mVersionTextView;
+
+    @InjectView(R.id.version_value_text_view)
+    TextView mVersionValueTextView;
+
+    @InjectView(R.id.text_size_section)
+    LinearLayout mTextSizeSection;
 
     private View mRootView;
-    private SwitchCompat mScreenOnSwitch;
-    private SwitchCompat mNightModeSwitch;
-    private TextView mTextSizeTextView;
-    private TextView mTextSizeValueTextView;
-    private TextView mRateMeTextView;
-    private TextView mVersionTextView;
-    private TextView mVersionValueTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        mSettings = Settings.getInstance();
+        App.get(this).getInjectionComponent().inject(this);
 
         initializeUi();
     }
@@ -77,14 +99,6 @@ public class SettingsActivity extends ActionBarActivity {
         final ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayShowHomeEnabled(true);
         actionBar.setIcon(R.drawable.ic_action_bar);
-
-        mScreenOnSwitch = (SwitchCompat) findViewById(R.id.screen_on_switch);
-        mNightModeSwitch = (SwitchCompat) findViewById(R.id.night_mode_switch);
-        mRateMeTextView = (TextView) findViewById(R.id.rate_me_text_view);
-        mTextSizeTextView = (TextView) findViewById(R.id.text_size_text_view);
-        mTextSizeValueTextView = (TextView) findViewById(R.id.text_size_value_text_view);
-        mVersionTextView = (TextView) findViewById(R.id.version_text_view);
-        mVersionValueTextView = (TextView) findViewById(R.id.version_value_text_view);
 
         // must call this before setting the listeners, otherwise all the listeners will be
         // immediately triggered
@@ -121,7 +135,7 @@ public class SettingsActivity extends ActionBarActivity {
             }
         });
 
-        findViewById(R.id.text_size_section).setOnClickListener(new View.OnClickListener() {
+        mTextSizeSection.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 DialogHelper.showDialog(SettingsActivity.this, R.string.pref_text_size_dialog_title,

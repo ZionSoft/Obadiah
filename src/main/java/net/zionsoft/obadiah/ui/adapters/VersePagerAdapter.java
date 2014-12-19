@@ -26,6 +26,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import net.zionsoft.obadiah.App;
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.Bible;
 import net.zionsoft.obadiah.model.Verse;
@@ -35,25 +36,41 @@ import net.zionsoft.obadiah.ui.utils.DialogHelper;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.inject.Inject;
+
+import butterknife.ButterKnife;
+import butterknife.InjectView;
+
 public class VersePagerAdapter extends PagerAdapter {
     public static interface Listener {
         public void onVersesSelectionChanged(boolean hasSelected);
     }
 
-    private static class Page {
+    static class Page {
         boolean inUse;
         int position;
         VerseListAdapter verseListAdapter;
 
         View rootView;
+
+        @InjectView(R.id.loading_spinner)
         View loadingSpinner;
+
+        @InjectView(R.id.verse_list_view)
         ListView verseListView;
+
+        Page(View view) {
+            ButterKnife.inject(this, view);
+            rootView = view;
+        }
     }
+
+    @Inject
+    Bible mBible;
 
     private final Context mContext;
     private final Listener mListener;
     private final LayoutInflater mInflater;
-    private final Bible mBible;
     private final List<Page> mPages;
 
     private String mTranslationShortName;
@@ -63,12 +80,12 @@ public class VersePagerAdapter extends PagerAdapter {
 
     public VersePagerAdapter(Context context, Listener listener) {
         super();
+        App.get(context).getInjectionComponent().inject(this);
 
         mContext = context;
         mListener = listener;
         mInflater = LayoutInflater.from(context);
-        mBible = Bible.getInstance();
-        mPages = new LinkedList<Page>();
+        mPages = new LinkedList<>();
     }
 
     @Override
@@ -87,10 +104,7 @@ public class VersePagerAdapter extends PagerAdapter {
         }
 
         if (page == null) {
-            page = new Page();
-            page.rootView = mInflater.inflate(R.layout.item_verse_pager, container, false);
-            page.loadingSpinner = page.rootView.findViewById(R.id.loading_spinner);
-            page.verseListView = (ListView) page.rootView.findViewById(R.id.verse_list_view);
+            page = new Page(mInflater.inflate(R.layout.item_verse_pager, container, false));
             final VerseListAdapter verseListAdapter = new VerseListAdapter(mContext);
             page.verseListAdapter = verseListAdapter;
             page.verseListView.setAdapter(verseListAdapter);

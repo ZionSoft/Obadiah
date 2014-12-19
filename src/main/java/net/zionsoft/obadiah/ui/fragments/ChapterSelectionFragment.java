@@ -20,12 +20,12 @@ package net.zionsoft.obadiah.ui.fragments;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ExpandableListView;
 
+import net.zionsoft.obadiah.App;
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.Bible;
 import net.zionsoft.obadiah.ui.adapters.BookExpandableListAdapter;
@@ -33,19 +33,27 @@ import net.zionsoft.obadiah.ui.utils.DialogHelper;
 
 import java.util.List;
 
-public class ChapterSelectionFragment extends Fragment {
+import javax.inject.Inject;
+
+import butterknife.InjectView;
+
+public class ChapterSelectionFragment extends BaseFragment {
     public static interface Listener {
         public void onChapterSelected(int bookIndex, int chapterIndex);
     }
 
-    private Bible mBible;
+    @Inject
+    Bible mBible;
+
+    @InjectView(R.id.book_list_view)
+    ExpandableListView mBookListView;
+
     private Listener mListener;
 
     private int mCurrentBook;
     private int mCurrentChapter;
 
     private BookExpandableListAdapter mBookListAdapter;
-    private ExpandableListView mBookListView;
     private int mLastExpandedGroup;
 
     public ChapterSelectionFragment() {
@@ -57,7 +65,6 @@ public class ChapterSelectionFragment extends Fragment {
         super.onAttach(activity);
 
         setRetainInstance(true);
-        mBible = Bible.getInstance();
         mListener = (Listener) activity;
     }
 
@@ -90,7 +97,6 @@ public class ChapterSelectionFragment extends Fragment {
                 }
         );
 
-        mBookListView = (ExpandableListView) view.findViewById(R.id.book_list_view);
         mBookListView.setAdapter(mBookListAdapter);
         mBookListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
             @Override
@@ -108,6 +114,12 @@ public class ChapterSelectionFragment extends Fragment {
                 return true;
             }
         });
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        App.get(getActivity()).getInjectionComponent().inject(this);
     }
 
     @Override

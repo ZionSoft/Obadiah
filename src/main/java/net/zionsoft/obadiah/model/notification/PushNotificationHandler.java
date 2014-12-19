@@ -25,6 +25,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
@@ -32,6 +33,7 @@ import android.text.TextUtils;
 
 import com.crashlytics.android.Crashlytics;
 
+import net.zionsoft.obadiah.App;
 import net.zionsoft.obadiah.BookSelectionActivity;
 import net.zionsoft.obadiah.Constants;
 import net.zionsoft.obadiah.R;
@@ -43,6 +45,8 @@ import net.zionsoft.obadiah.ui.activities.TranslationManagementActivity;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import javax.inject.Inject;
 
 public class PushNotificationHandler extends IntentService {
     private static final String KEY_EXTRAS = "net.zionsoft.obadiah.model.notification.PushNotificationHandler.KEY_EXTRAS";
@@ -58,12 +62,17 @@ public class PushNotificationHandler extends IntentService {
     private static final String MESSAGE_TYPE_VERSE = "verse";
     private static final String MESSAGE_TYPE_NEW_TRANSLATION = "newTranslation";
 
+    @Inject
+    DatabaseHelper mDatabaseHelper;
+
     public PushNotificationHandler() {
         super("net.zionsoft.obadiah.model.notification.PushNotificationHandler");
     }
 
     @Override
     protected void onHandleIntent(Intent intent) {
+        App.get(this).getInjectionComponent().inject(this);
+
         final Bundle extras = intent.getBundleExtra(KEY_EXTRAS);
         final String messageType = extras.getString("type");
         final String messageAttrs = extras.getString("attrs");
@@ -72,7 +81,7 @@ public class PushNotificationHandler extends IntentService {
         final int notificationId;
         if (MESSAGE_TYPE_VERSE.equals(messageType)) {
             notificationId = NOTIFICATION_ID_VERSE;
-            if (!prepareForVerse(this, builder, messageType, messageAttrs)) {
+            if (!prepareForVerse(builder, messageType, messageAttrs)) {
                 return;
             }
         } else if (MESSAGE_TYPE_NEW_TRANSLATION.equals(messageType)) {
@@ -93,20 +102,26 @@ public class PushNotificationHandler extends IntentService {
 
     @NonNull
     private static NotificationCompat.Builder buildBasicNotificationBuilder(Context context, String messageType) {
-        return new NotificationCompat.Builder(context)
+        final NotificationCompat.Builder builder = new NotificationCompat.Builder(context)
                 .setAutoCancel(true)
                 .setDefaults(Notification.DEFAULT_LIGHTS)
-                .setSmallIcon(R.drawable.ic_launcher)
                 .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
                 .setDeleteIntent(PendingIntent.getBroadcast(context, 0,
                         PushDismissedReceiver.newStartIntent(context, messageType),
                         PendingIntent.FLAG_UPDATE_CURRENT));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            builder.setSmallIcon(R.drawable.ic_notification)
+                    .setColor(context.getResources().getColor(R.color.blue));
+        } else {
+            builder.setSmallIcon(R.drawable.ic_launcher);
+        }
+        return builder;
     }
 
-    private static boolean prepareForVerse(Context context, NotificationCompat.Builder builder,
-                                           String messageType, String messageAttrs) {
+    private boolean prepareForVerse(NotificationCompat.Builder builder,
+                                    String messageType, String messageAttrs) {
         final SharedPreferences preferences
-                = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+                = getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 
         final String translationShortName
                 = preferences.getString(Constants.PREF_KEY_LAST_READ_TRANSLATION, null);
@@ -121,7 +136,7 @@ public class PushNotificationHandler extends IntentService {
             final int chapterIndex = jsonObject.getInt("chapter");
             final int verseIndex = jsonObject.getInt("verse");
 
-            db = DatabaseHelper.openDatabase();
+            db = mDatabaseHelper.openDatabase();
             final String bookName = TranslationHelper.getBookNames(db, translationShortName).get(bookIndex);
             final Verse verse = TranslationHelper.getVerse(db, translationShortName, bookName,
                     bookIndex, chapterIndex, verseIndex);
@@ -129,8 +144,8 @@ public class PushNotificationHandler extends IntentService {
                 throw new IllegalArgumentException("Invalid push message attrs: " + messageAttrs);
             }
 
-            builder.setContentIntent(PendingIntent.getActivity(context, 0,
-                    BookSelectionActivity.newStartReorderToTopIntent(context, messageType, bookIndex, chapterIndex, verseIndex),
+            builder.setContentIntent(PendingIntent.getActivity(this, 0,
+                    BookSelectionActivity.newStartReorderToTopIntent(this, messageType, bookIndex, chapterIndex, verseIndex),
                     PendingIntent.FLAG_UPDATE_CURRENT))
                     .setContentTitle(String.format("%s, %d:%d", bookName, chapterIndex + 1, verseIndex + 1))
                     .setContentText(verse.verseText)
@@ -140,7 +155,7 @@ public class PushNotificationHandler extends IntentService {
             return false;
         } finally {
             if (db != null) {
-                DatabaseHelper.closeDatabase();
+                mDatabaseHelper.closeDatabase();
             }
         }
         return true;

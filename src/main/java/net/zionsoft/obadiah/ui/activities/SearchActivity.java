@@ -26,7 +26,6 @@ import android.os.Bundle;
 import android.provider.SearchRecentSuggestions;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.SearchView;
 import android.text.TextUtils;
 import android.view.Menu;
@@ -40,6 +39,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.actions.SearchIntents;
 
+import net.zionsoft.obadiah.App;
 import net.zionsoft.obadiah.BookSelectionActivity;
 import net.zionsoft.obadiah.Constants;
 import net.zionsoft.obadiah.R;
@@ -54,7 +54,11 @@ import net.zionsoft.obadiah.ui.utils.DialogHelper;
 
 import java.util.List;
 
-public class SearchActivity extends ActionBarActivity {
+import javax.inject.Inject;
+
+import butterknife.InjectView;
+
+public class SearchActivity extends BaseActionBarActivity {
     public static Intent newStartReorderToTopIntent(Context context) {
         return new Intent(context, SearchActivity.class)
                 .setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
@@ -65,24 +69,34 @@ public class SearchActivity extends ActionBarActivity {
         List<Verse> verses;
     }
 
+    @Inject
+    Bible mBible;
+
+    @Inject
+    Settings mSettings;
+
+    @InjectView(R.id.loading_spinner)
+    View mLoadingSpinner;
+
+    @InjectView(R.id.search_result_list_view)
+    ListView mSearchResultListView;
+
     private NonConfigurationData mData;
 
-    private Settings mSettings;
     private SharedPreferences mPreferences;
     private SearchRecentSuggestions mRecentSearches;
 
     private SearchResultListAdapter mSearchResultListAdapter;
 
     private View mRootView;
-    private View mLoadingSpinner;
-    private ListView mSearchResultListView;
+
     private SearchView mSearchView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        App.get(this).getInjectionComponent().inject(this);
 
-        mSettings = Settings.getInstance();
         mPreferences = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE);
         mRecentSearches = new SearchRecentSuggestions(this,
                 RecentSearchProvider.AUTHORITY, RecentSearchProvider.MODE);
@@ -108,10 +122,8 @@ public class SearchActivity extends ActionBarActivity {
         actionBar.setDisplayShowHomeEnabled(true);
         actionBar.setIcon(R.drawable.ic_action_bar);
 
-        mLoadingSpinner = findViewById(R.id.loading_spinner);
         mLoadingSpinner.setVisibility(View.GONE);
 
-        mSearchResultListView = (ListView) findViewById(R.id.search_result_list_view);
         mSearchResultListAdapter = new SearchResultListAdapter(this);
         mSearchResultListView.setAdapter(mSearchResultListAdapter);
         mSearchResultListView.setOnItemClickListener(new OnItemClickListener() {
@@ -232,7 +244,7 @@ public class SearchActivity extends ActionBarActivity {
         mSearchResultListView.setVisibility(View.GONE);
 
         mRecentSearches.saveRecentQuery(query, null);
-        Bible.getInstance().searchVerses(mData.currentTranslation, query,
+        mBible.searchVerses(mData.currentTranslation, query,
                 new Bible.OnVersesLoadedListener() {
                     @Override
                     public void onVersesLoaded(List<Verse> verses) {

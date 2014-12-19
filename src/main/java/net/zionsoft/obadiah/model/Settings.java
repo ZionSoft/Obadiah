@@ -27,6 +27,10 @@ import android.support.annotation.StringRes;
 
 import net.zionsoft.obadiah.R;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+@Singleton
 public class Settings {
     public enum TextSize {
         VERY_SMALL("very_small", R.string.pref_text_size_very_small,
@@ -76,32 +80,18 @@ public class Settings {
     private static final String SETTING_KEY_SCREEN_ON = "pref_screen_on";
     private static final String SETTING_KEY_TEXT_SIZE = "pref_text_size";
 
-    private static Settings sInstance;
-
     private final SharedPreferences mSharedPreferences;
 
     private boolean mNightMode;
     private boolean mScreenOn;
     private TextSize mTextSize;
 
-    public static void initialize(Context context) {
-        if (sInstance == null) {
-            synchronized (Settings.class) {
-                if (sInstance == null)
-                    sInstance = new Settings(context.getApplicationContext());
-            }
-        }
-    }
-
-    private Settings(Context context) {
+    @Inject
+    public Settings(Context context) {
         super();
 
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         refresh();
-    }
-
-    public static Settings getInstance() {
-        return sInstance;
     }
 
     public void refresh() {

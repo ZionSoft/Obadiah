@@ -30,7 +30,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.text.TextUtils;
 import android.view.Menu;
@@ -47,6 +46,7 @@ import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.appindexing.AppIndexingManager;
 import net.zionsoft.obadiah.model.utils.AppUpdateChecker;
 import net.zionsoft.obadiah.model.utils.UriHelper;
+import net.zionsoft.obadiah.ui.activities.BaseActionBarActivity;
 import net.zionsoft.obadiah.ui.activities.ReadingProgressActivity;
 import net.zionsoft.obadiah.ui.activities.SearchActivity;
 import net.zionsoft.obadiah.ui.activities.SettingsActivity;
@@ -59,7 +59,11 @@ import net.zionsoft.obadiah.ui.utils.DialogHelper;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BookSelectionActivity extends ActionBarActivity
+import javax.inject.Inject;
+
+import butterknife.InjectView;
+
+public class BookSelectionActivity extends BaseActionBarActivity
         implements ChapterSelectionFragment.Listener, TextFragment.Listener {
     private static final String KEY_MESSAGE_TYPE = "net.zionsoft.obadiah.BookSelectionActivity.KEY_MESSAGE_TYPE";
     private static final String KEY_BOOK_INDEX = "net.zionsoft.obadiah.BookSelectionActivity.KEY_BOOK_INDEX";
@@ -83,9 +87,19 @@ public class BookSelectionActivity extends ActionBarActivity
         return new Intent(context, BookSelectionActivity.class);
     }
 
+    @Inject
+    Bible mBible;
+
+    @Inject
+    ReadingProgressManager mReadingProgressManager;
+
+    @Inject
+    Settings mSettings;
+
+    @InjectView(R.id.drawer_layout)
+    DrawerLayout mDrawerLayout;
+
     private AppIndexingManager mAppIndexingManager;
-    private Bible mBible;
-    private Settings mSettings;
     private SharedPreferences mPreferences;
 
     private String mCurrentTranslation;
@@ -96,7 +110,6 @@ public class BookSelectionActivity extends ActionBarActivity
     private ChapterSelectionFragment mChapterSelectionFragment;
     private TextFragment mTextFragment;
 
-    private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
     private Spinner mTranslationsSpinner;
     private View mRootView;
@@ -104,10 +117,9 @@ public class BookSelectionActivity extends ActionBarActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        App.get(this).getInjectionComponent().inject(this);
 
         mAppIndexingManager = new AppIndexingManager(this);
-        mBible = Bible.getInstance();
-        mSettings = Settings.getInstance();
         mPreferences = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE);
 
         initializeUi();
@@ -124,7 +136,6 @@ public class BookSelectionActivity extends ActionBarActivity
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeButtonEnabled(true);
 
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, 0, 0);
         mDrawerLayout.setDrawerListener(mDrawerToggle);
 
@@ -367,7 +378,7 @@ public class BookSelectionActivity extends ActionBarActivity
         mAppIndexingManager.onView(mCurrentTranslation, bookName, mCurrentBook, mCurrentChapter);
 
         // TODO get an improved tracking algorithm, e.g. only consider as "read" if the user stays for a while
-        ReadingProgressManager.getInstance().trackChapterReading(mCurrentBook, mCurrentChapter);
+        mReadingProgressManager.trackChapterReading(mCurrentBook, mCurrentChapter);
     }
 
     @Override

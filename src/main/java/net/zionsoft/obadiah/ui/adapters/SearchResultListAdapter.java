@@ -26,24 +26,29 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import net.zionsoft.obadiah.App;
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.Settings;
 import net.zionsoft.obadiah.model.Verse;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 public class SearchResultListAdapter extends BaseAdapter {
+    @Inject
+    Settings mSettings;
+
     private final LayoutInflater mInflater;
     private final Resources mResources;
-    private final Settings mSettings;
     private List<Verse> mVerses;
 
     public SearchResultListAdapter(Context context) {
         super();
+        App.get(context).getInjectionComponent().inject(this);
 
         mInflater = LayoutInflater.from(context);
         mResources = context.getResources();
-        mSettings = Settings.getInstance();
     }
 
     @Override

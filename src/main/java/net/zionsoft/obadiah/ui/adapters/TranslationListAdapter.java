@@ -30,6 +30,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import net.zionsoft.obadiah.App;
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.Settings;
 import net.zionsoft.obadiah.model.TranslationInfo;
@@ -37,6 +38,8 @@ import net.zionsoft.obadiah.model.TranslationInfo;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+
+import javax.inject.Inject;
 
 public class TranslationListAdapter extends BaseAdapter {
     private static final int VIEW_TYPE_HEADER = 0;
@@ -55,6 +58,9 @@ public class TranslationListAdapter extends BaseAdapter {
         }
     }
 
+    @Inject
+    Settings mSettings;
+
     private final LayoutInflater mInflater;
     private final Resources mResources;
     private final String mCurrentTranslation;
@@ -71,19 +77,20 @@ public class TranslationListAdapter extends BaseAdapter {
     private int mCount = 0;
 
     public TranslationListAdapter(Context context, String currentTranslation) {
+        App.get(context).getInjectionComponent().inject(this);
+
         mInflater = LayoutInflater.from(context);
         mResources = context.getResources();
         mCurrentTranslation = currentTranslation;
 
         mDownloadedTranslationsTitle = mResources.getString(R.string.text_downloaded_translations);
 
-        final Settings settings = Settings.getInstance();
-        mTextColor = settings.getTextColor();
+        mTextColor = mSettings.getTextColor();
 
-        mTextSize = mResources.getDimension(settings.getTextSize().textSize);
+        mTextSize = mResources.getDimension(mSettings.getTextSize().textSize);
         mMediumSizeSpan = new AbsoluteSizeSpan((int) mTextSize);
         mSmallSizeSpan = new AbsoluteSizeSpan(
-                (int) mResources.getDimension(settings.getTextSize().smallerTextSize));
+                (int) mResources.getDimension(mSettings.getTextSize().smallerTextSize));
     }
 
     @Override

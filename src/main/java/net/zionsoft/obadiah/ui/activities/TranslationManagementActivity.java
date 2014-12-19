@@ -20,7 +20,6 @@ package net.zionsoft.obadiah.ui.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -29,12 +28,17 @@ import android.view.View;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 
+import net.zionsoft.obadiah.App;
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.InAppBillingHelper;
 import net.zionsoft.obadiah.model.Settings;
 import net.zionsoft.obadiah.model.analytics.Analytics;
 
-public class TranslationManagementActivity extends ActionBarActivity {
+import javax.inject.Inject;
+
+import butterknife.InjectView;
+
+public class TranslationManagementActivity extends BaseActionBarActivity {
     private static final String KEY_MESSAGE_TYPE = "net.zionsoft.obadiah.ui.activities.TranslationManagementActivity.KEY_MESSAGE_TYPE";
 
     public static Intent newStartReorderToTopIntent(Context context, String messageType) {
@@ -46,7 +50,12 @@ public class TranslationManagementActivity extends ActionBarActivity {
         return new Intent(context, TranslationManagementActivity.class);
     }
 
-    private AdView mAdView;
+    @Inject
+    Settings mSettings;
+
+    @InjectView(R.id.ad_view)
+    AdView mAdView;
+
     private MenuItem mRemoveAdsMenuItem;
 
     private InAppBillingHelper mInAppBillingHelper;
@@ -54,6 +63,7 @@ public class TranslationManagementActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        App.get(this).getInjectionComponent().inject(this);
 
         initializeUi();
         initializeInAppBillingHelper();
@@ -64,10 +74,8 @@ public class TranslationManagementActivity extends ActionBarActivity {
         setContentView(R.layout.activity_translation_management);
 
         final View rootView = getWindow().getDecorView();
-        rootView.setBackgroundColor(Settings.getInstance().getBackgroundColor());
-        rootView.setKeepScreenOn(Settings.getInstance().keepScreenOn());
-
-        mAdView = (AdView) findViewById(R.id.ad_view);
+        rootView.setBackgroundColor(mSettings.getBackgroundColor());
+        rootView.setKeepScreenOn(mSettings.keepScreenOn());
     }
 
     private void initializeInAppBillingHelper() {
@@ -127,10 +135,19 @@ public class TranslationManagementActivity extends ActionBarActivity {
         super.onResume();
 
         Analytics.trackScreen(TranslationManagementActivity.class.getSimpleName());
+        mAdView.resume();
+    }
+
+    @Override
+    protected void onPause() {
+        mAdView.pause();
+
+        super.onPause();
     }
 
     @Override
     public void onDestroy() {
+        mAdView.destroy();
         mInAppBillingHelper.cleanup();
 
         super.onDestroy();

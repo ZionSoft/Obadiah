@@ -18,40 +18,59 @@
 package net.zionsoft.obadiah;
 
 import android.app.Application;
+import android.content.Context;
 
 import com.crashlytics.android.Crashlytics;
 
+import net.zionsoft.obadiah.injection.Dagger_InjectionComponent;
+import net.zionsoft.obadiah.injection.InjectionComponent;
+import net.zionsoft.obadiah.injection.InjectionModule;
 import net.zionsoft.obadiah.legacy.Upgrader;
 import net.zionsoft.obadiah.model.Bible;
-import net.zionsoft.obadiah.model.Settings;
 import net.zionsoft.obadiah.model.analytics.Analytics;
-import net.zionsoft.obadiah.model.database.DatabaseHelper;
 import net.zionsoft.obadiah.model.notification.PushNotificationRegister;
 import net.zionsoft.obadiah.ui.utils.UiHelper;
 
-import io.fabric.sdk.android.Fabric;
+import javax.inject.Inject;
 
 public class App extends Application {
+    @Inject
+    Bible mBible;
+
+    private InjectionComponent mInjectionComponent;
+
+    public static App get(Context context) {
+        return (App) context.getApplicationContext();
+    }
+
+    public InjectionComponent getInjectionComponent() {
+        return mInjectionComponent;
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();
-        Fabric.with(this, new Crashlytics.Builder().disabled(BuildConfig.DEBUG).build());
+
+        if (!BuildConfig.DEBUG) {
+            Crashlytics.start(this);
+        }
+
+        mInjectionComponent = Dagger_InjectionComponent.builder()
+                .injectionModule(new InjectionModule(this))
+                .build();
+        mInjectionComponent.inject(this);
 
         Analytics.initialize(this);
-        DatabaseHelper.initialize(this);
         PushNotificationRegister.register(this);
 
         Upgrader.upgrade(this);
-
-        Bible.initialize(this);
-        Settings.initialize(this);
 
         UiHelper.forceActionBarOverflowMenu(this);
     }
 
     @Override
     public void onLowMemory() {
-        Bible.getInstance().clearCache();
+        mBible.clearCache();
 
         super.onLowMemory();
     }
