@@ -25,6 +25,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
@@ -101,14 +102,20 @@ public class PushNotificationHandler extends IntentService {
 
     @NonNull
     private static NotificationCompat.Builder buildBasicNotificationBuilder(Context context, String messageType) {
-        return new NotificationCompat.Builder(context)
+        final NotificationCompat.Builder builder = new NotificationCompat.Builder(context)
                 .setAutoCancel(true)
                 .setDefaults(Notification.DEFAULT_LIGHTS)
-                .setSmallIcon(R.drawable.ic_launcher)
                 .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
                 .setDeleteIntent(PendingIntent.getBroadcast(context, 0,
                         PushDismissedReceiver.newStartIntent(context, messageType),
                         PendingIntent.FLAG_UPDATE_CURRENT));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            builder.setSmallIcon(R.drawable.ic_notification)
+                    .setColor(context.getResources().getColor(R.color.blue));
+        } else {
+            builder.setSmallIcon(R.drawable.ic_launcher);
+        }
+        return builder;
     }
 
     private boolean prepareForVerse(NotificationCompat.Builder builder,
