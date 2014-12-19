@@ -29,6 +29,7 @@ import net.zionsoft.obadiah.legacy.Upgrader;
 import net.zionsoft.obadiah.model.Bible;
 import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.notification.PushNotificationRegister;
+import net.zionsoft.obadiah.model.utils.AppUpdateChecker;
 import net.zionsoft.obadiah.ui.utils.UiHelper;
 
 import javax.inject.Inject;
@@ -63,6 +64,7 @@ public class App extends Application {
         Analytics.initialize(this);
         PushNotificationRegister.register(this);
 
+        AppUpdateChecker.check(this);
         Upgrader.upgrade(this);
 
         UiHelper.forceActionBarOverflowMenu(this);

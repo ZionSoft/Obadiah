@@ -124,7 +124,6 @@ public class BookSelectionActivity extends BaseActionBarActivity
 
         initializeUi();
         checkDeepLink();
-        checkClientVersion();
     }
 
     private void initializeUi() {
@@ -177,46 +176,6 @@ public class BookSelectionActivity extends BaseActionBarActivity
         }
     }
 
-    private void checkClientVersion() {
-        if (TextUtils.isEmpty(mPreferences.getString(Constants.PREF_KEY_LAST_READ_TRANSLATION, null))) {
-            // do nothing if there's no translation installed (most likely it's the 1st time use)
-            return;
-        }
-
-        AppUpdateChecker.checkAppUpdate(this, new AppUpdateChecker.OnAppUpdateCheckListener() {
-            @Override
-            public void onAppUpdateChecked(boolean needsUpdate) {
-                if (needsUpdate) {
-                    DialogHelper.showDialog(BookSelectionActivity.this, false,
-                            R.string.dialog_new_version_available_message,
-                            new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    try {
-                                        startActivity(new Intent(Intent.ACTION_VIEW).setData(Constants.GOOGLE_PLAY_URI));
-                                        Analytics.trackUIEvent("upgrade_app");
-                                    } catch (ActivityNotFoundException e) {
-                                        Analytics.trackException("Failed to open market for updating: "
-                                                + Build.MANUFACTURER + ", " + Build.MODEL);
-
-                                        // falls back to open a link in browser
-                                        startActivity(new Intent(Intent.ACTION_VIEW).setData(
-                                                Uri.parse("http://www.zionsoft.net/bible-reader/")));
-                                    }
-                                }
-                            },
-                            new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    Analytics.trackUIEvent("ignore_upgrade_app");
-                                }
-                            }
-                    );
-                }
-            }
-        });
-    }
-
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
@@ -230,6 +189,42 @@ public class BookSelectionActivity extends BaseActionBarActivity
 
         mAppIndexingManager.onStart();
         populateUi();
+        showUpdateDialog();
+    }
+
+    private void showUpdateDialog() {
+        if (TextUtils.isEmpty(mPreferences.getString(Constants.PREF_KEY_LAST_READ_TRANSLATION, null))) {
+            // do nothing if there's no translation installed (most likely it's the 1st time use)
+            return;
+        }
+
+        if (AppUpdateChecker.shouldUpdate(this)) {
+            DialogHelper.showDialog(BookSelectionActivity.this, false,
+                    R.string.dialog_new_version_available_message,
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            try {
+                                startActivity(new Intent(Intent.ACTION_VIEW).setData(Constants.GOOGLE_PLAY_URI));
+                                Analytics.trackUIEvent("upgrade_app");
+                            } catch (ActivityNotFoundException e) {
+                                Analytics.trackException("Failed to open market for updating: "
+                                        + Build.MANUFACTURER + ", " + Build.MODEL);
+
+                                // falls back to open a link in browser
+                                startActivity(new Intent(Intent.ACTION_VIEW).setData(
+                                        Uri.parse("http://www.zionsoft.net/bible-reader/")));
+                            }
+                        }
+                    },
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Analytics.trackUIEvent("ignore_upgrade_app");
+                        }
+                    });
+            AppUpdateChecker.markAsUpdateAsked(this);
+        }
     }
 
     private void populateUi() {

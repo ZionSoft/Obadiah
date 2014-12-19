@@ -17,12 +17,13 @@
 
 package net.zionsoft.obadiah.model.utils;
 
+import android.app.IntentService;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.AsyncTask;
-import android.os.Build;
 import android.text.format.DateUtils;
 
 import com.crashlytics.android.Crashlytics;
@@ -32,68 +33,75 @@ import net.zionsoft.obadiah.model.network.NetworkHelper;
 
 import org.json.JSONObject;
 
-import java.util.concurrent.RejectedExecutionException;
-
-public class AppUpdateChecker {
-    public static interface OnAppUpdateCheckListener {
-        public void onAppUpdateChecked(boolean needsUpdate);
+public class AppUpdateChecker extends IntentService {
+    public static void check(Context context) {
+        context.startService(new Intent(context, AppUpdateChecker.class));
     }
 
-    public static void checkAppUpdate(final Context context, final OnAppUpdateCheckListener onChecked) {
-        final AsyncTask<Void, Void, Boolean> asyncTask = new AsyncTask<Void, Void, Boolean>() {
-            @Override
-            protected Boolean doInBackground(Void... params) {
-                try {
-                    // we only check if at least 24 hours is passed
-                    final SharedPreferences preferences
-                            = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-                    final long now = System.currentTimeMillis();
-                    final long lastCheckedTimestamp = preferences.getLong(
-                            Constants.PREF_KEY_CHECKED_APPLICATION_VERSION_TIMESTAMP, 0);
-                    if (now - lastCheckedTimestamp < DateUtils.DAY_IN_MILLIS)
-                        return false;
+    public AppUpdateChecker() {
+        super("net.zionsoft.obadiah.model.utils.AppUpdateChecker");
+    }
 
-                    // we only check if the user has active WiFi or WiMAX
-                    final NetworkInfo networkInfo = ((ConnectivityManager) context
-                            .getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
-                    if (networkInfo == null || !networkInfo.isConnected())
-                        return false;
-                    final int networkType = networkInfo.getType();
-                    if (networkType != ConnectivityManager.TYPE_WIFI
-                            && networkType != ConnectivityManager.TYPE_WIMAX) {
-                        return false;
-                    }
-
-                    final String response = new String(NetworkHelper.get(NetworkHelper.CLIENT_VERSION_URL), "UTF-8");
-                    final JSONObject versionObject = new JSONObject(response);
-                    final int latestVersion = versionObject.getInt("versionCode");
-                    preferences.edit().putLong(Constants.PREF_KEY_CHECKED_APPLICATION_VERSION_TIMESTAMP, now).apply();
-
-                    // for each new version, we only ask once
-                    if (latestVersion == preferences.getInt(Constants.PREF_KEY_CHECKED_APPLICATION_VERSION, 0))
-                        return false;
-                    preferences.edit().putInt(Constants.PREF_KEY_CHECKED_APPLICATION_VERSION, latestVersion).apply();
-
-                    return context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionCode < latestVersion;
-                } catch (Exception e) {
-                    Crashlytics.logException(e);
-                    return false;
-                }
+    @Override
+    protected void onHandleIntent(Intent intent) {
+        try {
+            // we only check if at least 24 hours is passed
+            final SharedPreferences preferences
+                    = getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+            final long now = System.currentTimeMillis();
+            final long lastCheckedTimestamp = preferences.getLong(
+                    Constants.PREF_KEY_CHECKED_APPLICATION_VERSION_TIMESTAMP, 0);
+            if (now - lastCheckedTimestamp < DateUtils.DAY_IN_MILLIS) {
+                return;
             }
 
-            @Override
-            protected void onPostExecute(Boolean newVersionAvailable) {
-                onChecked.onAppUpdateChecked(newVersionAvailable);
+            // we only check if the user has active WiFi or WiMAX
+            final NetworkInfo networkInfo
+                    = ((ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
+            if (networkInfo == null || !networkInfo.isConnected()) {
+                return;
             }
-        };
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            try {
-                asyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-            } catch (RejectedExecutionException e) {
-                Crashlytics.logException(e);
+            final int networkType = networkInfo.getType();
+            if (networkType != ConnectivityManager.TYPE_WIFI
+                    && networkType != ConnectivityManager.TYPE_WIMAX) {
+                return;
             }
-        } else {
-            asyncTask.execute();
+
+            final String response = new String(NetworkHelper.get(NetworkHelper.CLIENT_VERSION_URL), "UTF-8");
+            final JSONObject versionObject = new JSONObject(response);
+            final int latestVersion = versionObject.getInt("versionCode");
+            final SharedPreferences.Editor editor = preferences.edit();
+            if (latestVersion < preferences.getInt(Constants.PREF_KEY_CHECKED_APPLICATION_VERSION, 0)) {
+                editor.putInt(Constants.PREF_KEY_CHECKED_APPLICATION_VERSION, latestVersion)
+                        .putBoolean(Constants.PREF_KEY_ASKED_APPLICATION_UPDATE, false);
+            }
+
+            editor.putLong(Constants.PREF_KEY_CHECKED_APPLICATION_VERSION_TIMESTAMP, now).apply();
+        } catch (Exception e) {
+            Crashlytics.logException(e);
         }
+    }
+
+    public static boolean shouldUpdate(Context context) {
+        try {
+            final SharedPreferences preferences
+                    = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+            if (preferences.getBoolean(Constants.PREF_KEY_ASKED_APPLICATION_UPDATE, false)) {
+                return false;
+            }
+
+            final int currentVersion = context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionCode;
+            final int availableVersion = preferences.getInt(Constants.PREF_KEY_CHECKED_APPLICATION_VERSION, 0);
+            return currentVersion < availableVersion;
+        } catch (PackageManager.NameNotFoundException e) {
+            Crashlytics.logException(e);
+            return false;
+        }
+    }
+
+    public static void markAsUpdateAsked(Context context) {
+        context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE).edit()
+                .putBoolean(Constants.PREF_KEY_ASKED_APPLICATION_UPDATE, false)
+                .apply();
     }
 }
