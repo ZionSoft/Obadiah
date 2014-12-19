@@ -193,8 +193,11 @@ public class TranslationListFragment extends BaseFragment implements SwipeRefres
                 if (!isAdded())
                     return;
 
-                ((DialogFragment) getChildFragmentManager().findFragmentByTag(TAG_DOWNLOAD_DIALOG_FRAGMENT))
-                        .dismissAllowingStateLoss();
+                final DialogFragment dialogFragment = (DialogFragment) getChildFragmentManager()
+                        .findFragmentByTag(TAG_DOWNLOAD_DIALOG_FRAGMENT);
+                if (dialogFragment != null) {
+                    dialogFragment.dismissAllowingStateLoss();
+                }
 
                 if (isSuccessful) {
                     Toast.makeText(getActivity(), R.string.toast_translation_downloaded, Toast.LENGTH_SHORT).show();
@@ -222,9 +225,11 @@ public class TranslationListFragment extends BaseFragment implements SwipeRefres
                 if (!isAdded())
                     return;
 
-                final DialogFragment fragment = (DialogFragment) getChildFragmentManager()
+                final DialogFragment dialogFragment = (DialogFragment) getChildFragmentManager()
                         .findFragmentByTag(TAG_DOWNLOAD_DIALOG_FRAGMENT);
-                ((ProgressDialog) fragment.getDialog()).setProgress(progress);
+                if (dialogFragment != null) {
+                    ((ProgressDialog) dialogFragment.getDialog()).setProgress(progress);
+                }
             }
         });
     }
