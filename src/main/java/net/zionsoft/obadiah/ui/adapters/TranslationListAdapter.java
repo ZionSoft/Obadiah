@@ -200,7 +200,7 @@ public class TranslationListAdapter extends BaseAdapter {
 
         if (available != null) {
             for (TranslationInfo translationInfo : available) {
-                final String language = new Locale(translationInfo.language.substring(0, 2)).getDisplayLanguage();
+                final String language = new Locale(translationInfo.language.split("_")[0]).getDisplayLanguage();
                 int index = 0;
                 List<TranslationInfoHolder> translations = null;
                 for (String sectionHeader : mSectionHeaders) {
