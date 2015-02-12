@@ -1,78 +1,23 @@
 buildscript {
     repositories {
-        mavenCentral()
-        maven { url 'http://download.crashlytics.com/maven' }
+        jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:1.0.0'
-        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.4'
-        classpath 'com.crashlytics.tools.gradle:crashlytics-gradle:1.+'
+        classpath 'com.android.tools.build:gradle:1.0.1'
     }
 }
+
 task wrapper(type: Wrapper) {
-    gradleVersion = "2.2.1"
-}
-apply plugin: 'com.android.application'
-apply plugin: 'com.neenbedankt.android-apt'
-apply plugin: 'crashlytics'
-
-repositories {
-    mavenCentral()
-    maven { url 'http://download.crashlytics.com/maven' }
-    maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+    gradleVersion = '2.2.1'
 }
 
-dependencies {
-    compile 'com.android.support:appcompat-v7:21.0.3'
-    compile 'com.google.android.gms:play-services-ads:6.5.87'
-    compile 'com.google.android.gms:play-services-appindexing:6.5.87'
+ext {
+    compileSdkVersion = 21
+    buildToolsVersion = "21.1.2"
 
-    compile 'com.google.dagger:dagger:2.0-SNAPSHOT'
-    apt 'com.google.dagger:dagger-compiler:2.0-SNAPSHOT'
-    provided 'org.glassfish:javax.annotation:10.0-b28'
+    minSdkVersion = 9
+    targetSdkVersion = 21
 
-    compile 'com.jakewharton:butterknife:6.0.0'
-
-    compile 'com.crashlytics.android:crashlytics:1.+'
+    sourceJavaVersion = JavaVersion.VERSION_1_7
+    targetJavaVersion = JavaVersion.VERSION_1_7
 }
-
-android {
-    compileSdkVersion 21
-    buildToolsVersion "21.1.2"
-
-    defaultConfig {
-        versionName "1.12.3"
-        versionCode 11203
-        minSdkVersion 9
-        targetSdkVersion 21
-    }
-
-    signingConfigs {
-        release {
-            storeFile file("zionsoft.keystore")
-            storePassword KEYSTORE_PASSWORD
-            keyAlias "zionsoft"
-            keyPassword KEY_PASSWORD
-        }
-    }
-
-    buildTypes {
-        release {
-            minifyEnabled true
-            shrinkResources true
-            proguardFile getDefaultProguardFile('proguard-android-optimize.txt')
-            proguardFile 'proguard.txt'
-            signingConfig signingConfigs.release
-        }
-    }
-}
-
-/**
- * Crashlytic - http://support.crashlytics.com/knowledgebase/articles/202938-gradle
- */
-// Android Manifest
-crashlytics.manifestPath = "src/main/AndroidManifest.xml"
-// Res folder
-crashlytics.resPath = "src/main/res"
-// Assets folder
-// crashlytics.assetsPath = "src/main/assets"
