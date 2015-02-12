@@ -47,9 +47,9 @@ android {
 
     signingConfigs {
         release {
-            storeFile file("zionsoft.keystore")
+            storeFile file(KEYSTORE_FILE)
             storePassword KEYSTORE_PASSWORD
-            keyAlias "zionsoft"
+            keyAlias KEY_ALIAS
             keyPassword KEY_PASSWORD
         }
     }
