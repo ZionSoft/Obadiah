@@ -1,3 +1,4 @@
+# Google Play services
 -keep class * extends java.util.ListResourceBundle {
     protected Object[][] getContents();
 }
@@ -17,6 +18,7 @@
 
 -keep class com.android.vending.billing.**
 
+# Support library
 -dontwarn android.support.v7.**
 -keep class android.support.v7.** { *; }
 -keep interface android.support.v7.** { *; }
