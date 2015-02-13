@@ -33,8 +33,6 @@ import android.support.v7.widget.SwitchCompat;
 import android.util.TypedValue;
 import android.view.View;
 import android.widget.CompoundButton;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import net.zionsoft.obadiah.App;
 import net.zionsoft.obadiah.Constants;
@@ -43,6 +41,7 @@ import net.zionsoft.obadiah.model.Settings;
 import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.ui.utils.DialogHelper;
 import net.zionsoft.obadiah.ui.widget.settings.SettingSectionHeader;
+import net.zionsoft.obadiah.ui.widget.settings.SettingTitleDescriptionButton;
 
 import javax.inject.Inject;
 
@@ -67,26 +66,17 @@ public class SettingsActivity extends BaseActionBarActivity {
     @InjectView(R.id.night_mode_switch)
     SwitchCompat mNightModeSwitch;
 
-    @InjectView(R.id.text_size_section)
-    LinearLayout mTextSizeSection;
-
-    @InjectView(R.id.text_size_text_view)
-    TextView mTextSizeTextView;
-
-    @InjectView(R.id.text_size_value_text_view)
-    TextView mTextSizeValueTextView;
+    @InjectView(R.id.text_size_setting_button)
+    SettingTitleDescriptionButton textSizeSettingButton;
 
     @InjectView(R.id.about_section_header)
     SettingSectionHeader aboutSectionHeader;
 
-    @InjectView(R.id.rate_me_text_view)
-    TextView mRateMeTextView;
+    @InjectView(R.id.rate_me_setting_button)
+    SettingTitleDescriptionButton rateMeSettingButton;
 
-    @InjectView(R.id.version_text_view)
-    TextView mVersionTextView;
-
-    @InjectView(R.id.version_value_text_view)
-    TextView mVersionValueTextView;
+    @InjectView(R.id.version_setting_button)
+    SettingTitleDescriptionButton versionSettingButton;
 
     private View mRootView;
 
@@ -127,7 +117,7 @@ public class SettingsActivity extends BaseActionBarActivity {
             }
         });
 
-        mRateMeTextView.setOnClickListener(new View.OnClickListener() {
+        rateMeSettingButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 try {
@@ -142,7 +132,7 @@ public class SettingsActivity extends BaseActionBarActivity {
             }
         });
 
-        mTextSizeSection.setOnClickListener(new View.OnClickListener() {
+        textSizeSettingButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 DialogHelper.showDialog(SettingsActivity.this, R.string.pref_text_size_dialog_title,
@@ -159,7 +149,7 @@ public class SettingsActivity extends BaseActionBarActivity {
         });
 
         try {
-            mVersionValueTextView.setText(getPackageManager().getPackageInfo(getPackageName(), 0).versionName);
+            versionSettingButton.setDescriptionText(getPackageManager().getPackageInfo(getPackageName(), 0).versionName);
         } catch (PackageManager.NameNotFoundException e) {
             // do nothing
         }
@@ -189,9 +179,9 @@ public class SettingsActivity extends BaseActionBarActivity {
                     final int animatedColorValue = (Integer) animator.getAnimatedValue();
                     mScreenOnSwitch.setTextColor(animatedColorValue);
                     mNightModeSwitch.setTextColor(animatedColorValue);
-                    mTextSizeTextView.setTextColor(animatedColorValue);
-                    mRateMeTextView.setTextColor(animatedColorValue);
-                    mVersionTextView.setTextColor(animatedColorValue);
+                    textSizeSettingButton.setTitleTextColor(animatedColorValue);
+                    rateMeSettingButton.setTitleTextColor(animatedColorValue);
+                    versionSettingButton.setTitleTextColor(animatedColorValue);
                 }
             });
             colorAnimator.setDuration(ANIMATION_DURATION).start();
@@ -199,9 +189,9 @@ public class SettingsActivity extends BaseActionBarActivity {
             mRootView.setBackgroundColor(backgroundColor);
             mScreenOnSwitch.setTextColor(textColor);
             mNightModeSwitch.setTextColor(textColor);
-            mTextSizeTextView.setTextColor(textColor);
-            mRateMeTextView.setTextColor(textColor);
-            mVersionTextView.setTextColor(textColor);
+            textSizeSettingButton.setTitleTextColor(textColor);
+            rateMeSettingButton.setTitleTextColor(textColor);
+            versionSettingButton.setTitleTextColor(textColor);
         }
 
         final Settings.TextSize textSizeSetting = mSettings.getTextSize();
@@ -217,14 +207,12 @@ public class SettingsActivity extends BaseActionBarActivity {
         mNightModeSwitch.setChecked(mSettings.isNightMode());
         mNightModeSwitch.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
 
-        mTextSizeTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
-        mTextSizeValueTextView.setText(textSizeSetting.title);
-        mTextSizeValueTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, smallerTextSize);
+        textSizeSettingButton.setDescriptionText(textSizeSetting.title);
+        textSizeSettingButton.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize, smallerTextSize);
 
-        mRateMeTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+        rateMeSettingButton.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize, smallerTextSize);
         aboutSectionHeader.setHeaderTextSize(TypedValue.COMPLEX_UNIT_PX, smallerTextSize);
-        mVersionTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
-        mVersionValueTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, smallerTextSize);
+        versionSettingButton.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize, smallerTextSize);
     }
 
     @Override

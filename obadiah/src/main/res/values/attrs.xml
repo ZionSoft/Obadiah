@@ -9,4 +9,10 @@
     <declare-styleable name="SettingSectionHeader">
         <attr name="settingSectionHeaderText" format="string|reference" />
     </declare-styleable>
+
+    <declare-styleable name="SettingTitleDescriptionButton">
+        <attr name="settingTitleDescriptionButtonTitle" format="string|reference" />
+        <attr name="settingTitleDescriptionButtonDescription" format="string|reference" />
+        <attr name="settingTitleDescriptionButtonDividerVisible" format="boolean" />
+    </declare-styleable>
 </resources>
