@@ -1,8 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:obadiah="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
+
+    <net.zionsoft.obadiah.ui.widget.settings.SettingSectionHeader
+        android:id="@+id/display_section_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        obadiah:settingSectionHeaderText="@string/pref_display" />
 
     <android.support.v7.widget.SwitchCompat
         android:id="@+id/screen_on_switch"
@@ -13,7 +20,9 @@
         android:paddingRight="@dimen/paddingRight"
         android:text="@string/pref_screen_on" />
 
-    <View style="@style/Divider.Horizontal" />
+    <View
+        style="@style/Divider.Horizontal"
+        android:background="@android:color/darker_gray" />
 
     <android.support.v7.widget.SwitchCompat
         android:id="@+id/night_mode_switch"
@@ -24,7 +33,9 @@
         android:paddingRight="@dimen/paddingRight"
         android:text="@string/pref_night_mode" />
 
-    <View style="@style/Divider.Horizontal" />
+    <View
+        style="@style/Divider.Horizontal"
+        android:background="@android:color/darker_gray" />
 
     <LinearLayout
         android:id="@+id/text_size_section"
@@ -51,7 +62,11 @@
             android:textColor="@color/dark_gray" />
     </LinearLayout>
 
-    <View style="@style/Divider.Horizontal" />
+    <net.zionsoft.obadiah.ui.widget.settings.SettingSectionHeader
+        android:id="@+id/about_section_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        obadiah:settingSectionHeaderText="@string/pref_about" />
 
     <TextView
         android:id="@+id/rate_me_text_view"
@@ -62,7 +77,9 @@
         android:gravity="center_vertical"
         android:text="@string/pref_rate_me" />
 
-    <View style="@style/Divider.Horizontal" />
+    <View
+        style="@style/Divider.Horizontal"
+        android:background="@android:color/darker_gray" />
 
     <LinearLayout
         android:background="@drawable/background_text"
@@ -88,7 +105,5 @@
             android:gravity="center_vertical|right"
             android:textColor="@color/dark_gray" />
     </LinearLayout>
-
-    <View style="@style/Divider.Horizontal" />
 
 </LinearLayout>

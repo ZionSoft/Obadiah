@@ -42,6 +42,7 @@ import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.Settings;
 import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.ui.utils.DialogHelper;
+import net.zionsoft.obadiah.ui.widget.settings.SettingSectionHeader;
 
 import javax.inject.Inject;
 
@@ -57,17 +58,26 @@ public class SettingsActivity extends BaseActionBarActivity {
     @Inject
     Settings mSettings;
 
+    @InjectView(R.id.display_section_header)
+    SettingSectionHeader displaySectionHeader;
+
     @InjectView(R.id.screen_on_switch)
     SwitchCompat mScreenOnSwitch;
 
     @InjectView(R.id.night_mode_switch)
     SwitchCompat mNightModeSwitch;
 
+    @InjectView(R.id.text_size_section)
+    LinearLayout mTextSizeSection;
+
     @InjectView(R.id.text_size_text_view)
     TextView mTextSizeTextView;
 
     @InjectView(R.id.text_size_value_text_view)
     TextView mTextSizeValueTextView;
+
+    @InjectView(R.id.about_section_header)
+    SettingSectionHeader aboutSectionHeader;
 
     @InjectView(R.id.rate_me_text_view)
     TextView mRateMeTextView;
@@ -77,9 +87,6 @@ public class SettingsActivity extends BaseActionBarActivity {
 
     @InjectView(R.id.version_value_text_view)
     TextView mVersionValueTextView;
-
-    @InjectView(R.id.text_size_section)
-    LinearLayout mTextSizeSection;
 
     private View mRootView;
 
@@ -202,6 +209,8 @@ public class SettingsActivity extends BaseActionBarActivity {
         final float textSize = resources.getDimension(textSizeSetting.textSize);
         final float smallerTextSize = resources.getDimension(textSizeSetting.smallerTextSize);
 
+        displaySectionHeader.setHeaderTextSize(TypedValue.COMPLEX_UNIT_PX, smallerTextSize);
+
         mScreenOnSwitch.setChecked(mSettings.keepScreenOn());
         mScreenOnSwitch.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
 
@@ -213,6 +222,7 @@ public class SettingsActivity extends BaseActionBarActivity {
         mTextSizeValueTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, smallerTextSize);
 
         mRateMeTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+        aboutSectionHeader.setHeaderTextSize(TypedValue.COMPLEX_UNIT_PX, smallerTextSize);
         mVersionTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
         mVersionValueTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, smallerTextSize);
     }
