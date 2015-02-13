@@ -99,8 +99,7 @@ public class SettingsActivity extends BaseActionBarActivity {
         actionBar.setIcon(R.drawable.ic_action_bar);
 
         rootView.setKeepScreenOn(settings.keepScreenOn());
-        updateBackgroundColor(settings.getBackgroundColor());
-        updateTitleTextColor(settings.getTextColor());
+        updateColor();
         updateTextSize();
 
         screenOnSwitch.setChecked(settings.keepScreenOn());
@@ -120,8 +119,8 @@ public class SettingsActivity extends BaseActionBarActivity {
 
                 settings.setNightMode(isChecked);
 
-                animateBackgroundColor(originalBackgroundColor, settings.getBackgroundColor());
-                animateTitleTextColor(originalTextColor, settings.getTextColor());
+                animateColor(originalBackgroundColor, settings.getBackgroundColor(),
+                        originalTextColor, settings.getTextColor());
             }
         });
 
@@ -174,50 +173,40 @@ public class SettingsActivity extends BaseActionBarActivity {
         }
     }
 
-    private void animateBackgroundColor(int from, int to) {
+    private void animateColor(final int fromBackgroundColor, final int toBackgroundColor,
+                              final int fromTitleTextColor, final int toTitleTextColor) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            final ValueAnimator backgroundColorAnimator = ValueAnimator.ofObject(new ArgbEvaluator(), from, to);
-            backgroundColorAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            final ArgbEvaluator argbEvaluator = new ArgbEvaluator();
+            final ValueAnimator colorAnimator = ValueAnimator.ofFloat(0.0F, 1.0F);
+            colorAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                 @TargetApi(Build.VERSION_CODES.HONEYCOMB)
                 @Override
                 public void onAnimationUpdate(ValueAnimator animator) {
-                    updateBackgroundColor((Integer) animator.getAnimatedValue());
+                    final float fraction = (Float) animator.getAnimatedValue();
+                    final int backgroundColor = (Integer) argbEvaluator.evaluate(fraction, fromBackgroundColor, toBackgroundColor);
+                    final int titleTextColor = (Integer) argbEvaluator.evaluate(fraction, fromTitleTextColor, toTitleTextColor);
+                    updateColor(backgroundColor, titleTextColor);
                 }
             });
-            backgroundColorAnimator.setDuration(ANIMATION_DURATION).start();
+            colorAnimator.setDuration(ANIMATION_DURATION).start();
         } else {
             // TODO adds animation for old devices
-            updateBackgroundColor(to);
+            updateColor(toBackgroundColor, toTitleTextColor);
         }
     }
 
-    private void updateBackgroundColor(int color) {
-        rootView.setBackgroundColor(color);
+    private void updateColor() {
+        updateColor(settings.getBackgroundColor(), settings.getTextColor());
     }
 
-    private void animateTitleTextColor(int from, int to) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            final ValueAnimator textColorAnimator = ValueAnimator.ofObject(new ArgbEvaluator(), from, to);
-            textColorAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-                @Override
-                public void onAnimationUpdate(ValueAnimator animator) {
-                    updateTitleTextColor((Integer) animator.getAnimatedValue());
-                }
-            });
-            textColorAnimator.setDuration(ANIMATION_DURATION).start();
-        } else {
-            // TODO adds animation for old devices
-            updateTitleTextColor(to);
-        }
-    }
+    private void updateColor(int backgroundColor, int titleTextColor) {
+        rootView.setBackgroundColor(backgroundColor);
 
-    private void updateTitleTextColor(int color) {
-        screenOnSwitch.setTitleTextColor(color);
-        nightModeSwitch.setTitleTextColor(color);
-        textSizeSettingButton.setTitleTextColor(color);
-        rateMeSettingButton.setTitleTextColor(color);
-        versionSettingButton.setTitleTextColor(color);
+        screenOnSwitch.setTitleTextColor(titleTextColor);
+        nightModeSwitch.setTitleTextColor(titleTextColor);
+        textSizeSettingButton.setTitleTextColor(titleTextColor);
+        rateMeSettingButton.setTitleTextColor(titleTextColor);
+        versionSettingButton.setTitleTextColor(titleTextColor);
     }
 
     private void animateTextSize(final float fromTextSize, final float toTextSize,
@@ -228,9 +217,9 @@ public class SettingsActivity extends BaseActionBarActivity {
                 @TargetApi(Build.VERSION_CODES.HONEYCOMB)
                 @Override
                 public void onAnimationUpdate(ValueAnimator animator) {
-                    final float animatedValue = (Float) animator.getAnimatedValue();
-                    final float textSize = fromTextSize + animatedValue * (toTextSize - fromTextSize);
-                    final float smallerTextSize = fromSmallerTextSize + animatedValue * (toSmallerTextSize - fromSmallerTextSize);
+                    final float fraction = (Float) animator.getAnimatedValue();
+                    final float textSize = fromTextSize + fraction * (toTextSize - fromTextSize);
+                    final float smallerTextSize = fromSmallerTextSize + fraction * (toSmallerTextSize - fromSmallerTextSize);
                     updateTextSize(textSize, smallerTextSize);
                 }
             });
