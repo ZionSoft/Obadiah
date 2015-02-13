@@ -97,23 +97,30 @@ public class SettingsActivity extends BaseActionBarActivity {
         actionBar.setDisplayShowHomeEnabled(true);
         actionBar.setIcon(R.drawable.ic_action_bar);
 
-        // must call this before setting the listeners, otherwise all the listeners will be
-        // immediately triggered
-        populateUi(false);
+        rootView.setKeepScreenOn(settings.keepScreenOn());
+        updateBackgroundColor(settings.getBackgroundColor());
+        updateTitleTextColor(settings.getTextColor());
+        updateTextSize();
 
+        screenOnSwitch.setChecked(settings.keepScreenOn());
         screenOnSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 settings.setKeepScreenOn(isChecked);
-                populateUi(false);
             }
         });
 
+        nightModeSwitch.setChecked(settings.isNightMode());
         nightModeSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                final int originalBackgroundColor = settings.getBackgroundColor();
+                final int originalTextColor = settings.getTextColor();
+
                 settings.setNightMode(isChecked);
-                populateUi(true);
+
+                animateBackgroundColor(originalBackgroundColor, settings.getBackgroundColor());
+                animateTitleTextColor(originalTextColor, settings.getTextColor());
             }
         });
 
@@ -132,6 +139,7 @@ public class SettingsActivity extends BaseActionBarActivity {
             }
         });
 
+        textSizeSettingButton.setDescriptionText(settings.getTextSize().title);
         textSizeSettingButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -140,8 +148,18 @@ public class SettingsActivity extends BaseActionBarActivity {
                         new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
+                                final Settings.TextSize originalTextSizeSetting = settings.getTextSize();
+                                final Resources resources = getResources();
+                                final float originalTextSize = resources.getDimension(originalTextSizeSetting.textSize);
+                                final float originalSmallerTextSize = resources.getDimension(originalTextSizeSetting.smallerTextSize);
+
                                 settings.setTextSize(Settings.TextSize.values()[which]);
-                                populateUi(false);
+                                textSizeSettingButton.setDescriptionText(settings.getTextSize().title);
+
+                                final Settings.TextSize textSizeSetting = settings.getTextSize();
+                                animateTextSize(originalTextSize, resources.getDimension(textSizeSetting.textSize),
+                                        originalSmallerTextSize, resources.getDimension(textSizeSetting.smallerTextSize));
+
                                 dialog.dismiss();
                             }
                         });
@@ -155,24 +173,32 @@ public class SettingsActivity extends BaseActionBarActivity {
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    private void populateUi(boolean animateColor) {
-        rootView.setKeepScreenOn(settings.keepScreenOn());
-
-        final int backgroundColor = settings.getBackgroundColor();
-        final int textColor = settings.getTextColor();
-        if (animateColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            final ValueAnimator backgroundColorAnimator = ValueAnimator.ofObject(new ArgbEvaluator(), textColor, backgroundColor);
+    private void animateBackgroundColor(int from, int to) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            final ValueAnimator backgroundColorAnimator = ValueAnimator.ofObject(new ArgbEvaluator(), from, to);
             backgroundColorAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @TargetApi(Build.VERSION_CODES.HONEYCOMB)
                 @Override
                 public void onAnimationUpdate(ValueAnimator animator) {
-                    rootView.setBackgroundColor((Integer) animator.getAnimatedValue());
+                    updateBackgroundColor((Integer) animator.getAnimatedValue());
                 }
             });
             backgroundColorAnimator.setDuration(ANIMATION_DURATION).start();
+        } else {
+            // TODO adds animation for old devices
+            updateBackgroundColor(to);
+        }
+    }
 
-            final ValueAnimator textColorAnimator = ValueAnimator.ofObject(new ArgbEvaluator(), backgroundColor, textColor);
+    private void updateBackgroundColor(int color) {
+        rootView.setBackgroundColor(color);
+    }
+
+    private void animateTitleTextColor(int from, int to) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            final ValueAnimator textColorAnimator = ValueAnimator.ofObject(new ArgbEvaluator(), from, to);
             textColorAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @TargetApi(Build.VERSION_CODES.HONEYCOMB)
                 @Override
                 public void onAnimationUpdate(ValueAnimator animator) {
                     updateTitleTextColor((Integer) animator.getAnimatedValue());
@@ -181,19 +207,8 @@ public class SettingsActivity extends BaseActionBarActivity {
             textColorAnimator.setDuration(ANIMATION_DURATION).start();
         } else {
             // TODO adds animation for old devices
-            rootView.setBackgroundColor(backgroundColor);
-            updateTitleTextColor(textColor);
+            updateTitleTextColor(to);
         }
-
-        final Settings.TextSize textSizeSetting = settings.getTextSize();
-        final Resources resources = getResources();
-        final float textSize = resources.getDimension(textSizeSetting.textSize);
-        final float smallerTextSize = resources.getDimension(textSizeSetting.smallerTextSize);
-        updateTextSize(textSize, smallerTextSize);
-
-        screenOnSwitch.setChecked(settings.keepScreenOn());
-        nightModeSwitch.setChecked(settings.isNightMode());
-        textSizeSettingButton.setDescriptionText(textSizeSetting.title);
     }
 
     private void updateTitleTextColor(int color) {
@@ -202,6 +217,34 @@ public class SettingsActivity extends BaseActionBarActivity {
         textSizeSettingButton.setTitleTextColor(color);
         rateMeSettingButton.setTitleTextColor(color);
         versionSettingButton.setTitleTextColor(color);
+    }
+
+    private void animateTextSize(final float fromTextSize, final float toTextSize,
+                                 final float fromSmallerTextSize, final float toSmallerTextSize) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            final ValueAnimator textSizeAnimator = ValueAnimator.ofFloat(0.0F, 1.0F);
+            textSizeAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+                @Override
+                public void onAnimationUpdate(ValueAnimator animator) {
+                    final float animatedValue = (Float) animator.getAnimatedValue();
+                    final float textSize = fromTextSize + animatedValue * (toTextSize - fromTextSize);
+                    final float smallerTextSize = fromSmallerTextSize + animatedValue * (toSmallerTextSize - fromSmallerTextSize);
+                    updateTextSize(textSize, smallerTextSize);
+                }
+            });
+            textSizeAnimator.setDuration(ANIMATION_DURATION).start();
+        } else {
+            // TODO adds animation for old devices
+            updateTextSize(toTextSize, toSmallerTextSize);
+        }
+    }
+
+    private void updateTextSize() {
+        final Settings.TextSize textSizeSetting = settings.getTextSize();
+        final Resources resources = getResources();
+        updateTextSize(resources.getDimension(textSizeSetting.textSize),
+                resources.getDimension(textSizeSetting.smallerTextSize));
     }
 
     private void updateTextSize(float textSize, float smallerTextSize) {
