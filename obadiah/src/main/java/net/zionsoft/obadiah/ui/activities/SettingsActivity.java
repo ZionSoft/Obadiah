@@ -55,7 +55,7 @@ public class SettingsActivity extends BaseActionBarActivity {
     private static final long ANIMATION_DURATION = 300L;
 
     @Inject
-    Settings mSettings;
+    Settings settings;
 
     @InjectView(R.id.display_section_header)
     SettingSectionHeader displaySectionHeader;
@@ -78,7 +78,7 @@ public class SettingsActivity extends BaseActionBarActivity {
     @InjectView(R.id.version_setting_button)
     SettingTitleDescriptionButton versionSettingButton;
 
-    private View mRootView;
+    private View rootView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,7 +91,7 @@ public class SettingsActivity extends BaseActionBarActivity {
     private void initializeUi() {
         setContentView(R.layout.activity_settings);
 
-        mRootView = getWindow().getDecorView();
+        rootView = getWindow().getDecorView();
 
         final ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayShowHomeEnabled(true);
@@ -104,7 +104,7 @@ public class SettingsActivity extends BaseActionBarActivity {
         screenOnSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                mSettings.setKeepScreenOn(isChecked);
+                settings.setKeepScreenOn(isChecked);
                 populateUi(false);
             }
         });
@@ -112,7 +112,7 @@ public class SettingsActivity extends BaseActionBarActivity {
         nightModeSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                mSettings.setNightMode(isChecked);
+                settings.setNightMode(isChecked);
                 populateUi(true);
             }
         });
@@ -136,11 +136,11 @@ public class SettingsActivity extends BaseActionBarActivity {
             @Override
             public void onClick(View v) {
                 DialogHelper.showDialog(SettingsActivity.this, R.string.pref_text_size_dialog_title,
-                        R.array.pref_text_size_value, mSettings.getTextSize().ordinal(),
+                        R.array.pref_text_size_value, settings.getTextSize().ordinal(),
                         new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                mSettings.setTextSize(Settings.TextSize.values()[which]);
+                                settings.setTextSize(Settings.TextSize.values()[which]);
                                 populateUi(false);
                                 dialog.dismiss();
                             }
@@ -157,17 +157,17 @@ public class SettingsActivity extends BaseActionBarActivity {
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     private void populateUi(boolean animateColor) {
-        mRootView.setKeepScreenOn(mSettings.keepScreenOn());
+        rootView.setKeepScreenOn(settings.keepScreenOn());
 
-        final int backgroundColor = mSettings.getBackgroundColor();
-        final int textColor = mSettings.getTextColor();
+        final int backgroundColor = settings.getBackgroundColor();
+        final int textColor = settings.getTextColor();
         if (animateColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
             // TODO adds animation for old devices
             ValueAnimator colorAnimator = ValueAnimator.ofObject(new ArgbEvaluator(), textColor, backgroundColor);
             colorAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                 @Override
                 public void onAnimationUpdate(ValueAnimator animator) {
-                    mRootView.setBackgroundColor((Integer) animator.getAnimatedValue());
+                    rootView.setBackgroundColor((Integer) animator.getAnimatedValue());
                 }
             });
             colorAnimator.setDuration(ANIMATION_DURATION).start();
@@ -186,7 +186,7 @@ public class SettingsActivity extends BaseActionBarActivity {
             });
             colorAnimator.setDuration(ANIMATION_DURATION).start();
         } else {
-            mRootView.setBackgroundColor(backgroundColor);
+            rootView.setBackgroundColor(backgroundColor);
             screenOnSwitch.setTitleTextColor(textColor);
             nightModeSwitch.setTitleTextColor(textColor);
             textSizeSettingButton.setTitleTextColor(textColor);
@@ -194,17 +194,17 @@ public class SettingsActivity extends BaseActionBarActivity {
             versionSettingButton.setTitleTextColor(textColor);
         }
 
-        final Settings.TextSize textSizeSetting = mSettings.getTextSize();
+        final Settings.TextSize textSizeSetting = settings.getTextSize();
         final Resources resources = getResources();
         final float textSize = resources.getDimension(textSizeSetting.textSize);
         final float smallerTextSize = resources.getDimension(textSizeSetting.smallerTextSize);
 
         displaySectionHeader.setHeaderTextSize(TypedValue.COMPLEX_UNIT_PX, smallerTextSize);
 
-        screenOnSwitch.setChecked(mSettings.keepScreenOn());
+        screenOnSwitch.setChecked(settings.keepScreenOn());
         screenOnSwitch.setTitleTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
 
-        nightModeSwitch.setChecked(mSettings.isNightMode());
+        nightModeSwitch.setChecked(settings.isNightMode());
         nightModeSwitch.setTitleTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
 
         textSizeSettingButton.setDescriptionText(textSizeSetting.title);
