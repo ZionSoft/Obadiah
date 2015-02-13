@@ -162,52 +162,54 @@ public class SettingsActivity extends BaseActionBarActivity {
         final int backgroundColor = settings.getBackgroundColor();
         final int textColor = settings.getTextColor();
         if (animateColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            // TODO adds animation for old devices
-            ValueAnimator colorAnimator = ValueAnimator.ofObject(new ArgbEvaluator(), textColor, backgroundColor);
-            colorAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            final ValueAnimator backgroundColorAnimator = ValueAnimator.ofObject(new ArgbEvaluator(), textColor, backgroundColor);
+            backgroundColorAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                 @Override
                 public void onAnimationUpdate(ValueAnimator animator) {
                     rootView.setBackgroundColor((Integer) animator.getAnimatedValue());
                 }
             });
-            colorAnimator.setDuration(ANIMATION_DURATION).start();
+            backgroundColorAnimator.setDuration(ANIMATION_DURATION).start();
 
-            colorAnimator = ValueAnimator.ofObject(new ArgbEvaluator(), backgroundColor, textColor);
-            colorAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            final ValueAnimator textColorAnimator = ValueAnimator.ofObject(new ArgbEvaluator(), backgroundColor, textColor);
+            textColorAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                 @Override
                 public void onAnimationUpdate(ValueAnimator animator) {
-                    final int animatedColorValue = (Integer) animator.getAnimatedValue();
-                    screenOnSwitch.setTitleTextColor(animatedColorValue);
-                    nightModeSwitch.setTitleTextColor(animatedColorValue);
-                    textSizeSettingButton.setTitleTextColor(animatedColorValue);
-                    rateMeSettingButton.setTitleTextColor(animatedColorValue);
-                    versionSettingButton.setTitleTextColor(animatedColorValue);
+                    updateTitleTextColor((Integer) animator.getAnimatedValue());
                 }
             });
-            colorAnimator.setDuration(ANIMATION_DURATION).start();
+            textColorAnimator.setDuration(ANIMATION_DURATION).start();
         } else {
+            // TODO adds animation for old devices
             rootView.setBackgroundColor(backgroundColor);
-            screenOnSwitch.setTitleTextColor(textColor);
-            nightModeSwitch.setTitleTextColor(textColor);
-            textSizeSettingButton.setTitleTextColor(textColor);
-            rateMeSettingButton.setTitleTextColor(textColor);
-            versionSettingButton.setTitleTextColor(textColor);
+            updateTitleTextColor(textColor);
         }
 
         final Settings.TextSize textSizeSetting = settings.getTextSize();
         final Resources resources = getResources();
         final float textSize = resources.getDimension(textSizeSetting.textSize);
         final float smallerTextSize = resources.getDimension(textSizeSetting.smallerTextSize);
-
-        displaySectionHeader.setHeaderTextSize(TypedValue.COMPLEX_UNIT_PX, smallerTextSize);
+        updateTextSize(textSize, smallerTextSize);
 
         screenOnSwitch.setChecked(settings.keepScreenOn());
-        screenOnSwitch.setTitleTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
-
         nightModeSwitch.setChecked(settings.isNightMode());
+        textSizeSettingButton.setDescriptionText(textSizeSetting.title);
+    }
+
+    private void updateTitleTextColor(int color) {
+        screenOnSwitch.setTitleTextColor(color);
+        nightModeSwitch.setTitleTextColor(color);
+        textSizeSettingButton.setTitleTextColor(color);
+        rateMeSettingButton.setTitleTextColor(color);
+        versionSettingButton.setTitleTextColor(color);
+    }
+
+    private void updateTextSize(float textSize, float smallerTextSize) {
+        displaySectionHeader.setHeaderTextSize(TypedValue.COMPLEX_UNIT_PX, smallerTextSize);
+
+        screenOnSwitch.setTitleTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
         nightModeSwitch.setTitleTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
 
-        textSizeSettingButton.setDescriptionText(textSizeSetting.title);
         textSizeSettingButton.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize, smallerTextSize);
 
         rateMeSettingButton.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize, smallerTextSize);
