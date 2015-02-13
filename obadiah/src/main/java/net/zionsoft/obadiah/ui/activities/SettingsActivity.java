@@ -31,7 +31,6 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.util.TypedValue;
 import android.view.View;
-import android.view.animation.BounceInterpolator;
 import android.widget.CompoundButton;
 
 import net.zionsoft.obadiah.App;
@@ -223,7 +222,6 @@ public class SettingsActivity extends BaseActionBarActivity {
                     updateTextSize(textSize, smallerTextSize);
                 }
             });
-            textSizeAnimator.setInterpolator(new BounceInterpolator());
             textSizeAnimator.setDuration(ANIMATION_DURATION).start();
         } else {
             // TODO adds animation for old devices
