@@ -29,7 +29,6 @@ import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
-import android.support.v7.widget.SwitchCompat;
 import android.util.TypedValue;
 import android.view.View;
 import android.widget.CompoundButton;
@@ -41,6 +40,7 @@ import net.zionsoft.obadiah.model.Settings;
 import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.ui.utils.DialogHelper;
 import net.zionsoft.obadiah.ui.widget.settings.SettingSectionHeader;
+import net.zionsoft.obadiah.ui.widget.settings.SettingSwitch;
 import net.zionsoft.obadiah.ui.widget.settings.SettingTitleDescriptionButton;
 
 import javax.inject.Inject;
@@ -61,10 +61,10 @@ public class SettingsActivity extends BaseActionBarActivity {
     SettingSectionHeader displaySectionHeader;
 
     @InjectView(R.id.screen_on_switch)
-    SwitchCompat mScreenOnSwitch;
+    SettingSwitch screenOnSwitch;
 
     @InjectView(R.id.night_mode_switch)
-    SwitchCompat mNightModeSwitch;
+    SettingSwitch nightModeSwitch;
 
     @InjectView(R.id.text_size_setting_button)
     SettingTitleDescriptionButton textSizeSettingButton;
@@ -101,7 +101,7 @@ public class SettingsActivity extends BaseActionBarActivity {
         // immediately triggered
         populateUi(false);
 
-        mScreenOnSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        screenOnSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 mSettings.setKeepScreenOn(isChecked);
@@ -109,7 +109,7 @@ public class SettingsActivity extends BaseActionBarActivity {
             }
         });
 
-        mNightModeSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        nightModeSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 mSettings.setNightMode(isChecked);
@@ -177,8 +177,8 @@ public class SettingsActivity extends BaseActionBarActivity {
                 @Override
                 public void onAnimationUpdate(ValueAnimator animator) {
                     final int animatedColorValue = (Integer) animator.getAnimatedValue();
-                    mScreenOnSwitch.setTextColor(animatedColorValue);
-                    mNightModeSwitch.setTextColor(animatedColorValue);
+                    screenOnSwitch.setTitleTextColor(animatedColorValue);
+                    nightModeSwitch.setTitleTextColor(animatedColorValue);
                     textSizeSettingButton.setTitleTextColor(animatedColorValue);
                     rateMeSettingButton.setTitleTextColor(animatedColorValue);
                     versionSettingButton.setTitleTextColor(animatedColorValue);
@@ -187,8 +187,8 @@ public class SettingsActivity extends BaseActionBarActivity {
             colorAnimator.setDuration(ANIMATION_DURATION).start();
         } else {
             mRootView.setBackgroundColor(backgroundColor);
-            mScreenOnSwitch.setTextColor(textColor);
-            mNightModeSwitch.setTextColor(textColor);
+            screenOnSwitch.setTitleTextColor(textColor);
+            nightModeSwitch.setTitleTextColor(textColor);
             textSizeSettingButton.setTitleTextColor(textColor);
             rateMeSettingButton.setTitleTextColor(textColor);
             versionSettingButton.setTitleTextColor(textColor);
@@ -201,11 +201,11 @@ public class SettingsActivity extends BaseActionBarActivity {
 
         displaySectionHeader.setHeaderTextSize(TypedValue.COMPLEX_UNIT_PX, smallerTextSize);
 
-        mScreenOnSwitch.setChecked(mSettings.keepScreenOn());
-        mScreenOnSwitch.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+        screenOnSwitch.setChecked(mSettings.keepScreenOn());
+        screenOnSwitch.setTitleTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
 
-        mNightModeSwitch.setChecked(mSettings.isNightMode());
-        mNightModeSwitch.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+        nightModeSwitch.setChecked(mSettings.isNightMode());
+        nightModeSwitch.setTitleTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
 
         textSizeSettingButton.setDescriptionText(textSizeSetting.title);
         textSizeSettingButton.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize, smallerTextSize);

@@ -15,4 +15,9 @@
         <attr name="settingTitleDescriptionButtonDescription" format="string|reference" />
         <attr name="settingTitleDescriptionButtonDividerVisible" format="boolean" />
     </declare-styleable>
+
+    <declare-styleable name="SettingSwitch">
+        <attr name="settingSwitchTitle" format="string|reference" />
+        <attr name="settingSwitchDividerVisible" format="boolean" />
+    </declare-styleable>
 </resources>

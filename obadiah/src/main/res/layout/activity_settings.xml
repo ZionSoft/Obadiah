@@ -11,31 +11,19 @@
         android:layout_height="wrap_content"
         obadiah:settingSectionHeaderText="@string/pref_display" />
 
-    <android.support.v7.widget.SwitchCompat
+    <net.zionsoft.obadiah.ui.widget.settings.SettingSwitch
         android:id="@+id/screen_on_switch"
-        android:background="@drawable/background_text"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/item_height"
-        android:paddingLeft="@dimen/paddingLeft"
-        android:paddingRight="@dimen/paddingRight"
-        android:text="@string/pref_screen_on" />
+        android:layout_height="wrap_content"
+        obadiah:settingSwitchTitle="@string/pref_screen_on"
+        obadiah:settingSwitchDividerVisible="true" />
 
-    <View
-        style="@style/Divider.Horizontal"
-        android:background="@android:color/darker_gray" />
-
-    <android.support.v7.widget.SwitchCompat
+    <net.zionsoft.obadiah.ui.widget.settings.SettingSwitch
         android:id="@+id/night_mode_switch"
-        android:background="@drawable/background_text"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/item_height"
-        android:paddingLeft="@dimen/paddingLeft"
-        android:paddingRight="@dimen/paddingRight"
-        android:text="@string/pref_night_mode" />
-
-    <View
-        style="@style/Divider.Horizontal"
-        android:background="@android:color/darker_gray" />
+        android:layout_height="wrap_content"
+        obadiah:settingSwitchTitle="@string/pref_night_mode"
+        obadiah:settingSwitchDividerVisible="true" />
 
     <net.zionsoft.obadiah.ui.widget.settings.SettingTitleDescriptionButton
         android:id="@+id/text_size_setting_button"
