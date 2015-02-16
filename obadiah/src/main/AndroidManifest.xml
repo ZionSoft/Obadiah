@@ -39,6 +39,9 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".ui.activities.OpenSourceLicenseListActivity"
+            android:label="@string/activity_open_source_licenses" />
+        <activity
             android:name=".ui.activities.ReadingProgressActivity"
             android:label="@string/activity_reading_progress" />
         <activity

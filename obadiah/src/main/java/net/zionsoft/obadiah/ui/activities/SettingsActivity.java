@@ -38,6 +38,7 @@ import net.zionsoft.obadiah.Constants;
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.Settings;
 import net.zionsoft.obadiah.model.analytics.Analytics;
+import net.zionsoft.obadiah.ui.utils.AnimationHelper;
 import net.zionsoft.obadiah.ui.utils.DialogHelper;
 import net.zionsoft.obadiah.ui.widget.settings.SettingSectionHeader;
 import net.zionsoft.obadiah.ui.widget.settings.SettingSwitch;
@@ -77,6 +78,9 @@ public class SettingsActivity extends BaseActionBarActivity {
 
     @InjectView(R.id.version_setting_button)
     SettingTitleDescriptionButton versionSettingButton;
+
+    @InjectView(R.id.license_setting_button)
+    SettingTitleDescriptionButton licenseSettingButton;
 
     private View rootView;
 
@@ -170,6 +174,14 @@ public class SettingsActivity extends BaseActionBarActivity {
         } catch (PackageManager.NameNotFoundException e) {
             // do nothing
         }
+
+        licenseSettingButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AnimationHelper.slideIn(SettingsActivity.this,
+                        OpenSourceLicenseListActivity.newStartIntent(SettingsActivity.this));
+            }
+        });
     }
 
     private void animateColor(final int fromBackgroundColor, final int toBackgroundColor,
@@ -206,6 +218,7 @@ public class SettingsActivity extends BaseActionBarActivity {
         textSizeSettingButton.setTitleTextColor(titleTextColor);
         rateMeSettingButton.setTitleTextColor(titleTextColor);
         versionSettingButton.setTitleTextColor(titleTextColor);
+        licenseSettingButton.setTitleTextColor(titleTextColor);
     }
 
     private void animateTextSize(final float fromTextSize, final float toTextSize,
@@ -247,6 +260,7 @@ public class SettingsActivity extends BaseActionBarActivity {
         rateMeSettingButton.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize, smallerTextSize);
         aboutSectionHeader.setHeaderTextSize(TypedValue.COMPLEX_UNIT_PX, smallerTextSize);
         versionSettingButton.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize, smallerTextSize);
+        licenseSettingButton.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize, smallerTextSize);
     }
 
     @Override

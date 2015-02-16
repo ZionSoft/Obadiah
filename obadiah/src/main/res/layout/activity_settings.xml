@@ -54,6 +54,15 @@
         android:layout_height="wrap_content"
         android:clickable="true"
         obadiah:settingTitleDescriptionButtonTitle="@string/pref_version"
+        obadiah:settingTitleDescriptionButtonDividerVisible="true" />
+
+    <net.zionsoft.obadiah.ui.widget.settings.SettingTitleDescriptionButton
+        android:id="@+id/license_setting_button"
+        android:background="@drawable/background_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        obadiah:settingTitleDescriptionButtonTitle="@string/pref_license"
         obadiah:settingTitleDescriptionButtonDividerVisible="false" />
 
 </LinearLayout>
