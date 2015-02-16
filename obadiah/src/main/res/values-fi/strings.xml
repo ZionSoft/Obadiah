@@ -4,6 +4,7 @@
     <string name="app_name">Raamattu</string>
 
     <string name="activity_manage_translation">Käännökset</string>
+    <string name="activity_open_source_licenses">Avoimen Lähdekoodin Käyttöluv.</string>
     <string name="activity_reading_progress">Lukeminen Edistyminen</string>
     <string name="activity_settings">Asetukset</string>
 
@@ -34,6 +35,9 @@
     <string name="pref_text_size_large">Suuri</string>
     <string name="pref_text_size_very_large">Valtava</string>
     <string name="pref_version">Versio</string>
+    <string name="pref_license">Avoimen Lähdekoodin Käyttöluv.</string>
+    <string name="pref_display">Näyttö</string>
+    <string name="pref_about">Lue Lisää</string>
 
     <string name="progress_dialog_translation_deleting">Poistaminen&#8230;</string>
     <string name="progress_dialog_translation_downloading">Lataaminen&#8230;</string>
