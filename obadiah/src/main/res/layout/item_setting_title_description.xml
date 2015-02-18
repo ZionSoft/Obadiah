@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <TextView
+        android:id="@+id/title_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="@dimen/paddingLeft"
+        android:layout_gravity="center_vertical"
+        tools:text="Title" />
+
+    <TextView
+        android:id="@+id/description_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingRight="@dimen/paddingRight"
+        android:layout_gravity="center_vertical|right"
+        android:textColor="@color/dark_gray"
+        tools:text="Description" />
+
+    <View
+        android:id="@+id/divider_view"
+        style="@style/Divider.Horizontal"
+        android:layout_gravity="bottom"
+        android:background="@android:color/darker_gray" />
+</merge>

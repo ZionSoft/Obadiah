@@ -5,4 +5,19 @@
         <attr name="textSize" format="dimension" />
         <attr name="textPadding" format="dimension" />
     </declare-styleable>
+
+    <declare-styleable name="SettingSectionHeader">
+        <attr name="settingSectionHeaderText" format="string|reference" />
+    </declare-styleable>
+
+    <declare-styleable name="SettingTitleDescriptionButton">
+        <attr name="settingTitleDescriptionButtonTitle" format="string|reference" />
+        <attr name="settingTitleDescriptionButtonDescription" format="string|reference" />
+        <attr name="settingTitleDescriptionButtonDividerVisible" format="boolean" />
+    </declare-styleable>
+
+    <declare-styleable name="SettingSwitch">
+        <attr name="settingSwitchTitle" format="string|reference" />
+        <attr name="settingSwitchDividerVisible" format="boolean" />
+    </declare-styleable>
 </resources>

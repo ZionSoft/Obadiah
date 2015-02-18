@@ -22,10 +22,12 @@ import net.zionsoft.obadiah.BookSelectionActivity;
 import net.zionsoft.obadiah.model.Bible;
 import net.zionsoft.obadiah.model.ReadingProgressManager;
 import net.zionsoft.obadiah.model.notification.PushNotificationHandler;
+import net.zionsoft.obadiah.ui.activities.OpenSourceLicenseListActivity;
 import net.zionsoft.obadiah.ui.activities.ReadingProgressActivity;
 import net.zionsoft.obadiah.ui.activities.SearchActivity;
 import net.zionsoft.obadiah.ui.activities.SettingsActivity;
 import net.zionsoft.obadiah.ui.activities.TranslationManagementActivity;
+import net.zionsoft.obadiah.ui.adapters.OpenSourceLicenseListAdapter;
 import net.zionsoft.obadiah.ui.adapters.ReadingProgressListAdapter;
 import net.zionsoft.obadiah.ui.adapters.SearchResultListAdapter;
 import net.zionsoft.obadiah.ui.adapters.TranslationListAdapter;
@@ -45,6 +47,8 @@ public interface InjectionComponent {
 
     public void inject(BookSelectionActivity bookSelectionActivity);
 
+    public void inject(OpenSourceLicenseListActivity openSourceLicenseListActivity);
+
     public void inject(ReadingProgressActivity readingProgressActivity);
 
     public void inject(SearchActivity searchActivity);
@@ -56,6 +60,8 @@ public interface InjectionComponent {
     public void inject(ChapterSelectionFragment chapterSelectionFragment);
 
     public void inject(TranslationListFragment translationListFragment);
+
+    public void inject(OpenSourceLicenseListAdapter openSourceLicenseListAdapter);
 
     public void inject(ReadingProgressListAdapter readingProgressListAdapter);
 

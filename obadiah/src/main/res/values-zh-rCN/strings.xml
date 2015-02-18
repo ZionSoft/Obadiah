@@ -4,6 +4,7 @@
     <string name="app_name">圣经</string>
 
     <string name="activity_manage_translation">译本</string>
+    <string name="activity_open_source_licenses">开源软件协议</string>
     <string name="activity_reading_progress">读经进度</string>
     <string name="activity_settings">设置</string>
 
@@ -34,6 +35,9 @@
     <string name="pref_text_size_large">大号</string>
     <string name="pref_text_size_very_large">超大号</string>
     <string name="pref_version">版本</string>
+    <string name="pref_license">开源软件协议</string>
+    <string name="pref_display">显示</string>
+    <string name="pref_about">关于</string>
 
     <string name="progress_dialog_translation_deleting">删除中&#8230;</string>
     <string name="progress_dialog_translation_downloading">下载中&#8230;</string>

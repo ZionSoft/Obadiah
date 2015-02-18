@@ -4,6 +4,7 @@
     <string name="app_name">聖經</string>
 
     <string name="activity_manage_translation">譯本</string>
+    <string name="activity_open_source_licenses">开源软体协议</string>
     <string name="activity_reading_progress">讀經進度</string>
     <string name="activity_settings">設置</string>
 
@@ -34,6 +35,9 @@
     <string name="pref_text_size_large">大號</string>
     <string name="pref_text_size_very_large">超大號</string>
     <string name="pref_version">版本</string>
+    <string name="pref_license">开源软体协议</string>
+    <string name="pref_display">顯示</string>
+    <string name="pref_about">關於</string>
 
     <string name="progress_dialog_translation_deleting">删除中&#8230;</string>
     <string name="progress_dialog_translation_downloading">下載中&#8230;</string>

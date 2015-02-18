@@ -29,19 +29,20 @@ import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
-import android.support.v7.widget.SwitchCompat;
 import android.util.TypedValue;
 import android.view.View;
 import android.widget.CompoundButton;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import net.zionsoft.obadiah.App;
 import net.zionsoft.obadiah.Constants;
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.Settings;
 import net.zionsoft.obadiah.model.analytics.Analytics;
+import net.zionsoft.obadiah.ui.utils.AnimationHelper;
 import net.zionsoft.obadiah.ui.utils.DialogHelper;
+import net.zionsoft.obadiah.ui.widget.settings.SettingSectionHeader;
+import net.zionsoft.obadiah.ui.widget.settings.SettingSwitch;
+import net.zionsoft.obadiah.ui.widget.settings.SettingTitleDescriptionButton;
 
 import javax.inject.Inject;
 
@@ -55,33 +56,33 @@ public class SettingsActivity extends BaseActionBarActivity {
     private static final long ANIMATION_DURATION = 300L;
 
     @Inject
-    Settings mSettings;
+    Settings settings;
+
+    @InjectView(R.id.display_section_header)
+    SettingSectionHeader displaySectionHeader;
 
     @InjectView(R.id.screen_on_switch)
-    SwitchCompat mScreenOnSwitch;
+    SettingSwitch screenOnSwitch;
 
     @InjectView(R.id.night_mode_switch)
-    SwitchCompat mNightModeSwitch;
+    SettingSwitch nightModeSwitch;
 
-    @InjectView(R.id.text_size_text_view)
-    TextView mTextSizeTextView;
+    @InjectView(R.id.text_size_setting_button)
+    SettingTitleDescriptionButton textSizeSettingButton;
 
-    @InjectView(R.id.text_size_value_text_view)
-    TextView mTextSizeValueTextView;
+    @InjectView(R.id.about_section_header)
+    SettingSectionHeader aboutSectionHeader;
 
-    @InjectView(R.id.rate_me_text_view)
-    TextView mRateMeTextView;
+    @InjectView(R.id.rate_me_setting_button)
+    SettingTitleDescriptionButton rateMeSettingButton;
 
-    @InjectView(R.id.version_text_view)
-    TextView mVersionTextView;
+    @InjectView(R.id.version_setting_button)
+    SettingTitleDescriptionButton versionSettingButton;
 
-    @InjectView(R.id.version_value_text_view)
-    TextView mVersionValueTextView;
+    @InjectView(R.id.license_setting_button)
+    SettingTitleDescriptionButton licenseSettingButton;
 
-    @InjectView(R.id.text_size_section)
-    LinearLayout mTextSizeSection;
-
-    private View mRootView;
+    private View rootView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,33 +95,39 @@ public class SettingsActivity extends BaseActionBarActivity {
     private void initializeUi() {
         setContentView(R.layout.activity_settings);
 
-        mRootView = getWindow().getDecorView();
+        rootView = getWindow().getDecorView();
 
         final ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayShowHomeEnabled(true);
         actionBar.setIcon(R.drawable.ic_action_bar);
 
-        // must call this before setting the listeners, otherwise all the listeners will be
-        // immediately triggered
-        populateUi(false);
+        rootView.setKeepScreenOn(settings.keepScreenOn());
+        updateColor();
+        updateTextSize();
 
-        mScreenOnSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        screenOnSwitch.setChecked(settings.keepScreenOn());
+        screenOnSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                mSettings.setKeepScreenOn(isChecked);
-                populateUi(false);
+                settings.setKeepScreenOn(isChecked);
             }
         });
 
-        mNightModeSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        nightModeSwitch.setChecked(settings.isNightMode());
+        nightModeSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                mSettings.setNightMode(isChecked);
-                populateUi(true);
+                final int originalBackgroundColor = settings.getBackgroundColor();
+                final int originalTextColor = settings.getTextColor();
+
+                settings.setNightMode(isChecked);
+
+                animateColor(originalBackgroundColor, settings.getBackgroundColor(),
+                        originalTextColor, settings.getTextColor());
             }
         });
 
-        mRateMeTextView.setOnClickListener(new View.OnClickListener() {
+        rateMeSettingButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 try {
@@ -135,16 +142,27 @@ public class SettingsActivity extends BaseActionBarActivity {
             }
         });
 
-        mTextSizeSection.setOnClickListener(new View.OnClickListener() {
+        textSizeSettingButton.setDescriptionText(settings.getTextSize().title);
+        textSizeSettingButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 DialogHelper.showDialog(SettingsActivity.this, R.string.pref_text_size_dialog_title,
-                        R.array.pref_text_size_value, mSettings.getTextSize().ordinal(),
+                        R.array.pref_text_size_value, settings.getTextSize().ordinal(),
                         new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                mSettings.setTextSize(Settings.TextSize.values()[which]);
-                                populateUi(false);
+                                final Settings.TextSize originalTextSizeSetting = settings.getTextSize();
+                                final Resources resources = getResources();
+                                final float originalTextSize = resources.getDimension(originalTextSizeSetting.textSize);
+                                final float originalSmallerTextSize = resources.getDimension(originalTextSizeSetting.smallerTextSize);
+
+                                settings.setTextSize(Settings.TextSize.values()[which]);
+                                textSizeSettingButton.setDescriptionText(settings.getTextSize().title);
+
+                                final Settings.TextSize textSizeSetting = settings.getTextSize();
+                                animateTextSize(originalTextSize, resources.getDimension(textSizeSetting.textSize),
+                                        originalSmallerTextSize, resources.getDimension(textSizeSetting.smallerTextSize));
+
                                 dialog.dismiss();
                             }
                         });
@@ -152,69 +170,97 @@ public class SettingsActivity extends BaseActionBarActivity {
         });
 
         try {
-            mVersionValueTextView.setText(getPackageManager().getPackageInfo(getPackageName(), 0).versionName);
+            versionSettingButton.setDescriptionText(getPackageManager().getPackageInfo(getPackageName(), 0).versionName);
         } catch (PackageManager.NameNotFoundException e) {
             // do nothing
         }
+
+        licenseSettingButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AnimationHelper.slideIn(SettingsActivity.this,
+                        OpenSourceLicenseListActivity.newStartIntent(SettingsActivity.this));
+            }
+        });
     }
 
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    private void populateUi(boolean animateColor) {
-        mRootView.setKeepScreenOn(mSettings.keepScreenOn());
-
-        final int backgroundColor = mSettings.getBackgroundColor();
-        final int textColor = mSettings.getTextColor();
-        if (animateColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            // TODO adds animation for old devices
-            ValueAnimator colorAnimator = ValueAnimator.ofObject(new ArgbEvaluator(), textColor, backgroundColor);
+    private void animateColor(final int fromBackgroundColor, final int toBackgroundColor,
+                              final int fromTitleTextColor, final int toTitleTextColor) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            final ArgbEvaluator argbEvaluator = new ArgbEvaluator();
+            final ValueAnimator colorAnimator = ValueAnimator.ofFloat(0.0F, 1.0F);
             colorAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @TargetApi(Build.VERSION_CODES.HONEYCOMB)
                 @Override
                 public void onAnimationUpdate(ValueAnimator animator) {
-                    mRootView.setBackgroundColor((Integer) animator.getAnimatedValue());
-                }
-            });
-            colorAnimator.setDuration(ANIMATION_DURATION).start();
-
-            colorAnimator = ValueAnimator.ofObject(new ArgbEvaluator(), backgroundColor, textColor);
-            colorAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                @Override
-                public void onAnimationUpdate(ValueAnimator animator) {
-                    final int animatedColorValue = (Integer) animator.getAnimatedValue();
-                    mScreenOnSwitch.setTextColor(animatedColorValue);
-                    mNightModeSwitch.setTextColor(animatedColorValue);
-                    mTextSizeTextView.setTextColor(animatedColorValue);
-                    mRateMeTextView.setTextColor(animatedColorValue);
-                    mVersionTextView.setTextColor(animatedColorValue);
+                    final float fraction = (Float) animator.getAnimatedValue();
+                    final int backgroundColor = (Integer) argbEvaluator.evaluate(fraction, fromBackgroundColor, toBackgroundColor);
+                    final int titleTextColor = (Integer) argbEvaluator.evaluate(fraction, fromTitleTextColor, toTitleTextColor);
+                    updateColor(backgroundColor, titleTextColor);
                 }
             });
             colorAnimator.setDuration(ANIMATION_DURATION).start();
         } else {
-            mRootView.setBackgroundColor(backgroundColor);
-            mScreenOnSwitch.setTextColor(textColor);
-            mNightModeSwitch.setTextColor(textColor);
-            mTextSizeTextView.setTextColor(textColor);
-            mRateMeTextView.setTextColor(textColor);
-            mVersionTextView.setTextColor(textColor);
+            // TODO adds animation for old devices
+            updateColor(toBackgroundColor, toTitleTextColor);
         }
+    }
 
-        final Settings.TextSize textSizeSetting = mSettings.getTextSize();
+    private void updateColor() {
+        updateColor(settings.getBackgroundColor(), settings.getTextColor());
+    }
+
+    private void updateColor(int backgroundColor, int titleTextColor) {
+        rootView.setBackgroundColor(backgroundColor);
+
+        screenOnSwitch.setTitleTextColor(titleTextColor);
+        nightModeSwitch.setTitleTextColor(titleTextColor);
+        textSizeSettingButton.setTitleTextColor(titleTextColor);
+        rateMeSettingButton.setTitleTextColor(titleTextColor);
+        versionSettingButton.setTitleTextColor(titleTextColor);
+        licenseSettingButton.setTitleTextColor(titleTextColor);
+    }
+
+    private void animateTextSize(final float fromTextSize, final float toTextSize,
+                                 final float fromSmallerTextSize, final float toSmallerTextSize) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            final ValueAnimator textSizeAnimator = ValueAnimator.ofFloat(0.0F, 1.0F);
+            textSizeAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+                @Override
+                public void onAnimationUpdate(ValueAnimator animator) {
+                    final float fraction = (Float) animator.getAnimatedValue();
+                    final float textSize = fromTextSize + fraction * (toTextSize - fromTextSize);
+                    final float smallerTextSize = fromSmallerTextSize + fraction * (toSmallerTextSize - fromSmallerTextSize);
+                    updateTextSize(textSize, smallerTextSize);
+                }
+            });
+            textSizeAnimator.setDuration(ANIMATION_DURATION).start();
+        } else {
+            // TODO adds animation for old devices
+            updateTextSize(toTextSize, toSmallerTextSize);
+        }
+    }
+
+    private void updateTextSize() {
+        final Settings.TextSize textSizeSetting = settings.getTextSize();
         final Resources resources = getResources();
-        final float textSize = resources.getDimension(textSizeSetting.textSize);
-        final float smallerTextSize = resources.getDimension(textSizeSetting.smallerTextSize);
+        updateTextSize(resources.getDimension(textSizeSetting.textSize),
+                resources.getDimension(textSizeSetting.smallerTextSize));
+    }
 
-        mScreenOnSwitch.setChecked(mSettings.keepScreenOn());
-        mScreenOnSwitch.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+    private void updateTextSize(float textSize, float smallerTextSize) {
+        displaySectionHeader.setHeaderTextSize(TypedValue.COMPLEX_UNIT_PX, smallerTextSize);
 
-        mNightModeSwitch.setChecked(mSettings.isNightMode());
-        mNightModeSwitch.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+        screenOnSwitch.setTitleTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+        nightModeSwitch.setTitleTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
 
-        mTextSizeTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
-        mTextSizeValueTextView.setText(textSizeSetting.title);
-        mTextSizeValueTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, smallerTextSize);
+        textSizeSettingButton.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize, smallerTextSize);
 
-        mRateMeTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
-        mVersionTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
-        mVersionValueTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, smallerTextSize);
+        rateMeSettingButton.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize, smallerTextSize);
+        aboutSectionHeader.setHeaderTextSize(TypedValue.COMPLEX_UNIT_PX, smallerTextSize);
+        versionSettingButton.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize, smallerTextSize);
+        licenseSettingButton.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize, smallerTextSize);
     }
 
     @Override

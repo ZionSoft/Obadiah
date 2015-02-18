@@ -13,9 +13,7 @@
         <item name="android:dividerHeight">1dp</item>
     </style>
 
-    <style name="Divider">
-        <item name="android:background">@android:color/darker_gray</item>
-    </style>
+    <style name="Divider" />
 
     <style name="Divider.Horizontal" parent="Divider">
         <item name="android:layout_width">match_parent</item>
