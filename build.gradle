@@ -3,20 +3,20 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:1.0.1'
+        classpath 'com.android.tools.build:gradle:1.1.0'
     }
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.2.1'
+    gradleVersion = '2.3'
 }
 
 ext {
-    compileSdkVersion = 21
-    buildToolsVersion = "21.1.2"
+    compileSdkVersion = 22
+    buildToolsVersion = '22'
 
     minSdkVersion = 9
-    targetSdkVersion = 21
+    targetSdkVersion = 22
 
     sourceJavaVersion = JavaVersion.VERSION_1_7
     targetJavaVersion = JavaVersion.VERSION_1_7

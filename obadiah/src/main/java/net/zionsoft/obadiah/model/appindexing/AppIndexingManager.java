@@ -25,12 +25,16 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 
+import net.zionsoft.obadiah.BuildConfig;
+
 public class AppIndexingManager {
     private final Activity mActivity;
     private final GoogleApiClient mGoogleApiClient;
 
     private static final String TITLE_TEMPLATE = "%s, %d (%s)";
-    private static final String APP_URI_TEMPLATE = "android-app://net.zionsoft.obadiah/http/bible.zionsoft.net/bible/%s/%d/%d";
+    private static final String APP_URI_TEMPLATE = BuildConfig.DEBUG
+            ? "android-app://net.zionsoft.obadiah.debug/http/bible.zionsoft.net/bible/%s/%d/%d"
+            : "android-app://net.zionsoft.obadiah/http/bible.zionsoft.net/bible/%s/%d/%d";
     private static final String WEB_URI_TEMPLATE = "http://bible.zionsoft.net/bible/%s/%d/%d";
     private Uri mAppIndexingUri;
 
