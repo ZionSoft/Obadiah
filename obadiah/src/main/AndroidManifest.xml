@@ -3,14 +3,14 @@
     package="net.zionsoft.obadiah">
 
     <permission
-        android:name="net.zionsoft.obadiah.permission.C2D_MESSAGE"
+        android:name="${applicationId}.permission.C2D_MESSAGE"
         android:protectionLevel="signature" />
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="com.android.vending.BILLING" />
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
-    <uses-permission android:name="net.zionsoft.obadiah.permission.C2D_MESSAGE" />
+    <uses-permission android:name="${applicationId}.permission.C2D_MESSAGE" />
 
     <application
         android:allowBackup="true"
@@ -79,7 +79,7 @@
 
         <provider
             android:name=".model.search.RecentSearchProvider"
-            android:authorities="net.zionsoft.obadiah.model.search.RecentSearchProvider"
+            android:authorities="${applicationId}.model.search.RecentSearchProvider"
             android:exported="false" />
 
         <receiver
