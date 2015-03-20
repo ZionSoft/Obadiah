@@ -72,7 +72,7 @@ public class BookSelectionActivity extends BaseActionBarActivity
 
     public static Intent newStartReorderToTopIntent(Context context, String messageType,
                                                     int book, int chapter, int verse) {
-        return newStartIntent(context).setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+        return newStartReorderToTopIntent(context)
                 .putExtra(KEY_MESSAGE_TYPE, messageType)
                 .putExtra(KEY_BOOK_INDEX, book)
                 .putExtra(KEY_CHAPTER_INDEX, chapter)
@@ -80,7 +80,13 @@ public class BookSelectionActivity extends BaseActionBarActivity
     }
 
     public static Intent newStartReorderToTopIntent(Context context) {
-        return newStartIntent(context).setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+        final Intent startIntent = newStartIntent(context);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
+            // there's some horrible issue with FLAG_ACTIVITY_REORDER_TO_FRONT for KitKat and above
+            // ref. https://code.google.com/p/android/issues/detail?id=63570
+            startIntent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+        }
+        return startIntent;
     }
 
     public static Intent newStartIntent(Context context) {

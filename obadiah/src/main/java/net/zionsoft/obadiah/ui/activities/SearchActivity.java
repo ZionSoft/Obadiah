@@ -21,6 +21,7 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.SearchRecentSuggestions;
 import android.support.v4.view.MenuItemCompat;
@@ -59,7 +60,13 @@ import butterknife.InjectView;
 
 public class SearchActivity extends BaseActionBarActivity {
     public static Intent newStartReorderToTopIntent(Context context) {
-        return new Intent(context, SearchActivity.class).setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+        final Intent startIntent = new Intent(context, SearchActivity.class);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
+            // there's some horrible issue with FLAG_ACTIVITY_REORDER_TO_FRONT for KitKat and above
+            // ref. https://code.google.com/p/android/issues/detail?id=63570
+            startIntent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+        }
+        return startIntent;
     }
 
     private static class NonConfigurationData {

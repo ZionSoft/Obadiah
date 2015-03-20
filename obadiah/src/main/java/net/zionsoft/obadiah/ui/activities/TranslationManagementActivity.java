@@ -19,6 +19,7 @@ package net.zionsoft.obadiah.ui.activities;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.Menu;
@@ -42,8 +43,13 @@ public class TranslationManagementActivity extends BaseActionBarActivity {
     private static final String KEY_MESSAGE_TYPE = "net.zionsoft.obadiah.ui.activities.TranslationManagementActivity.KEY_MESSAGE_TYPE";
 
     public static Intent newStartReorderToTopIntent(Context context, String messageType) {
-        return newStartIntent(context).setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
-                .putExtra(KEY_MESSAGE_TYPE, messageType);
+        final Intent startIntent = newStartIntent(context).putExtra(KEY_MESSAGE_TYPE, messageType);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
+            // there's some horrible issue with FLAG_ACTIVITY_REORDER_TO_FRONT for KitKat and above
+            // ref. https://code.google.com/p/android/issues/detail?id=63570
+            startIntent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+        }
+        return startIntent;
     }
 
     public static Intent newStartIntent(Context context) {
