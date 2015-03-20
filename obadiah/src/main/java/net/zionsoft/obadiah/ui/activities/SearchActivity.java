@@ -21,7 +21,6 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.provider.SearchRecentSuggestions;
 import android.support.v4.view.MenuItemCompat;
@@ -60,8 +59,7 @@ import butterknife.InjectView;
 
 public class SearchActivity extends BaseActionBarActivity {
     public static Intent newStartReorderToTopIntent(Context context) {
-        return new Intent(context, SearchActivity.class)
-                .setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+        return new Intent(context, SearchActivity.class).setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
     }
 
     private static class NonConfigurationData {
@@ -70,44 +68,40 @@ public class SearchActivity extends BaseActionBarActivity {
     }
 
     @Inject
-    Bible mBible;
+    Bible bible;
 
     @Inject
-    Settings mSettings;
+    Settings settings;
 
     @InjectView(R.id.loading_spinner)
-    View mLoadingSpinner;
+    View loadingSpinner;
 
     @InjectView(R.id.search_result_list_view)
-    ListView mSearchResultListView;
+    ListView searchResultListView;
 
-    private NonConfigurationData mData;
+    private NonConfigurationData nonConfigurationData;
 
-    private SharedPreferences mPreferences;
-    private SearchRecentSuggestions mRecentSearches;
+    private SearchRecentSuggestions recentSearches;
 
-    private SearchResultListAdapter mSearchResultListAdapter;
+    private SearchResultListAdapter searchResultListAdapter;
 
-    private View mRootView;
-
-    private SearchView mSearchView;
+    private SearchView searchView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         App.get(this).getInjectionComponent().inject(this);
 
-        mPreferences = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE);
-        mRecentSearches = new SearchRecentSuggestions(this,
+        recentSearches = new SearchRecentSuggestions(this,
                 RecentSearchProvider.AUTHORITY, RecentSearchProvider.MODE);
 
         initializeUi();
 
-        mData = (NonConfigurationData) getLastCustomNonConfigurationInstance();
-        if (mData == null) {
-            mData = new NonConfigurationData();
+        nonConfigurationData = (NonConfigurationData) getLastCustomNonConfigurationInstance();
+        if (nonConfigurationData == null) {
+            nonConfigurationData = new NonConfigurationData();
         } else {
-            mSearchResultListAdapter.setVerses(mData.verses);
+            searchResultListAdapter.setVerses(nonConfigurationData.verses);
         }
 
         handleStartIntent(getIntent());
@@ -116,20 +110,18 @@ public class SearchActivity extends BaseActionBarActivity {
     private void initializeUi() {
         setContentView(R.layout.activity_search);
 
-        mRootView = getWindow().getDecorView();
-
         final ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayShowHomeEnabled(true);
         actionBar.setIcon(R.drawable.ic_action_bar);
 
-        mLoadingSpinner.setVisibility(View.GONE);
+        loadingSpinner.setVisibility(View.GONE);
 
-        mSearchResultListAdapter = new SearchResultListAdapter(this);
-        mSearchResultListView.setAdapter(mSearchResultListAdapter);
-        mSearchResultListView.setOnItemClickListener(new OnItemClickListener() {
+        searchResultListAdapter = new SearchResultListAdapter(this);
+        searchResultListView.setAdapter(searchResultListAdapter);
+        searchResultListView.setOnItemClickListener(new OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                final Verse verse = mData.verses.get(position);
-                mPreferences.edit()
+                final Verse verse = nonConfigurationData.verses.get(position);
+                getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE).edit()
                         .putInt(Constants.PREF_KEY_LAST_READ_BOOK, verse.bookIndex)
                         .putInt(Constants.PREF_KEY_LAST_READ_CHAPTER, verse.chapterIndex)
                         .putInt(Constants.PREF_KEY_LAST_READ_VERSE, verse.verseIndex)
@@ -143,11 +135,11 @@ public class SearchActivity extends BaseActionBarActivity {
 
     private void handleStartIntent(Intent intent) {
         final String action = intent.getAction();
-        if (mSearchView != null
+        if (searchView != null
                 && (SearchIntents.ACTION_SEARCH.equals(action) || Intent.ACTION_SEARCH.equals(action))) {
             final String query = intent.getStringExtra(SearchManager.QUERY);
             if (!TextUtils.isEmpty(query)) {
-                mSearchView.setQuery(query, true);
+                searchView.setQuery(query, true);
             }
         }
     }
@@ -168,18 +160,21 @@ public class SearchActivity extends BaseActionBarActivity {
     }
 
     private void populateUi() {
-        mSettings.refresh();
-        mRootView.setKeepScreenOn(mSettings.keepScreenOn());
-        mRootView.setBackgroundColor(mSettings.getBackgroundColor());
+        settings.refresh();
 
-        final String selected = mPreferences.getString(Constants.PREF_KEY_LAST_READ_TRANSLATION, null);
+        final View rootView = getWindow().getDecorView();
+        rootView.setKeepScreenOn(settings.keepScreenOn());
+        rootView.setBackgroundColor(settings.getBackgroundColor());
+
+        final String selected = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE)
+                .getString(Constants.PREF_KEY_LAST_READ_TRANSLATION, null);
         setTitle(selected);
-        if (!selected.equals(mData.currentTranslation)) {
-            mData.currentTranslation = selected;
+        if (!selected.equals(nonConfigurationData.currentTranslation)) {
+            nonConfigurationData.currentTranslation = selected;
 
-            mSearchResultListAdapter.setVerses(null);
+            searchResultListAdapter.setVerses(null);
         }
-        mSearchResultListAdapter.notifyDataSetChanged();
+        searchResultListAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -195,12 +190,12 @@ public class SearchActivity extends BaseActionBarActivity {
 
         final MenuItem searchMenuItem = menu.findItem(R.id.action_search);
         MenuItemCompat.expandActionView(searchMenuItem);
-        mSearchView = (SearchView) MenuItemCompat.getActionView(searchMenuItem);
-        mSearchView.setSearchableInfo(((SearchManager) getSystemService(SEARCH_SERVICE))
+        searchView = (SearchView) MenuItemCompat.getActionView(searchMenuItem);
+        searchView.setSearchableInfo(((SearchManager) getSystemService(SEARCH_SERVICE))
                 .getSearchableInfo(getComponentName()));
-        mSearchView.setQueryRefinementEnabled(true);
-        mSearchView.setIconified(false);
-        mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+        searchView.setQueryRefinementEnabled(true);
+        searchView.setIconified(false);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextChange(String newText) {
                 return false;
@@ -226,7 +221,7 @@ public class SearchActivity extends BaseActionBarActivity {
 
     @Override
     public Object onRetainCustomNonConfigurationInstance() {
-        return mData;
+        return nonConfigurationData;
     }
 
     private void search(final String query) {
@@ -240,11 +235,11 @@ public class SearchActivity extends BaseActionBarActivity {
                     .hideSoftInputFromWindow(currentFocus.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
         }
 
-        mLoadingSpinner.setVisibility(View.VISIBLE);
-        mSearchResultListView.setVisibility(View.GONE);
+        loadingSpinner.setVisibility(View.VISIBLE);
+        searchResultListView.setVisibility(View.GONE);
 
-        mRecentSearches.saveRecentQuery(query, null);
-        mBible.searchVerses(mData.currentTranslation, query,
+        recentSearches.saveRecentQuery(query, null);
+        bible.searchVerses(nonConfigurationData.currentTranslation, query,
                 new Bible.OnVersesLoadedListener() {
                     @Override
                     public void onVersesLoaded(List<Verse> verses) {
@@ -260,19 +255,19 @@ public class SearchActivity extends BaseActionBarActivity {
                             return;
                         }
 
-                        AnimationHelper.fadeOut(mLoadingSpinner);
-                        AnimationHelper.fadeIn(mSearchResultListView);
+                        AnimationHelper.fadeOut(loadingSpinner);
+                        AnimationHelper.fadeIn(searchResultListView);
 
-                        mSearchResultListAdapter.setVerses(verses);
-                        mSearchResultListAdapter.notifyDataSetChanged();
-                        mSearchResultListView.post(new Runnable() {
+                        searchResultListAdapter.setVerses(verses);
+                        searchResultListAdapter.notifyDataSetChanged();
+                        searchResultListView.post(new Runnable() {
                             @Override
                             public void run() {
-                                mSearchResultListView.setSelection(0);
+                                searchResultListView.setSelection(0);
                             }
                         });
 
-                        mData.verses = verses;
+                        nonConfigurationData.verses = verses;
 
                         String text = getResources().getString(R.string.toast_verses_searched, verses.size());
                         Toast.makeText(SearchActivity.this, text, Toast.LENGTH_SHORT).show();
