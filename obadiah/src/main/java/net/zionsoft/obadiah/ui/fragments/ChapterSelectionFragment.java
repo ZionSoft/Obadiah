@@ -38,7 +38,7 @@ import javax.inject.Inject;
 import butterknife.InjectView;
 
 public class ChapterSelectionFragment extends BaseFragment {
-    public static interface Listener {
+    public interface Listener {
         public void onChapterSelected(int bookIndex, int chapterIndex);
     }
 
@@ -75,8 +75,9 @@ public class ChapterSelectionFragment extends BaseFragment {
     }
 
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        App.get(getActivity()).getInjectionComponent().inject(this);
 
         mBookListAdapter = new BookExpandableListAdapter(getActivity(),
                 new BookExpandableListAdapter.OnChapterClickListener() {
@@ -114,12 +115,6 @@ public class ChapterSelectionFragment extends BaseFragment {
                 return true;
             }
         });
-    }
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        App.get(getActivity()).getInjectionComponent().inject(this);
     }
 
     @Override

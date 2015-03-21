@@ -93,9 +93,15 @@ public class TranslationListFragment extends BaseFragment implements SwipeRefres
     }
 
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        App.get(getActivity()).getInjectionComponent().inject(this);
 
+        initializeUi();
+        loadTranslations(true);
+    }
+
+    private void initializeUi() {
         mSwipeContainer.setColorSchemeResources(R.color.dark_cyan, R.color.dark_lime, R.color.blue, R.color.dark_blue);
         mSwipeContainer.setOnRefreshListener(this);
 
@@ -135,14 +141,6 @@ public class TranslationListFragment extends BaseFragment implements SwipeRefres
             }
         });
         registerForContextMenu(mTranslationListView);
-    }
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        App.get(getActivity()).getInjectionComponent().inject(this);
-
-        loadTranslations(true);
     }
 
     private void loadTranslations(final boolean forceRefresh) {

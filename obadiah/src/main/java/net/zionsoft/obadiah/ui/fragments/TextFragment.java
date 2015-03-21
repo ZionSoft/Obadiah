@@ -42,7 +42,7 @@ import java.util.List;
 import butterknife.InjectView;
 
 public class TextFragment extends BaseFragment implements VersePagerAdapter.Listener {
-    public static interface Listener {
+    public interface Listener {
         public void onChapterSelected(int chapterIndex);
     }
 
@@ -76,8 +76,8 @@ public class TextFragment extends BaseFragment implements VersePagerAdapter.List
     }
 
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
 
         mVersePagerAdapter = new VersePagerAdapter(getActivity(), this);
 
