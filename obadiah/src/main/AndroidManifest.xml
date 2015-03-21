@@ -90,6 +90,11 @@
                 <category android:name="net.zionsoft.obadiah" />
             </intent-filter>
         </receiver>
+        <receiver android:name=".utils.PackageUpdateReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
 
         <service android:name=".model.notification.PushNotificationHandler" />
         <service android:name=".model.notification.PushNotificationRegister" />
