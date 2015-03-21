@@ -26,7 +26,6 @@ import android.view.View;
 import net.zionsoft.obadiah.App;
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.Settings;
-import net.zionsoft.obadiah.model.analytics.Analytics;
 
 import javax.inject.Inject;
 
@@ -55,18 +54,5 @@ public class OpenSourceLicenseListActivity extends BaseActionBarActivity {
         final View rootView = getWindow().getDecorView();
         rootView.setKeepScreenOn(settings.keepScreenOn());
         rootView.setBackgroundColor(settings.getBackgroundColor());
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        Analytics.trackScreen(OpenSourceLicenseListActivity.class.getSimpleName());
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        overridePendingTransition(R.anim.fade_in, R.anim.slide_out_left_to_right);
     }
 }

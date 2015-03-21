@@ -383,13 +383,6 @@ public class BookSelectionActivity extends BaseActionBarActivity
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-
-        Analytics.trackScreen(BookSelectionActivity.class.getSimpleName());
-    }
-
-    @Override
     protected void onStop() {
         mPreferences.edit()
                 .putInt(Constants.PREF_KEY_LAST_READ_BOOK, mCurrentBook)
@@ -399,12 +392,6 @@ public class BookSelectionActivity extends BaseActionBarActivity
         mAppIndexingManager.onStop();
 
         super.onStop();
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        overridePendingTransition(R.anim.fade_in, R.anim.slide_out_left_to_right);
     }
 
     @Override

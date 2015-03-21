@@ -140,7 +140,6 @@ public class TranslationManagementActivity extends BaseActionBarActivity {
     protected void onResume() {
         super.onResume();
 
-        Analytics.trackScreen(TranslationManagementActivity.class.getSimpleName());
         mAdView.resume();
     }
 
@@ -196,11 +195,5 @@ public class TranslationManagementActivity extends BaseActionBarActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (!mInAppBillingHelper.handleActivityResult(requestCode, resultCode, data))
             super.onActivityResult(requestCode, resultCode, data);
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        overridePendingTransition(R.anim.fade_in, R.anim.slide_out_left_to_right);
     }
 }

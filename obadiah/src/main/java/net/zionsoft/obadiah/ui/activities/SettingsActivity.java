@@ -262,17 +262,4 @@ public class SettingsActivity extends BaseActionBarActivity {
         versionSettingButton.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize, smallerTextSize);
         licenseSettingButton.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize, smallerTextSize);
     }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        Analytics.trackScreen(SettingsActivity.class.getSimpleName());
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        overridePendingTransition(R.anim.fade_in, R.anim.slide_out_left_to_right);
-    }
 }

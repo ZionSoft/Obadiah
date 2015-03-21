@@ -21,6 +21,9 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.View;
 import android.view.ViewGroup;
 
+import net.zionsoft.obadiah.R;
+import net.zionsoft.obadiah.model.analytics.Analytics;
+
 import butterknife.ButterKnife;
 
 public abstract class BaseActionBarActivity extends ActionBarActivity {
@@ -39,5 +42,18 @@ public abstract class BaseActionBarActivity extends ActionBarActivity {
     public void setContentView(View view, ViewGroup.LayoutParams params) {
         super.setContentView(view, params);
         ButterKnife.inject(this);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        Analytics.trackScreen(getClass().getSimpleName());
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        overridePendingTransition(R.anim.fade_in, R.anim.slide_out_left_to_right);
     }
 }

@@ -46,7 +46,6 @@ import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.Bible;
 import net.zionsoft.obadiah.model.Settings;
 import net.zionsoft.obadiah.model.Verse;
-import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.search.RecentSearchProvider;
 import net.zionsoft.obadiah.ui.adapters.SearchResultListAdapter;
 import net.zionsoft.obadiah.ui.utils.AnimationHelper;
@@ -185,13 +184,6 @@ public class SearchActivity extends BaseActionBarActivity {
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-
-        Analytics.trackScreen(SearchActivity.class.getSimpleName());
-    }
-
-    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_search, menu);
 
@@ -218,12 +210,6 @@ public class SearchActivity extends BaseActionBarActivity {
         handleStartIntent(getIntent());
 
         return true;
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        overridePendingTransition(R.anim.fade_in, R.anim.slide_out_left_to_right);
     }
 
     @Override

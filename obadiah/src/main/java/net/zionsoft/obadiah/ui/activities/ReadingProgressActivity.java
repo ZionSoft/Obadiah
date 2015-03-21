@@ -36,7 +36,6 @@ import net.zionsoft.obadiah.model.Bible;
 import net.zionsoft.obadiah.model.ReadingProgress;
 import net.zionsoft.obadiah.model.ReadingProgressManager;
 import net.zionsoft.obadiah.model.Settings;
-import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.ui.adapters.ReadingProgressListAdapter;
 import net.zionsoft.obadiah.ui.utils.AnimationHelper;
 import net.zionsoft.obadiah.ui.utils.DialogHelper;
@@ -252,18 +251,5 @@ public class ReadingProgressActivity extends BaseActionBarActivity {
             mReadingProgressAdapter.setData(mBookNames, mReadingProgress);
             mReadingProgressAdapter.notifyDataSetChanged();
         }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        Analytics.trackScreen(ReadingProgressActivity.class.getSimpleName());
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        overridePendingTransition(R.anim.fade_in, R.anim.slide_out_left_to_right);
     }
 }
