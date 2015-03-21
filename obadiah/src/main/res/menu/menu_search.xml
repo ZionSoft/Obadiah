@@ -6,4 +6,8 @@
         android:title="@null"
         obadiah:showAsAction="always"
         obadiah:actionViewClass="android.support.v7.widget.SearchView" />
+    <item
+        android:id="@+id/action_clear_search_history"
+        android:title="@string/action_clear_search_history"
+        obadiah:showAsAction="never" />
 </menu>

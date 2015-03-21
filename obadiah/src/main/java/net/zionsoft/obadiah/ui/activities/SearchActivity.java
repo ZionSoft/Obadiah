@@ -213,6 +213,17 @@ public class SearchActivity extends BaseActionBarActivity {
     }
 
     @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_clear_search_history:
+                recentSearches.clearHistory();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
     public Object onRetainCustomNonConfigurationInstance() {
         return nonConfigurationData;
     }

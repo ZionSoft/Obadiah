@@ -9,6 +9,7 @@
     <string name="activity_settings">Asetukset</string>
 
     <string name="action_copy">Kopioida</string>
+    <string name="action_clear_search_history">Tyhjennä Hakuhistoria</string>
     <string name="action_delete_translation">Poista</string>
     <string name="action_reading_progress">Lukeminen Edistyminen</string>
     <string name="action_remove_ads">Poista Mainokset</string>

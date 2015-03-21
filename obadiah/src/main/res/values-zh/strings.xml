@@ -9,6 +9,7 @@
     <string name="activity_settings">設置</string>
 
     <string name="action_copy">拷貝</string>
+    <string name="action_clear_search_history">刪除搜尋紀錄</string>
     <string name="action_delete_translation">刪除</string>
     <string name="action_reading_progress">讀經進度</string>
     <string name="action_remove_ads">移除廣告</string>
