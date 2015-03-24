@@ -21,13 +21,13 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.AsyncTask;
 import android.text.format.DateUtils;
 import android.util.SparseArray;
 
 import net.zionsoft.obadiah.App;
 import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.database.DatabaseHelper;
+import net.zionsoft.obadiah.utils.SimpleAsyncTask;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,7 +50,7 @@ public class ReadingProgressManager {
     }
 
     public void trackChapterReading(final int book, final int chapter) {
-        new AsyncTask<Void, Void, Void>() {
+        new SimpleAsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
                 SQLiteDatabase db = null;
@@ -95,11 +95,11 @@ public class ReadingProgressManager {
                 }
                 return null;
             }
-        }.execute();
+        }.start();
     }
 
     public void loadReadingProgress(final OnReadingProgressLoadedListener listener) {
-        new AsyncTask<Void, Void, ReadingProgress>() {
+        new SimpleAsyncTask<Void, Void, ReadingProgress>() {
             @Override
             protected ReadingProgress doInBackground(Void... params) {
                 SQLiteDatabase db = null;
@@ -147,6 +147,6 @@ public class ReadingProgressManager {
             protected void onPostExecute(ReadingProgress result) {
                 listener.onReadingProgressLoaded(result);
             }
-        }.execute();
+        }.start();
     }
 }

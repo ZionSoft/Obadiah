@@ -18,7 +18,6 @@
 package net.zionsoft.obadiah.ui.fragments;
 
 import android.content.Context;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 
@@ -26,6 +25,7 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.ui.adapters.OpenSourceLicenseListAdapter;
+import net.zionsoft.obadiah.utils.SimpleAsyncTask;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -40,7 +40,7 @@ public class OpenSourceLicenseListFragment extends ListFragment {
     }
 
     private void loadLicenses() {
-        new AsyncTask<Void, Void, List<String>>() {
+        new SimpleAsyncTask<Void, Void, List<String>>() {
             @Override
             protected List<String> doInBackground(Void... params) {
                 final List<String> licenses = new ArrayList<>();
@@ -62,6 +62,6 @@ public class OpenSourceLicenseListFragment extends ListFragment {
                     // TODO
                 }
             }
-        }.execute();
+        }.start();
     }
 }
