@@ -23,7 +23,6 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
@@ -33,24 +32,25 @@ import com.crashlytics.android.Crashlytics;
 
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.analytics.Analytics;
+import net.zionsoft.obadiah.utils.SimpleAsyncTask;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 public class InAppBillingHelper implements ServiceConnection {
-    public static interface OnInitializationFinishedListener {
+    public interface OnInitializationFinishedListener {
         public void onInitializationFinished(boolean isSuccessful);
     }
 
-    public static interface OnAdsRemovalStateLoadedListener {
+    public interface OnAdsRemovalStateLoadedListener {
         public void onAdsRemovalStateLoaded(boolean isRemoved);
     }
 
-    public static interface OnAdsRemovalPurchasedListener {
+    public interface OnAdsRemovalPurchasedListener {
         public void onAdsRemovalPurchased(boolean isSuccessful);
     }
 
-    private static enum Status {
+    private enum Status {
         UNINITIALIZED, INITIALIZING, INITIALIZED, RELEASED
     }
 
@@ -63,48 +63,48 @@ public class InAppBillingHelper implements ServiceConnection {
 
     private static final String ITEM_TYPE_INAPP = "inapp";
 
-    private Activity mContext;
-    private Status mStatus = Status.UNINITIALIZED;
-    private IInAppBillingService mInAppBillingService;
-    private OnInitializationFinishedListener mOnInitializationFinished;
-    private OnAdsRemovalPurchasedListener mOnAdsRemovalPurchased;
+    private Activity activity;
+    private Status status = Status.UNINITIALIZED;
+    private IInAppBillingService inAppBillingService;
+    private OnInitializationFinishedListener onInitializationFinished;
+    private OnAdsRemovalPurchasedListener onAdsRemovalPurchased;
 
-    public void initialize(Activity context, OnInitializationFinishedListener onInitializationFinished) {
-        if (mStatus != Status.UNINITIALIZED)
+    public void initialize(Activity activity, OnInitializationFinishedListener onInitializationFinished) {
+        if (status != Status.UNINITIALIZED)
             return;
-        mStatus = Status.INITIALIZING;
+        status = Status.INITIALIZING;
 
-        mContext = context;
-        mOnInitializationFinished = onInitializationFinished;
-        mContext.bindService(new Intent("com.android.vending.billing.InAppBillingService.BIND")
+        this.activity = activity;
+        this.onInitializationFinished = onInitializationFinished;
+        activity.bindService(new Intent("com.android.vending.billing.InAppBillingService.BIND")
                         .setPackage("com.android.vending"),
                 this, Context.BIND_AUTO_CREATE);
     }
 
     public void cleanup() {
-        if (mStatus != Status.INITIALIZED)
+        if (status != Status.INITIALIZED)
             return;
-        mStatus = Status.RELEASED;
+        status = Status.RELEASED;
 
-        mContext.unbindService(this);
+        activity.unbindService(this);
     }
 
     public void loadAdsRemovalState(final OnAdsRemovalStateLoadedListener onLoaded) {
-        if (mStatus != Status.INITIALIZED)
+        if (status != Status.INITIALIZED)
             return;
 
-        new AsyncTask<Void, Void, Boolean>() {
+        new SimpleAsyncTask<Void, Void, Boolean>() {
             @Override
             protected Boolean doInBackground(Void... params) {
                 try {
-                    final Bundle purchases = mInAppBillingService.getPurchases(BILLING_VERSION,
-                            mContext.getPackageName(), ITEM_TYPE_INAPP, null);
+                    final Bundle purchases = inAppBillingService.getPurchases(BILLING_VERSION,
+                            activity.getPackageName(), ITEM_TYPE_INAPP, null);
                     final int response = purchases.getInt("RESPONSE_CODE");
                     if (response != BILLING_RESPONSE_RESULT_OK) {
                         Analytics.trackException("Failed to load purchases - " + response);
                         return false;
                     }
-                    final String adsProductId = mContext.getString(R.string.in_app_product_no_ads);
+                    final String adsProductId = activity.getString(R.string.in_app_product_no_ads);
                     for (String data : purchases.getStringArrayList("INAPP_PURCHASE_DATA_LIST")) {
                         final JSONObject purchaseObject = new JSONObject(data);
                         if (purchaseObject.getString("productId").equals(adsProductId)
@@ -121,16 +121,16 @@ public class InAppBillingHelper implements ServiceConnection {
 
             @Override
             protected void onPostExecute(Boolean result) {
-                if (mStatus != InAppBillingHelper.Status.INITIALIZED)
+                if (status != InAppBillingHelper.Status.INITIALIZED)
                     return;
 
                 onLoaded.onAdsRemovalStateLoaded(result);
             }
-        }.execute();
+        }.start();
     }
 
     public void purchaseAdsRemoval(final OnAdsRemovalPurchasedListener onPurchased) {
-        if (mStatus != Status.INITIALIZED) {
+        if (status != Status.INITIALIZED) {
             Analytics.trackException("Failed to purchase ads removal - Not initialized");
             onPurchased.onAdsRemovalPurchased(false);
             return;
@@ -139,8 +139,8 @@ public class InAppBillingHelper implements ServiceConnection {
         try {
             // TODO verifies signature
 
-            final Bundle buyIntent = mInAppBillingService.getBuyIntent(BILLING_VERSION,
-                    mContext.getPackageName(), mContext.getString(R.string.in_app_product_no_ads),
+            final Bundle buyIntent = inAppBillingService.getBuyIntent(BILLING_VERSION,
+                    activity.getPackageName(), activity.getString(R.string.in_app_product_no_ads),
                     ITEM_TYPE_INAPP, null);
             final int response = buyIntent.getInt("RESPONSE_CODE");
             if (response == BILLING_RESPONSE_RESULT_ITEM_ALREADY_OWNED) {
@@ -153,9 +153,9 @@ public class InAppBillingHelper implements ServiceConnection {
                 return;
             }
 
-            mOnAdsRemovalPurchased = onPurchased;
+            onAdsRemovalPurchased = onPurchased;
             final PendingIntent pendingIntent = buyIntent.getParcelable("BUY_INTENT");
-            mContext.startIntentSenderForResult(pendingIntent.getIntentSender(),
+            activity.startIntentSenderForResult(pendingIntent.getIntentSender(),
                     REQUEST_PURCHASE, new Intent(), 0, 0, 0);
         } catch (Exception e) {
             Crashlytics.logException(e);
@@ -167,12 +167,12 @@ public class InAppBillingHelper implements ServiceConnection {
         if (requestCode != REQUEST_PURCHASE)
             return false;
 
-        if (mStatus != InAppBillingHelper.Status.INITIALIZED)
+        if (status != InAppBillingHelper.Status.INITIALIZED)
             return true;
 
         if (resultCode != Activity.RESULT_OK) {
-            mOnAdsRemovalPurchased.onAdsRemovalPurchased(false);
-            mOnAdsRemovalPurchased = null;
+            onAdsRemovalPurchased.onAdsRemovalPurchased(false);
+            onAdsRemovalPurchased = null;
             return true;
         }
 
@@ -180,24 +180,24 @@ public class InAppBillingHelper implements ServiceConnection {
         if (response != BILLING_RESPONSE_RESULT_OK
                 && response != BILLING_RESPONSE_RESULT_ITEM_ALREADY_OWNED) {
             Analytics.trackException("Failed to purchase ads removal - " + response);
-            mOnAdsRemovalPurchased.onAdsRemovalPurchased(false);
-            mOnAdsRemovalPurchased = null;
+            onAdsRemovalPurchased.onAdsRemovalPurchased(false);
+            onAdsRemovalPurchased = null;
             return true;
         }
 
         try {
             final JSONObject purchaseObject = new JSONObject(data.getStringExtra("INAPP_PURCHASE_DATA"));
             final String productId = purchaseObject.getString("productId");
-            final boolean isPurchased = productId.equals(mContext.getString(R.string.in_app_product_no_ads))
+            final boolean isPurchased = productId.equals(activity.getString(R.string.in_app_product_no_ads))
                     && purchaseObject.getInt("purchaseState") == 0;
             if (isPurchased)
                 Analytics.trackBillingPurchase("remove_ads");
-            mOnAdsRemovalPurchased.onAdsRemovalPurchased(isPurchased);
-            mOnAdsRemovalPurchased = null;
+            onAdsRemovalPurchased.onAdsRemovalPurchased(isPurchased);
+            onAdsRemovalPurchased = null;
         } catch (JSONException e) {
             Crashlytics.logException(e);
-            mOnAdsRemovalPurchased.onAdsRemovalPurchased(false);
-            mOnAdsRemovalPurchased = null;
+            onAdsRemovalPurchased.onAdsRemovalPurchased(false);
+            onAdsRemovalPurchased = null;
         }
 
         return true;
@@ -205,15 +205,15 @@ public class InAppBillingHelper implements ServiceConnection {
 
     @Override
     public void onServiceConnected(ComponentName name, IBinder service) {
-        if (mStatus == Status.RELEASED)
+        if (status == Status.RELEASED)
             return;
-        mStatus = Status.INITIALIZED;
+        status = Status.INITIALIZED;
 
         boolean result = false;
-        mInAppBillingService = IInAppBillingService.Stub.asInterface(service);
+        inAppBillingService = IInAppBillingService.Stub.asInterface(service);
         try {
-            final int response = mInAppBillingService.isBillingSupported(
-                    BILLING_VERSION, mContext.getPackageName(), ITEM_TYPE_INAPP);
+            final int response = inAppBillingService.isBillingSupported(
+                    BILLING_VERSION, activity.getPackageName(), ITEM_TYPE_INAPP);
             if (response == BILLING_RESPONSE_RESULT_OK)
                 result = true;
             else
@@ -221,14 +221,14 @@ public class InAppBillingHelper implements ServiceConnection {
         } catch (RemoteException e) {
             Crashlytics.logException(e);
         }
-        if (mOnInitializationFinished != null) {
-            mOnInitializationFinished.onInitializationFinished(result);
-            mOnInitializationFinished = null;
+        if (onInitializationFinished != null) {
+            onInitializationFinished.onInitializationFinished(result);
+            onInitializationFinished = null;
         }
     }
 
     @Override
     public void onServiceDisconnected(ComponentName name) {
-        mInAppBillingService = null;
+        inAppBillingService = null;
     }
 }
