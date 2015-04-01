@@ -51,6 +51,7 @@ import net.zionsoft.obadiah.ui.adapters.SearchResultListAdapter;
 import net.zionsoft.obadiah.ui.utils.AnimationHelper;
 import net.zionsoft.obadiah.ui.utils.DialogHelper;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -68,10 +69,9 @@ public class SearchActivity extends BaseActionBarActivity {
         return startIntent;
     }
 
-    private static class NonConfigurationData {
-        String currentTranslation;
-        List<Verse> verses;
-    }
+    private static final String KEY_CURRENT_TRANSLATION = "net.zionsoft.obadiah.ui.activities.SearchActivity.KEY_CURRENT_TRANSLATION";
+    private static final String KEY_QUERY = "net.zionsoft.obadiah.ui.activities.SearchActivity.KEY_QUERY";
+    private static final String KEY_VERSES = "net.zionsoft.obadiah.ui.activities.SearchActivity.KEY_VERSES";
 
     @Inject
     Bible bible;
@@ -85,12 +85,12 @@ public class SearchActivity extends BaseActionBarActivity {
     @InjectView(R.id.search_result_list_view)
     ListView searchResultListView;
 
-    private NonConfigurationData nonConfigurationData;
+    private String currentTranslation;
+    private String query;
+    private ArrayList<Verse> verses;
 
     private SearchRecentSuggestions recentSearches;
-
     private SearchResultListAdapter searchResultListAdapter;
-
     private SearchView searchView;
 
     @Override
@@ -98,17 +98,16 @@ public class SearchActivity extends BaseActionBarActivity {
         super.onCreate(savedInstanceState);
         App.get(this).getInjectionComponent().inject(this);
 
+        if (savedInstanceState != null) {
+            currentTranslation = savedInstanceState.getString(KEY_CURRENT_TRANSLATION);
+            query = savedInstanceState.getString(KEY_QUERY);
+            verses = savedInstanceState.getParcelableArrayList(KEY_VERSES);
+        }
+
         recentSearches = new SearchRecentSuggestions(this,
                 RecentSearchProvider.AUTHORITY, RecentSearchProvider.MODE);
 
         initializeUi();
-
-        nonConfigurationData = (NonConfigurationData) getLastCustomNonConfigurationInstance();
-        if (nonConfigurationData == null) {
-            nonConfigurationData = new NonConfigurationData();
-        } else {
-            searchResultListAdapter.setVerses(nonConfigurationData.verses);
-        }
 
         handleStartIntent(getIntent());
     }
@@ -123,10 +122,11 @@ public class SearchActivity extends BaseActionBarActivity {
         loadingSpinner.setVisibility(View.GONE);
 
         searchResultListAdapter = new SearchResultListAdapter(this);
+        searchResultListAdapter.setVerses(verses);
         searchResultListView.setAdapter(searchResultListAdapter);
         searchResultListView.setOnItemClickListener(new OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                final Verse verse = nonConfigurationData.verses.get(position);
+                final Verse verse = verses.get(position);
                 getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE).edit()
                         .putInt(Constants.PREF_KEY_LAST_READ_BOOK, verse.bookIndex)
                         .putInt(Constants.PREF_KEY_LAST_READ_CHAPTER, verse.chapterIndex)
@@ -175,12 +175,19 @@ public class SearchActivity extends BaseActionBarActivity {
         final String selected = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE)
                 .getString(Constants.PREF_KEY_LAST_READ_TRANSLATION, null);
         setTitle(selected);
-        if (!selected.equals(nonConfigurationData.currentTranslation)) {
-            nonConfigurationData.currentTranslation = selected;
-
+        if (!selected.equals(currentTranslation)) {
+            currentTranslation = selected;
             searchResultListAdapter.setVerses(null);
         }
         searchResultListAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(KEY_CURRENT_TRANSLATION, currentTranslation);
+        outState.putString(KEY_QUERY, query);
+        outState.putParcelableArrayList(KEY_VERSES, verses);
     }
 
     @Override
@@ -202,12 +209,17 @@ public class SearchActivity extends BaseActionBarActivity {
 
             @Override
             public boolean onQueryTextSubmit(String query) {
-                search(query);
+                SearchActivity.this.query = query;
+                search();
                 return true;
             }
         });
 
-        handleStartIntent(getIntent());
+        if (TextUtils.isEmpty(query)) {
+            handleStartIntent(getIntent());
+        } else {
+            searchView.setQuery(query, false);
+        }
 
         return true;
     }
@@ -223,12 +235,7 @@ public class SearchActivity extends BaseActionBarActivity {
         }
     }
 
-    @Override
-    public Object onRetainCustomNonConfigurationInstance() {
-        return nonConfigurationData;
-    }
-
-    private void search(final String query) {
+    private void search() {
         if (TextUtils.isEmpty(query)) {
             return;
         }
@@ -243,7 +250,7 @@ public class SearchActivity extends BaseActionBarActivity {
         searchResultListView.setVisibility(View.GONE);
 
         recentSearches.saveRecentQuery(query, null);
-        bible.searchVerses(nonConfigurationData.currentTranslation, query,
+        bible.searchVerses(currentTranslation, query,
                 new Bible.OnVersesLoadedListener() {
                     @Override
                     public void onVersesLoaded(List<Verse> verses) {
@@ -252,7 +259,7 @@ public class SearchActivity extends BaseActionBarActivity {
                                     new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
-                                            search(query);
+                                            search();
                                         }
                                     }, null
                             );
@@ -271,7 +278,7 @@ public class SearchActivity extends BaseActionBarActivity {
                             }
                         });
 
-                        nonConfigurationData.verses = verses;
+                        SearchActivity.this.verses = new ArrayList<>(verses);
 
                         String text = getResources().getString(R.string.toast_verses_searched, verses.size());
                         Toast.makeText(SearchActivity.this, text, Toast.LENGTH_SHORT).show();

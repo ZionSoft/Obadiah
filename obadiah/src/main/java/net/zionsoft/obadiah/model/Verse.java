@@ -17,7 +17,10 @@
 
 package net.zionsoft.obadiah.model;
 
-public class Verse {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class Verse implements Parcelable {
     public final int bookIndex;
     public final int chapterIndex;
     public final int verseIndex;
@@ -33,4 +36,30 @@ public class Verse {
         this.bookName = bookName;
         this.verseText = verseText;
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dst, int flags) {
+        dst.writeInt(bookIndex);
+        dst.writeInt(chapterIndex);
+        dst.writeInt(verseIndex);
+        dst.writeString(bookName);
+        dst.writeString(verseText);
+    }
+
+    public static final Parcelable.Creator<Verse> CREATOR = new Parcelable.Creator<Verse>() {
+        @Override
+        public Verse createFromParcel(Parcel in) {
+            return new Verse(in.readInt(), in.readInt(), in.readInt(), in.readString(), in.readString());
+        }
+
+        @Override
+        public Verse[] newArray(int size) {
+            return new Verse[size];
+        }
+    };
 }
