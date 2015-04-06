@@ -26,6 +26,11 @@ import java.util.concurrent.RejectedExecutionException;
 
 public abstract class SimpleAsyncTask<Params, Progress, Result> extends AsyncTask<Params, Progress, Result> {
     public void start(Params... params) {
+        if (getStatus() != Status.PENDING) {
+            Crashlytics.logException(new IllegalStateException("Attempted to start an async task with state " + getStatus()));
+            return;
+        }
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
             try {
                 executeOnExecutor(THREAD_POOL_EXECUTOR, params);
