@@ -65,15 +65,20 @@ public class ChapterSelectionFragment extends BaseFragment {
     }
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        App.get(getActivity()).getInjectionComponent().inject(this);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_chapter_selection, container, false);
     }
 
     @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        App.get(getActivity()).getInjectionComponent().inject(this);
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
         bookListAdapter = new BookExpandableListAdapter(getActivity(),
                 new BookExpandableListAdapter.OnChapterClickListener() {

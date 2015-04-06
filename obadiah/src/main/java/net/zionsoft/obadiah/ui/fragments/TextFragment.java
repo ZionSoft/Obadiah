@@ -72,8 +72,8 @@ public class TextFragment extends BaseFragment implements VersePagerAdapter.List
     }
 
     @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
         versePagerAdapter = new VersePagerAdapter(getActivity(), this);
 

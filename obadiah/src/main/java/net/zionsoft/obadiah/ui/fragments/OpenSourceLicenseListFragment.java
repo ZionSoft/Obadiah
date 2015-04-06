@@ -20,6 +20,7 @@ package net.zionsoft.obadiah.ui.fragments;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
+import android.view.View;
 
 import com.google.android.gms.common.GooglePlayServicesUtil;
 
@@ -33,8 +34,8 @@ import java.util.List;
 
 public class OpenSourceLicenseListFragment extends ListFragment {
     @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
         getListView().setDivider(null);
         loadLicenses();
     }

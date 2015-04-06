@@ -84,16 +84,25 @@ public class TranslationListFragment extends BaseFragment implements SwipeRefres
     }
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        App.get(getActivity()).getInjectionComponent().inject(this);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_translation_list, container, false);
     }
 
     @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        initializeUi();
+    }
+
+    @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        App.get(getActivity()).getInjectionComponent().inject(this);
-
-        initializeUi();
         loadTranslations(true);
     }
 
