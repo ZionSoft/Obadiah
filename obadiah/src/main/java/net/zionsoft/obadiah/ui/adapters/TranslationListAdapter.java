@@ -33,7 +33,7 @@ import android.widget.TextView;
 import net.zionsoft.obadiah.App;
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.Settings;
-import net.zionsoft.obadiah.model.TranslationInfo;
+import net.zionsoft.obadiah.model.translations.TranslationInfo;
 
 import java.util.ArrayList;
 import java.util.List;

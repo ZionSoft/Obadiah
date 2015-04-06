@@ -22,6 +22,7 @@ import net.zionsoft.obadiah.BookSelectionActivity;
 import net.zionsoft.obadiah.model.Bible;
 import net.zionsoft.obadiah.model.ReadingProgressManager;
 import net.zionsoft.obadiah.model.notification.PushNotificationHandler;
+import net.zionsoft.obadiah.model.translations.TranslationManager;
 import net.zionsoft.obadiah.ui.activities.OpenSourceLicenseListActivity;
 import net.zionsoft.obadiah.ui.activities.ReadingProgressActivity;
 import net.zionsoft.obadiah.ui.activities.SearchActivity;
@@ -78,4 +79,6 @@ public interface InjectionComponent {
     public void inject(Bible bible);
 
     public void inject(ReadingProgressManager readingProgressManager);
+
+    public void inject(TranslationManager translationManager);
 }

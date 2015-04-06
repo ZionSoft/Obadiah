@@ -43,8 +43,9 @@ import net.zionsoft.obadiah.App;
 import net.zionsoft.obadiah.Constants;
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.Bible;
-import net.zionsoft.obadiah.model.TranslationInfo;
 import net.zionsoft.obadiah.model.analytics.Analytics;
+import net.zionsoft.obadiah.model.translations.TranslationInfo;
+import net.zionsoft.obadiah.model.translations.TranslationManager;
 import net.zionsoft.obadiah.ui.adapters.TranslationListAdapter;
 import net.zionsoft.obadiah.ui.utils.AnimationHelper;
 import net.zionsoft.obadiah.ui.utils.DialogHelper;
@@ -55,13 +56,14 @@ import javax.inject.Inject;
 
 import butterknife.InjectView;
 
-public class TranslationListFragment extends BaseFragment implements SwipeRefreshLayout.OnRefreshListener {
+public class TranslationListFragment extends BaseFragment implements SwipeRefreshLayout.OnRefreshListener,
+        TranslationManager.OnTranslationsLoadedListener, TranslationManager.OnTranslationRemovedListener {
     private static final String TAG_DOWNLOAD_DIALOG_FRAGMENT = "net.zionsoft.obadiah.ui.fragments.TranslationListFragment.TAG_DOWNLOAD_DIALOG_FRAGMENT";
     private static final String TAG_REMOVE_DIALOG_FRAGMENT = "net.zionsoft.obadiah.ui.fragments.TranslationListFragment.TAG_REMOVE_DIALOG_FRAGMENT";
     private static final int CONTEXT_MENU_ITEM_DELETE = 0;
 
     @Inject
-    Bible bible;
+    TranslationManager translationManager;
 
     @InjectView(R.id.swipe_container)
     SwipeRefreshLayout swipeContainer;
@@ -150,39 +152,7 @@ public class TranslationListFragment extends BaseFragment implements SwipeRefres
 
     private void loadTranslations(final boolean forceRefresh) {
         translationListView.setVisibility(View.GONE);
-
-        bible.loadTranslations(forceRefresh, new Bible.OnTranslationsLoadedListener() {
-            @Override
-            public void onTranslationsLoaded(List<TranslationInfo> downloaded, List<TranslationInfo> available) {
-                if (!isAdded())
-                    return;
-
-                if (downloaded == null || available == null) {
-                    DialogHelper.showDialog(getActivity(), false, R.string.dialog_retry_network,
-                            new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    loadTranslations(forceRefresh);
-                                }
-                            }, new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    final Activity activity = getActivity();
-                                    activity.finish();
-                                    activity.overridePendingTransition(R.anim.fade_in, R.anim.slide_out_left_to_right);
-                                }
-                            }
-                    );
-                    return;
-                }
-
-                swipeContainer.setRefreshing(false);
-                AnimationHelper.fadeIn(translationListView);
-
-                translationListAdapter.setTranslations(downloaded, available);
-                translationListAdapter.notifyDataSetChanged();
-            }
-        });
+        translationManager.loadTranslations(forceRefresh, this);
     }
 
     private void downloadTranslation(final TranslationInfo translationInfo) {
@@ -190,7 +160,7 @@ public class TranslationListFragment extends BaseFragment implements SwipeRefres
         ProgressDialogFragment.newInstance(R.string.progress_dialog_translation_downloading, 100).show(fm, TAG_DOWNLOAD_DIALOG_FRAGMENT);
         fm.executePendingTransactions();
 
-        bible.downloadTranslation(translationInfo, new Bible.OnTranslationDownloadListener() {
+        translationManager.downloadTranslation(translationInfo, new TranslationManager.OnTranslationDownloadListener() {
             @Override
             public void onTranslationDownloaded(String translation, boolean isSuccessful) {
                 if (!isAdded())
@@ -300,34 +270,67 @@ public class TranslationListFragment extends BaseFragment implements SwipeRefres
         ProgressDialogFragment.newInstance(R.string.progress_dialog_translation_deleting).show(fm, TAG_REMOVE_DIALOG_FRAGMENT);
         fm.executePendingTransactions();
 
-        bible.removeTranslation(translationShortName, new Bible.OnTranslationRemovedListener() {
-            @Override
-            public void onTranslationRemoved(final String translation, boolean isSuccessful) {
-                if (!isAdded())
-                    return;
-
-                ((DialogFragment) getChildFragmentManager().findFragmentByTag(TAG_REMOVE_DIALOG_FRAGMENT))
-                        .dismissAllowingStateLoss();
-
-                if (isSuccessful) {
-                    Toast.makeText(getActivity(), R.string.toast_translation_deleted, Toast.LENGTH_SHORT).show();
-                    loadTranslations(false);
-                } else {
-                    DialogHelper.showDialog(getActivity(), true,
-                            R.string.dialog_translation_remove_failure_message,
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
-                                    removeTranslation(translation);
-                                }
-                            }, null
-                    );
-                }
-            }
-        });
+        translationManager.removeTranslation(translationShortName, this);
     }
 
     @Override
     public void onRefresh() {
         loadTranslations(true);
+    }
+
+    @Override
+    public void onTranslationsLoaded(@Nullable List<TranslationInfo> downloaded, @Nullable List<TranslationInfo> available) {
+        if (!isAdded()) {
+            return;
+        }
+
+        if (downloaded == null || available == null) {
+            DialogHelper.showDialog(getActivity(), false, R.string.dialog_retry_network,
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            loadTranslations(true);
+                        }
+                    }, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            final Activity activity = getActivity();
+                            activity.finish();
+                            activity.overridePendingTransition(R.anim.fade_in, R.anim.slide_out_left_to_right);
+                        }
+                    }
+            );
+            return;
+        }
+
+        swipeContainer.setRefreshing(false);
+        AnimationHelper.fadeIn(translationListView);
+
+        translationListAdapter.setTranslations(downloaded, available);
+        translationListAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onTranslationRemoved(final String translation, boolean isSuccessful) {
+        if (!isAdded()) {
+            return;
+        }
+
+        ((DialogFragment) getChildFragmentManager().findFragmentByTag(TAG_REMOVE_DIALOG_FRAGMENT))
+                .dismissAllowingStateLoss();
+
+        if (isSuccessful) {
+            Toast.makeText(getActivity(), R.string.toast_translation_deleted, Toast.LENGTH_SHORT).show();
+            loadTranslations(false);
+        } else {
+            DialogHelper.showDialog(getActivity(), true,
+                    R.string.dialog_translation_remove_failure_message,
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            removeTranslation(translation);
+                        }
+                    }, null
+            );
+        }
     }
 }

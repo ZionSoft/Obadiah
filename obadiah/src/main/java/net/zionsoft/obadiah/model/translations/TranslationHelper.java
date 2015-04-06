@@ -24,7 +24,6 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import net.zionsoft.obadiah.model.Bible;
-import net.zionsoft.obadiah.model.TranslationInfo;
 import net.zionsoft.obadiah.model.Verse;
 import net.zionsoft.obadiah.model.database.DatabaseHelper;
 
