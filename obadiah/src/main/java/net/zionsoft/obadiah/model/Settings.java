@@ -44,7 +44,7 @@ public class Settings {
         VERY_LARGE("very_large", R.string.pref_text_size_very_large,
                 R.dimen.text_size_very_large, R.dimen.smaller_text_size_very_large);
 
-        private final String mSettingKey;
+        private final String settingKey;
 
         @StringRes
         public final int title;
@@ -57,7 +57,7 @@ public class Settings {
 
         private TextSize(String settingKey, @StringRes int title,
                          @DimenRes int textSize, @DimenRes int smallerTextSize) {
-            mSettingKey = settingKey;
+            this.settingKey = settingKey;
             this.title = title;
             this.textSize = textSize;
             this.smallerTextSize = smallerTextSize;
@@ -67,7 +67,7 @@ public class Settings {
 
         public static TextSize fromSettingKey(@Nullable String settingKey) {
             for (TextSize textSize : TextSize.values()) {
-                if (textSize.mSettingKey.equals(settingKey)) {
+                if (textSize.settingKey.equals(settingKey)) {
                     return textSize;
                 }
             }
@@ -80,65 +80,65 @@ public class Settings {
     private static final String SETTING_KEY_SCREEN_ON = "pref_screen_on";
     private static final String SETTING_KEY_TEXT_SIZE = "pref_text_size";
 
-    private final SharedPreferences mSharedPreferences;
+    private final SharedPreferences sharedPreferences;
 
-    private boolean mNightMode;
-    private boolean mScreenOn;
-    private TextSize mTextSize;
+    private boolean nightMode;
+    private boolean screenOn;
+    private TextSize textSize;
 
     @Inject
     public Settings(Context context) {
         super();
 
-        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         refresh();
     }
 
     public void refresh() {
-        mNightMode = mSharedPreferences.getBoolean(SETTING_KEY_NIGHT_MODE, false);
-        mScreenOn = mSharedPreferences.getBoolean(SETTING_KEY_SCREEN_ON, false);
+        nightMode = sharedPreferences.getBoolean(SETTING_KEY_NIGHT_MODE, false);
+        screenOn = sharedPreferences.getBoolean(SETTING_KEY_SCREEN_ON, false);
 
-        mTextSize = TextSize.fromSettingKey(mSharedPreferences.getString(SETTING_KEY_TEXT_SIZE, null));
+        textSize = TextSize.fromSettingKey(sharedPreferences.getString(SETTING_KEY_TEXT_SIZE, null));
     }
 
     public boolean keepScreenOn() {
-        return mScreenOn;
+        return screenOn;
     }
 
     public void setKeepScreenOn(boolean keepScreenOn) {
-        mScreenOn = keepScreenOn;
-        mSharedPreferences.edit()
+        screenOn = keepScreenOn;
+        sharedPreferences.edit()
                 .putBoolean(SETTING_KEY_SCREEN_ON, keepScreenOn)
                 .apply();
     }
 
     public boolean isNightMode() {
-        return mNightMode;
+        return nightMode;
     }
 
     public void setNightMode(boolean isNightMode) {
-        mNightMode = isNightMode;
-        mSharedPreferences.edit()
+        nightMode = isNightMode;
+        sharedPreferences.edit()
                 .putBoolean(SETTING_KEY_NIGHT_MODE, isNightMode)
                 .apply();
     }
 
     public int getBackgroundColor() {
-        return mNightMode ? Color.BLACK : Color.WHITE;
+        return nightMode ? Color.BLACK : Color.WHITE;
     }
 
     public int getTextColor() {
-        return mNightMode ? Color.WHITE : Color.BLACK;
+        return nightMode ? Color.WHITE : Color.BLACK;
     }
 
     public TextSize getTextSize() {
-        return mTextSize;
+        return textSize;
     }
 
     public void setTextSize(TextSize textSize) {
-        mTextSize = textSize;
-        mSharedPreferences.edit()
-                .putString(SETTING_KEY_TEXT_SIZE, textSize.mSettingKey)
+        this.textSize = textSize;
+        sharedPreferences.edit()
+                .putString(SETTING_KEY_TEXT_SIZE, textSize.settingKey)
                 .apply();
     }
 }

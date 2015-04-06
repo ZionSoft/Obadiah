@@ -89,26 +89,26 @@ public class ReadingProgressActivity extends BaseActionBarActivity {
     }
 
     @Inject
-    Bible mBible;
+    Bible bible;
 
     @Inject
-    ReadingProgressManager mReadingProgressManager;
+    ReadingProgressManager readingProgressManager;
 
     @Inject
-    Settings mSettings;
+    Settings settings;
 
     @InjectView(R.id.loading_spinner)
-    View mLoadingSpinner;
+    View loadingSpinner;
 
     @InjectView(R.id.reading_progress_list_view)
-    ListView mReadingProgressListView;
+    ListView readingProgressListView;
 
-    private List<String> mBookNames;
-    private ReadingProgress mReadingProgress;
+    private List<String> bookNames;
+    private ReadingProgress readingProgress;
 
-    private ReadingProgressListAdapter mReadingProgressAdapter;
+    private ReadingProgressListAdapter readingProgressAdapter;
 
-    private HeaderViewHolder mHeaderViewHolder;
+    private HeaderViewHolder headerViewHolder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -125,66 +125,66 @@ public class ReadingProgressActivity extends BaseActionBarActivity {
         setContentView(R.layout.activity_reading_progress);
 
         final View rootView = getWindow().getDecorView();
-        rootView.setKeepScreenOn(mSettings.keepScreenOn());
-        rootView.setBackgroundColor(mSettings.getBackgroundColor());
+        rootView.setKeepScreenOn(settings.keepScreenOn());
+        rootView.setBackgroundColor(settings.getBackgroundColor());
 
         final ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayShowHomeEnabled(true);
         actionBar.setIcon(R.drawable.ic_action_bar);
 
-        mLoadingSpinner.setVisibility(View.VISIBLE);
-        mReadingProgressListView.setVisibility(View.GONE);
+        loadingSpinner.setVisibility(View.VISIBLE);
+        readingProgressListView.setVisibility(View.GONE);
 
         // list view header
-        final int textColor = mSettings.getTextColor();
+        final int textColor = settings.getTextColor();
 
         final Resources resources = getResources();
-        final float textSize = resources.getDimension(mSettings.getTextSize().textSize);
-        final float smallerTextSize = resources.getDimension(mSettings.getTextSize().smallerTextSize);
+        final float textSize = resources.getDimension(settings.getTextSize().textSize);
+        final float smallerTextSize = resources.getDimension(settings.getTextSize().smallerTextSize);
 
         final View header = LayoutInflater.from(this).inflate(R.layout.item_reading_progress_header,
-                mReadingProgressListView, false);
-        mHeaderViewHolder = new HeaderViewHolder(header);
+                readingProgressListView, false);
+        headerViewHolder = new HeaderViewHolder(header);
 
-        mHeaderViewHolder.continuousReading.setTextColor(textColor);
-        mHeaderViewHolder.continuousReading.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+        headerViewHolder.continuousReading.setTextColor(textColor);
+        headerViewHolder.continuousReading.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
 
-        mHeaderViewHolder.continuousReadingCount.setTextColor(textColor);
-        mHeaderViewHolder.continuousReadingCount.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+        headerViewHolder.continuousReadingCount.setTextColor(textColor);
+        headerViewHolder.continuousReadingCount.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
 
-        mHeaderViewHolder.chapterRead.setTextColor(textColor);
-        mHeaderViewHolder.chapterRead.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+        headerViewHolder.chapterRead.setTextColor(textColor);
+        headerViewHolder.chapterRead.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
 
-        mHeaderViewHolder.chapterReadCount.setTextColor(textColor);
-        mHeaderViewHolder.chapterReadCount.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+        headerViewHolder.chapterReadCount.setTextColor(textColor);
+        headerViewHolder.chapterReadCount.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
 
-        mHeaderViewHolder.finishedBooks.setTextColor(textColor);
-        mHeaderViewHolder.finishedBooks.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+        headerViewHolder.finishedBooks.setTextColor(textColor);
+        headerViewHolder.finishedBooks.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
 
-        mHeaderViewHolder.finishedBooksCount.setTextColor(textColor);
-        mHeaderViewHolder.finishedBooksCount.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+        headerViewHolder.finishedBooksCount.setTextColor(textColor);
+        headerViewHolder.finishedBooksCount.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
 
-        mHeaderViewHolder.finishedOldTestament.setTextColor(textColor);
-        mHeaderViewHolder.finishedOldTestament.setTextSize(TypedValue.COMPLEX_UNIT_PX, smallerTextSize);
+        headerViewHolder.finishedOldTestament.setTextColor(textColor);
+        headerViewHolder.finishedOldTestament.setTextSize(TypedValue.COMPLEX_UNIT_PX, smallerTextSize);
 
-        mHeaderViewHolder.finishedOldTestamentCount.setTextColor(textColor);
-        mHeaderViewHolder.finishedOldTestamentCount.setTextSize(TypedValue.COMPLEX_UNIT_PX, smallerTextSize);
+        headerViewHolder.finishedOldTestamentCount.setTextColor(textColor);
+        headerViewHolder.finishedOldTestamentCount.setTextSize(TypedValue.COMPLEX_UNIT_PX, smallerTextSize);
 
-        mHeaderViewHolder.finishedNewTestament.setTextColor(textColor);
-        mHeaderViewHolder.finishedNewTestament.setTextSize(TypedValue.COMPLEX_UNIT_PX, smallerTextSize);
+        headerViewHolder.finishedNewTestament.setTextColor(textColor);
+        headerViewHolder.finishedNewTestament.setTextSize(TypedValue.COMPLEX_UNIT_PX, smallerTextSize);
 
-        mHeaderViewHolder.finishedNewTestamentCount.setTextColor(textColor);
-        mHeaderViewHolder.finishedNewTestamentCount.setTextSize(TypedValue.COMPLEX_UNIT_PX, smallerTextSize);
+        headerViewHolder.finishedNewTestamentCount.setTextColor(textColor);
+        headerViewHolder.finishedNewTestamentCount.setTextSize(TypedValue.COMPLEX_UNIT_PX, smallerTextSize);
 
-        mReadingProgressListView.addHeaderView(header);
+        readingProgressListView.addHeaderView(header);
 
         // list adapter
-        mReadingProgressAdapter = new ReadingProgressListAdapter(this);
-        mReadingProgressListView.setAdapter(mReadingProgressAdapter);
+        readingProgressAdapter = new ReadingProgressListAdapter(this);
+        readingProgressListView.setAdapter(readingProgressAdapter);
     }
 
     private void loadBookNames() {
-        mBible.loadBookNames(getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE)
+        bible.loadBookNames(getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE)
                         .getString(Constants.PREF_KEY_LAST_READ_TRANSLATION, null),
                 new Bible.OnStringsLoadedListener() {
                     @Override
@@ -201,7 +201,7 @@ public class ReadingProgressActivity extends BaseActionBarActivity {
                             return;
                         }
 
-                        mBookNames = strings;
+                        bookNames = strings;
                         updateAdapter();
                     }
                 }
@@ -209,7 +209,7 @@ public class ReadingProgressActivity extends BaseActionBarActivity {
     }
 
     private void loadReadingProgress() {
-        mReadingProgressManager.loadReadingProgress(new ReadingProgressManager.OnReadingProgressLoadedListener() {
+        readingProgressManager.loadReadingProgress(new ReadingProgressManager.OnReadingProgressLoadedListener() {
             @Override
             public void onReadingProgressLoaded(ReadingProgress readingProgress) {
                 if (readingProgress == null) {
@@ -224,32 +224,32 @@ public class ReadingProgressActivity extends BaseActionBarActivity {
                     return;
                 }
 
-                mHeaderViewHolder.continuousReadingCount.setText(getString(R.string.text_continuous_reading_count,
+                headerViewHolder.continuousReadingCount.setText(getString(R.string.text_continuous_reading_count,
                         readingProgress.getContinuousReadingDays()));
 
-                mHeaderViewHolder.chapterReadCount.setText(getString(R.string.text_chapters_read_count,
+                headerViewHolder.chapterReadCount.setText(getString(R.string.text_chapters_read_count,
                         readingProgress.getTotalChapterRead()));
 
-                mHeaderViewHolder.finishedBooksCount.setText(getString(R.string.text_finished_books_count,
+                headerViewHolder.finishedBooksCount.setText(getString(R.string.text_finished_books_count,
                         readingProgress.getFinishedBooksCount()));
-                mHeaderViewHolder.finishedOldTestamentCount.setText(getString(R.string.text_finished_old_testament_count,
+                headerViewHolder.finishedOldTestamentCount.setText(getString(R.string.text_finished_old_testament_count,
                         readingProgress.getFinishedOldTestamentCount()));
-                mHeaderViewHolder.finishedNewTestamentCount.setText(getString(R.string.text_finished_new_testament_count,
+                headerViewHolder.finishedNewTestamentCount.setText(getString(R.string.text_finished_new_testament_count,
                         readingProgress.getFinishedNewTestamentCount()));
 
-                mReadingProgress = readingProgress;
+                ReadingProgressActivity.this.readingProgress = readingProgress;
                 updateAdapter();
             }
         });
     }
 
     private void updateAdapter() {
-        if (mBookNames != null && mReadingProgress != null) {
-            AnimationHelper.fadeOut(mLoadingSpinner);
-            AnimationHelper.fadeIn(mReadingProgressListView);
+        if (bookNames != null && readingProgress != null) {
+            AnimationHelper.fadeOut(loadingSpinner);
+            AnimationHelper.fadeIn(readingProgressListView);
 
-            mReadingProgressAdapter.setData(mBookNames, mReadingProgress);
-            mReadingProgressAdapter.notifyDataSetChanged();
+            readingProgressAdapter.setData(bookNames, readingProgress);
+            readingProgressAdapter.notifyDataSetChanged();
         }
     }
 }

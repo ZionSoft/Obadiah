@@ -61,30 +61,26 @@ public class TranslationListFragment extends BaseFragment implements SwipeRefres
     private static final int CONTEXT_MENU_ITEM_DELETE = 0;
 
     @Inject
-    Bible mBible;
+    Bible bible;
 
     @InjectView(R.id.swipe_container)
-    SwipeRefreshLayout mSwipeContainer;
+    SwipeRefreshLayout swipeContainer;
 
     @InjectView(R.id.translation_list_view)
-    ListView mTranslationListView;
+    ListView translationListView;
 
-    private SharedPreferences mPreferences;
-    private String mCurrentTranslation;
+    private SharedPreferences preferences;
+    private String currentTranslation;
 
-    private TranslationListAdapter mTranslationListAdapter;
-
-    public TranslationListFragment() {
-        super();
-    }
+    private TranslationListAdapter translationListAdapter;
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
 
         setRetainInstance(true);
-        mPreferences = activity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-        mCurrentTranslation = mPreferences.getString(Constants.PREF_KEY_LAST_READ_TRANSLATION, null);
+        preferences = activity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+        currentTranslation = preferences.getString(Constants.PREF_KEY_LAST_READ_TRANSLATION, null);
     }
 
     @Override
@@ -102,17 +98,17 @@ public class TranslationListFragment extends BaseFragment implements SwipeRefres
     }
 
     private void initializeUi() {
-        mSwipeContainer.setColorSchemeResources(R.color.dark_cyan, R.color.dark_lime, R.color.blue, R.color.dark_blue);
-        mSwipeContainer.setOnRefreshListener(this);
+        swipeContainer.setColorSchemeResources(R.color.dark_cyan, R.color.dark_lime, R.color.blue, R.color.dark_blue);
+        swipeContainer.setOnRefreshListener(this);
 
         // workaround for https://code.google.com/p/android/issues/detail?id=77712
-        mSwipeContainer.setProgressViewOffset(false, 0,
+        swipeContainer.setProgressViewOffset(false, 0,
                 (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24, getResources().getDisplayMetrics()));
-        mSwipeContainer.setRefreshing(true);
+        swipeContainer.setRefreshing(true);
 
-        mTranslationListAdapter = new TranslationListAdapter(getActivity(), mCurrentTranslation);
-        mTranslationListView.setAdapter(mTranslationListAdapter);
-        mTranslationListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        translationListAdapter = new TranslationListAdapter(getActivity(), currentTranslation);
+        translationListView.setAdapter(translationListAdapter);
+        translationListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if (!isAdded()) {
@@ -120,7 +116,7 @@ public class TranslationListFragment extends BaseFragment implements SwipeRefres
                 }
 
                 final Pair<TranslationInfo, Boolean> translation
-                        = mTranslationListAdapter.getTranslation(position);
+                        = translationListAdapter.getTranslation(position);
                 if (translation == null) {
                     return;
                 }
@@ -128,7 +124,7 @@ public class TranslationListFragment extends BaseFragment implements SwipeRefres
                 if (translation.second) {
                     Analytics.trackTranslationSelection(translation.first.shortName);
 
-                    mPreferences.edit()
+                    preferences.edit()
                             .putString(Constants.PREF_KEY_LAST_READ_TRANSLATION, translation.first.shortName)
                             .apply();
 
@@ -140,13 +136,13 @@ public class TranslationListFragment extends BaseFragment implements SwipeRefres
                 }
             }
         });
-        registerForContextMenu(mTranslationListView);
+        registerForContextMenu(translationListView);
     }
 
     private void loadTranslations(final boolean forceRefresh) {
-        mTranslationListView.setVisibility(View.GONE);
+        translationListView.setVisibility(View.GONE);
 
-        mBible.loadTranslations(forceRefresh, new Bible.OnTranslationsLoadedListener() {
+        bible.loadTranslations(forceRefresh, new Bible.OnTranslationsLoadedListener() {
             @Override
             public void onTranslationsLoaded(List<TranslationInfo> downloaded, List<TranslationInfo> available) {
                 if (!isAdded())
@@ -171,11 +167,11 @@ public class TranslationListFragment extends BaseFragment implements SwipeRefres
                     return;
                 }
 
-                mSwipeContainer.setRefreshing(false);
-                AnimationHelper.fadeIn(mTranslationListView);
+                swipeContainer.setRefreshing(false);
+                AnimationHelper.fadeIn(translationListView);
 
-                mTranslationListAdapter.setTranslations(downloaded, available);
-                mTranslationListAdapter.notifyDataSetChanged();
+                translationListAdapter.setTranslations(downloaded, available);
+                translationListAdapter.notifyDataSetChanged();
             }
         });
     }
@@ -185,7 +181,7 @@ public class TranslationListFragment extends BaseFragment implements SwipeRefres
         ProgressDialogFragment.newInstance(R.string.progress_dialog_translation_downloading, 100).show(fm, TAG_DOWNLOAD_DIALOG_FRAGMENT);
         fm.executePendingTransactions();
 
-        mBible.downloadTranslation(translationInfo, new Bible.OnTranslationDownloadListener() {
+        bible.downloadTranslation(translationInfo, new Bible.OnTranslationDownloadListener() {
             @Override
             public void onTranslationDownloaded(String translation, boolean isSuccessful) {
                 if (!isAdded())
@@ -199,12 +195,12 @@ public class TranslationListFragment extends BaseFragment implements SwipeRefres
 
                 if (isSuccessful) {
                     Toast.makeText(getActivity(), R.string.toast_translation_downloaded, Toast.LENGTH_SHORT).show();
-                    if (mCurrentTranslation == null) {
+                    if (currentTranslation == null) {
                         Analytics.trackTranslationSelection(translation);
 
-                        mCurrentTranslation = translation;
-                        mPreferences.edit()
-                                .putString(Constants.PREF_KEY_LAST_READ_TRANSLATION, mCurrentTranslation)
+                        currentTranslation = translation;
+                        preferences.edit()
+                                .putString(Constants.PREF_KEY_LAST_READ_TRANSLATION, currentTranslation)
                                 .apply();
                     }
                     loadTranslations(false);
@@ -234,21 +230,21 @@ public class TranslationListFragment extends BaseFragment implements SwipeRefres
 
     @Override
     public void onDestroyView() {
-        unregisterForContextMenu(mTranslationListView);
+        unregisterForContextMenu(translationListView);
 
         super.onDestroyView();
     }
 
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-        if (v != mTranslationListView) {
+        if (v != translationListView) {
             super.onCreateContextMenu(menu, v, menuInfo);
             return;
         }
 
         final TranslationInfo translationInfo
                 = getTranslationInfo((AdapterView.AdapterContextMenuInfo) menuInfo);
-        if (translationInfo == null || mCurrentTranslation.equals(translationInfo.name)) {
+        if (translationInfo == null || currentTranslation.equals(translationInfo.name)) {
             return;
         }
 
@@ -286,7 +282,7 @@ public class TranslationListFragment extends BaseFragment implements SwipeRefres
     @Nullable
     private TranslationInfo getTranslationInfo(AdapterView.AdapterContextMenuInfo contextMenuInfo) {
         final Pair<TranslationInfo, Boolean> translation
-                = mTranslationListAdapter.getTranslation(contextMenuInfo.position);
+                = translationListAdapter.getTranslation(contextMenuInfo.position);
         return translation != null && translation.second ? translation.first : null;
     }
 
@@ -295,7 +291,7 @@ public class TranslationListFragment extends BaseFragment implements SwipeRefres
         ProgressDialogFragment.newInstance(R.string.progress_dialog_translation_deleting).show(fm, TAG_REMOVE_DIALOG_FRAGMENT);
         fm.executePendingTransactions();
 
-        mBible.removeTranslation(translationShortName, new Bible.OnTranslationRemovedListener() {
+        bible.removeTranslation(translationShortName, new Bible.OnTranslationRemovedListener() {
             @Override
             public void onTranslationRemoved(final String translation, boolean isSuccessful) {
                 if (!isAdded())

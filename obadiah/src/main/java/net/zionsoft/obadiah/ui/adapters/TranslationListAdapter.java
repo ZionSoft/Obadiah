@@ -59,43 +59,42 @@ public class TranslationListAdapter extends BaseAdapter {
     }
 
     @Inject
-    Settings mSettings;
+    Settings settings;
 
-    private final LayoutInflater mInflater;
-    private final Resources mResources;
-    private final String mCurrentTranslation;
-    private final String mDownloadedTranslationsTitle;
+    private final LayoutInflater inflater;
+    private final Resources resources;
+    private final String currentTranslation;
+    private final String downloadedTranslationsTitle;
 
-    private final int mTextColor;
-    private final float mTextSize;
-    private final AbsoluteSizeSpan mMediumSizeSpan;
-    private final AbsoluteSizeSpan mSmallSizeSpan;
+    private final int textColor;
+    private final float textSize;
+    private final AbsoluteSizeSpan mediumSizeSpan;
+    private final AbsoluteSizeSpan smallSizeSpan;
 
-    private final List<String> mSectionHeaders = new ArrayList<String>();
-    private final List<List<TranslationInfoHolder>> mTranslations
-            = new ArrayList<List<TranslationInfoHolder>>();
-    private int mCount = 0;
+    private final List<String> sectionHeaders = new ArrayList<>();
+    private final List<List<TranslationInfoHolder>> translations = new ArrayList<>();
+    private int count = 0;
 
     public TranslationListAdapter(Context context, String currentTranslation) {
         App.get(context).getInjectionComponent().inject(this);
 
-        mInflater = LayoutInflater.from(context);
-        mResources = context.getResources();
-        mCurrentTranslation = currentTranslation;
+        inflater = LayoutInflater.from(context);
+        resources = context.getResources();
+        this.currentTranslation = currentTranslation;
 
-        mDownloadedTranslationsTitle = mResources.getString(R.string.text_downloaded_translations);
+        downloadedTranslationsTitle = resources.getString(R.string.text_downloaded_translations);
 
-        mTextColor = mSettings.getTextColor();
+        textColor = settings.getTextColor();
 
-        mTextSize = mResources.getDimension(mSettings.getTextSize().textSize);
-        mMediumSizeSpan = new AbsoluteSizeSpan((int) mTextSize);
-        mSmallSizeSpan = new AbsoluteSizeSpan(
-                (int) mResources.getDimension(mSettings.getTextSize().smallerTextSize));
+        textSize = resources.getDimension(settings.getTextSize().textSize);
+        mediumSizeSpan = new AbsoluteSizeSpan((int) textSize);
+        smallSizeSpan = new AbsoluteSizeSpan(
+                (int) resources.getDimension(settings.getTextSize().smallerTextSize));
     }
 
     @Override
     public int getCount() {
-        return mCount;
+        return count;
     }
 
     @Override
@@ -108,7 +107,7 @@ public class TranslationListAdapter extends BaseAdapter {
         if (position == 0) {
             return VIEW_TYPE_HEADER;
         }
-        for (List<TranslationInfoHolder> translations : mTranslations) {
+        for (List<TranslationInfoHolder> translations : this.translations) {
             position -= translations.size() + 1;
             if (position < 0) {
                 return VIEW_TYPE_TRANSLATION;
@@ -123,9 +122,9 @@ public class TranslationListAdapter extends BaseAdapter {
     public Object getItem(int position) {
         int index = 0;
         if (position == 0) {
-            return mSectionHeaders.get(index);
+            return sectionHeaders.get(index);
         }
-        for (List<TranslationInfoHolder> translations : mTranslations) {
+        for (List<TranslationInfoHolder> translations : this.translations) {
             --position;
             final int size = translations.size();
             if (position < size) {
@@ -135,7 +134,7 @@ public class TranslationListAdapter extends BaseAdapter {
             position -= size;
             ++index;
             if (position == 0) {
-                return mSectionHeaders.get(index);
+                return sectionHeaders.get(index);
             }
         }
         return null;
@@ -160,42 +159,42 @@ public class TranslationListAdapter extends BaseAdapter {
 
     private View getHeaderView(int position, View convertView, ViewGroup parent) {
         final TextView textView = (TextView) (convertView == null
-                ? mInflater.inflate(R.layout.item_translation_section, parent, false) : convertView);
-        textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, mTextSize);
+                ? inflater.inflate(R.layout.item_translation_section, parent, false) : convertView);
+        textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
         textView.setText((String) getItem(position));
         return textView;
     }
 
     private View getTranslationView(int position, View convertView, ViewGroup parent) {
         final TextView textView = (TextView) (convertView == null
-                ? mInflater.inflate(R.layout.item_translation, parent, false) : convertView);
+                ? inflater.inflate(R.layout.item_translation, parent, false) : convertView);
 
         final TranslationInfoHolder translation = (TranslationInfoHolder) getItem(position);
         textView.setCompoundDrawablesWithIntrinsicBounds(0, 0,
-                translation.translationInfo.shortName.equals(mCurrentTranslation) ? R.drawable.ic_check : 0, 0);
+                translation.translationInfo.shortName.equals(currentTranslation) ? R.drawable.ic_check : 0, 0);
         textView.setText(translation.title);
-        textView.setTextColor(mTextColor);
+        textView.setTextColor(textColor);
 
         return textView;
     }
 
     public void setTranslations(@Nullable List<TranslationInfo> downloaded,
                                 @Nullable List<TranslationInfo> available) {
-        mSectionHeaders.clear();
-        mTranslations.clear();
-        mCount = 0;
+        sectionHeaders.clear();
+        translations.clear();
+        count = 0;
         if (downloaded != null && downloaded.size() > 0) {
             final List<TranslationInfoHolder> translations
                     = new ArrayList<TranslationInfoHolder>(downloaded.size());
             for (TranslationInfo translationInfo : downloaded) {
                 final SpannableStringBuilder text = new SpannableStringBuilder(translationInfo.name);
-                text.setSpan(mMediumSizeSpan, 0, translationInfo.name.length(), 0);
+                text.setSpan(mediumSizeSpan, 0, translationInfo.name.length(), 0);
 
                 translations.add(new TranslationInfoHolder(translationInfo, text, true));
             }
-            mSectionHeaders.add(mDownloadedTranslationsTitle);
-            mTranslations.add(translations);
-            mCount = downloaded.size() + 1;
+            sectionHeaders.add(downloadedTranslationsTitle);
+            this.translations.add(translations);
+            count = downloaded.size() + 1;
         }
 
         if (available != null) {
@@ -203,29 +202,29 @@ public class TranslationListAdapter extends BaseAdapter {
                 final String language = new Locale(translationInfo.language.split("_")[0]).getDisplayLanguage();
                 int index = 0;
                 List<TranslationInfoHolder> translations = null;
-                for (String sectionHeader : mSectionHeaders) {
+                for (String sectionHeader : sectionHeaders) {
                     if (sectionHeader.equals(language)) {
-                        translations = mTranslations.get(index);
+                        translations = this.translations.get(index);
                         break;
                     }
                     ++index;
                 }
                 if (translations == null) {
                     translations = new ArrayList<TranslationInfoHolder>();
-                    mSectionHeaders.add(language);
-                    mTranslations.add(translations);
-                    ++mCount;
+                    sectionHeaders.add(language);
+                    this.translations.add(translations);
+                    ++count;
                 }
 
                 final SpannableStringBuilder text = new SpannableStringBuilder(
-                        mResources.getString(R.string.text_available_translation_info,
+                        resources.getString(R.string.text_available_translation_info,
                                 translationInfo.name, translationInfo.size / 1024)
                 );
-                text.setSpan(mMediumSizeSpan, 0, translationInfo.name.length(), 0);
-                text.setSpan(mSmallSizeSpan, translationInfo.name.length(), text.length(), 0);
+                text.setSpan(mediumSizeSpan, 0, translationInfo.name.length(), 0);
+                text.setSpan(smallSizeSpan, translationInfo.name.length(), text.length(), 0);
 
                 translations.add(new TranslationInfoHolder(translationInfo, text, false));
-                ++mCount;
+                ++count;
             }
         }
     }

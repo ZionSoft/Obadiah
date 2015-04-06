@@ -24,29 +24,29 @@ import net.zionsoft.obadiah.R;
 import java.util.Calendar;
 
 public class DateFormatter {
-    private final Resources mResources;
-    private final String[] mMonths;
-    private final Calendar mCalendar;
-    private final int mCurrentYear;
+    private final Resources resources;
+    private final String[] months;
+    private final Calendar calendar;
+    private final int currentYear;
 
     public DateFormatter(Resources resources) {
         super();
 
-        mResources = resources;
-        mMonths = resources.getStringArray(R.array.text_months);
-        mCalendar = Calendar.getInstance();
-        mCurrentYear = mCalendar.get(Calendar.YEAR);
+        this.resources = resources;
+        months = resources.getStringArray(R.array.text_months);
+        calendar = Calendar.getInstance();
+        currentYear = calendar.get(Calendar.YEAR);
     }
 
     public String format(long timestamp) {
-        mCalendar.setTimeInMillis(timestamp);
-        final int year = mCalendar.get(Calendar.YEAR);
-        if (year == mCurrentYear) {
-            return mResources.getString(R.string.text_date_without_year,
-                    mCalendar.get(Calendar.DATE), mMonths[mCalendar.get(Calendar.MONTH)]);
+        calendar.setTimeInMillis(timestamp);
+        final int year = calendar.get(Calendar.YEAR);
+        if (year == currentYear) {
+            return resources.getString(R.string.text_date_without_year,
+                    calendar.get(Calendar.DATE), months[calendar.get(Calendar.MONTH)]);
         } else {
-            return mResources.getString(R.string.text_date, mCalendar.get(Calendar.DATE),
-                    mMonths[mCalendar.get(Calendar.MONTH)], year);
+            return resources.getString(R.string.text_date, calendar.get(Calendar.DATE),
+                    months[calendar.get(Calendar.MONTH)], year);
         }
     }
 }

@@ -28,8 +28,8 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import net.zionsoft.obadiah.BuildConfig;
 
 public class AppIndexingManager {
-    private final Activity mActivity;
-    private final GoogleApiClient mGoogleApiClient;
+    private final Activity activity;
+    private final GoogleApiClient googleApiClient;
 
     private static final String TITLE_TEMPLATE = "%s, %d (%s)";
     private static final String APP_URI_TEMPLATE = BuildConfig.DEBUG
@@ -43,28 +43,28 @@ public class AppIndexingManager {
 
         if (ConnectionResult.SUCCESS != GooglePlayServicesUtil.isGooglePlayServicesAvailable(activity)) {
             // no need to bother the user to install latest Google Play services
-            mActivity = null;
-            mGoogleApiClient = null;
+            this.activity = null;
+            googleApiClient = null;
             return;
         }
 
-        mActivity = activity;
-        mGoogleApiClient = new GoogleApiClient.Builder(activity).addApi(AppIndex.APP_INDEX_API).build();
+        this.activity = activity;
+        googleApiClient = new GoogleApiClient.Builder(activity).addApi(AppIndex.APP_INDEX_API).build();
     }
 
     public void onStart() {
-        if (mGoogleApiClient != null)
-            mGoogleApiClient.connect();
+        if (googleApiClient != null)
+            googleApiClient.connect();
     }
 
     public void onView(String translationShortName, String bookName, int bookIndex, int chapterIndex) {
-        if (mGoogleApiClient != null) {
+        if (googleApiClient != null) {
             onViewEnd();
 
             // TODO add out links
 
             mAppIndexingUri = Uri.parse(String.format(APP_URI_TEMPLATE, translationShortName, bookIndex, chapterIndex));
-            AppIndex.AppIndexApi.view(mGoogleApiClient, mActivity, mAppIndexingUri,
+            AppIndex.AppIndexApi.view(googleApiClient, activity, mAppIndexingUri,
                     String.format(TITLE_TEMPLATE, translationShortName, chapterIndex + 1, bookName),
                     Uri.parse(String.format(WEB_URI_TEMPLATE, translationShortName, bookIndex, chapterIndex)), null);
         }
@@ -72,13 +72,13 @@ public class AppIndexingManager {
 
     private void onViewEnd() {
         if (mAppIndexingUri != null)
-            AppIndex.AppIndexApi.viewEnd(mGoogleApiClient, mActivity, mAppIndexingUri);
+            AppIndex.AppIndexApi.viewEnd(googleApiClient, activity, mAppIndexingUri);
     }
 
     public void onStop() {
-        if (mGoogleApiClient != null) {
+        if (googleApiClient != null) {
             onViewEnd();
-            mGoogleApiClient.disconnect();
+            googleApiClient.disconnect();
         }
     }
 }

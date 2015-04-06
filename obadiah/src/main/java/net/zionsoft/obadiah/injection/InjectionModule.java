@@ -30,39 +30,39 @@ import dagger.Provides;
 
 @Module
 public final class InjectionModule {
-    private final App mApplication;
+    private final App application;
 
     public InjectionModule(App application) {
-        mApplication = application;
+        this.application = application;
     }
 
     @Provides
     @Singleton
     public App provideApplication() {
-        return mApplication;
+        return application;
     }
 
     @Provides
     @Singleton
     public Bible provideBible() {
-        return new Bible(mApplication);
+        return new Bible(application);
     }
 
     @Provides
     @Singleton
     public DatabaseHelper provideDatabaseHelper() {
-        return new DatabaseHelper(mApplication);
+        return new DatabaseHelper(application);
     }
 
     @Provides
     @Singleton
     public ReadingProgressManager provideReadingProgressManager() {
-        return new ReadingProgressManager(mApplication);
+        return new ReadingProgressManager(application);
     }
 
     @Provides
     @Singleton
     public Settings provideSettings() {
-        return new Settings(mApplication);
+        return new Settings(application);
     }
 }

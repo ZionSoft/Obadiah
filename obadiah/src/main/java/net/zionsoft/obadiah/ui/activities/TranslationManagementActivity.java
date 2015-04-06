@@ -57,14 +57,14 @@ public class TranslationManagementActivity extends BaseActionBarActivity {
     }
 
     @Inject
-    Settings mSettings;
+    Settings settings;
 
     @InjectView(R.id.ad_view)
-    AdView mAdView;
+    AdView adView;
 
-    private MenuItem mRemoveAdsMenuItem;
+    private MenuItem removeAdsMenuItem;
 
-    private InAppBillingHelper mInAppBillingHelper;
+    private InAppBillingHelper inAppBillingHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,17 +80,17 @@ public class TranslationManagementActivity extends BaseActionBarActivity {
         setContentView(R.layout.activity_translation_management);
 
         final View rootView = getWindow().getDecorView();
-        rootView.setBackgroundColor(mSettings.getBackgroundColor());
-        rootView.setKeepScreenOn(mSettings.keepScreenOn());
+        rootView.setBackgroundColor(settings.getBackgroundColor());
+        rootView.setKeepScreenOn(settings.keepScreenOn());
     }
 
     private void initializeInAppBillingHelper() {
-        mInAppBillingHelper = new InAppBillingHelper();
-        mInAppBillingHelper.initialize(this, new InAppBillingHelper.OnInitializationFinishedListener() {
+        inAppBillingHelper = new InAppBillingHelper();
+        inAppBillingHelper.initialize(this, new InAppBillingHelper.OnInitializationFinishedListener() {
             @Override
             public void onInitializationFinished(boolean isSuccessful) {
                 if (isSuccessful) {
-                    mInAppBillingHelper.loadAdsRemovalState(new InAppBillingHelper.OnAdsRemovalStateLoadedListener() {
+                    inAppBillingHelper.loadAdsRemovalState(new InAppBillingHelper.OnAdsRemovalStateLoadedListener() {
                         @Override
                         public void onAdsRemovalStateLoaded(boolean isRemoved) {
                             if (isRemoved)
@@ -103,8 +103,8 @@ public class TranslationManagementActivity extends BaseActionBarActivity {
                     showAds();
 
                     // billing can't be initialized, then makes no sense to show the menu item
-                    if (mRemoveAdsMenuItem != null)
-                        mRemoveAdsMenuItem.setVisible(false);
+                    if (removeAdsMenuItem != null)
+                        removeAdsMenuItem.setVisible(false);
                 }
             }
         });
@@ -120,18 +120,18 @@ public class TranslationManagementActivity extends BaseActionBarActivity {
     }
 
     private void hideAds() {
-        if (mRemoveAdsMenuItem != null)
-            mRemoveAdsMenuItem.setVisible(false);
+        if (removeAdsMenuItem != null)
+            removeAdsMenuItem.setVisible(false);
 
-        mAdView.setVisibility(View.GONE);
+        adView.setVisibility(View.GONE);
     }
 
     private void showAds() {
-        if (mRemoveAdsMenuItem != null)
-            mRemoveAdsMenuItem.setVisible(true);
+        if (removeAdsMenuItem != null)
+            removeAdsMenuItem.setVisible(true);
 
-        mAdView.setVisibility(View.VISIBLE);
-        mAdView.loadAd(new AdRequest.Builder()
+        adView.setVisibility(View.VISIBLE);
+        adView.loadAd(new AdRequest.Builder()
                 .addKeyword("bible").addKeyword("jesus").addKeyword("christian")
                 .build());
     }
@@ -140,20 +140,20 @@ public class TranslationManagementActivity extends BaseActionBarActivity {
     protected void onResume() {
         super.onResume();
 
-        mAdView.resume();
+        adView.resume();
     }
 
     @Override
     protected void onPause() {
-        mAdView.pause();
+        adView.pause();
 
         super.onPause();
     }
 
     @Override
     public void onDestroy() {
-        mAdView.destroy();
-        mInAppBillingHelper.cleanup();
+        adView.destroy();
+        inAppBillingHelper.cleanup();
 
         super.onDestroy();
     }
@@ -161,7 +161,7 @@ public class TranslationManagementActivity extends BaseActionBarActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_translation_management, menu);
-        mRemoveAdsMenuItem = menu.findItem(R.id.action_remove_ads);
+        removeAdsMenuItem = menu.findItem(R.id.action_remove_ads);
 
         return true;
     }
@@ -180,7 +180,7 @@ public class TranslationManagementActivity extends BaseActionBarActivity {
     private void removeAds() {
         Analytics.trackUIEvent("remove_ads");
 
-        mInAppBillingHelper.purchaseAdsRemoval(new InAppBillingHelper.OnAdsRemovalPurchasedListener() {
+        inAppBillingHelper.purchaseAdsRemoval(new InAppBillingHelper.OnAdsRemovalPurchasedListener() {
             @Override
             public void onAdsRemovalPurchased(boolean isSuccessful) {
                 if (isSuccessful)
@@ -193,7 +193,7 @@ public class TranslationManagementActivity extends BaseActionBarActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (!mInAppBillingHelper.handleActivityResult(requestCode, resultCode, data))
+        if (!inAppBillingHelper.handleActivityResult(requestCode, resultCode, data))
             super.onActivityResult(requestCode, resultCode, data);
     }
 }

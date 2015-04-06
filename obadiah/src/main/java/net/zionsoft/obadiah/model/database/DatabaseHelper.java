@@ -49,8 +49,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 5;
     private static final String DATABASE_NAME = "DB_OBADIAH";
 
-    private int mCounter;
-    private SQLiteDatabase mDatabase;
+    private int counter;
+    private SQLiteDatabase database;
 
     @Inject
     public DatabaseHelper(Context context) {
@@ -59,18 +59,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public SQLiteDatabase openDatabase() {
         synchronized (this) {
-            if (++mCounter == 1) {
-                mDatabase = getWritableDatabase();
+            if (++counter == 1) {
+                database = getWritableDatabase();
             }
-            return mDatabase;
+            return database;
         }
     }
 
     public void closeDatabase() {
         synchronized (this) {
-            if (--mCounter == 0) {
-                mDatabase.close();
-                mDatabase = null;
+            if (--counter == 0) {
+                database.close();
+                database = null;
             }
         }
     }

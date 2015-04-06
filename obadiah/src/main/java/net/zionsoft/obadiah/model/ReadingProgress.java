@@ -24,13 +24,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ReadingProgress {
-    private final int mTotalChaptersRead;
-    private final int mFinishedBooks;
-    private final int mFinishedOldTestament;
-    private final int mFinishedNewTestament;
-    private final int mContinuousReading;
-    private final List<Integer> mChaptersReadPerBook;
-    private final List<Pair<Integer, Long>> mLastChapterReadPerBook;
+    private final int totalChaptersRead;
+    private final int finishedBooks;
+    private final int finishedOldTestament;
+    private final int finishedNewTestament;
+    private final int continuousReading;
+    private final List<Integer> chaptersReadPerBook;
+    private final List<Pair<Integer, Long>> lastChapterReadPerBook;
 
     ReadingProgress(List<SparseArray<Long>> chaptersReadPerBook, int continuousReading) {
         super();
@@ -40,8 +40,8 @@ public class ReadingProgress {
         int finishedOldTestament = 0;
         int finishedNewTestament = 0;
         int i = 0;
-        mChaptersReadPerBook = new ArrayList<Integer>(Bible.getBookCount());
-        mLastChapterReadPerBook = new ArrayList<Pair<Integer, Long>>(Bible.getBookCount());
+        this.chaptersReadPerBook = new ArrayList<>(Bible.getBookCount());
+        lastChapterReadPerBook = new ArrayList<>(Bible.getBookCount());
         for (SparseArray<Long> chaptersRead : chaptersReadPerBook) {
             final int chaptersCount = Bible.getChapterCount(i);
             int lastReadChapter = -1;
@@ -53,10 +53,10 @@ public class ReadingProgress {
                     lastReadChapter = j;
                 }
             }
-            mLastChapterReadPerBook.add(new Pair<Integer, Long>(lastReadChapter, lastReadTimestamp));
+            lastChapterReadPerBook.add(new Pair<>(lastReadChapter, lastReadTimestamp));
 
             final int chaptersReadCount = chaptersRead.size();
-            mChaptersReadPerBook.add(chaptersReadCount);
+            this.chaptersReadPerBook.add(chaptersReadCount);
             totalChaptersRead += chaptersReadCount;
 
             if (chaptersReadCount == Bible.getChapterCount(i)) {
@@ -68,35 +68,35 @@ public class ReadingProgress {
             }
             ++i;
         }
-        mTotalChaptersRead = totalChaptersRead;
-        mFinishedBooks = finishedBooks;
-        mFinishedOldTestament = finishedOldTestament;
-        mFinishedNewTestament = finishedNewTestament;
-        mContinuousReading = continuousReading;
+        this.totalChaptersRead = totalChaptersRead;
+        this.finishedBooks = finishedBooks;
+        this.finishedOldTestament = finishedOldTestament;
+        this.finishedNewTestament = finishedNewTestament;
+        this.continuousReading = continuousReading;
     }
 
     public int getFinishedBooksCount() {
-        return mFinishedBooks;
+        return finishedBooks;
     }
 
     public int getFinishedOldTestamentCount() {
-        return mFinishedOldTestament;
+        return finishedOldTestament;
     }
 
     public int getFinishedNewTestamentCount() {
-        return mFinishedNewTestament;
+        return finishedNewTestament;
     }
 
     public int getTotalChapterRead() {
-        return mTotalChaptersRead;
+        return totalChaptersRead;
     }
 
     public Pair<Integer, Long> getLastReadChapter(int book) {
-        return mLastChapterReadPerBook.get(book);
+        return lastChapterReadPerBook.get(book);
     }
 
     public int getChapterRead(int book) {
-        return mChaptersReadPerBook.get(book);
+        return chaptersReadPerBook.get(book);
     }
 
     public int getChapterCount(int book) {
@@ -104,6 +104,6 @@ public class ReadingProgress {
     }
 
     public int getContinuousReadingDays() {
-        return mContinuousReading;
+        return continuousReading;
     }
 }

@@ -44,30 +44,30 @@ public class VerseListAdapter extends BaseAdapter {
     }
 
     @Inject
-    Settings mSettings;
+    Settings settings;
 
-    private final LayoutInflater mInflater;
-    private final Resources mResources;
+    private final LayoutInflater inflater;
+    private final Resources resources;
 
-    private List<Verse> mVerses;
-    private boolean[] mSelected;
-    private int mSelectedCount;
+    private List<Verse> verses;
+    private boolean[] selected;
+    private int selectedCount;
 
     public VerseListAdapter(Context context) {
         App.get(context).getInjectionComponent().inject(this);
 
-        mInflater = LayoutInflater.from(context);
-        mResources = context.getResources();
+        inflater = LayoutInflater.from(context);
+        resources = context.getResources();
     }
 
     @Override
     public int getCount() {
-        return mVerses == null ? 0 : mVerses.size();
+        return verses == null ? 0 : verses.size();
     }
 
     @Override
     public Verse getItem(int position) {
-        return mVerses == null ? null : mVerses.get(position);
+        return verses == null ? null : verses.get(position);
     }
 
     @Override
@@ -80,7 +80,7 @@ public class VerseListAdapter extends BaseAdapter {
         final LinearLayout linearLayout;
         final ViewTag viewTag;
         if (convertView == null) {
-            linearLayout = (LinearLayout) mInflater.inflate(R.layout.item_text, parent, false);
+            linearLayout = (LinearLayout) inflater.inflate(R.layout.item_text, parent, false);
 
             viewTag = new ViewTag();
             viewTag.index = (TextView) linearLayout.getChildAt(0);
@@ -91,14 +91,14 @@ public class VerseListAdapter extends BaseAdapter {
             viewTag = (ViewTag) linearLayout.getTag();
         }
 
-        if (mSelected[position]) {
-            linearLayout.setBackgroundColor(mResources.getColor(R.color.blue_semi_transparent));
+        if (selected[position]) {
+            linearLayout.setBackgroundColor(resources.getColor(R.color.blue_semi_transparent));
         } else {
             linearLayout.setBackgroundResource(R.drawable.background_text);
         }
 
-        final int textColor = mSettings.getTextColor();
-        final float textSize = mResources.getDimension(mSettings.getTextSize().textSize);
+        final int textColor = settings.getTextColor();
+        final float textSize = resources.getDimension(settings.getTextSize().textSize);
         viewTag.index.setTextColor(textColor);
         viewTag.index.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
 
@@ -113,46 +113,46 @@ public class VerseListAdapter extends BaseAdapter {
 
         viewTag.text.setTextColor(textColor);
         viewTag.text.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
-        viewTag.text.setText(mVerses.get(position).verseText);
+        viewTag.text.setText(verses.get(position).verseText);
 
         return linearLayout;
     }
 
     void setVerses(List<Verse> verses) {
-        mVerses = verses;
+        this.verses = verses;
 
-        final int size = mVerses.size();
-        if (mSelected == null || mSelected.length < size)
-            mSelected = new boolean[size];
+        final int size = this.verses.size();
+        if (selected == null || selected.length < size)
+            selected = new boolean[size];
         deselectVerses();
     }
 
     void select(int position) {
-        mSelected[position] ^= true;
-        if (mSelected[position])
-            ++mSelectedCount;
+        selected[position] ^= true;
+        if (selected[position])
+            ++selectedCount;
         else
-            --mSelectedCount;
+            --selectedCount;
     }
 
     boolean hasSelectedVerses() {
-        return mSelectedCount > 0;
+        return selectedCount > 0;
     }
 
     List<Verse> getSelectedVerses() {
-        final List<Verse> selectedVerses = new ArrayList<Verse>(mSelectedCount);
+        final List<Verse> selectedVerses = new ArrayList<Verse>(selectedCount);
         int i = 0;
-        for (boolean selected : mSelected) {
+        for (boolean selected : this.selected) {
             if (selected)
-                selectedVerses.add(mVerses.get(i));
+                selectedVerses.add(verses.get(i));
             ++i;
         }
         return selectedVerses;
     }
 
     void deselectVerses() {
-        for (int i = 0; i < mSelected.length; ++i)
-            mSelected[i] = false;
-        mSelectedCount = 0;
+        for (int i = 0; i < selected.length; ++i)
+            selected[i] = false;
+        selectedCount = 0;
     }
 }

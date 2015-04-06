@@ -51,9 +51,9 @@ public class BookExpandableListAdapter extends BaseExpandableListAdapter {
     private final View.OnClickListener mViewClickListener;
     private final LayoutInflater mInflater;
 
-    private List<String> mBookNames;
-    private int mCurrentBook;
-    private int mCurrentChapter;
+    private List<String> bookNames;
+    private int currentBook;
+    private int currentChapter;
 
     public BookExpandableListAdapter(Context context, OnChapterClickListener listener) {
         super();
@@ -71,12 +71,12 @@ public class BookExpandableListAdapter extends BaseExpandableListAdapter {
 
     @Override
     public int getGroupCount() {
-        return mBookNames == null ? 0 : Bible.getBookCount();
+        return bookNames == null ? 0 : Bible.getBookCount();
     }
 
     @Override
     public int getChildrenCount(int groupPosition) {
-        if (mBookNames == null)
+        if (bookNames == null)
             return 0;
 
         final int chapterCount = Bible.getChapterCount(groupPosition);
@@ -85,7 +85,7 @@ public class BookExpandableListAdapter extends BaseExpandableListAdapter {
 
     @Override
     public String getGroup(int groupPosition) {
-        return mBookNames.get(groupPosition);
+        return bookNames.get(groupPosition);
     }
 
     @Override
@@ -112,7 +112,7 @@ public class BookExpandableListAdapter extends BaseExpandableListAdapter {
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
         final TextView textView = (TextView) (convertView == null
                 ? mInflater.inflate(R.layout.item_book_name, parent, false) : convertView);
-        textView.setText(mBookNames.get(groupPosition));
+        textView.setText(bookNames.get(groupPosition));
         return textView;
     }
 
@@ -143,7 +143,7 @@ public class BookExpandableListAdapter extends BaseExpandableListAdapter {
                 textView.setVisibility(View.GONE);
             } else {
                 textView.setVisibility(View.VISIBLE);
-                textView.setBackgroundColor(groupPosition == mCurrentBook && chapter == mCurrentChapter
+                textView.setBackgroundColor(groupPosition == currentBook && chapter == currentChapter
                                 ? Color.DKGRAY : Color.TRANSPARENT
                 );
                 textView.setText(Integer.toString(chapter + 1));
@@ -167,11 +167,11 @@ public class BookExpandableListAdapter extends BaseExpandableListAdapter {
     }
 
     public void setBookNames(List<String> bookNames) {
-        mBookNames = bookNames;
+        this.bookNames = bookNames;
     }
 
     public void setSelected(int currentBook, int currentChapter) {
-        mCurrentBook = currentBook;
-        mCurrentChapter = currentChapter;
+        this.currentBook = currentBook;
+        this.currentChapter = currentChapter;
     }
 }

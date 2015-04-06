@@ -43,29 +43,25 @@ public class ChapterSelectionFragment extends BaseFragment {
     }
 
     @Inject
-    Bible mBible;
+    Bible bible;
 
     @InjectView(R.id.book_list_view)
-    ExpandableListView mBookListView;
+    ExpandableListView bookListView;
 
-    private Listener mListener;
+    private Listener listener;
 
-    private int mCurrentBook;
-    private int mCurrentChapter;
+    private int currentBook;
+    private int currentChapter;
 
-    private BookExpandableListAdapter mBookListAdapter;
-    private int mLastExpandedGroup;
-
-    public ChapterSelectionFragment() {
-        super();
-    }
+    private BookExpandableListAdapter bookListAdapter;
+    private int lastExpandedGroup;
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
 
         setRetainInstance(true);
-        mListener = (Listener) activity;
+        listener = (Listener) activity;
     }
 
     @Override
@@ -79,27 +75,27 @@ public class ChapterSelectionFragment extends BaseFragment {
         super.onActivityCreated(savedInstanceState);
         App.get(getActivity()).getInjectionComponent().inject(this);
 
-        mBookListAdapter = new BookExpandableListAdapter(getActivity(),
+        bookListAdapter = new BookExpandableListAdapter(getActivity(),
                 new BookExpandableListAdapter.OnChapterClickListener() {
                     @Override
                     public void onChapterClicked(int book, int chapter) {
-                        if (mCurrentBook == book && mCurrentChapter == chapter)
+                        if (currentBook == book && currentChapter == chapter)
                             return;
 
-                        mCurrentBook = book;
-                        mCurrentChapter = chapter;
+                        currentBook = book;
+                        currentChapter = chapter;
 
-                        mBookListAdapter.setSelected(mCurrentBook, mCurrentChapter);
-                        mBookListAdapter.notifyDataSetChanged();
+                        bookListAdapter.setSelected(currentBook, currentChapter);
+                        bookListAdapter.notifyDataSetChanged();
 
-                        if (mListener != null)
-                            mListener.onChapterSelected(mCurrentBook, mCurrentChapter);
+                        if (listener != null)
+                            listener.onChapterSelected(currentBook, currentChapter);
                     }
                 }
         );
 
-        mBookListView.setAdapter(mBookListAdapter);
-        mBookListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
+        bookListView.setAdapter(bookListAdapter);
+        bookListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
             @Override
             public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
                 parent.smoothScrollToPosition(groupPosition);
@@ -107,9 +103,9 @@ public class ChapterSelectionFragment extends BaseFragment {
                     parent.collapseGroup(groupPosition);
                 } else {
                     parent.expandGroup(groupPosition);
-                    if (mLastExpandedGroup != groupPosition) {
-                        parent.collapseGroup(mLastExpandedGroup);
-                        mLastExpandedGroup = groupPosition;
+                    if (lastExpandedGroup != groupPosition) {
+                        parent.collapseGroup(lastExpandedGroup);
+                        lastExpandedGroup = groupPosition;
                     }
                 }
                 return true;
@@ -119,21 +115,21 @@ public class ChapterSelectionFragment extends BaseFragment {
 
     @Override
     public void onDetach() {
-        mListener = null;
+        listener = null;
 
         super.onDetach();
     }
 
     public void setSelected(int currentBook, int currentChapter) {
-        mCurrentBook = currentBook;
-        mCurrentChapter = currentChapter;
+        this.currentBook = currentBook;
+        this.currentChapter = currentChapter;
 
-        mBookListAdapter.setSelected(currentBook, currentChapter);
-        mBookListAdapter.notifyDataSetChanged();
+        bookListAdapter.setSelected(currentBook, currentChapter);
+        bookListAdapter.notifyDataSetChanged();
 
-        mLastExpandedGroup = mCurrentBook;
-        mBookListView.expandGroup(mCurrentBook);
-        mBookListView.setSelectedGroup(mCurrentBook);
+        lastExpandedGroup = this.currentBook;
+        bookListView.expandGroup(this.currentBook);
+        bookListView.setSelectedGroup(this.currentBook);
     }
 
     public void setSelected(String translationShortName, int currentBook, int currentChapter) {
@@ -142,7 +138,7 @@ public class ChapterSelectionFragment extends BaseFragment {
     }
 
     private void loadBookNames(final String translationShortName) {
-        mBible.loadBookNames(translationShortName, new Bible.OnStringsLoadedListener() {
+        bible.loadBookNames(translationShortName, new Bible.OnStringsLoadedListener() {
                     @Override
                     public void onStringsLoaded(List<String> strings) {
                         if (!isAdded())
@@ -160,13 +156,13 @@ public class ChapterSelectionFragment extends BaseFragment {
                             return;
                         }
 
-                        mBookListAdapter.setSelected(mCurrentBook, mCurrentChapter);
-                        mBookListAdapter.setBookNames(strings);
-                        mBookListAdapter.notifyDataSetChanged();
+                        bookListAdapter.setSelected(currentBook, currentChapter);
+                        bookListAdapter.setBookNames(strings);
+                        bookListAdapter.notifyDataSetChanged();
 
-                        mLastExpandedGroup = mCurrentBook;
-                        mBookListView.expandGroup(mCurrentBook);
-                        mBookListView.setSelectedGroup(mCurrentBook);
+                        lastExpandedGroup = currentBook;
+                        bookListView.expandGroup(currentBook);
+                        bookListView.setSelectedGroup(currentBook);
                     }
                 }
         );

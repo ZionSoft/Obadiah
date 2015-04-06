@@ -27,81 +27,81 @@ import com.google.android.gms.analytics.Tracker;
 import net.zionsoft.obadiah.R;
 
 public class Analytics {
-    private static Tracker sTracker;
+    private static Tracker tracker;
 
     public static void initialize(Context context) {
-        if (sTracker == null) {
+        if (tracker == null) {
             synchronized (Analytics.class) {
-                if (sTracker == null)
-                    sTracker = GoogleAnalytics.getInstance(context.getApplicationContext()).newTracker(R.xml.analytics);
+                if (tracker == null)
+                    tracker = GoogleAnalytics.getInstance(context.getApplicationContext()).newTracker(R.xml.analytics);
             }
         }
     }
 
     public static void trackException(String description) {
-        sTracker.send(new HitBuilders.ExceptionBuilder()
+        tracker.send(new HitBuilders.ExceptionBuilder()
                 .setDescription(description).setFatal(false)
                 .build());
     }
 
     public static void trackBillingNotSupported(int reason) {
-        sTracker.send(new HitBuilders.EventBuilder("billing", "not_supported")
+        tracker.send(new HitBuilders.EventBuilder("billing", "not_supported")
                 .setLabel(String.format("Manufacturer: %s, Model: %s, Reason: %d",
                         Build.MANUFACTURER, Build.MODEL, reason))
                 .build());
     }
 
     public static void trackBillingPurchase(String productName) {
-        sTracker.send(new HitBuilders.EventBuilder("billing", "purchased")
+        tracker.send(new HitBuilders.EventBuilder("billing", "purchased")
                 .setLabel(productName)
                 .build());
     }
 
     public static void trackScreen(String name) {
-        sTracker.setScreenName(name);
-        sTracker.send(new HitBuilders.ScreenViewBuilder().build());
+        tracker.setScreenName(name);
+        tracker.send(new HitBuilders.ScreenViewBuilder().build());
     }
 
     public static void trackTranslationListDownloading(boolean isSuccessful, long elapsedTime) {
-        sTracker.send(new HitBuilders.EventBuilder("download_translation_list", "")
+        tracker.send(new HitBuilders.EventBuilder("download_translation_list", "")
                 .setLabel(Boolean.toString(isSuccessful))
                 .build());
         if (isSuccessful)
-            sTracker.send(new HitBuilders.TimingBuilder("download_translation_list", "", elapsedTime).build());
+            tracker.send(new HitBuilders.TimingBuilder("download_translation_list", "", elapsedTime).build());
     }
 
     public static void trackTranslationDownload(String translation, boolean isSuccessful, long elapsedTime) {
-        sTracker.send(new HitBuilders.EventBuilder("download_translation", translation)
+        tracker.send(new HitBuilders.EventBuilder("download_translation", translation)
                 .setLabel(Boolean.toString(isSuccessful))
                 .build());
         if (isSuccessful)
-            sTracker.send(new HitBuilders.TimingBuilder("download_translation", translation, elapsedTime).build());
+            tracker.send(new HitBuilders.TimingBuilder("download_translation", translation, elapsedTime).build());
     }
 
     public static void trackTranslationRemoval(String translation, boolean isSuccessful) {
-        sTracker.send(new HitBuilders.EventBuilder("remove_translation", translation)
+        tracker.send(new HitBuilders.EventBuilder("remove_translation", translation)
                 .setLabel(Boolean.toString(isSuccessful))
                 .build());
     }
 
     public static void trackTranslationSelection(String translation) {
-        sTracker.send(new HitBuilders.EventBuilder("select_translation", translation)
+        tracker.send(new HitBuilders.EventBuilder("select_translation", translation)
                 .build());
     }
 
     public static void trackDeepLink() {
-        sTracker.send(new HitBuilders.EventBuilder("deep_link", "open")
+        tracker.send(new HitBuilders.EventBuilder("deep_link", "open")
                 .build());
     }
 
     public static void trackUIEvent(String label) {
-        sTracker.send(new HitBuilders.EventBuilder("ui", "button_click")
+        tracker.send(new HitBuilders.EventBuilder("ui", "button_click")
                 .setLabel(label)
                 .build());
     }
 
     public static void trackNotificationEvent(String action, String label) {
-        sTracker.send(new HitBuilders.EventBuilder("notification", action)
+        tracker.send(new HitBuilders.EventBuilder("notification", action)
                 .setLabel(label)
                 .build());
     }

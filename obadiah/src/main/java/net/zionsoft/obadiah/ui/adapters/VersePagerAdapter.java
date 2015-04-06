@@ -66,37 +66,37 @@ public class VersePagerAdapter extends PagerAdapter {
     }
 
     @Inject
-    Bible mBible;
+    Bible bible;
 
-    private final Context mContext;
-    private final Listener mListener;
-    private final LayoutInflater mInflater;
-    private final List<Page> mPages;
+    private final Context context;
+    private final Listener listener;
+    private final LayoutInflater inflater;
+    private final List<Page> pages;
 
-    private String mTranslationShortName;
-    private int mCurrentBook = -1;
-    private int mCurrentChapter;
-    private int mCurrentVerse;
+    private String translationShortName;
+    private int currentBook = -1;
+    private int currentChapter;
+    private int currentVerse;
 
     public VersePagerAdapter(Context context, Listener listener) {
         super();
         App.get(context).getInjectionComponent().inject(this);
 
-        mContext = context;
-        mListener = listener;
-        mInflater = LayoutInflater.from(context);
-        mPages = new LinkedList<>();
+        this.context = context;
+        this.listener = listener;
+        inflater = LayoutInflater.from(context);
+        pages = new LinkedList<>();
     }
 
     @Override
     public int getCount() {
-        return mCurrentBook < 0 || mTranslationShortName == null ? 0 : Bible.getChapterCount(mCurrentBook);
+        return currentBook < 0 || translationShortName == null ? 0 : Bible.getChapterCount(currentBook);
     }
 
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
         Page page = null;
-        for (Page p : mPages) {
+        for (Page p : pages) {
             if (!p.inUse) {
                 page = p;
                 break;
@@ -104,8 +104,8 @@ public class VersePagerAdapter extends PagerAdapter {
         }
 
         if (page == null) {
-            page = new Page(mInflater.inflate(R.layout.item_verse_pager, container, false));
-            final VerseListAdapter verseListAdapter = new VerseListAdapter(mContext);
+            page = new Page(inflater.inflate(R.layout.item_verse_pager, container, false));
+            final VerseListAdapter verseListAdapter = new VerseListAdapter(context);
             page.verseListAdapter = verseListAdapter;
             page.verseListView.setAdapter(verseListAdapter);
             page.verseListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -114,10 +114,10 @@ public class VersePagerAdapter extends PagerAdapter {
                     verseListAdapter.select(position);
                     verseListAdapter.notifyDataSetChanged();
 
-                    mListener.onVersesSelectionChanged(verseListAdapter.hasSelectedVerses());
+                    listener.onVersesSelectionChanged(verseListAdapter.hasSelectedVerses());
                 }
             });
-            mPages.add(page);
+            pages.add(page);
         }
 
         container.addView(page.rootView, 0);
@@ -132,11 +132,11 @@ public class VersePagerAdapter extends PagerAdapter {
     }
 
     private void loadVerses(final int position, final Page page) {
-        mBible.loadVerses(mTranslationShortName, mCurrentBook, position, new Bible.OnVersesLoadedListener() {
+        bible.loadVerses(translationShortName, currentBook, position, new Bible.OnVersesLoadedListener() {
                     @Override
                     public void onVersesLoaded(List<Verse> verses) {
                         if (verses == null || verses.size() == 0) {
-                            DialogHelper.showDialog(mContext, false, R.string.dialog_retry,
+                            DialogHelper.showDialog(context, false, R.string.dialog_retry,
                                     new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
@@ -154,12 +154,12 @@ public class VersePagerAdapter extends PagerAdapter {
                             page.verseListAdapter.setVerses(verses);
                             page.verseListAdapter.notifyDataSetChanged();
 
-                            if (mCurrentVerse > 0 && mCurrentChapter == position) {
+                            if (currentVerse > 0 && currentChapter == position) {
                                 page.verseListView.post(new Runnable() {
                                     @Override
                                     public void run() {
-                                        page.verseListView.setSelection(mCurrentVerse);
-                                        mCurrentVerse = 0;
+                                        page.verseListView.setSelection(currentVerse);
+                                        currentVerse = 0;
                                     }
                                 });
                             } else {
@@ -173,7 +173,7 @@ public class VersePagerAdapter extends PagerAdapter {
 
     @Override
     public void destroyItem(ViewGroup container, int position, Object object) {
-        for (Page page : mPages) {
+        for (Page page : pages) {
             if (page.position == position) {
                 page.inUse = false;
                 container.removeView(page.rootView);
@@ -193,17 +193,17 @@ public class VersePagerAdapter extends PagerAdapter {
     }
 
     public void setTranslationShortName(String translationShortName) {
-        mTranslationShortName = translationShortName;
+        this.translationShortName = translationShortName;
     }
 
     public void setSelected(int currentBook, int currentChapter, int currentVerse) {
-        mCurrentBook = currentBook;
-        mCurrentChapter = currentChapter;
-        mCurrentVerse = currentVerse;
+        this.currentBook = currentBook;
+        this.currentChapter = currentChapter;
+        this.currentVerse = currentVerse;
     }
 
     public int getCurrentVerse(int chapter) {
-        for (Page page : mPages) {
+        for (Page page : pages) {
             if (page.position == chapter)
                 return page.verseListView.getFirstVisiblePosition();
         }
@@ -211,7 +211,7 @@ public class VersePagerAdapter extends PagerAdapter {
     }
 
     public List<Verse> getSelectedVerses(int chapter) {
-        for (Page page : mPages) {
+        for (Page page : pages) {
             if (page.position == chapter)
                 return page.verseListAdapter.getSelectedVerses();
         }
@@ -219,7 +219,7 @@ public class VersePagerAdapter extends PagerAdapter {
     }
 
     public void deselectVerses() {
-        for (Page page : mPages) {
+        for (Page page : pages) {
             page.verseListAdapter.deselectVerses();
             page.verseListAdapter.notifyDataSetChanged();
         }

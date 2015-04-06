@@ -94,39 +94,39 @@ public class BookSelectionActivity extends BaseActionBarActivity
     }
 
     @Inject
-    Bible mBible;
+    Bible bible;
 
     @Inject
-    ReadingProgressManager mReadingProgressManager;
+    ReadingProgressManager readingProgressManager;
 
     @Inject
-    Settings mSettings;
+    Settings settings;
 
     @InjectView(R.id.drawer_layout)
-    DrawerLayout mDrawerLayout;
+    DrawerLayout drawerLayout;
 
-    private AppIndexingManager mAppIndexingManager;
-    private SharedPreferences mPreferences;
+    private AppIndexingManager appIndexingManager;
+    private SharedPreferences preferences;
 
-    private String mCurrentTranslation;
-    private List<String> mBookNames;
-    private int mCurrentBook;
-    private int mCurrentChapter;
+    private String currentTranslation;
+    private List<String> bookNames;
+    private int currentBook;
+    private int currentChapter;
 
-    private ChapterSelectionFragment mChapterSelectionFragment;
-    private TextFragment mTextFragment;
+    private ChapterSelectionFragment chapterSelectionFragment;
+    private TextFragment textFragment;
 
-    private ActionBarDrawerToggle mDrawerToggle;
-    private Spinner mTranslationsSpinner;
-    private View mRootView;
+    private ActionBarDrawerToggle drawerToggle;
+    private Spinner translationsSpinner;
+    private View rootView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         App.get(this).getInjectionComponent().inject(this);
 
-        mAppIndexingManager = new AppIndexingManager(this);
-        mPreferences = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE);
+        appIndexingManager = new AppIndexingManager(this);
+        preferences = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE);
 
         initializeUi();
         checkDeepLink();
@@ -135,25 +135,25 @@ public class BookSelectionActivity extends BaseActionBarActivity
     private void initializeUi() {
         setContentView(R.layout.activity_book_selection);
 
-        mRootView = getWindow().getDecorView();
+        rootView = getWindow().getDecorView();
 
         final ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeButtonEnabled(true);
 
-        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, 0, 0);
-        mDrawerLayout.setDrawerListener(mDrawerToggle);
+        drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, 0, 0);
+        drawerLayout.setDrawerListener(drawerToggle);
 
         final FragmentManager fm = getSupportFragmentManager();
-        mChapterSelectionFragment = (ChapterSelectionFragment) fm.findFragmentById(R.id.left_drawer);
-        mTextFragment = (TextFragment) fm.findFragmentById(R.id.text_fragment);
+        chapterSelectionFragment = (ChapterSelectionFragment) fm.findFragmentById(R.id.left_drawer);
+        textFragment = (TextFragment) fm.findFragmentById(R.id.text_fragment);
     }
 
     private void checkDeepLink() {
         final Intent startIntent = getIntent();
         final Uri uri = startIntent.getData();
         if (uri != null) {
-            UriHelper.checkDeepLink(mPreferences, uri);
+            UriHelper.checkDeepLink(preferences, uri);
         } else {
             final String messageType = startIntent.getStringExtra(KEY_MESSAGE_TYPE);
             if (TextUtils.isEmpty(messageType)) {
@@ -172,7 +172,7 @@ public class BookSelectionActivity extends BaseActionBarActivity
                 return;
             }
 
-            mPreferences.edit()
+            preferences.edit()
                     .putInt(Constants.PREF_KEY_LAST_READ_BOOK, bookIndex)
                     .putInt(Constants.PREF_KEY_LAST_READ_CHAPTER, chapterIndex)
                     .putInt(Constants.PREF_KEY_LAST_READ_VERSE, verseIndex)
@@ -186,20 +186,20 @@ public class BookSelectionActivity extends BaseActionBarActivity
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
 
-        mDrawerToggle.syncState();
+        drawerToggle.syncState();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
 
-        mAppIndexingManager.onStart();
+        appIndexingManager.onStart();
         populateUi();
         showUpdateDialog();
     }
 
     private void showUpdateDialog() {
-        if (TextUtils.isEmpty(mPreferences.getString(Constants.PREF_KEY_LAST_READ_TRANSLATION, null))) {
+        if (TextUtils.isEmpty(preferences.getString(Constants.PREF_KEY_LAST_READ_TRANSLATION, null))) {
             // do nothing if there's no translation installed (most likely it's the 1st time use)
             return;
         }
@@ -234,12 +234,12 @@ public class BookSelectionActivity extends BaseActionBarActivity
     }
 
     private void populateUi() {
-        mSettings.refresh();
-        mRootView.setKeepScreenOn(mSettings.keepScreenOn());
-        mRootView.setBackgroundColor(mSettings.getBackgroundColor());
+        settings.refresh();
+        rootView.setKeepScreenOn(settings.keepScreenOn());
+        rootView.setBackgroundColor(settings.getBackgroundColor());
 
-        mCurrentTranslation = mPreferences.getString(Constants.PREF_KEY_LAST_READ_TRANSLATION, null);
-        if (mCurrentTranslation == null) {
+        currentTranslation = preferences.getString(Constants.PREF_KEY_LAST_READ_TRANSLATION, null);
+        if (currentTranslation == null) {
             DialogHelper.showDialog(this, false, R.string.dialog_no_translation,
                     new DialogInterface.OnClickListener() {
                         @Override
@@ -257,21 +257,21 @@ public class BookSelectionActivity extends BaseActionBarActivity
             return;
         }
 
-        mCurrentBook = mPreferences.getInt(Constants.PREF_KEY_LAST_READ_BOOK, 0);
-        mCurrentChapter = mPreferences.getInt(Constants.PREF_KEY_LAST_READ_CHAPTER, 0);
+        currentBook = preferences.getInt(Constants.PREF_KEY_LAST_READ_BOOK, 0);
+        currentChapter = preferences.getInt(Constants.PREF_KEY_LAST_READ_CHAPTER, 0);
 
         loadTranslations();
     }
 
     private void loadTranslations() {
-        if (mTranslationsSpinner == null)
+        if (translationsSpinner == null)
             return;
 
-        mBible.loadDownloadedTranslations(new Bible.OnStringsLoadedListener() {
+        bible.loadDownloadedTranslations(new Bible.OnStringsLoadedListener() {
             @Override
             public void onStringsLoaded(List<String> strings) {
                 if (strings == null || strings.size() == 0) {
-                    if (mCurrentTranslation != null) {
+                    if (currentTranslation != null) {
                         DialogHelper.showDialog(BookSelectionActivity.this, false, R.string.dialog_retry,
                                 new DialogInterface.OnClickListener() {
                                     @Override
@@ -287,7 +287,7 @@ public class BookSelectionActivity extends BaseActionBarActivity
                 int selected = 0;
                 boolean hasSelectedTranslation = false;
                 for (String translation : strings) {
-                    if (translation.equals(mCurrentTranslation)) {
+                    if (translation.equals(currentTranslation)) {
                         hasSelectedTranslation = true;
                         break;
                     }
@@ -295,10 +295,10 @@ public class BookSelectionActivity extends BaseActionBarActivity
                 }
                 if (!hasSelectedTranslation) {
                     // the requested translation is not available
-                    mCurrentTranslation = strings.get(0);
+                    currentTranslation = strings.get(0);
                     selected = 0;
-                    mPreferences.edit()
-                            .putString(Constants.PREF_KEY_LAST_READ_TRANSLATION, mCurrentTranslation)
+                    preferences.edit()
+                            .putString(Constants.PREF_KEY_LAST_READ_TRANSLATION, currentTranslation)
                             .apply();
                 }
 
@@ -306,10 +306,10 @@ public class BookSelectionActivity extends BaseActionBarActivity
                 final List<String> translations = new ArrayList<String>(translationsCount + 1);
                 translations.addAll(strings);
                 translations.add(getResources().getString(R.string.text_more_translations));
-                mTranslationsSpinner.setAdapter(new ArrayAdapter<String>(
+                translationsSpinner.setAdapter(new ArrayAdapter<String>(
                         getSupportActionBar().getThemedContext(), R.layout.item_drop_down, translations));
-                mTranslationsSpinner.setSelection(selected);
-                mTranslationsSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                translationsSpinner.setSelection(selected);
+                translationsSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                     @Override
                     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                         if (position == translationsCount) {
@@ -319,14 +319,14 @@ public class BookSelectionActivity extends BaseActionBarActivity
                         }
 
                         final String selected = translations.get(position);
-                        if (selected.equals(mCurrentTranslation))
+                        if (selected.equals(currentTranslation))
                             return;
 
                         Analytics.trackTranslationSelection(selected);
-                        mCurrentTranslation = selected;
-                        mPreferences.edit()
+                        currentTranslation = selected;
+                        preferences.edit()
                                 .putString(Constants.PREF_KEY_LAST_READ_TRANSLATION, selected)
-                                .putInt(Constants.PREF_KEY_LAST_READ_VERSE, mTextFragment.getCurrentVerse())
+                                .putInt(Constants.PREF_KEY_LAST_READ_VERSE, textFragment.getCurrentVerse())
                                 .apply();
 
                         loadTexts();
@@ -344,11 +344,11 @@ public class BookSelectionActivity extends BaseActionBarActivity
     }
 
     private void loadTexts() {
-        mBible.loadBookNames(mCurrentTranslation, new Bible.OnStringsLoadedListener() {
+        bible.loadBookNames(currentTranslation, new Bible.OnStringsLoadedListener() {
                     @Override
                     public void onStringsLoaded(List<String> strings) {
                         if (strings == null || strings.size() == 0) {
-                            if (mCurrentTranslation != null) {
+                            if (currentTranslation != null) {
                                 DialogHelper.showDialog(BookSelectionActivity.this, false, R.string.dialog_retry,
                                         new DialogInterface.OnClickListener() {
                                             @Override
@@ -361,35 +361,35 @@ public class BookSelectionActivity extends BaseActionBarActivity
                             return;
                         }
 
-                        mBookNames = strings;
+                        bookNames = strings;
                         updateTitle();
                     }
                 }
         );
 
-        mChapterSelectionFragment.setSelected(mCurrentTranslation, mCurrentBook, mCurrentChapter);
+        chapterSelectionFragment.setSelected(currentTranslation, currentBook, currentChapter);
 
-        mTextFragment.setSelected(mCurrentTranslation, mCurrentBook, mCurrentChapter,
-                mPreferences.getInt(Constants.PREF_KEY_LAST_READ_VERSE, 0));
+        textFragment.setSelected(currentTranslation, currentBook, currentChapter,
+                preferences.getInt(Constants.PREF_KEY_LAST_READ_VERSE, 0));
     }
 
     private void updateTitle() {
-        final String bookName = mBookNames.get(mCurrentBook);
-        setTitle(String.format("%s, %d", bookName, mCurrentChapter + 1));
-        mAppIndexingManager.onView(mCurrentTranslation, bookName, mCurrentBook, mCurrentChapter);
+        final String bookName = bookNames.get(currentBook);
+        setTitle(String.format("%s, %d", bookName, currentChapter + 1));
+        appIndexingManager.onView(currentTranslation, bookName, currentBook, currentChapter);
 
         // TODO get an improved tracking algorithm, e.g. only consider as "read" if the user stays for a while
-        mReadingProgressManager.trackChapterReading(mCurrentBook, mCurrentChapter);
+        readingProgressManager.trackChapterReading(currentBook, currentChapter);
     }
 
     @Override
     protected void onStop() {
-        mPreferences.edit()
-                .putInt(Constants.PREF_KEY_LAST_READ_BOOK, mCurrentBook)
-                .putInt(Constants.PREF_KEY_LAST_READ_CHAPTER, mCurrentChapter)
-                .putInt(Constants.PREF_KEY_LAST_READ_VERSE, mTextFragment.getCurrentVerse())
+        preferences.edit()
+                .putInt(Constants.PREF_KEY_LAST_READ_BOOK, currentBook)
+                .putInt(Constants.PREF_KEY_LAST_READ_CHAPTER, currentChapter)
+                .putInt(Constants.PREF_KEY_LAST_READ_VERSE, textFragment.getCurrentVerse())
                 .apply();
-        mAppIndexingManager.onStop();
+        appIndexingManager.onStop();
 
         super.onStop();
     }
@@ -398,14 +398,14 @@ public class BookSelectionActivity extends BaseActionBarActivity
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
 
-        mDrawerToggle.onConfigurationChanged(newConfig);
+        drawerToggle.onConfigurationChanged(newConfig);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_bookselection, menu);
 
-        mTranslationsSpinner = (Spinner) MenuItemCompat.getActionView(menu.findItem(R.id.action_translations));
+        translationsSpinner = (Spinner) MenuItemCompat.getActionView(menu.findItem(R.id.action_translations));
         loadTranslations();
 
         return true;
@@ -413,7 +413,7 @@ public class BookSelectionActivity extends BaseActionBarActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (mDrawerToggle.onOptionsItemSelected(item))
+        if (drawerToggle.onOptionsItemSelected(item))
             return true;
 
         switch (item.getItemId()) {
@@ -433,23 +433,23 @@ public class BookSelectionActivity extends BaseActionBarActivity
 
     @Override
     public void onChapterSelected(int bookIndex, int chapterIndex) {
-        if (mCurrentBook == bookIndex && mCurrentChapter == chapterIndex)
+        if (currentBook == bookIndex && currentChapter == chapterIndex)
             return;
-        mCurrentBook = bookIndex;
-        mCurrentChapter = chapterIndex;
+        currentBook = bookIndex;
+        currentChapter = chapterIndex;
 
-        mDrawerLayout.closeDrawers();
-        mTextFragment.setSelected(bookIndex, chapterIndex, 0);
+        drawerLayout.closeDrawers();
+        textFragment.setSelected(bookIndex, chapterIndex, 0);
         updateTitle();
     }
 
     @Override
     public void onChapterSelected(int chapterIndex) {
-        if (mCurrentChapter == chapterIndex)
+        if (currentChapter == chapterIndex)
             return;
-        mCurrentChapter = chapterIndex;
+        currentChapter = chapterIndex;
 
-        mChapterSelectionFragment.setSelected(mCurrentBook, mCurrentChapter);
+        chapterSelectionFragment.setSelected(currentBook, currentChapter);
         updateTitle();
     }
 }

@@ -42,7 +42,7 @@ public class ReadingProgressManager {
     }
 
     @Inject
-    DatabaseHelper mDatabaseHelper;
+    DatabaseHelper databaseHelper;
 
     @Inject
     public ReadingProgressManager(Context context) {
@@ -55,7 +55,7 @@ public class ReadingProgressManager {
             protected Void doInBackground(Void... params) {
                 SQLiteDatabase db = null;
                 try {
-                    db = mDatabaseHelper.openDatabase();
+                    db = databaseHelper.openDatabase();
                     if (db == null) {
                         Analytics.trackException("Failed to open database.");
                         return null;
@@ -90,7 +90,7 @@ public class ReadingProgressManager {
                         if (db.inTransaction()) {
                             db.endTransaction();
                         }
-                        mDatabaseHelper.closeDatabase();
+                        databaseHelper.closeDatabase();
                     }
                 }
                 return null;
@@ -105,7 +105,7 @@ public class ReadingProgressManager {
                 SQLiteDatabase db = null;
                 Cursor cursor = null;
                 try {
-                    db = mDatabaseHelper.openDatabase();
+                    db = databaseHelper.openDatabase();
                     if (db == null) {
                         Analytics.trackException("Failed to open database.");
                         return null;
@@ -138,7 +138,7 @@ public class ReadingProgressManager {
                         cursor.close();
                     }
                     if (db != null) {
-                        mDatabaseHelper.closeDatabase();
+                        databaseHelper.closeDatabase();
                     }
                 }
             }

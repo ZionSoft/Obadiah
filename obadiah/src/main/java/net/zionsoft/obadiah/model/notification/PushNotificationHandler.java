@@ -63,7 +63,7 @@ public class PushNotificationHandler extends IntentService {
     private static final String MESSAGE_TYPE_NEW_TRANSLATION = "newTranslation";
 
     @Inject
-    DatabaseHelper mDatabaseHelper;
+    DatabaseHelper databaseHelper;
 
     public PushNotificationHandler() {
         super("net.zionsoft.obadiah.model.notification.PushNotificationHandler");
@@ -136,7 +136,7 @@ public class PushNotificationHandler extends IntentService {
             final int chapterIndex = jsonObject.getInt("chapter");
             final int verseIndex = jsonObject.getInt("verse");
 
-            db = mDatabaseHelper.openDatabase();
+            db = databaseHelper.openDatabase();
             final String bookName = TranslationHelper.getBookNames(db, translationShortName).get(bookIndex);
             final Verse verse = TranslationHelper.getVerse(db, translationShortName, bookName,
                     bookIndex, chapterIndex, verseIndex);
@@ -155,7 +155,7 @@ public class PushNotificationHandler extends IntentService {
             return false;
         } finally {
             if (db != null) {
-                mDatabaseHelper.closeDatabase();
+                databaseHelper.closeDatabase();
             }
         }
         return true;

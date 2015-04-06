@@ -37,28 +37,28 @@ import javax.inject.Inject;
 
 public class SearchResultListAdapter extends BaseAdapter {
     @Inject
-    Settings mSettings;
+    Settings settings;
 
-    private final LayoutInflater mInflater;
-    private final Resources mResources;
-    private List<Verse> mVerses;
+    private final LayoutInflater inflater;
+    private final Resources resources;
+    private List<Verse> verses;
 
     public SearchResultListAdapter(Context context) {
         super();
         App.get(context).getInjectionComponent().inject(this);
 
-        mInflater = LayoutInflater.from(context);
-        mResources = context.getResources();
+        inflater = LayoutInflater.from(context);
+        resources = context.getResources();
     }
 
     @Override
     public int getCount() {
-        return mVerses == null ? 0 : mVerses.size();
+        return verses == null ? 0 : verses.size();
     }
 
     @Override
     public Verse getItem(int position) {
-        return mVerses.get(position);
+        return verses.get(position);
     }
 
     @Override
@@ -69,13 +69,13 @@ public class SearchResultListAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         final TextView textView = (TextView) (convertView == null
-                ? mInflater.inflate(R.layout.item_search_result, parent, false) : convertView);
+                ? inflater.inflate(R.layout.item_search_result, parent, false) : convertView);
 
-        textView.setTextColor(mSettings.getTextColor());
+        textView.setTextColor(settings.getTextColor());
         textView.setTextSize(TypedValue.COMPLEX_UNIT_PX,
-                mResources.getDimension(mSettings.getTextSize().textSize));
+                resources.getDimension(settings.getTextSize().textSize));
 
-        final Verse verse = mVerses.get(position);
+        final Verse verse = verses.get(position);
         textView.setText(String.format("%s %d:%d\n%s", verse.bookName,
                 verse.chapterIndex + 1, verse.verseIndex + 1, verse.verseText));
 
@@ -83,6 +83,6 @@ public class SearchResultListAdapter extends BaseAdapter {
     }
 
     public void setVerses(List<Verse> verses) {
-        mVerses = verses;
+        this.verses = verses;
     }
 }

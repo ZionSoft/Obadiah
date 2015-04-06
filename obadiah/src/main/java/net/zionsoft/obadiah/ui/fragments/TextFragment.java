@@ -47,26 +47,22 @@ public class TextFragment extends BaseFragment implements VersePagerAdapter.List
     }
 
     @InjectView(R.id.verse_view_pager)
-    ViewPager mVerseViewPager;
+    ViewPager verseViewPager;
 
-    private Listener mListener;
+    private Listener listener;
 
-    private VersePagerAdapter mVersePagerAdapter;
+    private VersePagerAdapter versePagerAdapter;
 
-    private ActionMode mActionMode;
+    private ActionMode actionMode;
     @SuppressWarnings("deprecation")
-    private ClipboardManager mClipboardManager;
-
-    public TextFragment() {
-        super();
-    }
+    private ClipboardManager clipboardManager;
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
 
         setRetainInstance(true);
-        mListener = (Listener) activity;
+        listener = (Listener) activity;
     }
 
     @Override
@@ -79,10 +75,10 @@ public class TextFragment extends BaseFragment implements VersePagerAdapter.List
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        mVersePagerAdapter = new VersePagerAdapter(getActivity(), this);
+        versePagerAdapter = new VersePagerAdapter(getActivity(), this);
 
-        mVerseViewPager.setAdapter(mVersePagerAdapter);
-        mVerseViewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+        verseViewPager.setAdapter(versePagerAdapter);
+        verseViewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             public void onPageScrollStateChanged(int state) {
                 // do nothing
             }
@@ -93,11 +89,11 @@ public class TextFragment extends BaseFragment implements VersePagerAdapter.List
             }
 
             public void onPageSelected(int position) {
-                if (mActionMode != null)
-                    mActionMode.finish();
+                if (actionMode != null)
+                    actionMode.finish();
 
-                if (mListener != null)
-                    mListener.onChapterSelected(position);
+                if (listener != null)
+                    listener.onChapterSelected(position);
             }
         });
     }
@@ -106,20 +102,20 @@ public class TextFragment extends BaseFragment implements VersePagerAdapter.List
     public void onStart() {
         super.onStart();
 
-        mVersePagerAdapter.notifyDataSetChanged();
+        versePagerAdapter.notifyDataSetChanged();
     }
 
     @Override
     public void onStop() {
-        if (mActionMode != null)
-            mActionMode.finish();
+        if (actionMode != null)
+            actionMode.finish();
 
         super.onStop();
     }
 
     @Override
     public void onDetach() {
-        mListener = null;
+        listener = null;
 
         super.onDetach();
     }
@@ -127,9 +123,9 @@ public class TextFragment extends BaseFragment implements VersePagerAdapter.List
     @Override
     public void onVersesSelectionChanged(boolean hasSelected) {
         if (hasSelected) {
-            if (mActionMode != null)
+            if (actionMode != null)
                 return;
-            mActionMode = ((ActionBarActivity) getActivity()).startSupportActionMode(new ActionMode.Callback() {
+            actionMode = ((ActionBarActivity) getActivity()).startSupportActionMode(new ActionMode.Callback() {
                 @Override
                 public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
                     actionMode.getMenuInflater().inflate(R.menu.menu_text_selection_context, menu);
@@ -148,11 +144,11 @@ public class TextFragment extends BaseFragment implements VersePagerAdapter.List
                             Analytics.trackUIEvent("copy");
 
                             final Activity activity = getActivity();
-                            if (mClipboardManager == null) {
+                            if (clipboardManager == null) {
                                 // noinspection deprecation
-                                mClipboardManager = (ClipboardManager) activity.getSystemService(Context.CLIPBOARD_SERVICE);
+                                clipboardManager = (ClipboardManager) activity.getSystemService(Context.CLIPBOARD_SERVICE);
                             }
-                            mClipboardManager.setText(buildText(mVersePagerAdapter.getSelectedVerses(mVerseViewPager.getCurrentItem())));
+                            clipboardManager.setText(buildText(versePagerAdapter.getSelectedVerses(verseViewPager.getCurrentItem())));
                             Toast.makeText(activity, R.string.toast_verses_copied, Toast.LENGTH_SHORT).show();
                             actionMode.finish();
                             return true;
@@ -161,7 +157,7 @@ public class TextFragment extends BaseFragment implements VersePagerAdapter.List
 
                             startActivity(Intent.createChooser(new Intent().setAction(Intent.ACTION_SEND).setType("text/plain")
                                             .putExtra(Intent.EXTRA_TEXT,
-                                                    buildText(mVersePagerAdapter.getSelectedVerses(mVerseViewPager.getCurrentItem()))),
+                                                    buildText(versePagerAdapter.getSelectedVerses(verseViewPager.getCurrentItem()))),
                                     getResources().getText(R.string.text_share_with)
                             ));
                             actionMode.finish();
@@ -173,15 +169,15 @@ public class TextFragment extends BaseFragment implements VersePagerAdapter.List
 
                 @Override
                 public void onDestroyActionMode(ActionMode actionMode) {
-                    if (actionMode != mActionMode)
+                    if (actionMode != TextFragment.this.actionMode)
                         return;
-                    mVersePagerAdapter.deselectVerses();
-                    mActionMode = null;
+                    versePagerAdapter.deselectVerses();
+                    TextFragment.this.actionMode = null;
                 }
             });
         } else {
-            if (mActionMode != null)
-                mActionMode.finish();
+            if (actionMode != null)
+                actionMode.finish();
         }
     }
 
@@ -199,19 +195,19 @@ public class TextFragment extends BaseFragment implements VersePagerAdapter.List
     }
 
     public int getCurrentVerse() {
-        return mVersePagerAdapter.getCurrentVerse(mVerseViewPager.getCurrentItem());
+        return versePagerAdapter.getCurrentVerse(verseViewPager.getCurrentItem());
     }
 
     public void setSelected(int currentBook, int currentChapter, int currentVerse) {
-        mVersePagerAdapter.setSelected(currentBook, currentChapter, currentVerse);
-        mVersePagerAdapter.notifyDataSetChanged();
+        versePagerAdapter.setSelected(currentBook, currentChapter, currentVerse);
+        versePagerAdapter.notifyDataSetChanged();
 
-        mVerseViewPager.setCurrentItem(currentChapter, true);
+        verseViewPager.setCurrentItem(currentChapter, true);
     }
 
     public void setSelected(String translationShortName, int currentBook,
                             int currentChapter, int currentVerse) {
-        mVersePagerAdapter.setTranslationShortName(translationShortName);
+        versePagerAdapter.setTranslationShortName(translationShortName);
 
         setSelected(currentBook, currentChapter, currentVerse);
     }

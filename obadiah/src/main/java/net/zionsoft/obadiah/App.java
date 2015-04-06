@@ -36,16 +36,16 @@ import javax.inject.Inject;
 
 public class App extends Application {
     @Inject
-    Bible mBible;
+    Bible bible;
 
-    private InjectionComponent mInjectionComponent;
+    private InjectionComponent injectionComponent;
 
     public static App get(Context context) {
         return (App) context.getApplicationContext();
     }
 
     public InjectionComponent getInjectionComponent() {
-        return mInjectionComponent;
+        return injectionComponent;
     }
 
     @Override
@@ -56,10 +56,10 @@ public class App extends Application {
             Crashlytics.start(this);
         }
 
-        mInjectionComponent = Dagger_InjectionComponent.builder()
+        injectionComponent = Dagger_InjectionComponent.builder()
                 .injectionModule(new InjectionModule(this))
                 .build();
-        mInjectionComponent.inject(this);
+        injectionComponent.inject(this);
 
         Analytics.initialize(this);
         PushNotificationRegister.register(this);
@@ -72,7 +72,7 @@ public class App extends Application {
 
     @Override
     public void onLowMemory() {
-        mBible.clearCache();
+        bible.clearCache();
 
         super.onLowMemory();
     }

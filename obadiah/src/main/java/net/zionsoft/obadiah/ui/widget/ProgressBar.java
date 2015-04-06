@@ -35,15 +35,15 @@ public class ProgressBar extends View {
     private static final int DEFAULT_TEXT_SIZE = 20;
 
     // TODO introduces custom attributes for them
-    private Paint mBackGroundPaint;
-    private Paint mProgressPaint;
-    private Paint mFullProgressPaint;
-    private Paint mTextPaint;
+    private Paint backGroundPaint;
+    private Paint progressPaint;
+    private Paint fullProgressPaint;
+    private Paint textPaint;
 
-    private int mProgress;
-    private int mMaxProgress = DEFAULT_MAX_PROGRESS;
-    private int mTextPadding = DEFAULT_TEXT_PADDING;
-    private String mText;
+    private int progress;
+    private int maxProgress = DEFAULT_MAX_PROGRESS;
+    private int textPadding = DEFAULT_TEXT_PADDING;
+    private String text;
 
     public ProgressBar(Context context) {
         super(context);
@@ -67,18 +67,18 @@ public class ProgressBar extends View {
 
     private void init(Context context) {
         final Resources resources = context.getResources();
-        mBackGroundPaint = new Paint();
-        mBackGroundPaint.setColor(Color.LTGRAY);
-        mProgressPaint = new Paint();
-        mProgressPaint.setColor(resources.getColor(R.color.dark_cyan));
-        mFullProgressPaint = new Paint();
-        mFullProgressPaint.setColor(resources.getColor(R.color.dark_lime));
-        mTextPaint = new Paint();
-        mTextPaint.setAntiAlias(true);
-        mTextPaint.setColor(Color.BLACK);
-        mTextPaint.setTextAlign(Paint.Align.RIGHT);
-        mTextPaint.setTextSize(DEFAULT_TEXT_SIZE);
-        mTextPaint.setTypeface(Typeface.DEFAULT_BOLD);
+        backGroundPaint = new Paint();
+        backGroundPaint.setColor(Color.LTGRAY);
+        progressPaint = new Paint();
+        progressPaint.setColor(resources.getColor(R.color.dark_cyan));
+        fullProgressPaint = new Paint();
+        fullProgressPaint.setColor(resources.getColor(R.color.dark_lime));
+        textPaint = new Paint();
+        textPaint.setAntiAlias(true);
+        textPaint.setColor(Color.BLACK);
+        textPaint.setTextAlign(Paint.Align.RIGHT);
+        textPaint.setTextSize(DEFAULT_TEXT_SIZE);
+        textPaint.setTypeface(Typeface.DEFAULT_BOLD);
     }
 
     private void setAttrs(AttributeSet attrs) {
@@ -86,9 +86,9 @@ public class ProgressBar extends View {
             return;
 
         final TypedArray attributes = getContext().obtainStyledAttributes(attrs, R.styleable.ProgressBar, 0, 0);
-        mMaxProgress = attributes.getInt(R.styleable.ProgressBar_maxProgress, DEFAULT_MAX_PROGRESS);
-        mTextPadding = attributes.getDimensionPixelSize(R.styleable.ProgressBar_textPadding, DEFAULT_TEXT_PADDING);
-        mTextPaint.setTextSize(attributes.getDimensionPixelSize(R.styleable.ProgressBar_textSize, DEFAULT_TEXT_SIZE));
+        maxProgress = attributes.getInt(R.styleable.ProgressBar_maxProgress, DEFAULT_MAX_PROGRESS);
+        textPadding = attributes.getDimensionPixelSize(R.styleable.ProgressBar_textPadding, DEFAULT_TEXT_PADDING);
+        textPaint.setTextSize(attributes.getDimensionPixelSize(R.styleable.ProgressBar_textSize, DEFAULT_TEXT_SIZE));
         attributes.recycle();
     }
 
@@ -103,18 +103,18 @@ public class ProgressBar extends View {
         final int right = width - paddingRight;
         final int height = getHeight();
         final int bottom = height - getPaddingBottom();
-        if (mProgress <= 0) {
-            canvas.drawRect(paddingLeft, paddingTop, right, bottom, mBackGroundPaint);
-        } else if (mProgress >= mMaxProgress) {
-            canvas.drawRect(paddingLeft, paddingTop, right, bottom, mFullProgressPaint);
+        if (progress <= 0) {
+            canvas.drawRect(paddingLeft, paddingTop, right, bottom, backGroundPaint);
+        } else if (progress >= maxProgress) {
+            canvas.drawRect(paddingLeft, paddingTop, right, bottom, fullProgressPaint);
         } else {
-            final int middle = mProgress * (width - paddingLeft - paddingRight) / mMaxProgress;
-            canvas.drawRect(paddingLeft, paddingTop, middle, bottom, mProgressPaint);
-            canvas.drawRect(middle, paddingTop, right, bottom, mBackGroundPaint);
+            final int middle = progress * (width - paddingLeft - paddingRight) / maxProgress;
+            canvas.drawRect(paddingLeft, paddingTop, middle, bottom, progressPaint);
+            canvas.drawRect(middle, paddingTop, right, bottom, backGroundPaint);
         }
 
-        if (mText != null)
-            canvas.drawText(mText, width - mTextPadding, height - mTextPadding, mTextPaint);
+        if (text != null)
+            canvas.drawText(text, width - textPadding, height - textPadding, textPaint);
     }
 
     @Override
@@ -127,22 +127,22 @@ public class ProgressBar extends View {
         }
 
         // we only use match_parent for width, and wrap_content for height
-        final int height = (int) (mTextPaint.getTextSize()) + 2 * mTextPadding;
+        final int height = (int) (textPaint.getTextSize()) + 2 * textPadding;
         setMeasuredDimension(MeasureSpec.getSize(widthMeasureSpec),
                 heightSpecMode == MeasureSpec.UNSPECIFIED ? height : Math.min(height, MeasureSpec.getSize(heightMeasureSpec)));
     }
 
     public void setProgress(int progress) {
-        mProgress = progress;
+        this.progress = progress;
         postInvalidate();
     }
 
     public int getMaxProgress() {
-        return mMaxProgress;
+        return maxProgress;
     }
 
     public void setText(String text) {
-        mText = text;
+        this.text = text;
         postInvalidate();
     }
 }

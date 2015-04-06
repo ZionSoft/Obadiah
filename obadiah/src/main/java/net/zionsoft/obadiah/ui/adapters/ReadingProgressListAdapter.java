@@ -58,38 +58,38 @@ public class ReadingProgressListAdapter extends BaseAdapter {
     }
 
     @Inject
-    Settings mSettings;
+    Settings settings;
 
-    private final int mTextColor;
-    private final float mSmallerTextSize;
+    private final int textColor;
+    private final float smallerTextSize;
 
-    private final DateFormatter mDateFormatter;
-    private final Resources mResources;
-    private final LayoutInflater mInflater;
+    private final DateFormatter dateFormatter;
+    private final Resources resources;
+    private final LayoutInflater inflater;
 
-    private List<String> mBookNames;
-    private ReadingProgress mReadingProgress;
+    private List<String> bookNames;
+    private ReadingProgress readingProgress;
 
     public ReadingProgressListAdapter(Context context) {
         super();
         App.get(context).getInjectionComponent().inject(this);
 
-        mTextColor = mSettings.getTextColor();
-        mSmallerTextSize = context.getResources().getDimension(mSettings.getTextSize().smallerTextSize);
+        textColor = settings.getTextColor();
+        smallerTextSize = context.getResources().getDimension(settings.getTextSize().smallerTextSize);
 
-        mResources = context.getResources();
-        mDateFormatter = new DateFormatter(mResources);
-        mInflater = LayoutInflater.from(context);
+        resources = context.getResources();
+        dateFormatter = new DateFormatter(resources);
+        inflater = LayoutInflater.from(context);
     }
 
     @Override
     public int getCount() {
-        return mBookNames == null || mReadingProgress == null ? 0 : mBookNames.size();
+        return bookNames == null || readingProgress == null ? 0 : bookNames.size();
     }
 
     @Override
     public String getItem(int position) {
-        return mBookNames == null || mReadingProgress == null ? null : mBookNames.get(position);
+        return bookNames == null || readingProgress == null ? null : bookNames.get(position);
     }
 
     @Override
@@ -102,23 +102,23 @@ public class ReadingProgressListAdapter extends BaseAdapter {
         final View rootView;
         final ViewTag viewTag;
         if (convertView == null) {
-            rootView = mInflater.inflate(R.layout.item_reading_progress, parent, false);
+            rootView = inflater.inflate(R.layout.item_reading_progress, parent, false);
 
             viewTag = new ViewTag(rootView);
-            viewTag.bookName.setTextColor(mTextColor);
-            viewTag.bookName.setTextSize(TypedValue.COMPLEX_UNIT_PX, mSmallerTextSize);
-            viewTag.lastReadChapter.setTextColor(mTextColor);
-            viewTag.lastReadChapter.setTextSize(TypedValue.COMPLEX_UNIT_PX, mSmallerTextSize);
+            viewTag.bookName.setTextColor(textColor);
+            viewTag.bookName.setTextSize(TypedValue.COMPLEX_UNIT_PX, smallerTextSize);
+            viewTag.lastReadChapter.setTextColor(textColor);
+            viewTag.lastReadChapter.setTextSize(TypedValue.COMPLEX_UNIT_PX, smallerTextSize);
             rootView.setTag(viewTag);
         } else {
             rootView = convertView;
             viewTag = (ViewTag) rootView.getTag();
         }
 
-        viewTag.bookName.setText(mBookNames.get(position));
+        viewTag.bookName.setText(bookNames.get(position));
 
-        final int chaptersRead = mReadingProgress.getChapterRead(position);
-        final int chaptersCount = mReadingProgress.getChapterCount(position);
+        final int chaptersRead = readingProgress.getChapterRead(position);
+        final int chaptersCount = readingProgress.getChapterCount(position);
         int progress = chaptersRead * viewTag.readingProgress.getMaxProgress() / chaptersCount;
         if (progress == 0 && chaptersRead > 0) {
             // always show something if progress has been made
@@ -128,9 +128,9 @@ public class ReadingProgressListAdapter extends BaseAdapter {
         viewTag.readingProgress.setText(String.format("%d / %d", chaptersRead, chaptersCount));
 
         if (chaptersRead > 0) {
-            final Pair<Integer, Long> lastReadChapter = mReadingProgress.getLastReadChapter(position);
-            viewTag.lastReadChapter.setText(mResources.getString(R.string.text_last_read_chapter,
-                    lastReadChapter.first + 1, mDateFormatter.format(lastReadChapter.second)));
+            final Pair<Integer, Long> lastReadChapter = readingProgress.getLastReadChapter(position);
+            viewTag.lastReadChapter.setText(resources.getString(R.string.text_last_read_chapter,
+                    lastReadChapter.first + 1, dateFormatter.format(lastReadChapter.second)));
             viewTag.lastReadChapter.setVisibility(View.VISIBLE);
         } else {
             viewTag.lastReadChapter.setVisibility(View.GONE);
@@ -140,7 +140,7 @@ public class ReadingProgressListAdapter extends BaseAdapter {
     }
 
     public void setData(List<String> bookNames, ReadingProgress readingProgress) {
-        mBookNames = bookNames;
-        mReadingProgress = readingProgress;
+        this.bookNames = bookNames;
+        this.readingProgress = readingProgress;
     }
 }
