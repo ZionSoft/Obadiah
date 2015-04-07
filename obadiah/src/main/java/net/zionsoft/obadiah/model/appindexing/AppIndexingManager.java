@@ -65,7 +65,7 @@ public class AppIndexingManager {
 
             mAppIndexingUri = Uri.parse(String.format(APP_URI_TEMPLATE, translationShortName, bookIndex, chapterIndex));
             AppIndex.AppIndexApi.view(googleApiClient, activity, mAppIndexingUri,
-                    String.format(TITLE_TEMPLATE, translationShortName, chapterIndex + 1, bookName),
+                    String.format(TITLE_TEMPLATE, bookName, chapterIndex + 1, translationShortName),
                     Uri.parse(String.format(WEB_URI_TEMPLATE, translationShortName, bookIndex, chapterIndex)), null);
         }
     }
