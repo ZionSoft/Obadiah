@@ -22,7 +22,7 @@ import android.content.Context;
 
 import com.crashlytics.android.Crashlytics;
 
-import net.zionsoft.obadiah.injection.Dagger_InjectionComponent;
+import net.zionsoft.obadiah.injection.DaggerInjectionComponent;
 import net.zionsoft.obadiah.injection.InjectionComponent;
 import net.zionsoft.obadiah.injection.InjectionModule;
 import net.zionsoft.obadiah.legacy.Upgrader;
@@ -56,7 +56,7 @@ public class App extends Application {
             Crashlytics.start(this);
         }
 
-        injectionComponent = Dagger_InjectionComponent.builder()
+        injectionComponent = DaggerInjectionComponent.builder()
                 .injectionModule(new InjectionModule(this))
                 .build();
         injectionComponent.inject(this);
