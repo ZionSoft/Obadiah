@@ -34,12 +34,12 @@ public abstract class SimpleAsyncTask<Params, Progress, Result> extends AsyncTas
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
             try {
                 executeOnExecutor(THREAD_POOL_EXECUTOR, params);
-                return;
             } catch (RejectedExecutionException e) {
+                // well, it just fails
                 Crashlytics.logException(e);
-                // falls through
             }
+        } else {
+            execute(params);
         }
-        execute(params);
     }
 }
