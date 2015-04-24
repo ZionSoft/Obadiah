@@ -46,7 +46,7 @@ import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.appindexing.AppIndexingManager;
 import net.zionsoft.obadiah.model.utils.AppUpdateChecker;
 import net.zionsoft.obadiah.model.utils.UriHelper;
-import net.zionsoft.obadiah.ui.activities.BaseActionBarActivity;
+import net.zionsoft.obadiah.ui.activities.BaseAppCompatActivity;
 import net.zionsoft.obadiah.ui.activities.ReadingProgressActivity;
 import net.zionsoft.obadiah.ui.activities.SearchActivity;
 import net.zionsoft.obadiah.ui.activities.SettingsActivity;
@@ -63,7 +63,7 @@ import javax.inject.Inject;
 
 import butterknife.InjectView;
 
-public class BookSelectionActivity extends BaseActionBarActivity
+public class BookSelectionActivity extends BaseAppCompatActivity
         implements ChapterSelectionFragment.Listener, TextFragment.Listener {
     private static final String KEY_MESSAGE_TYPE = "net.zionsoft.obadiah.BookSelectionActivity.KEY_MESSAGE_TYPE";
     private static final String KEY_BOOK_INDEX = "net.zionsoft.obadiah.BookSelectionActivity.KEY_BOOK_INDEX";

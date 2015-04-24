@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+       xmlns:tools="http://schemas.android.com/tools">
 
     <android.support.v7.widget.SwitchCompat
         android:id="@+id/switch_button"
         android:background="@drawable/background_text"
         android:layout_width="match_parent"
         android:layout_height="@dimen/item_height"
-        android:paddingLeft="@dimen/paddingLeft"
-        android:paddingRight="@dimen/paddingRight"
-        tools:text="Title" />
+        android:layout_marginLeft="@dimen/paddingLeft"
+        android:layout_marginRight="@dimen/paddingRight"
+        tools:text="Title"/>
 
     <View
         android:id="@+id/divider_view"
         style="@style/Divider.Horizontal"
         android:layout_gravity="bottom"
-        android:background="@android:color/darker_gray" />
+        android:background="@android:color/darker_gray"/>
 </merge>

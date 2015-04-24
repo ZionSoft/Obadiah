@@ -48,7 +48,7 @@ import javax.inject.Inject;
 
 import butterknife.InjectView;
 
-public class SettingsActivity extends BaseActionBarActivity {
+public class SettingsActivity extends BaseAppCompatActivity {
     public static Intent newStartIntent(Context context) {
         return new Intent(context, SettingsActivity.class);
     }

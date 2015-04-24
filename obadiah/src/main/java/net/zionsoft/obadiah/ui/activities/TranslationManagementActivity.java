@@ -39,7 +39,7 @@ import javax.inject.Inject;
 
 import butterknife.InjectView;
 
-public class TranslationManagementActivity extends BaseActionBarActivity {
+public class TranslationManagementActivity extends BaseAppCompatActivity {
     private static final String KEY_MESSAGE_TYPE = "net.zionsoft.obadiah.ui.activities.TranslationManagementActivity.KEY_MESSAGE_TYPE";
 
     public static Intent newStartReorderToTopIntent(Context context, String messageType) {

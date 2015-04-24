@@ -17,7 +17,7 @@
 
 package net.zionsoft.obadiah.ui.activities;
 
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -26,7 +26,7 @@ import net.zionsoft.obadiah.model.analytics.Analytics;
 
 import butterknife.ButterKnife;
 
-public abstract class BaseActionBarActivity extends ActionBarActivity {
+public abstract class BaseAppCompatActivity extends AppCompatActivity {
     @Override
     public void setContentView(View view) {
         super.setContentView(view);

@@ -47,7 +47,7 @@ import javax.inject.Inject;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 
-public class ReadingProgressActivity extends BaseActionBarActivity {
+public class ReadingProgressActivity extends BaseAppCompatActivity {
     public static Intent newStartIntent(Context context) {
         return new Intent(context, ReadingProgressActivity.class);
     }

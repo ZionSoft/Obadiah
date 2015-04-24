@@ -56,7 +56,7 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:appcompat-v7:22.0.0'
+    compile 'com.android.support:appcompat-v7:22.1.1'
     compile 'com.google.android.gms:play-services-ads:7.0.0'
     compile 'com.google.android.gms:play-services-appindexing:7.0.0'
     compile 'com.google.android.gms:play-services-gcm:7.0.0'

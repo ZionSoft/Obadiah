@@ -58,7 +58,7 @@ import javax.inject.Inject;
 
 import butterknife.InjectView;
 
-public class SearchActivity extends BaseActionBarActivity {
+public class SearchActivity extends BaseAppCompatActivity {
     public static Intent newStartReorderToTopIntent(Context context) {
         final Intent startIntent = new Intent(context, SearchActivity.class);
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {

@@ -29,7 +29,7 @@ import net.zionsoft.obadiah.model.Settings;
 
 import javax.inject.Inject;
 
-public class OpenSourceLicenseListActivity extends BaseActionBarActivity {
+public class OpenSourceLicenseListActivity extends BaseAppCompatActivity {
     public static Intent newStartIntent(Context context) {
         return new Intent(context, OpenSourceLicenseListActivity.class);
     }
