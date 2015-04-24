@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="net.zionsoft.obadiah">
+          package="net.zionsoft.obadiah">
 
     <permission
         android:name="${applicationId}.permission.C2D_MESSAGE"
-        android:protectionLevel="signature" />
+        android:protectionLevel="signature"/>
 
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="com.android.vending.BILLING" />
-    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
-    <uses-permission android:name="${applicationId}.permission.C2D_MESSAGE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="com.android.vending.BILLING"/>
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE"/>
+    <uses-permission android:name="${applicationId}.permission.C2D_MESSAGE"/>
 
     <application
         android:allowBackup="true"
@@ -22,90 +22,90 @@
             android:name=".BookSelectionActivity"
             android:label="@string/app_name">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.MAIN"/>
 
-                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
             <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
+                <action android:name="android.intent.action.VIEW"/>
 
                 <data
                     android:scheme="http"
                     android:host="bible.zionsoft.net"
-                    android:pathPrefix="/bible" />
+                    android:pathPrefix="/bible"/>
 
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
             </intent-filter>
         </activity>
         <activity
             android:name=".ui.activities.OpenSourceLicenseListActivity"
-            android:label="@string/activity_open_source_licenses" />
+            android:label="@string/activity_open_source_licenses"/>
         <activity
             android:name=".ui.activities.ReadingProgressActivity"
-            android:label="@string/activity_reading_progress" />
+            android:label="@string/activity_reading_progress"/>
         <activity
             android:name=".ui.activities.SearchActivity"
             android:launchMode="singleTop">
             <intent-filter>
-                <action android:name="android.intent.action.SEARCH" />
+                <action android:name="android.intent.action.SEARCH"/>
             </intent-filter>
             <intent-filter>
-                <action android:name="com.google.android.gms.actions.SEARCH_ACTION" />
-                <category android:name="android.intent.category.DEFAULT" />
+                <action android:name="com.google.android.gms.actions.SEARCH_ACTION"/>
+                <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
 
             <meta-data
                 android:name="android.app.searchable"
-                android:resource="@xml/searchable" />
+                android:resource="@xml/searchable"/>
         </activity>
         <activity android:name=".ui.activities.ShortcutActivity">
             <intent-filter>
-                <action android:name="android.intent.action.CREATE_SHORTCUT" />
+                <action android:name="android.intent.action.CREATE_SHORTCUT"/>
 
-                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
         <activity
             android:name=".ui.activities.SettingsActivity"
-            android:label="@string/activity_settings" />
+            android:label="@string/activity_settings"/>
         <activity
             android:name=".ui.activities.TranslationManagementActivity"
-            android:label="@string/activity_manage_translation" />
+            android:label="@string/activity_manage_translation"/>
 
         <activity
             android:name="com.google.android.gms.ads.AdActivity"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize" />
+            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"/>
 
         <provider
             android:name=".model.search.RecentSearchProvider"
             android:authorities="${applicationId}.model.search.RecentSearchProvider"
-            android:exported="false" />
+            android:exported="false"/>
 
         <receiver
             android:name=".model.notification.PushNotificationReceiver"
             android:permission="com.google.android.c2dm.permission.SEND">
             <intent-filter>
-                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
-                <category android:name="net.zionsoft.obadiah" />
+                <action android:name="com.google.android.c2dm.intent.RECEIVE"/>
+                <category android:name="net.zionsoft.obadiah"/>
             </intent-filter>
         </receiver>
         <receiver android:name=".utils.PackageUpdateReceiver">
             <intent-filter>
-                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
             </intent-filter>
         </receiver>
 
-        <service android:name=".model.notification.PushNotificationHandler" />
-        <service android:name=".model.notification.PushNotificationRegister" />
-        <service android:name=".model.utils.AppUpdateChecker" />
+        <service android:name=".model.notification.PushNotificationHandler"/>
+        <service android:name=".model.notification.PushNotificationRegister"/>
+        <service android:name=".model.utils.AppUpdateChecker"/>
 
         <meta-data
             android:name="com.google.android.gms.version"
-            android:value="@integer/google_play_services_version" />
+            android:value="@integer/google_play_services_version"/>
         <meta-data
             android:name="com.crashlytics.ApiKey"
-            android:value="TODO" />
+            android:value="TODO"/>
     </application>
 
 </manifest>
