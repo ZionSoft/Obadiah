@@ -22,7 +22,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.text.ClipboardManager;
 import android.view.LayoutInflater;
@@ -125,7 +125,7 @@ public class TextFragment extends BaseFragment implements VersePagerAdapter.List
         if (hasSelected) {
             if (actionMode != null)
                 return;
-            actionMode = ((ActionBarActivity) getActivity()).startSupportActionMode(new ActionMode.Callback() {
+            actionMode = ((AppCompatActivity) getActivity()).startSupportActionMode(new ActionMode.Callback() {
                 @Override
                 public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
                     actionMode.getMenuInflater().inflate(R.menu.menu_text_selection_context, menu);
