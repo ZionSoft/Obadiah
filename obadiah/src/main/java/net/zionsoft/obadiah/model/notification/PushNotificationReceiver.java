@@ -20,26 +20,18 @@ package net.zionsoft.obadiah.model.notification;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-
-import com.google.android.gms.gcm.GoogleCloudMessaging;
+import android.text.TextUtils;
 
 import net.zionsoft.obadiah.model.analytics.Analytics;
 
 public class PushNotificationReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-        GoogleCloudMessaging gcm = null;
-        try {
-            gcm = GoogleCloudMessaging.getInstance(context);
-            final String messageType = gcm.getMessageType(intent);
+        // should just use GcmReceiver, but it requires the WAKE_LOCK permission
+        final String messageType = intent.getStringExtra("message_type");
+        if (TextUtils.isEmpty(messageType) || messageType.equals("gcm")) {
             Analytics.trackNotificationEvent("notification_received", messageType);
-            if (GoogleCloudMessaging.MESSAGE_TYPE_MESSAGE.equals(messageType)) {
-                context.startService(PushNotificationHandler.newStartIntent(context, intent.getExtras()));
-            }
-        } finally {
-            if (gcm != null) {
-                gcm.close();
-            }
+            context.startService(PushNotificationHandler.newStartIntent(context, intent.getExtras()));
         }
     }
 }

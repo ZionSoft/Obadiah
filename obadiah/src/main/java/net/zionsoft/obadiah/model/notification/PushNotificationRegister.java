@@ -24,19 +24,12 @@ import android.content.Intent;
 import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.gcm.GcmPubSub;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.google.android.gms.iid.InstanceID;
 
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.analytics.Analytics;
-import net.zionsoft.obadiah.model.network.NetworkHelper;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
-import java.util.Date;
-import java.util.Locale;
-import java.util.TimeZone;
 
 public class PushNotificationRegister extends IntentService {
     public static void register(Context context) {
@@ -53,24 +46,15 @@ public class PushNotificationRegister extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        GoogleCloudMessaging gcm = null;
         try {
-            gcm = GoogleCloudMessaging.getInstance(this);
-            final String registrationId = gcm.register(getString(R.string.google_cloud_messaging_sender_id));
-
-            final JSONObject jsonObject = new JSONObject();
-            jsonObject.put("pushNotificationId", registrationId);
-            jsonObject.put("utcOffset", TimeZone.getDefault().getOffset(new Date().getTime()) / 1000);
-            jsonObject.put("locale", Locale.getDefault().toString().toLowerCase());
-            NetworkHelper.post(NetworkHelper.DEVICE_ACCOUNT_URL, jsonObject.toString());
+            final String token = InstanceID.getInstance(this).getToken(
+                    getString(R.string.google_cloud_messaging_sender_id),
+                    GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
+            GcmPubSub.getInstance(this).subscribe(token, "/topics/verses", null);
 
             Analytics.trackNotificationEvent("device_registered", null);
-        } catch (IOException | JSONException e) {
+        } catch (Exception e) {
             Crashlytics.logException(e);
-        } finally {
-            if (gcm != null) {
-                gcm.close();
-            }
         }
     }
 }
