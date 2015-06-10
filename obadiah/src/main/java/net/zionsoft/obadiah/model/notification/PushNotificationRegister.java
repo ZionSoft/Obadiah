@@ -50,7 +50,9 @@ public class PushNotificationRegister extends IntentService {
             final String token = InstanceID.getInstance(this).getToken(
                     getString(R.string.google_cloud_messaging_sender_id),
                     GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
-            GcmPubSub.getInstance(this).subscribe(token, "/topics/verses", null);
+            final GcmPubSub gcmPubSub = GcmPubSub.getInstance(this);
+            gcmPubSub.subscribe(token, "/topics/verses", null);
+            gcmPubSub.subscribe(token, "/topics/newTranslation", null);
 
             Analytics.trackNotificationEvent("device_registered", null);
         } catch (Exception e) {
