@@ -6,4 +6,4 @@
     android:paddingLeft="@dimen/paddingLeft"
     android:paddingRight="@dimen/paddingRight"
     android:gravity="left|center_vertical"
-    android:background="@drawable/background_item_translation" />
+    android:background="@drawable/background_text" />
