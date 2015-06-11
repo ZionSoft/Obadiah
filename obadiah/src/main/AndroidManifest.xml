@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="net.zionsoft.obadiah">
+<manifest
+    package="net.zionsoft.obadiah"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
     <permission
         android:name="${applicationId}.permission.C2D_MESSAGE"
@@ -13,10 +14,10 @@
     <uses-permission android:name="${applicationId}.permission.C2D_MESSAGE"/>
 
     <application
+        android:name=".App"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:name=".App"
         android:theme="@style/AppTheme">
         <activity
             android:name=".BookSelectionActivity"
@@ -30,9 +31,9 @@
                 <action android:name="android.intent.action.VIEW"/>
 
                 <data
-                    android:scheme="http"
                     android:host="bible.zionsoft.net"
-                    android:pathPrefix="/bible"/>
+                    android:pathPrefix="/bible"
+                    android:scheme="http"/>
 
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
@@ -99,6 +100,13 @@
         <service android:name=".model.notification.PushNotificationHandler"/>
         <service android:name=".model.notification.PushNotificationRegister"/>
         <service android:name=".model.utils.AppUpdateChecker"/>
+        <service
+            android:name=".model.notification.InstanceIDListener"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.android.gms.iid.InstanceID"/>
+            </intent-filter>
+        </service>
 
         <meta-data
             android:name="com.google.android.gms.version"

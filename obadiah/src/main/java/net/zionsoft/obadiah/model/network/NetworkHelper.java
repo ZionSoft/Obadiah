@@ -20,12 +20,8 @@ package net.zionsoft.obadiah.model.network;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.text.TextUtils;
-
-import com.crashlytics.android.Crashlytics;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -38,8 +34,6 @@ public class NetworkHelper {
 
     public static final String SECONDARY_TRANSLATIONS_LIST_URL = "http://bible.zionsoft.net/translations/list.json";
     public static final String SECONDARY_TRANSLATION_URL_TEMPLATE = "http://bible.zionsoft.net/translations/%s.zip";
-
-    public static final String DEVICE_ACCOUNT_URL = "https://z-bible.appspot.com/v1/account/device";
 
     public static boolean isOnline(Context context) {
         final ConnectivityManager connectivityManager
@@ -75,33 +69,5 @@ public class NetworkHelper {
             result = tmp;
         }
         return result;
-    }
-
-    public static void post(String url, String body) throws IOException {
-        final HttpURLConnection httpConnection = (HttpURLConnection) new URL(url).openConnection();
-        httpConnection.setRequestMethod("POST");
-
-        BufferedOutputStream bos = null;
-        try {
-            if (!TextUtils.isEmpty(body)) {
-                httpConnection.setDoOutput(true);
-
-                final byte[] output = body.getBytes();
-                httpConnection.setFixedLengthStreamingMode(output.length);
-                bos = new BufferedOutputStream(httpConnection.getOutputStream());
-                bos.write(output);
-                bos.flush();
-            }
-        } finally {
-            if (bos != null) {
-                try {
-                    bos.close();
-                } catch (IOException e) {
-                    // not much we can do
-                    Crashlytics.logException(e);
-                }
-            }
-            httpConnection.disconnect();
-        }
     }
 }
