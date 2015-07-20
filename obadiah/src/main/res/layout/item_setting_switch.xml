@@ -7,8 +7,8 @@
         android:background="@drawable/background_text"
         android:layout_width="match_parent"
         android:layout_height="@dimen/item_height"
-        android:layout_marginLeft="@dimen/paddingLeft"
-        android:layout_marginRight="@dimen/paddingRight"
+        android:paddingLeft="@dimen/paddingLeft"
+        android:paddingRight="@dimen/paddingRight"
         tools:text="Title"/>
 
     <View
