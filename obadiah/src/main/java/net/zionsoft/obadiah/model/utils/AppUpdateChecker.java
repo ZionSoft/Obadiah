@@ -78,7 +78,7 @@ public class AppUpdateChecker extends IntentService {
 
             editor.putLong(Constants.PREF_KEY_CHECKED_APPLICATION_VERSION_TIMESTAMP, now).apply();
         } catch (Exception e) {
-            Crashlytics.logException(e);
+            Crashlytics.getInstance().core.logException(e);
         }
     }
 
@@ -94,7 +94,7 @@ public class AppUpdateChecker extends IntentService {
             final int availableVersion = preferences.getInt(Constants.PREF_KEY_CHECKED_APPLICATION_VERSION, 0);
             return currentVersion < availableVersion;
         } catch (PackageManager.NameNotFoundException e) {
-            Crashlytics.logException(e);
+            Crashlytics.getInstance().core.logException(e);
             return false;
         }
     }

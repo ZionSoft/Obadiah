@@ -54,7 +54,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import butterknife.InjectView;
+import butterknife.Bind;
 
 public class TranslationListFragment extends BaseFragment implements SwipeRefreshLayout.OnRefreshListener,
         TranslationManager.OnTranslationsLoadedListener, TranslationManager.OnTranslationRemovedListener {
@@ -65,10 +65,10 @@ public class TranslationListFragment extends BaseFragment implements SwipeRefres
     @Inject
     TranslationManager translationManager;
 
-    @InjectView(R.id.swipe_container)
+    @Bind(R.id.swipe_container)
     SwipeRefreshLayout swipeContainer;
 
-    @InjectView(R.id.translation_list_view)
+    @Bind(R.id.translation_list_view)
     ListView translationListView;
 
     private SharedPreferences preferences;

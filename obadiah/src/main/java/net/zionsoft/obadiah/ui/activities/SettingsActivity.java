@@ -46,7 +46,7 @@ import net.zionsoft.obadiah.ui.widget.settings.SettingTitleDescriptionButton;
 
 import javax.inject.Inject;
 
-import butterknife.InjectView;
+import butterknife.Bind;
 
 public class SettingsActivity extends BaseAppCompatActivity {
     public static Intent newStartIntent(Context context) {
@@ -58,28 +58,28 @@ public class SettingsActivity extends BaseAppCompatActivity {
     @Inject
     Settings settings;
 
-    @InjectView(R.id.display_section_header)
+    @Bind(R.id.display_section_header)
     SettingSectionHeader displaySectionHeader;
 
-    @InjectView(R.id.screen_on_switch)
+    @Bind(R.id.screen_on_switch)
     SettingSwitch screenOnSwitch;
 
-    @InjectView(R.id.night_mode_switch)
+    @Bind(R.id.night_mode_switch)
     SettingSwitch nightModeSwitch;
 
-    @InjectView(R.id.text_size_setting_button)
+    @Bind(R.id.text_size_setting_button)
     SettingTitleDescriptionButton textSizeSettingButton;
 
-    @InjectView(R.id.about_section_header)
+    @Bind(R.id.about_section_header)
     SettingSectionHeader aboutSectionHeader;
 
-    @InjectView(R.id.rate_me_setting_button)
+    @Bind(R.id.rate_me_setting_button)
     SettingTitleDescriptionButton rateMeSettingButton;
 
-    @InjectView(R.id.version_setting_button)
+    @Bind(R.id.version_setting_button)
     SettingTitleDescriptionButton versionSettingButton;
 
-    @InjectView(R.id.license_setting_button)
+    @Bind(R.id.license_setting_button)
     SettingTitleDescriptionButton licenseSettingButton;
 
     private View rootView;

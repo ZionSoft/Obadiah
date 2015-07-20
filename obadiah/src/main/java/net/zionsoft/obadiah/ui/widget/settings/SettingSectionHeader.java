@@ -28,11 +28,11 @@ import android.widget.TextView;
 
 import net.zionsoft.obadiah.R;
 
+import butterknife.Bind;
 import butterknife.ButterKnife;
-import butterknife.InjectView;
 
 public class SettingSectionHeader extends FrameLayout {
-    @InjectView(R.id.header_text_view)
+    @Bind(R.id.header_text_view)
     TextView headerTextView;
 
     public SettingSectionHeader(Context context) {
@@ -52,7 +52,7 @@ public class SettingSectionHeader extends FrameLayout {
 
     private void init(@NonNull Context context, @Nullable AttributeSet attrs) {
         inflate(context, R.layout.header_setting_section, this);
-        ButterKnife.inject(this, this);
+        ButterKnife.bind(this, this);
 
         if (attrs != null) {
             final TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.SettingSectionHeader);

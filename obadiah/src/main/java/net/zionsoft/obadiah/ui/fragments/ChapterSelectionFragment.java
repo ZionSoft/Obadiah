@@ -35,7 +35,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import butterknife.InjectView;
+import butterknife.Bind;
 
 public class ChapterSelectionFragment extends BaseFragment {
     public interface Listener {
@@ -45,7 +45,7 @@ public class ChapterSelectionFragment extends BaseFragment {
     @Inject
     Bible bible;
 
-    @InjectView(R.id.book_list_view)
+    @Bind(R.id.book_list_view)
     ExpandableListView bookListView;
 
     private Listener listener;

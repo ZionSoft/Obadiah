@@ -96,13 +96,13 @@ public class TranslationManager {
                 try {
                     translations = downloadTranslationList(NetworkHelper.PRIMARY_TRANSLATIONS_LIST_URL);
                 } catch (Exception e) {
-                    Crashlytics.logException(e);
+                    Crashlytics.getInstance().core.logException(e);
                 }
                 if (translations == null) {
                     try {
                         translations = downloadTranslationList(NetworkHelper.SECONDARY_TRANSLATIONS_LIST_URL);
                     } catch (Exception e) {
-                        Crashlytics.logException(e);
+                        Crashlytics.getInstance().core.logException(e);
                         return null;
                     }
                 }
@@ -269,7 +269,7 @@ public class TranslationManager {
                     downloadTranslation(url, translationInfo.shortName, onProgress);
                     downloaded = true;
                 } catch (Exception e) {
-                    Crashlytics.logException(e);
+                    Crashlytics.getInstance().core.logException(e);
                 }
 
                 if (!downloaded) {
@@ -281,7 +281,8 @@ public class TranslationManager {
                         downloadTranslation(url, translationInfo.shortName, onProgress);
                         downloaded = true;
                     } catch (Exception e) {
-                        Crashlytics.logException(e);
+                        Crashlytics.getInstance().core.logException(e);
+                        Crashlytics.getInstance().core.logException(e);
                     }
                 }
                 return downloaded;

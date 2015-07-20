@@ -61,7 +61,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import butterknife.InjectView;
+import butterknife.Bind;
 
 public class BookSelectionActivity extends BaseAppCompatActivity
         implements ChapterSelectionFragment.Listener, TextFragment.Listener {
@@ -102,7 +102,7 @@ public class BookSelectionActivity extends BaseAppCompatActivity
     @Inject
     Settings settings;
 
-    @InjectView(R.id.drawer_layout)
+    @Bind(R.id.drawer_layout)
     DrawerLayout drawerLayout;
 
     private AppIndexingManager appIndexingManager;

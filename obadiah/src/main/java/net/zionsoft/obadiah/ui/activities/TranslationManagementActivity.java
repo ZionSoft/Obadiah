@@ -37,7 +37,7 @@ import net.zionsoft.obadiah.model.analytics.Analytics;
 
 import javax.inject.Inject;
 
-import butterknife.InjectView;
+import butterknife.Bind;
 
 public class TranslationManagementActivity extends BaseAppCompatActivity {
     private static final String KEY_MESSAGE_TYPE = "net.zionsoft.obadiah.ui.activities.TranslationManagementActivity.KEY_MESSAGE_TYPE";
@@ -59,7 +59,7 @@ public class TranslationManagementActivity extends BaseAppCompatActivity {
     @Inject
     Settings settings;
 
-    @InjectView(R.id.ad_view)
+    @Bind(R.id.ad_view)
     AdView adView;
 
     private MenuItem removeAdsMenuItem;

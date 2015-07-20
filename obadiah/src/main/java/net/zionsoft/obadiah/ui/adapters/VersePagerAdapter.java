@@ -38,8 +38,8 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import butterknife.Bind;
 import butterknife.ButterKnife;
-import butterknife.InjectView;
 
 public class VersePagerAdapter extends PagerAdapter {
     public static interface Listener {
@@ -53,14 +53,14 @@ public class VersePagerAdapter extends PagerAdapter {
 
         View rootView;
 
-        @InjectView(R.id.loading_spinner)
+        @Bind(R.id.loading_spinner)
         View loadingSpinner;
 
-        @InjectView(R.id.verse_list_view)
+        @Bind(R.id.verse_list_view)
         ListView verseListView;
 
         Page(View view) {
-            ButterKnife.inject(this, view);
+            ButterKnife.bind(this, view);
             rootView = view;
         }
     }

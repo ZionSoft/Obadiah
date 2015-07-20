@@ -56,7 +56,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import butterknife.InjectView;
+import butterknife.Bind;
 
 public class SearchActivity extends BaseAppCompatActivity {
     public static Intent newStartReorderToTopIntent(Context context) {
@@ -79,10 +79,10 @@ public class SearchActivity extends BaseAppCompatActivity {
     @Inject
     Settings settings;
 
-    @InjectView(R.id.loading_spinner)
+    @Bind(R.id.loading_spinner)
     View loadingSpinner;
 
-    @InjectView(R.id.search_result_list_view)
+    @Bind(R.id.search_result_list_view)
     ListView searchResultListView;
 
     private String currentTranslation;
