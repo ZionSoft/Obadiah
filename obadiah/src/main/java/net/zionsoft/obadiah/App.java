@@ -34,6 +34,8 @@ import net.zionsoft.obadiah.ui.utils.UiHelper;
 
 import javax.inject.Inject;
 
+import io.fabric.sdk.android.Fabric;
+
 public class App extends Application {
     @Inject
     Bible bible;
@@ -53,7 +55,7 @@ public class App extends Application {
         super.onCreate();
 
         if (!BuildConfig.DEBUG) {
-            Crashlytics.start(this);
+            Fabric.with(this, new Crashlytics());
         }
 
         injectionComponent = DaggerInjectionComponent.builder()

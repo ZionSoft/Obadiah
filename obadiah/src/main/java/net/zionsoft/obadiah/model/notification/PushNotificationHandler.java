@@ -151,7 +151,7 @@ public class PushNotificationHandler extends IntentService {
                     .setContentText(verse.verseText)
                     .setStyle(new NotificationCompat.BigTextStyle().bigText(verse.verseText));
         } catch (Exception e) {
-            Crashlytics.logException(e);
+            Crashlytics.getInstance().core.logException(e);
             return false;
         } finally {
             if (db != null) {
@@ -179,7 +179,7 @@ public class PushNotificationHandler extends IntentService {
                     .setContentText(contentText)
                     .setStyle(new NotificationCompat.BigTextStyle().bigText(contentText));
         } catch (Exception e) {
-            Crashlytics.logException(e);
+            Crashlytics.getInstance().core.logException(e);
             return false;
         }
 

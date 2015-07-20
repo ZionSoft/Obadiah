@@ -114,7 +114,7 @@ public class InAppBillingHelper implements ServiceConnection {
                     }
                     return false;
                 } catch (Exception e) {
-                    Crashlytics.logException(e);
+                    Crashlytics.getInstance().core.logException(e);
                     return false;
                 }
             }
@@ -158,7 +158,7 @@ public class InAppBillingHelper implements ServiceConnection {
             activity.startIntentSenderForResult(pendingIntent.getIntentSender(),
                     REQUEST_PURCHASE, new Intent(), 0, 0, 0);
         } catch (Exception e) {
-            Crashlytics.logException(e);
+            Crashlytics.getInstance().core.logException(e);
             onPurchased.onAdsRemovalPurchased(false);
         }
     }
@@ -195,7 +195,7 @@ public class InAppBillingHelper implements ServiceConnection {
             onAdsRemovalPurchased.onAdsRemovalPurchased(isPurchased);
             onAdsRemovalPurchased = null;
         } catch (JSONException e) {
-            Crashlytics.logException(e);
+            Crashlytics.getInstance().core.logException(e);
             onAdsRemovalPurchased.onAdsRemovalPurchased(false);
             onAdsRemovalPurchased = null;
         }
@@ -219,7 +219,7 @@ public class InAppBillingHelper implements ServiceConnection {
             else
                 Analytics.trackBillingNotSupported(response);
         } catch (RemoteException e) {
-            Crashlytics.logException(e);
+            Crashlytics.getInstance().core.logException(e);
         }
         if (onInitializationFinished != null) {
             onInitializationFinished.onInitializationFinished(result);
