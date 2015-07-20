@@ -38,22 +38,22 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import butterknife.Bind;
 import butterknife.ButterKnife;
-import butterknife.InjectView;
 
 public class ReadingProgressListAdapter extends BaseAdapter {
     static class ViewTag {
-        @InjectView(R.id.book_name_text_view)
+        @Bind(R.id.book_name_text_view)
         TextView bookName;
 
-        @InjectView(R.id.reading_progress_bar)
+        @Bind(R.id.reading_progress_bar)
         ProgressBar readingProgress;
 
-        @InjectView(R.id.last_read_chapter_text_view)
+        @Bind(R.id.last_read_chapter_text_view)
         TextView lastReadChapter;
 
         ViewTag(View view) {
-            ButterKnife.inject(this, view);
+            ButterKnife.bind(this, view);
         }
     }
 

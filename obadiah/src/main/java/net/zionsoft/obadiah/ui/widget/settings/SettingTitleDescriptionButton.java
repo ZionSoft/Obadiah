@@ -30,17 +30,17 @@ import android.widget.TextView;
 
 import net.zionsoft.obadiah.R;
 
+import butterknife.Bind;
 import butterknife.ButterKnife;
-import butterknife.InjectView;
 
 public class SettingTitleDescriptionButton extends FrameLayout {
-    @InjectView(R.id.title_text_view)
+    @Bind(R.id.title_text_view)
     TextView titleTextView;
 
-    @InjectView(R.id.description_text_view)
+    @Bind(R.id.description_text_view)
     TextView descriptionTextView;
 
-    @InjectView(R.id.divider_view)
+    @Bind(R.id.divider_view)
     View dividerView;
 
     public SettingTitleDescriptionButton(Context context) {
@@ -61,7 +61,7 @@ public class SettingTitleDescriptionButton extends FrameLayout {
     private void init(@NonNull Context context, @Nullable AttributeSet attrs) {
         setMinimumHeight(getResources().getDimensionPixelSize(R.dimen.item_height));
         inflate(context, R.layout.item_setting_title_description, this);
-        ButterKnife.inject(this, this);
+        ButterKnife.bind(this, this);
 
         if (attrs != null) {
             final TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.SettingTitleDescriptionButton);

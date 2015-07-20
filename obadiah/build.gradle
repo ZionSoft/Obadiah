@@ -65,7 +65,7 @@ dependencies {
     apt 'com.google.dagger:dagger-compiler:2.0.1'
     provided 'javax.annotation:javax.annotation-api:1.2'
 
-    compile 'com.jakewharton:butterknife:6.1.0'
+    compile 'com.jakewharton:butterknife:7.0.1'
 
     compile('com.crashlytics.sdk.android:crashlytics:2.3.2@aar') {
         transitive = true;

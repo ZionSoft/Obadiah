@@ -44,8 +44,8 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import butterknife.Bind;
 import butterknife.ButterKnife;
-import butterknife.InjectView;
 
 public class ReadingProgressActivity extends BaseAppCompatActivity {
     public static Intent newStartIntent(Context context) {
@@ -53,38 +53,38 @@ public class ReadingProgressActivity extends BaseAppCompatActivity {
     }
 
     static class HeaderViewHolder {
-        @InjectView(R.id.continuous_reading_text_view)
+        @Bind(R.id.continuous_reading_text_view)
         TextView continuousReading;
 
-        @InjectView(R.id.continuous_reading_count_text_view)
+        @Bind(R.id.continuous_reading_count_text_view)
         TextView continuousReadingCount;
 
-        @InjectView(R.id.chapter_read_text_view)
+        @Bind(R.id.chapter_read_text_view)
         TextView chapterRead;
 
-        @InjectView(R.id.chapter_read_count_text_view)
+        @Bind(R.id.chapter_read_count_text_view)
         TextView chapterReadCount;
 
-        @InjectView(R.id.finished_books_text_view)
+        @Bind(R.id.finished_books_text_view)
         TextView finishedBooks;
 
-        @InjectView(R.id.finished_books_count_text_view)
+        @Bind(R.id.finished_books_count_text_view)
         TextView finishedBooksCount;
 
-        @InjectView(R.id.finished_old_testament_text_view)
+        @Bind(R.id.finished_old_testament_text_view)
         TextView finishedOldTestament;
 
-        @InjectView(R.id.finished_old_testament_count_text_view)
+        @Bind(R.id.finished_old_testament_count_text_view)
         TextView finishedOldTestamentCount;
 
-        @InjectView(R.id.finished_new_testament_text_view)
+        @Bind(R.id.finished_new_testament_text_view)
         TextView finishedNewTestament;
 
-        @InjectView(R.id.finished_new_testament_count_text_view)
+        @Bind(R.id.finished_new_testament_count_text_view)
         TextView finishedNewTestamentCount;
 
         HeaderViewHolder(View view) {
-            ButterKnife.inject(this, view);
+            ButterKnife.bind(this, view);
         }
     }
 
@@ -97,10 +97,10 @@ public class ReadingProgressActivity extends BaseAppCompatActivity {
     @Inject
     Settings settings;
 
-    @InjectView(R.id.loading_spinner)
+    @Bind(R.id.loading_spinner)
     View loadingSpinner;
 
-    @InjectView(R.id.reading_progress_list_view)
+    @Bind(R.id.reading_progress_list_view)
     ListView readingProgressListView;
 
     private List<String> bookNames;

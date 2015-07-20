@@ -39,14 +39,14 @@ import net.zionsoft.obadiah.ui.adapters.VersePagerAdapter;
 
 import java.util.List;
 
-import butterknife.InjectView;
+import butterknife.Bind;
 
 public class TextFragment extends BaseFragment implements VersePagerAdapter.Listener {
     public interface Listener {
         public void onChapterSelected(int chapterIndex);
     }
 
-    @InjectView(R.id.verse_view_pager)
+    @Bind(R.id.verse_view_pager)
     ViewPager verseViewPager;
 
     private Listener listener;

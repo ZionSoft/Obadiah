@@ -30,14 +30,14 @@ import android.widget.FrameLayout;
 
 import net.zionsoft.obadiah.R;
 
+import butterknife.Bind;
 import butterknife.ButterKnife;
-import butterknife.InjectView;
 
 public class SettingSwitch extends FrameLayout {
-    @InjectView(R.id.switch_button)
+    @Bind(R.id.switch_button)
     SwitchCompat switchButton;
 
-    @InjectView(R.id.divider_view)
+    @Bind(R.id.divider_view)
     View dividerView;
 
     public SettingSwitch(Context context) {
@@ -57,7 +57,7 @@ public class SettingSwitch extends FrameLayout {
 
     private void init(@NonNull Context context, @Nullable AttributeSet attrs) {
         inflate(context, R.layout.item_setting_switch, this);
-        ButterKnife.inject(this, this);
+        ButterKnife.bind(this, this);
 
         if (attrs != null) {
             final TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.SettingSwitch);
