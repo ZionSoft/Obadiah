@@ -1,68 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:obadiah="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:obadiah="http://schemas.android.com/apk/res-auto"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-    <net.zionsoft.obadiah.ui.widget.settings.SettingSectionHeader
-        android:id="@+id/display_section_header"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        obadiah:settingSectionHeaderText="@string/pref_display" />
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-    <net.zionsoft.obadiah.ui.widget.settings.SettingSwitch
-        android:id="@+id/screen_on_switch"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        obadiah:settingSwitchTitle="@string/pref_screen_on"
-        obadiah:settingSwitchDividerVisible="true" />
+        <net.zionsoft.obadiah.ui.widget.settings.SettingSectionHeader
+            android:id="@+id/display_section_header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            obadiah:settingSectionHeaderText="@string/pref_display"/>
 
-    <net.zionsoft.obadiah.ui.widget.settings.SettingSwitch
-        android:id="@+id/night_mode_switch"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        obadiah:settingSwitchTitle="@string/pref_night_mode"
-        obadiah:settingSwitchDividerVisible="true" />
+        <net.zionsoft.obadiah.ui.widget.settings.SettingSwitch
+            android:id="@+id/screen_on_switch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            obadiah:settingSwitchDividerVisible="true"
+            obadiah:settingSwitchTitle="@string/pref_screen_on"/>
 
-    <net.zionsoft.obadiah.ui.widget.settings.SettingTitleDescriptionButton
-        android:id="@+id/text_size_setting_button"
-        android:background="@drawable/background_text"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        obadiah:settingTitleDescriptionButtonTitle="@string/pref_text_size"
-        obadiah:settingTitleDescriptionButtonDividerVisible="false" />
+        <net.zionsoft.obadiah.ui.widget.settings.SettingSwitch
+            android:id="@+id/night_mode_switch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            obadiah:settingSwitchDividerVisible="true"
+            obadiah:settingSwitchTitle="@string/pref_night_mode"/>
 
-    <net.zionsoft.obadiah.ui.widget.settings.SettingSectionHeader
-        android:id="@+id/about_section_header"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        obadiah:settingSectionHeaderText="@string/pref_about" />
+        <net.zionsoft.obadiah.ui.widget.settings.SettingTitleDescriptionButton
+            android:id="@+id/text_size_setting_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/background_text"
+            obadiah:settingTitleDescriptionButtonDividerVisible="false"
+            obadiah:settingTitleDescriptionButtonTitle="@string/pref_text_size"/>
 
-    <net.zionsoft.obadiah.ui.widget.settings.SettingTitleDescriptionButton
-        android:id="@+id/rate_me_setting_button"
-        android:background="@drawable/background_text"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        obadiah:settingTitleDescriptionButtonTitle="@string/pref_rate_me"
-        obadiah:settingTitleDescriptionButtonDividerVisible="true" />
+        <net.zionsoft.obadiah.ui.widget.settings.SettingSectionHeader
+            android:id="@+id/about_section_header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            obadiah:settingSectionHeaderText="@string/pref_about"/>
 
-    <net.zionsoft.obadiah.ui.widget.settings.SettingTitleDescriptionButton
-        android:id="@+id/version_setting_button"
-        android:background="@drawable/background_text"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:clickable="true"
-        obadiah:settingTitleDescriptionButtonTitle="@string/pref_version"
-        obadiah:settingTitleDescriptionButtonDividerVisible="true" />
+        <net.zionsoft.obadiah.ui.widget.settings.SettingTitleDescriptionButton
+            android:id="@+id/rate_me_setting_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/background_text"
+            obadiah:settingTitleDescriptionButtonDividerVisible="true"
+            obadiah:settingTitleDescriptionButtonTitle="@string/pref_rate_me"/>
 
-    <net.zionsoft.obadiah.ui.widget.settings.SettingTitleDescriptionButton
-        android:id="@+id/license_setting_button"
-        android:background="@drawable/background_text"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:clickable="true"
-        obadiah:settingTitleDescriptionButtonTitle="@string/pref_license"
-        obadiah:settingTitleDescriptionButtonDividerVisible="false" />
+        <net.zionsoft.obadiah.ui.widget.settings.SettingTitleDescriptionButton
+            android:id="@+id/version_setting_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/background_text"
+            android:clickable="true"
+            obadiah:settingTitleDescriptionButtonDividerVisible="true"
+            obadiah:settingTitleDescriptionButtonTitle="@string/pref_version"/>
 
-</LinearLayout>
+        <net.zionsoft.obadiah.ui.widget.settings.SettingTitleDescriptionButton
+            android:id="@+id/license_setting_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/background_text"
+            android:clickable="true"
+            obadiah:settingTitleDescriptionButtonDividerVisible="false"
+            obadiah:settingTitleDescriptionButtonTitle="@string/pref_license"/>
+    </LinearLayout>
+</ScrollView>
