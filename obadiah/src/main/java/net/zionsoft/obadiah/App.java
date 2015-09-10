@@ -54,9 +54,7 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
 
-        if (!BuildConfig.DEBUG) {
-            Fabric.with(this, new Crashlytics());
-        }
+        Fabric.with(this, new Crashlytics());
 
         injectionComponent = DaggerInjectionComponent.builder()
                 .injectionModule(new InjectionModule(this))
