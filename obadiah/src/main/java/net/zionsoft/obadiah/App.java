@@ -19,6 +19,7 @@ package net.zionsoft.obadiah;
 
 import android.app.Application;
 import android.content.Context;
+import android.os.StrictMode;
 
 import com.crashlytics.android.Crashlytics;
 
@@ -53,6 +54,9 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        if (BuildConfig.DEBUG) {
+            StrictMode.enableDefaults();
+        }
 
         Fabric.with(this, new Crashlytics());
 
