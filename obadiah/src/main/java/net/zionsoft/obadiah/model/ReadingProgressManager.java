@@ -21,6 +21,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.support.annotation.Nullable;
 import android.text.format.DateUtils;
 import android.util.SparseArray;
 
@@ -37,10 +38,6 @@ import javax.inject.Singleton;
 
 @Singleton
 public class ReadingProgressManager {
-    public static interface OnReadingProgressLoadedListener {
-        public void onReadingProgressLoaded(ReadingProgress readingProgress);
-    }
-
     @Inject
     DatabaseHelper databaseHelper;
 
@@ -98,55 +95,46 @@ public class ReadingProgressManager {
         }.start();
     }
 
-    public void loadReadingProgress(final OnReadingProgressLoadedListener listener) {
-        new SimpleAsyncTask<Void, Void, ReadingProgress>() {
-            @Override
-            protected ReadingProgress doInBackground(Void... params) {
-                SQLiteDatabase db = null;
-                Cursor cursor = null;
-                try {
-                    db = databaseHelper.openDatabase();
-                    if (db == null) {
-                        Analytics.trackException("Failed to open database.");
-                        return null;
-                    }
-
-                    cursor = db.query(DatabaseHelper.TABLE_READING_PROGRESS,
-                            new String[]{DatabaseHelper.COLUMN_BOOK_INDEX, DatabaseHelper.COLUMN_CHAPTER_INDEX,
-                                    DatabaseHelper.COLUMN_LAST_READING_TIMESTAMP},
-                            null, null, null, null, null
-                    );
-                    final int bookIndex = cursor.getColumnIndex(DatabaseHelper.COLUMN_BOOK_INDEX);
-                    final int chapterIndex = cursor.getColumnIndex(DatabaseHelper.COLUMN_CHAPTER_INDEX);
-                    final int lastReadingTimestamp = cursor.getColumnIndex(DatabaseHelper.COLUMN_LAST_READING_TIMESTAMP);
-
-                    final int bookCount = Bible.getBookCount();
-                    final List<SparseArray<Long>> chaptersReadPerBook = new ArrayList<SparseArray<Long>>(bookCount);
-                    for (int i = 0; i < bookCount; ++i)
-                        chaptersReadPerBook.add(new SparseArray<Long>(Bible.getChapterCount(i)));
-                    while (cursor.moveToNext()) {
-                        chaptersReadPerBook.get(cursor.getInt(bookIndex))
-                                .append(cursor.getInt(chapterIndex), cursor.getLong(lastReadingTimestamp));
-                    }
-
-                    final int continuousReadingDays = Integer.parseInt(
-                            DatabaseHelper.getMetadata(db, DatabaseHelper.KEY_CONTINUOUS_READING_DAYS, "1"));
-
-                    return new ReadingProgress(chaptersReadPerBook, continuousReadingDays);
-                } finally {
-                    if (cursor != null) {
-                        cursor.close();
-                    }
-                    if (db != null) {
-                        databaseHelper.closeDatabase();
-                    }
-                }
+    @Nullable
+    public ReadingProgress loadReadingProgress() {
+        SQLiteDatabase db = null;
+        Cursor cursor = null;
+        try {
+            db = databaseHelper.openDatabase();
+            if (db == null) {
+                Analytics.trackException("Failed to open database.");
+                return null;
             }
 
-            @Override
-            protected void onPostExecute(ReadingProgress result) {
-                listener.onReadingProgressLoaded(result);
+            cursor = db.query(DatabaseHelper.TABLE_READING_PROGRESS,
+                    new String[]{DatabaseHelper.COLUMN_BOOK_INDEX, DatabaseHelper.COLUMN_CHAPTER_INDEX,
+                            DatabaseHelper.COLUMN_LAST_READING_TIMESTAMP},
+                    null, null, null, null, null
+            );
+            final int bookIndex = cursor.getColumnIndex(DatabaseHelper.COLUMN_BOOK_INDEX);
+            final int chapterIndex = cursor.getColumnIndex(DatabaseHelper.COLUMN_CHAPTER_INDEX);
+            final int lastReadingTimestamp = cursor.getColumnIndex(DatabaseHelper.COLUMN_LAST_READING_TIMESTAMP);
+
+            final int bookCount = Bible.getBookCount();
+            final List<SparseArray<Long>> chaptersReadPerBook = new ArrayList<>(bookCount);
+            for (int i = 0; i < bookCount; ++i)
+                chaptersReadPerBook.add(new SparseArray<Long>(Bible.getChapterCount(i)));
+            while (cursor.moveToNext()) {
+                chaptersReadPerBook.get(cursor.getInt(bookIndex))
+                        .append(cursor.getInt(chapterIndex), cursor.getLong(lastReadingTimestamp));
             }
-        }.start();
+
+            final int continuousReadingDays = Integer.parseInt(
+                    DatabaseHelper.getMetadata(db, DatabaseHelper.KEY_CONTINUOUS_READING_DAYS, "1"));
+
+            return new ReadingProgress(chaptersReadPerBook, continuousReadingDays);
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+            if (db != null) {
+                databaseHelper.closeDatabase();
+            }
+        }
     }
 }
