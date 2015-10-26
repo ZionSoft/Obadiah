@@ -22,9 +22,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v7.app.ActionBar;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.widget.ListView;
 import android.widget.ProgressBar;
 
 import net.zionsoft.obadiah.R;
@@ -53,8 +54,11 @@ public class OpenSourceLicenseActivity extends BaseAppCompatActivity implements 
     @Inject
     Settings settings;
 
+    @Bind(R.id.toolbar)
+    Toolbar toolbar;
+
     @Bind(R.id.license_list)
-    ListView licenseList;
+    RecyclerView licenseList;
 
     @Bind(R.id.loading_spinner)
     ProgressBar loadingSpinner;
@@ -72,10 +76,10 @@ public class OpenSourceLicenseActivity extends BaseAppCompatActivity implements 
         }
 
         setContentView(R.layout.activity_open_source_license);
-
-        final ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayShowHomeEnabled(true);
-        actionBar.setIcon(R.drawable.ic_action_bar);
+        toolbar.setLogo(R.drawable.ic_action_bar);
+        toolbar.setTitle(R.string.activity_open_source_license);
+        setSupportActionBar(toolbar);
+        licenseList.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
     }
 
     @Override
@@ -106,7 +110,7 @@ public class OpenSourceLicenseActivity extends BaseAppCompatActivity implements 
 
     @Override
     public void onLicensesLoaded(List<String> licenses) {
-        licenseList.setAdapter(new OpenSourceLicenseListAdapter(this, licenses));
+        licenseList.setAdapter(new OpenSourceLicenseListAdapter(this, settings, licenses));
         loadingSpinner.setVisibility(View.GONE);
     }
 }

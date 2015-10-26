@@ -9,6 +9,15 @@
         <item name="android:dropDownListViewStyle">@style/AppSpinnerStyle</item>
     </style>
 
+    <style name="AppTheme.NoActionBar" parent="Theme.AppCompat.NoActionBar">
+        <item name="actionModeBackground">@color/blue</item>
+        <item name="colorPrimary">@color/blue</item>
+        <item name="colorPrimaryDark">@color/dark_blue</item>
+        <item name="colorAccent">@color/gold</item>
+        <item name="titleTextColor">@android:color/white</item>
+        <item name="android:dropDownListViewStyle">@style/AppSpinnerStyle</item>
+    </style>
+
     <style name="AppSpinnerStyle" parent="android:style/Widget.ListView.DropDown">
         <item name="android:divider">@android:color/darker_gray</item>
         <item name="android:dividerHeight">1dp</item>

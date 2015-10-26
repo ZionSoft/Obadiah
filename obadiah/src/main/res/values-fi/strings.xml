@@ -4,7 +4,7 @@
     <string name="app_name">Raamattu</string>
 
     <string name="activity_manage_translation">Käännökset</string>
-    <string name="activity_open_source_licenses">Avoimen Lähdekoodin Käyttöluv.</string>
+    <string name="activity_open_source_license">Avoimen Lähdekoodin Käyttöluv.</string>
     <string name="activity_reading_progress">Lukeminen Edistyminen</string>
     <string name="activity_settings">Asetukset</string>
 
