@@ -43,7 +43,7 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".ui.activities.ReadingProgressActivity"
-            android:label="@string/activity_reading_progress" />
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".ui.activities.SearchActivity"
             android:launchMode="singleTop">

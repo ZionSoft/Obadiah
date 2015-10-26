@@ -20,16 +20,13 @@ package net.zionsoft.obadiah.ui.activities;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v7.app.ActionBar;
-import android.util.TypedValue;
-import android.view.LayoutInflater;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.widget.ListView;
-import android.widget.TextView;
 
 import net.zionsoft.obadiah.Constants;
 import net.zionsoft.obadiah.R;
@@ -48,47 +45,10 @@ import java.util.List;
 import javax.inject.Inject;
 
 import butterknife.Bind;
-import butterknife.ButterKnife;
 
 public class ReadingProgressActivity extends BaseAppCompatActivity implements ReadingProgressView {
     public static Intent newStartIntent(Context context) {
         return new Intent(context, ReadingProgressActivity.class);
-    }
-
-    static class HeaderViewHolder {
-        @Bind(R.id.continuous_reading_text_view)
-        TextView continuousReading;
-
-        @Bind(R.id.continuous_reading_count_text_view)
-        TextView continuousReadingCount;
-
-        @Bind(R.id.chapter_read_text_view)
-        TextView chapterRead;
-
-        @Bind(R.id.chapter_read_count_text_view)
-        TextView chapterReadCount;
-
-        @Bind(R.id.finished_books_text_view)
-        TextView finishedBooks;
-
-        @Bind(R.id.finished_books_count_text_view)
-        TextView finishedBooksCount;
-
-        @Bind(R.id.finished_old_testament_text_view)
-        TextView finishedOldTestament;
-
-        @Bind(R.id.finished_old_testament_count_text_view)
-        TextView finishedOldTestamentCount;
-
-        @Bind(R.id.finished_new_testament_text_view)
-        TextView finishedNewTestament;
-
-        @Bind(R.id.finished_new_testament_count_text_view)
-        TextView finishedNewTestamentCount;
-
-        HeaderViewHolder(View view) {
-            ButterKnife.bind(this, view);
-        }
     }
 
     @ActivityScope
@@ -98,16 +58,17 @@ public class ReadingProgressActivity extends BaseAppCompatActivity implements Re
     @Inject
     Settings settings;
 
+    @Bind(R.id.toolbar)
+    Toolbar toolbar;
+
+    @Bind(R.id.reading_progress_list)
+    RecyclerView readingProgressList;
+
     @Bind(R.id.loading_spinner)
     View loadingSpinner;
 
-    @Bind(R.id.reading_progress_list_view)
-    ListView readingProgressListView;
-
     private List<String> bookNames;
     private ReadingProgress readingProgress;
-
-    private HeaderViewHolder headerViewHolder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,18 +83,10 @@ public class ReadingProgressActivity extends BaseAppCompatActivity implements Re
         }
 
         setContentView(R.layout.activity_reading_progress);
-
-        final ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayShowHomeEnabled(true);
-        actionBar.setIcon(R.drawable.ic_action_bar);
-
-        loadingSpinner.setVisibility(View.VISIBLE);
-        readingProgressListView.setVisibility(View.GONE);
-
-        final View header = LayoutInflater.from(this).inflate(R.layout.item_reading_progress_header,
-                readingProgressListView, false);
-        headerViewHolder = new HeaderViewHolder(header);
-        readingProgressListView.addHeaderView(header);
+        toolbar.setLogo(R.drawable.ic_action_bar);
+        toolbar.setTitle(R.string.activity_reading_progress);
+        setSupportActionBar(toolbar);
+        readingProgressList.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
     }
 
     @Override
@@ -146,41 +99,6 @@ public class ReadingProgressActivity extends BaseAppCompatActivity implements Re
             final View rootView = getWindow().getDecorView();
             rootView.setKeepScreenOn(settings.keepScreenOn());
             rootView.setBackgroundColor(settings.getBackgroundColor());
-
-            final Resources resources = getResources();
-            final int textColor = settings.getTextColor();
-            final float textSize = resources.getDimension(settings.getTextSize().textSize);
-            final float smallerTextSize = resources.getDimension(settings.getTextSize().smallerTextSize);
-
-            headerViewHolder.continuousReading.setTextColor(textColor);
-            headerViewHolder.continuousReading.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
-
-            headerViewHolder.continuousReadingCount.setTextColor(textColor);
-            headerViewHolder.continuousReadingCount.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
-
-            headerViewHolder.chapterRead.setTextColor(textColor);
-            headerViewHolder.chapterRead.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
-
-            headerViewHolder.chapterReadCount.setTextColor(textColor);
-            headerViewHolder.chapterReadCount.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
-
-            headerViewHolder.finishedBooks.setTextColor(textColor);
-            headerViewHolder.finishedBooks.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
-
-            headerViewHolder.finishedBooksCount.setTextColor(textColor);
-            headerViewHolder.finishedBooksCount.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
-
-            headerViewHolder.finishedOldTestament.setTextColor(textColor);
-            headerViewHolder.finishedOldTestament.setTextSize(TypedValue.COMPLEX_UNIT_PX, smallerTextSize);
-
-            headerViewHolder.finishedOldTestamentCount.setTextColor(textColor);
-            headerViewHolder.finishedOldTestamentCount.setTextSize(TypedValue.COMPLEX_UNIT_PX, smallerTextSize);
-
-            headerViewHolder.finishedNewTestament.setTextColor(textColor);
-            headerViewHolder.finishedNewTestament.setTextSize(TypedValue.COMPLEX_UNIT_PX, smallerTextSize);
-
-            headerViewHolder.finishedNewTestamentCount.setTextColor(textColor);
-            headerViewHolder.finishedNewTestamentCount.setTextSize(TypedValue.COMPLEX_UNIT_PX, smallerTextSize);
         }
     }
 
@@ -226,19 +144,6 @@ public class ReadingProgressActivity extends BaseAppCompatActivity implements Re
 
     @Override
     public void onReadingProgressLoaded(ReadingProgress readingProgress) {
-        headerViewHolder.continuousReadingCount.setText(getString(R.string.text_continuous_reading_count,
-                readingProgress.getContinuousReadingDays()));
-
-        headerViewHolder.chapterReadCount.setText(getString(R.string.text_chapters_read_count,
-                readingProgress.getTotalChapterRead()));
-
-        headerViewHolder.finishedBooksCount.setText(getString(R.string.text_finished_books_count,
-                readingProgress.getFinishedBooksCount()));
-        headerViewHolder.finishedOldTestamentCount.setText(getString(R.string.text_finished_old_testament_count,
-                readingProgress.getFinishedOldTestamentCount()));
-        headerViewHolder.finishedNewTestamentCount.setText(getString(R.string.text_finished_new_testament_count,
-                readingProgress.getFinishedNewTestamentCount()));
-
         this.readingProgress = readingProgress;
         updateAdapter();
     }
@@ -257,12 +162,8 @@ public class ReadingProgressActivity extends BaseAppCompatActivity implements Re
     private void updateAdapter() {
         if (bookNames != null && readingProgress != null) {
             AnimationHelper.fadeOut(loadingSpinner);
-            AnimationHelper.fadeIn(readingProgressListView);
-
-            ReadingProgressListAdapter readingProgressAdapter = new ReadingProgressListAdapter(this);
-            readingProgressListView.setAdapter(readingProgressAdapter);
-            readingProgressAdapter.setData(bookNames, readingProgress);
-            readingProgressAdapter.notifyDataSetChanged();
+            readingProgressList.setAdapter(
+                    new ReadingProgressListAdapter(this, settings, bookNames, readingProgress));
         }
     }
 }
