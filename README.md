@@ -1,5 +1,7 @@
 A simple and easy-to-use Bible reader.
 
+Get it on [Google Play Store](https://play.google.com/store/apps/details?id=net.zionsoft.obadiah).
+
 License
 -------
     Obadiah: a simple and easy-to-use Bible reader
