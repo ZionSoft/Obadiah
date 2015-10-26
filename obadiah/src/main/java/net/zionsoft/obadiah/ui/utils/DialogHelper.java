@@ -17,11 +17,11 @@
 
 package net.zionsoft.obadiah.ui.utils;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.support.annotation.ArrayRes;
 import android.support.annotation.StringRes;
+import android.support.v7.app.AlertDialog;
 
 public class DialogHelper {
     public static void showDialog(Context context, @StringRes int title, @ArrayRes int items, int selected,
