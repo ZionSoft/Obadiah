@@ -179,7 +179,7 @@ public class SettingsActivity extends BaseAppCompatActivity {
             @Override
             public void onClick(View v) {
                 AnimationHelper.slideIn(SettingsActivity.this,
-                        OpenSourceLicenseListActivity.newStartIntent(SettingsActivity.this));
+                        OpenSourceLicenseActivity.newStartIntent(SettingsActivity.this));
             }
         });
     }

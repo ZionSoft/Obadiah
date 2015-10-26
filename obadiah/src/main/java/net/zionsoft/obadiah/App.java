@@ -23,9 +23,7 @@ import android.os.StrictMode;
 
 import com.crashlytics.android.Crashlytics;
 
-import net.zionsoft.obadiah.injection.DaggerInjectionComponent;
 import net.zionsoft.obadiah.injection.InjectionComponent;
-import net.zionsoft.obadiah.injection.InjectionModule;
 import net.zionsoft.obadiah.legacy.Upgrader;
 import net.zionsoft.obadiah.model.Bible;
 import net.zionsoft.obadiah.model.analytics.Analytics;
@@ -60,9 +58,7 @@ public class App extends Application {
 
         Fabric.with(this, new Crashlytics());
 
-        injectionComponent = DaggerInjectionComponent.builder()
-                .injectionModule(new InjectionModule(this))
-                .build();
+        injectionComponent = InjectionComponent.Initializer.init(this);
         injectionComponent.inject(this);
 
         Analytics.initialize(this);

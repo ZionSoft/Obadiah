@@ -19,11 +19,12 @@ package net.zionsoft.obadiah.injection;
 
 import net.zionsoft.obadiah.App;
 import net.zionsoft.obadiah.BookSelectionActivity;
+import net.zionsoft.obadiah.injection.components.OpenSourceLicenseComponent;
+import net.zionsoft.obadiah.injection.modules.OpenSourceLicenseModule;
 import net.zionsoft.obadiah.model.Bible;
 import net.zionsoft.obadiah.model.ReadingProgressManager;
 import net.zionsoft.obadiah.model.notification.PushNotificationHandler;
 import net.zionsoft.obadiah.model.translations.TranslationManager;
-import net.zionsoft.obadiah.ui.activities.OpenSourceLicenseListActivity;
 import net.zionsoft.obadiah.ui.activities.ReadingProgressActivity;
 import net.zionsoft.obadiah.ui.activities.SearchActivity;
 import net.zionsoft.obadiah.ui.activities.SettingsActivity;
@@ -47,8 +48,6 @@ public interface InjectionComponent {
     public void inject(App app);
 
     public void inject(BookSelectionActivity bookSelectionActivity);
-
-    public void inject(OpenSourceLicenseListActivity openSourceLicenseListActivity);
 
     public void inject(ReadingProgressActivity readingProgressActivity);
 
@@ -81,4 +80,14 @@ public interface InjectionComponent {
     public void inject(ReadingProgressManager readingProgressManager);
 
     public void inject(TranslationManager translationManager);
+
+    OpenSourceLicenseComponent plus(OpenSourceLicenseModule openSourceLicenseModule);
+
+    final class Initializer {
+        public static InjectionComponent init(App app) {
+            return DaggerInjectionComponent.builder()
+                    .injectionModule(new InjectionModule(app))
+                    .build();
+        }
+    }
 }

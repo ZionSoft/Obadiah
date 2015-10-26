@@ -27,4 +27,5 @@ ext {
     daggerVersion = '2.0.1'
     javaxAnnotationApiVersion = '1.2'
     butterKnifeVersion = '7.0.1'
+    rxAndroidVersion = '1.0.1'
 }
