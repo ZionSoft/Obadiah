@@ -68,7 +68,7 @@
         </activity>
         <activity
             android:name=".ui.activities.SettingsActivity"
-            android:label="@string/activity_settings" />
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".ui.activities.TranslationManagementActivity"
             android:label="@string/activity_manage_translation" />

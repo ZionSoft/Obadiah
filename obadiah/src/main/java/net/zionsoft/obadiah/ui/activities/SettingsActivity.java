@@ -28,7 +28,7 @@ import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
+import android.support.v7.widget.Toolbar;
 import android.util.TypedValue;
 import android.view.View;
 import android.widget.CompoundButton;
@@ -57,6 +57,9 @@ public class SettingsActivity extends BaseAppCompatActivity {
 
     @Inject
     Settings settings;
+
+    @Bind(R.id.toolbar)
+    Toolbar toolbar;
 
     @Bind(R.id.display_section_header)
     SettingSectionHeader displaySectionHeader;
@@ -97,9 +100,9 @@ public class SettingsActivity extends BaseAppCompatActivity {
 
         rootView = getWindow().getDecorView();
 
-        final ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayShowHomeEnabled(true);
-        actionBar.setIcon(R.drawable.ic_action_bar);
+        toolbar.setLogo(R.drawable.ic_action_bar);
+        toolbar.setTitle(R.string.activity_settings);
+        setSupportActionBar(toolbar);
 
         rootView.setKeepScreenOn(settings.keepScreenOn());
         updateColor();
