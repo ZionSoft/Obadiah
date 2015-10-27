@@ -23,7 +23,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.SearchRecentSuggestions;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.SearchView;
@@ -39,14 +40,14 @@ import android.widget.Toast;
 
 import com.google.android.gms.actions.SearchIntents;
 
-import net.zionsoft.obadiah.App;
 import net.zionsoft.obadiah.BookSelectionActivity;
 import net.zionsoft.obadiah.Constants;
 import net.zionsoft.obadiah.R;
-import net.zionsoft.obadiah.model.Bible;
+import net.zionsoft.obadiah.injection.components.fragments.SearchComponentFragment;
+import net.zionsoft.obadiah.injection.scopes.ActivityScope;
 import net.zionsoft.obadiah.model.Settings;
 import net.zionsoft.obadiah.model.Verse;
-import net.zionsoft.obadiah.model.search.RecentSearchProvider;
+import net.zionsoft.obadiah.mvp.presenters.SearchPresenter;
 import net.zionsoft.obadiah.ui.adapters.SearchResultListAdapter;
 import net.zionsoft.obadiah.ui.utils.AnimationHelper;
 import net.zionsoft.obadiah.ui.utils.DialogHelper;
@@ -58,7 +59,7 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 
-public class SearchActivity extends BaseAppCompatActivity {
+public class SearchActivity extends BaseAppCompatActivity implements net.zionsoft.obadiah.mvp.views.SearchView {
     public static Intent newStartReorderToTopIntent(Context context) {
         final Intent startIntent = new Intent(context, SearchActivity.class);
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
@@ -73,8 +74,9 @@ public class SearchActivity extends BaseAppCompatActivity {
     private static final String KEY_QUERY = "net.zionsoft.obadiah.ui.activities.SearchActivity.KEY_QUERY";
     private static final String KEY_VERSES = "net.zionsoft.obadiah.ui.activities.SearchActivity.KEY_VERSES";
 
+    @ActivityScope
     @Inject
-    Bible bible;
+    SearchPresenter searchPresenter;
 
     @Inject
     Settings settings;
@@ -89,23 +91,26 @@ public class SearchActivity extends BaseAppCompatActivity {
     private String query;
     private ArrayList<Verse> verses;
 
-    private SearchRecentSuggestions recentSearches;
     private SearchResultListAdapter searchResultListAdapter;
     private SearchView searchView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        App.get(this).getInjectionComponent().inject(this);
+
+        FragmentManager fm = getSupportFragmentManager();
+        if (fm.findFragmentByTag(SearchComponentFragment.FRAGMENT_TAG) == null) {
+            fm.beginTransaction()
+                    .add(SearchComponentFragment.newInstance(),
+                            SearchComponentFragment.FRAGMENT_TAG)
+                    .commit();
+        }
 
         if (savedInstanceState != null) {
             currentTranslation = savedInstanceState.getString(KEY_CURRENT_TRANSLATION);
             query = savedInstanceState.getString(KEY_QUERY);
             verses = savedInstanceState.getParcelableArrayList(KEY_VERSES);
         }
-
-        recentSearches = new SearchRecentSuggestions(this,
-                RecentSearchProvider.AUTHORITY, RecentSearchProvider.MODE);
 
         initializeUi();
 
@@ -151,6 +156,15 @@ public class SearchActivity extends BaseAppCompatActivity {
     }
 
     @Override
+    public void onAttachFragment(Fragment fragment) {
+        super.onAttachFragment(fragment);
+
+        if (fragment instanceof SearchComponentFragment) {
+            ((SearchComponentFragment) fragment).getComponent().inject(this);
+        }
+    }
+
+    @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
 
@@ -180,6 +194,18 @@ public class SearchActivity extends BaseAppCompatActivity {
             searchResultListAdapter.setVerses(null);
         }
         searchResultListAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    protected void onResumeFragments() {
+        super.onResumeFragments();
+        searchPresenter.takeView(this);
+    }
+
+    @Override
+    protected void onPause() {
+        searchPresenter.dropView();
+        super.onPause();
     }
 
     @Override
@@ -228,7 +254,7 @@ public class SearchActivity extends BaseAppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_clear_search_history:
-                recentSearches.clearHistory();
+                searchPresenter.clearSearchHistory();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -249,41 +275,37 @@ public class SearchActivity extends BaseAppCompatActivity {
         loadingSpinner.setVisibility(View.VISIBLE);
         searchResultListView.setVisibility(View.GONE);
 
-        recentSearches.saveRecentQuery(query, null);
-        bible.searchVerses(currentTranslation, query,
-                new Bible.OnVersesLoadedListener() {
+        searchPresenter.search(currentTranslation, query);
+    }
+
+    @Override
+    public void onVersesSearched(List<Verse> verses) {
+        AnimationHelper.fadeOut(loadingSpinner);
+        AnimationHelper.fadeIn(searchResultListView);
+
+        searchResultListAdapter.setVerses(verses);
+        searchResultListAdapter.notifyDataSetChanged();
+        searchResultListView.post(new Runnable() {
+            @Override
+            public void run() {
+                searchResultListView.setSelection(0);
+            }
+        });
+
+        this.verses = new ArrayList<>(verses);
+
+        String text = getResources().getString(R.string.toast_verses_searched, verses.size());
+        Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onVersesSearchFailed() {
+        DialogHelper.showDialog(this, false, R.string.dialog_retry,
+                new DialogInterface.OnClickListener() {
                     @Override
-                    public void onVersesLoaded(List<Verse> verses) {
-                        if (verses == null) {
-                            DialogHelper.showDialog(SearchActivity.this, false, R.string.dialog_retry,
-                                    new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            search();
-                                        }
-                                    }, null
-                            );
-                            return;
-                        }
-
-                        AnimationHelper.fadeOut(loadingSpinner);
-                        AnimationHelper.fadeIn(searchResultListView);
-
-                        searchResultListAdapter.setVerses(verses);
-                        searchResultListAdapter.notifyDataSetChanged();
-                        searchResultListView.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                searchResultListView.setSelection(0);
-                            }
-                        });
-
-                        SearchActivity.this.verses = new ArrayList<>(verses);
-
-                        String text = getResources().getString(R.string.toast_verses_searched, verses.size());
-                        Toast.makeText(SearchActivity.this, text, Toast.LENGTH_SHORT).show();
+                    public void onClick(DialogInterface dialog, int which) {
+                        search();
                     }
-                }
-        );
+                }, null);
     }
 }
