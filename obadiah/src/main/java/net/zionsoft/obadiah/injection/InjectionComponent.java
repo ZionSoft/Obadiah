@@ -31,7 +31,6 @@ import net.zionsoft.obadiah.model.notification.PushNotificationHandler;
 import net.zionsoft.obadiah.model.translations.TranslationManager;
 import net.zionsoft.obadiah.ui.activities.SettingsActivity;
 import net.zionsoft.obadiah.ui.activities.TranslationManagementActivity;
-import net.zionsoft.obadiah.ui.adapters.SearchResultListAdapter;
 import net.zionsoft.obadiah.ui.adapters.TranslationListAdapter;
 import net.zionsoft.obadiah.ui.adapters.VerseListAdapter;
 import net.zionsoft.obadiah.ui.adapters.VersePagerAdapter;
@@ -56,8 +55,6 @@ public interface InjectionComponent {
     public void inject(ChapterSelectionFragment chapterSelectionFragment);
 
     public void inject(TranslationListFragment translationListFragment);
-
-    public void inject(SearchResultListAdapter searchResultListAdapter);
 
     public void inject(TranslationListAdapter translationListAdapter);
 

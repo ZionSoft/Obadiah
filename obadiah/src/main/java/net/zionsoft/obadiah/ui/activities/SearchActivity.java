@@ -26,16 +26,15 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.MenuItemCompat;
-import android.support.v7.app.ActionBar;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import com.google.android.gms.actions.SearchIntents;
@@ -59,7 +58,9 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 
-public class SearchActivity extends BaseAppCompatActivity implements net.zionsoft.obadiah.mvp.views.SearchView {
+public class SearchActivity extends BaseAppCompatActivity
+        implements net.zionsoft.obadiah.mvp.views.SearchView,
+        RecyclerView.OnChildAttachStateChangeListener, View.OnClickListener {
     public static Intent newStartReorderToTopIntent(Context context) {
         final Intent startIntent = new Intent(context, SearchActivity.class);
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
@@ -81,17 +82,20 @@ public class SearchActivity extends BaseAppCompatActivity implements net.zionsof
     @Inject
     Settings settings;
 
+    @Bind(R.id.toolbar)
+    Toolbar toolbar;
+
+    @Bind(R.id.search_result_list)
+    RecyclerView searchResultList;
+
     @Bind(R.id.loading_spinner)
     View loadingSpinner;
-
-    @Bind(R.id.search_result_list_view)
-    ListView searchResultListView;
 
     private String currentTranslation;
     private String query;
     private ArrayList<Verse> verses;
 
-    private SearchResultListAdapter searchResultListAdapter;
+    private SearchResultListAdapter searchResultAdapter;
     private SearchView searchView;
 
     @Override
@@ -112,36 +116,27 @@ public class SearchActivity extends BaseAppCompatActivity implements net.zionsof
             verses = savedInstanceState.getParcelableArrayList(KEY_VERSES);
         }
 
-        initializeUi();
+        setContentView(R.layout.activity_search);
+        toolbar.setLogo(R.drawable.ic_action_bar);
+        setSupportActionBar(toolbar);
+        searchResultList.addOnChildAttachStateChangeListener(this);
+        searchResultList.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+        initializeAdapter();
 
         handleStartIntent(getIntent());
     }
 
-    private void initializeUi() {
-        setContentView(R.layout.activity_search);
-
-        final ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayShowHomeEnabled(true);
-        actionBar.setIcon(R.drawable.ic_action_bar);
-
-        loadingSpinner.setVisibility(View.GONE);
-
-        searchResultListAdapter = new SearchResultListAdapter(this);
-        searchResultListAdapter.setVerses(verses);
-        searchResultListView.setAdapter(searchResultListAdapter);
-        searchResultListView.setOnItemClickListener(new OnItemClickListener() {
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                final Verse verse = verses.get(position);
-                getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE).edit()
-                        .putInt(Constants.PREF_KEY_LAST_READ_BOOK, verse.bookIndex)
-                        .putInt(Constants.PREF_KEY_LAST_READ_CHAPTER, verse.chapterIndex)
-                        .putInt(Constants.PREF_KEY_LAST_READ_VERSE, verse.verseIndex)
-                        .apply();
-
-                AnimationHelper.slideIn(SearchActivity.this,
-                        BookSelectionActivity.newStartReorderToTopIntent(SearchActivity.this));
-            }
-        });
+    private void initializeAdapter() {
+        if (searchResultList == null || settings == null || searchResultAdapter != null) {
+            // if the activity is recreated due to screen orientation change, the component fragment
+            // is called before the UI is initialized, i.e. onAttachFragment() is called inside
+            // super.onCreate()
+            // therefore, we try to do the initialization in both places
+            return;
+        }
+        searchResultAdapter = new SearchResultListAdapter(this, settings);
+        searchResultAdapter.setVerses(verses);
+        searchResultList.setAdapter(searchResultAdapter);
     }
 
     private void handleStartIntent(Intent intent) {
@@ -161,6 +156,7 @@ public class SearchActivity extends BaseAppCompatActivity implements net.zionsof
 
         if (fragment instanceof SearchComponentFragment) {
             ((SearchComponentFragment) fragment).getComponent().inject(this);
+            initializeAdapter();
         }
     }
 
@@ -191,9 +187,9 @@ public class SearchActivity extends BaseAppCompatActivity implements net.zionsof
         setTitle(selected);
         if (!selected.equals(currentTranslation)) {
             currentTranslation = selected;
-            searchResultListAdapter.setVerses(null);
+            searchResultAdapter.setVerses(null);
         }
-        searchResultListAdapter.notifyDataSetChanged();
+        searchResultAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -250,17 +246,6 @@ public class SearchActivity extends BaseAppCompatActivity implements net.zionsof
         return true;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_clear_search_history:
-                searchPresenter.clearSearchHistory();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
     private void search() {
         if (TextUtils.isEmpty(query)) {
             return;
@@ -273,24 +258,30 @@ public class SearchActivity extends BaseAppCompatActivity implements net.zionsof
         }
 
         loadingSpinner.setVisibility(View.VISIBLE);
-        searchResultListView.setVisibility(View.GONE);
+        searchResultList.setVisibility(View.GONE);
 
         searchPresenter.search(currentTranslation, query);
     }
 
     @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_clear_search_history:
+                searchPresenter.clearSearchHistory();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
     public void onVersesSearched(List<Verse> verses) {
         AnimationHelper.fadeOut(loadingSpinner);
-        AnimationHelper.fadeIn(searchResultListView);
+        AnimationHelper.fadeIn(searchResultList);
 
-        searchResultListAdapter.setVerses(verses);
-        searchResultListAdapter.notifyDataSetChanged();
-        searchResultListView.post(new Runnable() {
-            @Override
-            public void run() {
-                searchResultListView.setSelection(0);
-            }
-        });
+        searchResultAdapter.setVerses(verses);
+        searchResultAdapter.notifyDataSetChanged();
+        searchResultList.scrollToPosition(0);
 
         this.verses = new ArrayList<>(verses);
 
@@ -307,5 +298,27 @@ public class SearchActivity extends BaseAppCompatActivity implements net.zionsof
                         search();
                     }
                 }, null);
+    }
+
+    @Override
+    public void onChildViewAttachedToWindow(View view) {
+        view.setOnClickListener(this);
+    }
+
+    @Override
+    public void onChildViewDetachedFromWindow(View view) {
+        view.setOnClickListener(null);
+    }
+
+    @Override
+    public void onClick(View v) {
+        final Verse verse = verses.get(searchResultList.getChildAdapterPosition(v));
+        getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE).edit()
+                .putInt(Constants.PREF_KEY_LAST_READ_BOOK, verse.bookIndex)
+                .putInt(Constants.PREF_KEY_LAST_READ_CHAPTER, verse.chapterIndex)
+                .putInt(Constants.PREF_KEY_LAST_READ_VERSE, verse.verseIndex)
+                .apply();
+
+        AnimationHelper.slideIn(this, BookSelectionActivity.newStartReorderToTopIntent(this));
     }
 }
