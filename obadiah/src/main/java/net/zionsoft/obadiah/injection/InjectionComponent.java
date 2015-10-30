@@ -43,7 +43,7 @@ import javax.inject.Singleton;
 import dagger.Component;
 
 @Singleton
-@Component(modules = InjectionModule.class)
+@Component(modules = BaseInjectionModule.class)
 public interface InjectionComponent {
     public void inject(App app);
 
@@ -80,7 +80,7 @@ public interface InjectionComponent {
     final class Initializer {
         public static InjectionComponent init(App app) {
             return DaggerInjectionComponent.builder()
-                    .injectionModule(new InjectionModule(app))
+                    .baseInjectionModule(new InjectionModule(app))
                     .build();
         }
     }
