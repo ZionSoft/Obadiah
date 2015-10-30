@@ -17,8 +17,10 @@
 
 package net.zionsoft.obadiah.ui.widget.settings;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -47,6 +49,12 @@ public class SettingSectionHeader extends FrameLayout {
 
     public SettingSectionHeader(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        init(context, attrs);
+    }
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    public SettingSectionHeader(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+        super(context, attrs, defStyleAttr, defStyleRes);
         init(context, attrs);
     }
 

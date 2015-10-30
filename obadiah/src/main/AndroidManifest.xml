@@ -39,14 +39,15 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.activities.OpenSourceLicenseListActivity"
-            android:label="@string/activity_open_source_licenses" />
+            android:name=".ui.activities.OpenSourceLicenseActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".ui.activities.ReadingProgressActivity"
-            android:label="@string/activity_reading_progress" />
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".ui.activities.SearchActivity"
-            android:launchMode="singleTop">
+            android:launchMode="singleTop"
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
@@ -68,7 +69,7 @@
         </activity>
         <activity
             android:name=".ui.activities.SettingsActivity"
-            android:label="@string/activity_settings" />
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".ui.activities.TranslationManagementActivity"
             android:label="@string/activity_manage_translation" />

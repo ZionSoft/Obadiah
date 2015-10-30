@@ -21,10 +21,11 @@ ext {
     sourceJavaVersion = JavaVersion.VERSION_1_7
     targetJavaVersion = JavaVersion.VERSION_1_7
 
-    supportLibVersion = '23.0.1'
+    supportLibVersion = '23.1.0'
     playServicesVersion = '8.1.0'
 
     daggerVersion = '2.0.1'
     javaxAnnotationApiVersion = '1.2'
     butterKnifeVersion = '7.0.1'
+    rxAndroidVersion = '1.0.1'
 }

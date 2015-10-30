@@ -18,66 +18,46 @@
 package net.zionsoft.obadiah.ui.adapters;
 
 import android.content.Context;
+import android.support.v7.widget.RecyclerView;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import net.zionsoft.obadiah.App;
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.Settings;
 
 import java.util.List;
 
-import javax.inject.Inject;
-
-public class OpenSourceLicenseListAdapter extends BaseAdapter {
+public class OpenSourceLicenseListAdapter extends RecyclerView.Adapter {
     private final LayoutInflater inflater;
     private final int textColor;
     private final float textSize;
     private final List<String> licenses;
 
-    @Inject
-    Settings settings;
-
-    public OpenSourceLicenseListAdapter(Context context, List<String> licenses) {
-        App.get(context).getInjectionComponent().inject(this);
-
-        inflater = LayoutInflater.from(context);
-        textColor = settings.getTextColor();
-        textSize = context.getResources().getDimensionPixelSize(settings.getTextSize().textSize);
-
+    public OpenSourceLicenseListAdapter(Context context, Settings settings, List<String> licenses) {
+        this.inflater = LayoutInflater.from(context);
+        this.textColor = settings.getTextColor();
+        this.textSize = context.getResources().getDimensionPixelSize(settings.getTextSize().textSize);
         this.licenses = licenses;
     }
 
     @Override
-    public int getCount() {
-        return licenses != null ? licenses.size() : 0;
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        TextView textView = (TextView) inflater.inflate(R.layout.item_open_source_license, parent, false);
+        textView.setTextColor(textColor);
+        textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+        return new RecyclerView.ViewHolder(textView) {
+        };
     }
 
     @Override
-    public String getItem(int position) {
-        return licenses != null ? licenses.get(position) : null;
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+        ((TextView) holder.itemView).setText(licenses.get(position));
     }
 
     @Override
-    public long getItemId(int position) {
-        return position;
-    }
-
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        final TextView textView;
-        if (convertView == null) {
-            textView = (TextView) inflater.inflate(R.layout.item_open_source_license, parent, false);
-            textView.setTextColor(textColor);
-            textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
-        } else {
-            textView = (TextView) convertView;
-        }
-        textView.setText(getItem(position));
-        return textView;
+    public int getItemCount() {
+        return licenses.size();
     }
 }

@@ -3,11 +3,11 @@
     xmlns:obadiah="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingTop="@dimen/padding"
+    android:orientation="vertical"
     android:paddingBottom="@dimen/padding"
     android:paddingLeft="@dimen/paddingLeft"
     android:paddingRight="@dimen/paddingRight"
-    android:orientation="vertical">
+    android:paddingTop="@dimen/padding">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -34,5 +34,4 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textStyle="italic" />
-
 </LinearLayout>

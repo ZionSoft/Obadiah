@@ -19,6 +19,7 @@ package net.zionsoft.obadiah.model;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
+import android.support.annotation.Nullable;
 import android.support.v4.util.LruCache;
 
 import net.zionsoft.obadiah.App;
@@ -137,35 +138,39 @@ public class Bible {
         }.start();
     }
 
-    public void loadBookNames(final String translationShortName, final OnStringsLoadedListener listener) {
-        final List<String> bookNames = bookNameCache.get(translationShortName);
-        if (bookNames != null) {
-            listener.onStringsLoaded(bookNames);
-            return;
-        }
+    @Nullable
+    public List<String> loadBookNames(String translationShortName) {
+        List<String> bookNames = bookNameCache.get(translationShortName);
+        if (bookNames == null) {
+            SQLiteDatabase db = null;
+            try {
+                db = databaseHelper.openDatabase();
+                if (db == null) {
+                    Analytics.trackException("Failed to open database.");
+                    return null;
+                }
+                bookNames = Collections.unmodifiableList(
+                        TranslationHelper.getBookNames(db, translationShortName));
+            } finally {
+                if (db != null) {
+                    databaseHelper.closeDatabase();
+                }
+            }
 
+            bookNameCache.put(translationShortName, bookNames);
+        }
+        return bookNames;
+    }
+
+    public void loadBookNames(final String translationShortName, final OnStringsLoadedListener listener) {
         new SimpleAsyncTask<Void, Void, List<String>>() {
             @Override
             protected List<String> doInBackground(Void... params) {
-                SQLiteDatabase db = null;
-                try {
-                    db = databaseHelper.openDatabase();
-                    if (db == null) {
-                        Analytics.trackException("Failed to open database.");
-                        return null;
-                    }
-                    return TranslationHelper.getBookNames(db, translationShortName);
-                } finally {
-                    if (db != null) {
-                        databaseHelper.closeDatabase();
-                    }
-                }
+                return loadBookNames(translationShortName);
             }
 
             @Override
             protected void onPostExecute(List<String> result) {
-                result = Collections.unmodifiableList(result);
-                bookNameCache.put(translationShortName, result);
                 listener.onStringsLoaded(result);
             }
         }.start();
@@ -220,36 +225,26 @@ public class Bible {
         return String.format("%s-%d-%d", translationShortName, book, chapter);
     }
 
-    public void searchVerses(final String translationShortName, final String keyword,
-                             final OnVersesLoadedListener listener) {
-        new SimpleAsyncTask<Void, Void, List<Verse>>() {
-            @Override
-            protected List<Verse> doInBackground(Void... params) {
-                SQLiteDatabase db = null;
-                try {
-                    db = databaseHelper.openDatabase();
-                    if (db == null) {
-                        Analytics.trackException("Failed to open database.");
-                        return null;
-                    }
-                    List<String> bookNames = bookNameCache.get(translationShortName);
-                    if (bookNames == null) {
-                        // this should not happen, but just in case
-                        bookNames = Collections.unmodifiableList(TranslationHelper.getBookNames(db, translationShortName));
-                        bookNameCache.put(translationShortName, bookNames);
-                    }
-                    return TranslationHelper.searchVerses(db, translationShortName, bookNames, keyword);
-                } finally {
-                    if (db != null) {
-                        databaseHelper.closeDatabase();
-                    }
-                }
+    @Nullable
+    public List<Verse> search(String translationShortName, String query) {
+        SQLiteDatabase db = null;
+        try {
+            db = databaseHelper.openDatabase();
+            if (db == null) {
+                Analytics.trackException("Failed to open database.");
+                return null;
             }
-
-            @Override
-            protected void onPostExecute(List<Verse> result) {
-                listener.onVersesLoaded(result);
+            List<String> bookNames = bookNameCache.get(translationShortName);
+            if (bookNames == null) {
+                // this should not happen, but just in case
+                bookNames = Collections.unmodifiableList(TranslationHelper.getBookNames(db, translationShortName));
+                bookNameCache.put(translationShortName, bookNames);
             }
-        }.start();
+            return TranslationHelper.searchVerses(db, translationShortName, bookNames, query);
+        } finally {
+            if (db != null) {
+                databaseHelper.closeDatabase();
+            }
+        }
     }
 }

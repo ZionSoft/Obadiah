@@ -4,7 +4,7 @@
     <string name="app_name">Bible</string>
 
     <string name="activity_manage_translation">Translations</string>
-    <string name="activity_open_source_licenses">Open Sources Licenses</string>
+    <string name="activity_open_source_license">Open Sources Licenses</string>
     <string name="activity_reading_progress">Reading Progress</string>
     <string name="activity_settings">Settings</string>
 

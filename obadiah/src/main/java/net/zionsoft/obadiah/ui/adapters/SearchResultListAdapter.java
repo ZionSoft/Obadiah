@@ -19,70 +19,59 @@ package net.zionsoft.obadiah.ui.adapters;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.support.v7.widget.RecyclerView;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import net.zionsoft.obadiah.App;
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.Settings;
 import net.zionsoft.obadiah.model.Verse;
 
 import java.util.List;
 
-import javax.inject.Inject;
-
-public class SearchResultListAdapter extends BaseAdapter {
-    @Inject
-    Settings settings;
-
+public class SearchResultListAdapter extends RecyclerView.Adapter {
     private final LayoutInflater inflater;
     private final Resources resources;
+    private final Settings settings;
+
     private List<Verse> verses;
 
-    public SearchResultListAdapter(Context context) {
-        super();
-        App.get(context).getInjectionComponent().inject(this);
-
-        inflater = LayoutInflater.from(context);
-        resources = context.getResources();
+    public SearchResultListAdapter(Context context, Settings settings) {
+        this.inflater = LayoutInflater.from(context);
+        this.resources = context.getResources();
+        this.settings = settings;
     }
 
     @Override
-    public int getCount() {
-        return verses == null ? 0 : verses.size();
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        return new RecyclerView.ViewHolder(inflater.inflate(R.layout.item_search_result, parent, false)) {
+        };
     }
 
     @Override
-    public Verse getItem(int position) {
-        return verses.get(position);
-    }
-
-    @Override
-    public long getItemId(int position) {
-        return position;
-    }
-
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        final TextView textView = (TextView) (convertView == null
-                ? inflater.inflate(R.layout.item_search_result, parent, false) : convertView);
-
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+        final TextView textView = (TextView) holder.itemView;
         textView.setTextColor(settings.getTextColor());
         textView.setTextSize(TypedValue.COMPLEX_UNIT_PX,
                 resources.getDimension(settings.getTextSize().textSize));
 
-        final Verse verse = verses.get(position);
+        final Verse verse = getVerse(position);
         textView.setText(String.format("%s %d:%d\n%s", verse.bookName,
                 verse.chapterIndex + 1, verse.verseIndex + 1, verse.verseText));
+    }
 
-        return textView;
+    @Override
+    public int getItemCount() {
+        return verses != null ? verses.size() : 0;
     }
 
     public void setVerses(List<Verse> verses) {
         this.verses = verses;
+    }
+
+    public Verse getVerse(int position) {
+        return verses.get(position);
     }
 }

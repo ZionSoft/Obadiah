@@ -17,6 +17,7 @@
 
 package net.zionsoft.obadiah.ui.widget;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
@@ -24,6 +25,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.util.AttributeSet;
 import android.view.View;
 
@@ -47,25 +49,26 @@ public class ProgressBar extends View {
 
     public ProgressBar(Context context) {
         super(context);
-
-        init(context);
+        init(context, null);
     }
 
     public ProgressBar(Context context, AttributeSet attrs) {
         super(context, attrs);
-
-        init(context);
-        setAttrs(attrs);
+        init(context, attrs);
     }
 
     public ProgressBar(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-
-        init(context);
-        setAttrs(attrs);
+        init(context, attrs);
     }
 
-    private void init(Context context) {
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    public ProgressBar(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+        super(context, attrs, defStyleAttr, defStyleRes);
+        init(context, attrs);
+    }
+
+    private void init(Context context, AttributeSet attrs) {
         final Resources resources = context.getResources();
         backGroundPaint = new Paint();
         backGroundPaint.setColor(Color.LTGRAY);
@@ -79,17 +82,14 @@ public class ProgressBar extends View {
         textPaint.setTextAlign(Paint.Align.RIGHT);
         textPaint.setTextSize(DEFAULT_TEXT_SIZE);
         textPaint.setTypeface(Typeface.DEFAULT_BOLD);
-    }
 
-    private void setAttrs(AttributeSet attrs) {
-        if (attrs == null)
-            return;
-
-        final TypedArray attributes = getContext().obtainStyledAttributes(attrs, R.styleable.ProgressBar, 0, 0);
-        maxProgress = attributes.getInt(R.styleable.ProgressBar_maxProgress, DEFAULT_MAX_PROGRESS);
-        textPadding = attributes.getDimensionPixelSize(R.styleable.ProgressBar_textPadding, DEFAULT_TEXT_PADDING);
-        textPaint.setTextSize(attributes.getDimensionPixelSize(R.styleable.ProgressBar_textSize, DEFAULT_TEXT_SIZE));
-        attributes.recycle();
+        if (attrs != null) {
+            final TypedArray attributes = getContext().obtainStyledAttributes(attrs, R.styleable.ProgressBar, 0, 0);
+            maxProgress = attributes.getInt(R.styleable.ProgressBar_maxProgress, DEFAULT_MAX_PROGRESS);
+            textPadding = attributes.getDimensionPixelSize(R.styleable.ProgressBar_textPadding, DEFAULT_TEXT_PADDING);
+            textPaint.setTextSize(attributes.getDimensionPixelSize(R.styleable.ProgressBar_textSize, DEFAULT_TEXT_SIZE));
+            attributes.recycle();
+        }
     }
 
     @Override

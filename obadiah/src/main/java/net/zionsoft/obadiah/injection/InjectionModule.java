@@ -17,6 +17,8 @@
 
 package net.zionsoft.obadiah.injection;
 
+import android.content.Context;
+
 import net.zionsoft.obadiah.App;
 import net.zionsoft.obadiah.model.Bible;
 import net.zionsoft.obadiah.model.ReadingProgressManager;
@@ -39,7 +41,7 @@ public final class InjectionModule {
 
     @Provides
     @Singleton
-    public App provideApplication() {
+    public Context provideContext() {
         return application;
     }
 

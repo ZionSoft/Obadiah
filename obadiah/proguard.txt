@@ -39,3 +39,6 @@
 -keepclasseswithmembernames class * {
     @butterknife.* <methods>;
 }
+
+# RxJava
+-dontwarn rx.internal.util.unsafe.**

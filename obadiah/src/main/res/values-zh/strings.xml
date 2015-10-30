@@ -4,7 +4,7 @@
     <string name="app_name">聖經</string>
 
     <string name="activity_manage_translation">譯本</string>
-    <string name="activity_open_source_licenses">开源软体协议</string>
+    <string name="activity_open_source_license">开源软体协议</string>
     <string name="activity_reading_progress">讀經進度</string>
     <string name="activity_settings">設置</string>
 
