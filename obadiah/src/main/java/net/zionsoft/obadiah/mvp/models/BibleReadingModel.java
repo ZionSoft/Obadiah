@@ -31,8 +31,8 @@ import rx.Observable;
 import rx.Subscriber;
 
 public class BibleReadingModel {
-    private final SharedPreferences preferences;
     private final Bible bible;
+    private final SharedPreferences preferences;
 
     public BibleReadingModel(Context context, Bible bible) {
         this.preferences = context.getApplicationContext()

@@ -36,7 +36,8 @@ public class ReadingProgressPresenter extends MVPPresenter<ReadingProgressView> 
 
     private CompositeSubscription subscription;
 
-    public ReadingProgressPresenter(BibleReadingModel bibleReadingModel, ReadingProgressModel readingProgressModel) {
+    public ReadingProgressPresenter(BibleReadingModel bibleReadingModel,
+                                    ReadingProgressModel readingProgressModel) {
         this.bibleReadingModel = bibleReadingModel;
         this.readingProgressModel = readingProgressModel;
     }

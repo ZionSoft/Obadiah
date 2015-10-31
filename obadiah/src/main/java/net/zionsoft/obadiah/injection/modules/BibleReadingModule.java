@@ -24,13 +24,13 @@ import net.zionsoft.obadiah.model.Bible;
 import net.zionsoft.obadiah.model.ReadingProgressManager;
 import net.zionsoft.obadiah.mvp.models.BibleReadingModel;
 import net.zionsoft.obadiah.mvp.models.ReadingProgressModel;
-import net.zionsoft.obadiah.mvp.presenters.ReadingProgressPresenter;
+import net.zionsoft.obadiah.mvp.presenters.BibleReadingPresenter;
 
 import dagger.Module;
 import dagger.Provides;
 
 @Module
-public class ReadingProgressModule {
+public class BibleReadingModule {
     @Provides
     public BibleReadingModel provideBibleReadingModel(Context context, Bible bible) {
         return new BibleReadingModel(context, bible);
@@ -43,8 +43,8 @@ public class ReadingProgressModule {
 
     @Provides
     @ActivityScope
-    public ReadingProgressPresenter progressPresenter(BibleReadingModel bibleReadingModel,
-                                                      ReadingProgressModel readingProgressModel) {
-        return new ReadingProgressPresenter(bibleReadingModel, readingProgressModel);
+    public BibleReadingPresenter provideBibleReadingPresenter(BibleReadingModel bibleReadingModel,
+                                                              ReadingProgressModel readingProgressModel) {
+        return new BibleReadingPresenter(bibleReadingModel, readingProgressModel);
     }
 }

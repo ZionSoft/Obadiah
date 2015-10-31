@@ -26,6 +26,7 @@ import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -39,6 +40,8 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
+import net.zionsoft.obadiah.injection.components.fragments.BibleReadingComponentFragment;
+import net.zionsoft.obadiah.injection.scopes.ActivityScope;
 import net.zionsoft.obadiah.model.Bible;
 import net.zionsoft.obadiah.model.ReadingProgressManager;
 import net.zionsoft.obadiah.model.Settings;
@@ -46,6 +49,8 @@ import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.appindexing.AppIndexingManager;
 import net.zionsoft.obadiah.model.utils.AppUpdateChecker;
 import net.zionsoft.obadiah.model.utils.UriHelper;
+import net.zionsoft.obadiah.mvp.presenters.BibleReadingPresenter;
+import net.zionsoft.obadiah.mvp.views.BibleReadingView;
 import net.zionsoft.obadiah.ui.activities.BaseAppCompatActivity;
 import net.zionsoft.obadiah.ui.activities.ReadingProgressActivity;
 import net.zionsoft.obadiah.ui.activities.SearchActivity;
@@ -63,8 +68,8 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 
-public class BookSelectionActivity extends BaseAppCompatActivity
-        implements ChapterSelectionFragment.Listener, TextFragment.Listener {
+public class BookSelectionActivity extends BaseAppCompatActivity implements BibleReadingView,
+        ChapterSelectionFragment.Listener, TextFragment.Listener {
     private static final String KEY_MESSAGE_TYPE = "net.zionsoft.obadiah.BookSelectionActivity.KEY_MESSAGE_TYPE";
     private static final String KEY_BOOK_INDEX = "net.zionsoft.obadiah.BookSelectionActivity.KEY_BOOK_INDEX";
     private static final String KEY_CHAPTER_INDEX = "net.zionsoft.obadiah.BookSelectionActivity.KEY_CHAPTER_INDEX";
@@ -92,6 +97,10 @@ public class BookSelectionActivity extends BaseAppCompatActivity
     public static Intent newStartIntent(Context context) {
         return new Intent(context, BookSelectionActivity.class);
     }
+
+    @ActivityScope
+    @Inject
+    BibleReadingPresenter bibleReadingPresenter;
 
     @Inject
     Bible bible;
@@ -123,7 +132,14 @@ public class BookSelectionActivity extends BaseAppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        App.get(this).getInjectionComponent().inject(this);
+
+        FragmentManager fm = getSupportFragmentManager();
+        if (fm.findFragmentByTag(BibleReadingComponentFragment.FRAGMENT_TAG) == null) {
+            fm.beginTransaction()
+                    .add(BibleReadingComponentFragment.newInstance(),
+                            BibleReadingComponentFragment.FRAGMENT_TAG)
+                    .commit();
+        }
 
         appIndexingManager = new AppIndexingManager(this);
         preferences = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE);
@@ -179,6 +195,19 @@ public class BookSelectionActivity extends BaseAppCompatActivity
                     .apply();
 
             Analytics.trackNotificationEvent("notification_opened", messageType);
+        }
+    }
+
+    @Override
+    public void onAttachFragment(Fragment fragment) {
+        super.onAttachFragment(fragment);
+
+        if (fragment instanceof BibleReadingComponentFragment) {
+            ((BibleReadingComponentFragment) fragment).getComponent().inject(this);
+
+            final View rootView = getWindow().getDecorView();
+            rootView.setKeepScreenOn(settings.keepScreenOn());
+            rootView.setBackgroundColor(settings.getBackgroundColor());
         }
     }
 
@@ -380,6 +409,18 @@ public class BookSelectionActivity extends BaseAppCompatActivity
 
         // TODO get an improved tracking algorithm, e.g. only consider as "read" if the user stays for a while
         readingProgressManager.trackChapterReading(currentBook, currentChapter);
+    }
+
+    @Override
+    protected void onResumeFragments() {
+        super.onResumeFragments();
+        bibleReadingPresenter.takeView(this);
+    }
+
+    @Override
+    protected void onPause() {
+        bibleReadingPresenter.dropView();
+        super.onPause();
     }
 
     @Override

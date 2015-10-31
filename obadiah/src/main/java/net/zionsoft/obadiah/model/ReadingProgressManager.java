@@ -28,7 +28,6 @@ import android.util.SparseArray;
 import net.zionsoft.obadiah.App;
 import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.database.DatabaseHelper;
-import net.zionsoft.obadiah.utils.SimpleAsyncTask;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,52 +46,46 @@ public class ReadingProgressManager {
     }
 
     public void trackChapterReading(final int book, final int chapter) {
-        new SimpleAsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... params) {
-                SQLiteDatabase db = null;
-                try {
-                    db = databaseHelper.openDatabase();
-                    if (db == null) {
-                        Analytics.trackException("Failed to open database.");
-                        return null;
-                    }
-                    db.beginTransaction();
-
-                    final ContentValues values = new ContentValues(3);
-                    values.put(DatabaseHelper.COLUMN_BOOK_INDEX, book);
-                    values.put(DatabaseHelper.COLUMN_CHAPTER_INDEX, chapter);
-                    values.put(DatabaseHelper.COLUMN_LAST_READING_TIMESTAMP, System.currentTimeMillis());
-                    db.insertWithOnConflict(DatabaseHelper.TABLE_READING_PROGRESS,
-                            null, values, SQLiteDatabase.CONFLICT_REPLACE);
-
-                    final long lastReadingDay = Long.parseLong(DatabaseHelper.getMetadata(
-                            db, DatabaseHelper.KEY_LAST_READING_TIMESTAMP, "0")) / DateUtils.DAY_IN_MILLIS;
-                    final long now = System.currentTimeMillis();
-                    final long today = now / DateUtils.DAY_IN_MILLIS;
-                    final long diff = today - lastReadingDay;
-                    if (diff == 1) {
-                        final int continuousReadingDays = Integer.parseInt(
-                                DatabaseHelper.getMetadata(db, DatabaseHelper.KEY_CONTINUOUS_READING_DAYS, "0"));
-                        DatabaseHelper.setMetadata(db, DatabaseHelper.KEY_CONTINUOUS_READING_DAYS,
-                                Integer.toString(continuousReadingDays + 1));
-                    } else if (diff > 2) {
-                        DatabaseHelper.setMetadata(db, DatabaseHelper.KEY_CONTINUOUS_READING_DAYS, "1");
-                    }
-                    DatabaseHelper.setMetadata(db, DatabaseHelper.KEY_LAST_READING_TIMESTAMP, Long.toString(now));
-
-                    db.setTransactionSuccessful();
-                } finally {
-                    if (db != null) {
-                        if (db.inTransaction()) {
-                            db.endTransaction();
-                        }
-                        databaseHelper.closeDatabase();
-                    }
-                }
-                return null;
+        SQLiteDatabase db = null;
+        try {
+            db = databaseHelper.openDatabase();
+            if (db == null) {
+                Analytics.trackException("Failed to open database.");
+                return;
             }
-        }.start();
+            db.beginTransaction();
+
+            final ContentValues values = new ContentValues(3);
+            values.put(DatabaseHelper.COLUMN_BOOK_INDEX, book);
+            values.put(DatabaseHelper.COLUMN_CHAPTER_INDEX, chapter);
+            values.put(DatabaseHelper.COLUMN_LAST_READING_TIMESTAMP, System.currentTimeMillis());
+            db.insertWithOnConflict(DatabaseHelper.TABLE_READING_PROGRESS,
+                    null, values, SQLiteDatabase.CONFLICT_REPLACE);
+
+            final long lastReadingDay = Long.parseLong(DatabaseHelper.getMetadata(
+                    db, DatabaseHelper.KEY_LAST_READING_TIMESTAMP, "0")) / DateUtils.DAY_IN_MILLIS;
+            final long now = System.currentTimeMillis();
+            final long today = now / DateUtils.DAY_IN_MILLIS;
+            final long diff = today - lastReadingDay;
+            if (diff == 1) {
+                final int continuousReadingDays = Integer.parseInt(
+                        DatabaseHelper.getMetadata(db, DatabaseHelper.KEY_CONTINUOUS_READING_DAYS, "0"));
+                DatabaseHelper.setMetadata(db, DatabaseHelper.KEY_CONTINUOUS_READING_DAYS,
+                        Integer.toString(continuousReadingDays + 1));
+            } else if (diff > 2) {
+                DatabaseHelper.setMetadata(db, DatabaseHelper.KEY_CONTINUOUS_READING_DAYS, "1");
+            }
+            DatabaseHelper.setMetadata(db, DatabaseHelper.KEY_LAST_READING_TIMESTAMP, Long.toString(now));
+
+            db.setTransactionSuccessful();
+        } finally {
+            if (db != null) {
+                if (db.inTransaction()) {
+                    db.endTransaction();
+                }
+                databaseHelper.closeDatabase();
+            }
+        }
     }
 
     @Nullable
