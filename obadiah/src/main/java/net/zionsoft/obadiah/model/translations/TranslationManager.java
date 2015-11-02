@@ -56,10 +56,6 @@ public class TranslationManager {
         public void onTranslationDownloadProgress(String translation, int progress);
     }
 
-    public interface OnTranslationRemovedListener {
-        public void onTranslationRemoved(String translation, boolean isSuccessful);
-    }
-
     @Inject
     DatabaseHelper databaseHelper;
 
@@ -172,32 +168,23 @@ public class TranslationManager {
         }
     }
 
-    public void removeTranslation(final String translationShortName, final OnTranslationRemovedListener listener) {
-        new SimpleAsyncTask<Void, Void, Boolean>() {
-            @Override
-            protected Boolean doInBackground(Void... params) {
-                return removeTranslation(translationShortName);
+    public boolean removeTranslation(TranslationInfo translation) {
+        final boolean removed = removeTranslation(translation.shortName);
+        Analytics.trackTranslationRemoval(translation.shortName, removed);
+
+        downloadedTranslationShortNames = unmodifiableRemove(downloadedTranslationShortNames, translation.shortName);
+
+        TranslationInfo removedTranslation = null;
+        for (TranslationInfo downloaded : downloadedTranslations) {
+            if (downloaded.shortName.equals(translation.shortName)) {
+                removedTranslation = downloaded;
+                break;
             }
+        }
+        downloadedTranslations = unmodifiableRemove(downloadedTranslations, removedTranslation);
+        availableTranslations = unmodifiableAppend(availableTranslations, removedTranslation);
 
-            @Override
-            protected void onPostExecute(Boolean result) {
-                Analytics.trackTranslationRemoval(translationShortName, result);
-
-                downloadedTranslationShortNames = unmodifiableRemove(downloadedTranslationShortNames, translationShortName);
-
-                TranslationInfo removed = null;
-                for (TranslationInfo downloaded : downloadedTranslations) {
-                    if (downloaded.shortName.equals(translationShortName)) {
-                        removed = downloaded;
-                        break;
-                    }
-                }
-                downloadedTranslations = unmodifiableRemove(downloadedTranslations, removed);
-                availableTranslations = unmodifiableAppend(availableTranslations, removed);
-
-                listener.onTranslationRemoved(translationShortName, result);
-            }
-        }.start();
+        return removed;
     }
 
     private boolean removeTranslation(String translationShortName) {

@@ -60,8 +60,7 @@ import javax.inject.Inject;
 import butterknife.Bind;
 
 public class TranslationListFragment extends BaseFragment implements SwipeRefreshLayout.OnRefreshListener,
-        TranslationManager.OnTranslationsLoadedListener, TranslationManager.OnTranslationRemovedListener,
-        TranslationManagementView {
+        TranslationManager.OnTranslationsLoadedListener, TranslationManagementView {
     private static final String TAG_DOWNLOAD_DIALOG_FRAGMENT = "net.zionsoft.obadiah.ui.fragments.TranslationListFragment.TAG_DOWNLOAD_DIALOG_FRAGMENT";
     private static final String TAG_REMOVE_DIALOG_FRAGMENT = "net.zionsoft.obadiah.ui.fragments.TranslationListFragment.TAG_REMOVE_DIALOG_FRAGMENT";
     private static final int CONTEXT_MENU_ITEM_DELETE = 0;
@@ -269,7 +268,7 @@ public class TranslationListFragment extends BaseFragment implements SwipeRefres
                 DialogHelper.showDialog(getActivity(), true, R.string.dialog_translation_delete_confirm_message,
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
-                                removeTranslation(translationInfo.shortName);
+                                removeTranslation(translationInfo);
                             }
                         }, null
                 );
@@ -286,17 +285,39 @@ public class TranslationListFragment extends BaseFragment implements SwipeRefres
         return translation != null && translation.second ? translation.first : null;
     }
 
-    private void removeTranslation(String translationShortName) {
+    private void removeTranslation(TranslationInfo translation) {
         final FragmentManager fm = getChildFragmentManager();
         ProgressDialogFragment.newInstance(R.string.progress_dialog_translation_deleting).show(fm, TAG_REMOVE_DIALOG_FRAGMENT);
         fm.executePendingTransactions();
 
-        translationManager.removeTranslation(translationShortName, this);
+        translationManagementPresenter.removeTranslation(translation);
     }
 
     @Override
     public void onRefresh() {
         loadTranslations(true);
+    }
+
+    @Override
+    public void onTranslationRemoved() {
+        ((DialogFragment) getChildFragmentManager().findFragmentByTag(TAG_REMOVE_DIALOG_FRAGMENT))
+                .dismissAllowingStateLoss();
+
+        Toast.makeText(getActivity(), R.string.toast_translation_deleted, Toast.LENGTH_SHORT).show();
+        loadTranslations(false);
+    }
+
+    @Override
+    public void onTranslationRemovalFailed(final TranslationInfo translation) {
+        ((DialogFragment) getChildFragmentManager().findFragmentByTag(TAG_REMOVE_DIALOG_FRAGMENT))
+                .dismissAllowingStateLoss();
+
+        DialogHelper.showDialog(getActivity(), true, R.string.dialog_translation_remove_failure_message,
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        removeTranslation(translation);
+                    }
+                }, null);
     }
 
     @Override
@@ -329,29 +350,5 @@ public class TranslationListFragment extends BaseFragment implements SwipeRefres
 
         translationListAdapter.setTranslations(downloaded, available);
         translationListAdapter.notifyDataSetChanged();
-    }
-
-    @Override
-    public void onTranslationRemoved(final String translation, boolean isSuccessful) {
-        if (!isAdded()) {
-            return;
-        }
-
-        ((DialogFragment) getChildFragmentManager().findFragmentByTag(TAG_REMOVE_DIALOG_FRAGMENT))
-                .dismissAllowingStateLoss();
-
-        if (isSuccessful) {
-            Toast.makeText(getActivity(), R.string.toast_translation_deleted, Toast.LENGTH_SHORT).show();
-            loadTranslations(false);
-        } else {
-            DialogHelper.showDialog(getActivity(), true,
-                    R.string.dialog_translation_remove_failure_message,
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            removeTranslation(translation);
-                        }
-                    }, null
-            );
-        }
     }
 }

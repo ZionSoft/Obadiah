@@ -17,5 +17,10 @@
 
 package net.zionsoft.obadiah.mvp.views;
 
+import net.zionsoft.obadiah.model.translations.TranslationInfo;
+
 public interface TranslationManagementView extends MVPView {
+    void onTranslationRemoved();
+
+    void onTranslationRemovalFailed(TranslationInfo translation);
 }

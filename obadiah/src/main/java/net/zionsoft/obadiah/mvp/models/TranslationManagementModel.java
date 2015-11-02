@@ -17,12 +17,26 @@
 
 package net.zionsoft.obadiah.mvp.models;
 
+import net.zionsoft.obadiah.model.translations.TranslationInfo;
 import net.zionsoft.obadiah.model.translations.TranslationManager;
+
+import rx.Observable;
+import rx.Subscriber;
 
 public class TranslationManagementModel {
     private final TranslationManager translationManager;
 
     public TranslationManagementModel(TranslationManager translationManager) {
         this.translationManager = translationManager;
+    }
+
+    public Observable<Boolean> removeTranslation(final TranslationInfo translation) {
+        return Observable.create(new Observable.OnSubscribe<Boolean>() {
+            @Override
+            public void call(Subscriber<? super Boolean> subscriber) {
+                subscriber.onNext(translationManager.removeTranslation(translation));
+                subscriber.onCompleted();
+            }
+        });
     }
 }

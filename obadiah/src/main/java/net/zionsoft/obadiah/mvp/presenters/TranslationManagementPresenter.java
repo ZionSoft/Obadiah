@@ -17,13 +17,56 @@
 
 package net.zionsoft.obadiah.mvp.presenters;
 
+import net.zionsoft.obadiah.model.translations.TranslationInfo;
 import net.zionsoft.obadiah.mvp.models.TranslationManagementModel;
 import net.zionsoft.obadiah.mvp.views.TranslationManagementView;
+
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+import rx.schedulers.Schedulers;
+import rx.subscriptions.CompositeSubscription;
 
 public class TranslationManagementPresenter extends MVPPresenter<TranslationManagementView> {
     private final TranslationManagementModel translationManagementModel;
 
+    private CompositeSubscription subscription;
+
     public TranslationManagementPresenter(TranslationManagementModel translationManagementModel) {
         this.translationManagementModel = translationManagementModel;
+    }
+
+    @Override
+    protected void onViewTaken() {
+        super.onViewTaken();
+        subscription = new CompositeSubscription();
+    }
+
+    @Override
+    protected void onViewDropped() {
+        if (subscription != null) {
+            subscription.unsubscribe();
+            subscription = null;
+        }
+
+        super.onViewDropped();
+    }
+
+    public void removeTranslation(final TranslationInfo translation) {
+        subscription.add(translationManagementModel.removeTranslation(translation)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Action1<Boolean>() {
+                    @Override
+                    public void call(Boolean removed) {
+                        final TranslationManagementView v = getView();
+                        if (v != null) {
+                            if (removed) {
+                                v.onTranslationRemoved();
+                            } else {
+                                v.onTranslationRemovalFailed(translation);
+                            }
+                        }
+                    }
+                }));
     }
 }
