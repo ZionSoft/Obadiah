@@ -28,4 +28,6 @@ ext {
     javaxAnnotationApiVersion = '1.2'
     butterKnifeVersion = '7.0.1'
     rxAndroidVersion = '1.0.1'
+
+    stethoVersion = '1.2.0'
 }

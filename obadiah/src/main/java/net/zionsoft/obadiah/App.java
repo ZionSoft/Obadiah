@@ -17,7 +17,6 @@
 
 package net.zionsoft.obadiah;
 
-import android.app.Application;
 import android.content.Context;
 import android.os.StrictMode;
 
@@ -35,7 +34,7 @@ import javax.inject.Inject;
 
 import io.fabric.sdk.android.Fabric;
 
-public class App extends Application {
+public class App extends BaseApp {
     @Inject
     Bible bible;
 
