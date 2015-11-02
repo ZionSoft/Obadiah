@@ -18,6 +18,7 @@
 package net.zionsoft.obadiah;
 
 import android.app.Application;
+import android.os.StrictMode;
 
 import com.facebook.stetho.Stetho;
 
@@ -27,5 +28,6 @@ public abstract class BaseApp extends Application {
         super.onCreate();
 
         Stetho.initializeWithDefaults(this);
+        StrictMode.enableDefaults();
     }
 }
