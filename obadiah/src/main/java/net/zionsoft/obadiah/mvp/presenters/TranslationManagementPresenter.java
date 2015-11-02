@@ -18,6 +18,7 @@
 package net.zionsoft.obadiah.mvp.presenters;
 
 import net.zionsoft.obadiah.model.translations.TranslationInfo;
+import net.zionsoft.obadiah.model.translations.Translations;
 import net.zionsoft.obadiah.mvp.models.TranslationManagementModel;
 import net.zionsoft.obadiah.mvp.views.TranslationManagementView;
 
@@ -49,6 +50,25 @@ public class TranslationManagementPresenter extends MVPPresenter<TranslationMana
         }
 
         super.onViewDropped();
+    }
+
+    public void loadTranslations(boolean forceRefresh) {
+        subscription.add(translationManagementModel.loadTranslations(forceRefresh)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Action1<Translations>() {
+                    @Override
+                    public void call(Translations translations) {
+                        final TranslationManagementView v = getView();
+                        if (v != null) {
+                            if (translations != null) {
+                                v.onTranslationLoaded(translations);
+                            } else {
+                                v.onTranslationLoadFailed();
+                            }
+                        }
+                    }
+                }));
     }
 
     public void removeTranslation(final TranslationInfo translation) {

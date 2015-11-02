@@ -47,20 +47,19 @@ import net.zionsoft.obadiah.injection.scopes.ActivityScope;
 import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.translations.TranslationInfo;
 import net.zionsoft.obadiah.model.translations.TranslationManager;
+import net.zionsoft.obadiah.model.translations.Translations;
 import net.zionsoft.obadiah.mvp.presenters.TranslationManagementPresenter;
 import net.zionsoft.obadiah.mvp.views.TranslationManagementView;
 import net.zionsoft.obadiah.ui.adapters.TranslationListAdapter;
 import net.zionsoft.obadiah.ui.utils.AnimationHelper;
 import net.zionsoft.obadiah.ui.utils.DialogHelper;
 
-import java.util.List;
-
 import javax.inject.Inject;
 
 import butterknife.Bind;
 
-public class TranslationListFragment extends BaseFragment implements SwipeRefreshLayout.OnRefreshListener,
-        TranslationManager.OnTranslationsLoadedListener, TranslationManagementView {
+public class TranslationListFragment extends BaseFragment
+        implements SwipeRefreshLayout.OnRefreshListener, TranslationManagementView {
     private static final String TAG_DOWNLOAD_DIALOG_FRAGMENT = "net.zionsoft.obadiah.ui.fragments.TranslationListFragment.TAG_DOWNLOAD_DIALOG_FRAGMENT";
     private static final String TAG_REMOVE_DIALOG_FRAGMENT = "net.zionsoft.obadiah.ui.fragments.TranslationListFragment.TAG_REMOVE_DIALOG_FRAGMENT";
     private static final int CONTEXT_MENU_ITEM_DELETE = 0;
@@ -110,12 +109,6 @@ public class TranslationListFragment extends BaseFragment implements SwipeRefres
         initializeUi();
     }
 
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        loadTranslations(true);
-    }
-
     private void initializeUi() {
         swipeContainer.setColorSchemeResources(R.color.dark_cyan, R.color.dark_lime, R.color.blue, R.color.dark_blue);
         swipeContainer.setOnRefreshListener(this);
@@ -160,7 +153,7 @@ public class TranslationListFragment extends BaseFragment implements SwipeRefres
 
     private void loadTranslations(final boolean forceRefresh) {
         translationListView.setVisibility(View.GONE);
-        translationManager.loadTranslations(forceRefresh, this);
+        translationManagementPresenter.loadTranslations(forceRefresh);
     }
 
     private void downloadTranslation(final TranslationInfo translationInfo) {
@@ -219,6 +212,7 @@ public class TranslationListFragment extends BaseFragment implements SwipeRefres
     public void onResume() {
         super.onResume();
         translationManagementPresenter.takeView(this);
+        loadTranslations(true);
     }
 
     @Override
@@ -299,6 +293,34 @@ public class TranslationListFragment extends BaseFragment implements SwipeRefres
     }
 
     @Override
+    public void onTranslationLoaded(Translations translations) {
+        swipeContainer.setRefreshing(false);
+        AnimationHelper.fadeIn(translationListView);
+
+        translationListAdapter.setTranslations(translations.downloaded, translations.available);
+        translationListAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onTranslationLoadFailed() {
+        DialogHelper.showDialog(getActivity(), false, R.string.dialog_retry_network,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        loadTranslations(true);
+                    }
+                }, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        final Activity activity = getActivity();
+                        activity.finish();
+                        activity.overridePendingTransition(R.anim.fade_in, R.anim.slide_out_left_to_right);
+                    }
+                }
+        );
+    }
+
+    @Override
     public void onTranslationRemoved() {
         ((DialogFragment) getChildFragmentManager().findFragmentByTag(TAG_REMOVE_DIALOG_FRAGMENT))
                 .dismissAllowingStateLoss();
@@ -318,37 +340,5 @@ public class TranslationListFragment extends BaseFragment implements SwipeRefres
                         removeTranslation(translation);
                     }
                 }, null);
-    }
-
-    @Override
-    public void onTranslationsLoaded(@Nullable List<TranslationInfo> downloaded, @Nullable List<TranslationInfo> available) {
-        if (!isAdded()) {
-            return;
-        }
-
-        if (downloaded == null || available == null) {
-            DialogHelper.showDialog(getActivity(), false, R.string.dialog_retry_network,
-                    new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            loadTranslations(true);
-                        }
-                    }, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            final Activity activity = getActivity();
-                            activity.finish();
-                            activity.overridePendingTransition(R.anim.fade_in, R.anim.slide_out_left_to_right);
-                        }
-                    }
-            );
-            return;
-        }
-
-        swipeContainer.setRefreshing(false);
-        AnimationHelper.fadeIn(translationListView);
-
-        translationListAdapter.setTranslations(downloaded, available);
-        translationListAdapter.notifyDataSetChanged();
     }
 }

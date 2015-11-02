@@ -20,8 +20,6 @@ package net.zionsoft.obadiah.model.translations;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.SystemClock;
-import android.support.annotation.Nullable;
-import android.support.v4.util.Pair;
 
 import com.crashlytics.android.Crashlytics;
 
@@ -46,10 +44,6 @@ import java.util.zip.ZipInputStream;
 import javax.inject.Inject;
 
 public class TranslationManager {
-    public interface OnTranslationsLoadedListener {
-        public void onTranslationsLoaded(@Nullable List<TranslationInfo> downloaded, @Nullable List<TranslationInfo> available);
-    }
-
     public interface OnTranslationDownloadListener {
         public void onTranslationDownloaded(String translation, boolean isSuccessful);
 
@@ -61,129 +55,85 @@ public class TranslationManager {
 
     private final Context context;
 
-    private List<String> downloadedTranslationShortNames;
-    private List<TranslationInfo> downloadedTranslations;
-    private List<TranslationInfo> availableTranslations;
-
     @Inject
     public TranslationManager(Context context) {
         App.get(context).getInjectionComponent().inject(this);
         this.context = context.getApplicationContext();
     }
 
-    public void loadTranslations(boolean forceRefresh, final OnTranslationsLoadedListener listener) {
-        if (!forceRefresh && downloadedTranslations != null && availableTranslations != null) {
-            // we have cache, so use it
-            listener.onTranslationsLoaded(downloadedTranslations, availableTranslations);
-            return;
-        }
-
-        if (!NetworkHelper.isOnline(context)) {
-            // do nothing if network is not available
-            listener.onTranslationsLoaded(null, null);
-            return;
+    public Translations loadTranslations(boolean forceRefresh) {
+        if (!forceRefresh) {
+            final List<TranslationInfo> translations;
+            final List<String> downloaded;
+            SQLiteDatabase db = null;
+            try {
+                db = databaseHelper.openDatabase();
+                if (db != null) {
+                    translations = TranslationHelper.sortByLocale(TranslationHelper.getTranslations(db));
+                    downloaded = TranslationHelper.getDownloadedTranslationShortNames(db);
+                    if (translations.size() > 0) {
+                        return new Translations.Builder()
+                                .translations(translations).downloaded(downloaded)
+                                .build();
+                    }
+                } else {
+                    Analytics.trackException("Failed to open database.");
+                }
+            } finally {
+                if (db != null) {
+                    databaseHelper.closeDatabase();
+                }
+            }
         }
 
         final long timestamp = SystemClock.elapsedRealtime();
-        new SimpleAsyncTask<Void, Void, Pair<List<TranslationInfo>, List<TranslationInfo>>>() {
-            @Override
-            protected Pair<List<TranslationInfo>, List<TranslationInfo>> doInBackground(Void... params) {
-                List<TranslationInfo> translations = null;
-                try {
-                    translations = downloadTranslationList(NetworkHelper.PRIMARY_TRANSLATIONS_LIST_URL);
-                } catch (Exception e) {
-                    Crashlytics.getInstance().core.logException(e);
-                }
-                if (translations == null) {
-                    try {
-                        translations = downloadTranslationList(NetworkHelper.SECONDARY_TRANSLATIONS_LIST_URL);
-                    } catch (Exception e) {
-                        Crashlytics.getInstance().core.logException(e);
-                        return null;
-                    }
-                }
 
-                if (downloadedTranslationShortNames == null) {
-                    // this should not happen, but just in case
-                    downloadedTranslationShortNames = Collections.unmodifiableList(getDownloadedTranslationShortNames());
-                }
-
-                final List<TranslationInfo> downloaded
-                        = new ArrayList<>(downloadedTranslationShortNames.size());
-                final List<TranslationInfo> available
-                        = new ArrayList<>(translations.size() - downloadedTranslationShortNames.size());
-                translations = TranslationHelper.sortByLocale(translations);
-                for (TranslationInfo translation : translations) {
-                    boolean isDownloaded = false;
-                    for (String translationShortName : downloadedTranslationShortNames) {
-                        if (translation.shortName.equals(translationShortName)) {
-                            isDownloaded = true;
-                            break;
-                        }
-                    }
-                    if (isDownloaded) {
-                        downloaded.add(translation);
-                    } else {
-                        available.add(translation);
-                    }
-                }
-
-                return new Pair<>(downloaded, available);
+        List<TranslationInfo> translations = null;
+        try {
+            translations = downloadTranslationList(NetworkHelper.PRIMARY_TRANSLATIONS_LIST_URL);
+        } catch (Exception e) {
+            Crashlytics.getInstance().core.logException(e);
+        }
+        if (translations == null) {
+            try {
+                translations = downloadTranslationList(NetworkHelper.SECONDARY_TRANSLATIONS_LIST_URL);
+            } catch (Exception e) {
+                Crashlytics.getInstance().core.logException(e);
+                Analytics.trackTranslationListDownloading(false, SystemClock.elapsedRealtime() - timestamp);
+                return null;
             }
+        }
+        translations = TranslationHelper.sortByLocale(translations);
 
-            @Override
-            protected void onPostExecute(Pair<List<TranslationInfo>, List<TranslationInfo>> result) {
-                final boolean isSuccessful = result != null;
-                Analytics.trackTranslationListDownloading(isSuccessful, SystemClock.elapsedRealtime() - timestamp);
-
-                if (isSuccessful) {
-                    downloadedTranslations = result.first;
-                    availableTranslations = result.second;
-                } else {
-                    downloadedTranslations = null;
-                    availableTranslations = null;
-                }
-                listener.onTranslationsLoaded(downloadedTranslations, availableTranslations);
+        final List<String> downloaded;
+        SQLiteDatabase db = null;
+        try {
+            db = databaseHelper.openDatabase();
+            if (db == null) {
+                Analytics.trackException("Failed to open database.");
+                Analytics.trackTranslationListDownloading(false, SystemClock.elapsedRealtime() - timestamp);
+                return null;
             }
-        }.start();
+            TranslationHelper.saveTranslations(db, translations);
+            downloaded = TranslationHelper.getDownloadedTranslationShortNames(db);
+        } finally {
+            if (db != null) {
+                databaseHelper.closeDatabase();
+            }
+        }
+
+        Analytics.trackTranslationListDownloading(true, SystemClock.elapsedRealtime() - timestamp);
+
+        return new Translations.Builder().translations(translations).downloaded(downloaded).build();
     }
 
     private static List<TranslationInfo> downloadTranslationList(String url) throws Exception {
         return TranslationHelper.toTranslationList(new JSONArray(new String(NetworkHelper.get(url), "UTF8")));
     }
 
-    private List<String> getDownloadedTranslationShortNames() {
-        SQLiteDatabase db = null;
-        try {
-            db = databaseHelper.openDatabase();
-            if (db == null) {
-                Analytics.trackException("Failed to open database.");
-                return null;
-            }
-            return TranslationHelper.getDownloadedTranslationShortNames(db);
-        } finally {
-            if (db != null) {
-                databaseHelper.closeDatabase();
-            }
-        }
-    }
-
     public boolean removeTranslation(TranslationInfo translation) {
         final boolean removed = removeTranslation(translation.shortName);
         Analytics.trackTranslationRemoval(translation.shortName, removed);
-
-        downloadedTranslationShortNames = unmodifiableRemove(downloadedTranslationShortNames, translation.shortName);
-
-        TranslationInfo removedTranslation = null;
-        for (TranslationInfo downloaded : downloadedTranslations) {
-            if (downloaded.shortName.equals(translation.shortName)) {
-                removedTranslation = downloaded;
-                break;
-            }
-        }
-        downloadedTranslations = unmodifiableRemove(downloadedTranslations, removedTranslation);
-        availableTranslations = unmodifiableAppend(availableTranslations, removedTranslation);
-
         return removed;
     }
 
@@ -283,20 +233,6 @@ public class TranslationManager {
             @Override
             protected void onPostExecute(Boolean result) {
                 Analytics.trackTranslationDownload(translationInfo.shortName, result, SystemClock.elapsedRealtime() - mTimestamp);
-
-                if (result) {
-                    downloadedTranslationShortNames = unmodifiableAppend(downloadedTranslationShortNames, translationInfo.shortName);
-
-                    TranslationInfo downloaded = null;
-                    for (TranslationInfo available : availableTranslations) {
-                        if (available.shortName.equals(translationInfo.shortName)) {
-                            downloaded = available;
-                            break;
-                        }
-                    }
-                    downloadedTranslations = unmodifiableAppend(downloadedTranslations, downloaded);
-                    availableTranslations = unmodifiableRemove(availableTranslations, downloaded);
-                }
                 listener.onTranslationDownloaded(translationInfo.shortName, result);
             }
         }.start();
