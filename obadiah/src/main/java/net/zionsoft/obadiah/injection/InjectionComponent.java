@@ -22,9 +22,11 @@ import net.zionsoft.obadiah.BookSelectionActivity;
 import net.zionsoft.obadiah.injection.components.OpenSourceLicenseComponent;
 import net.zionsoft.obadiah.injection.components.ReadingProgressComponent;
 import net.zionsoft.obadiah.injection.components.SearchComponent;
+import net.zionsoft.obadiah.injection.components.TranslationManagementComponent;
 import net.zionsoft.obadiah.injection.modules.OpenSourceLicenseModule;
 import net.zionsoft.obadiah.injection.modules.ReadingProgressModule;
 import net.zionsoft.obadiah.injection.modules.SearchModule;
+import net.zionsoft.obadiah.injection.modules.TranslationManagementModule;
 import net.zionsoft.obadiah.model.Bible;
 import net.zionsoft.obadiah.model.ReadingProgressManager;
 import net.zionsoft.obadiah.model.notification.PushNotificationHandler;
@@ -35,7 +37,6 @@ import net.zionsoft.obadiah.ui.adapters.TranslationListAdapter;
 import net.zionsoft.obadiah.ui.adapters.VerseListAdapter;
 import net.zionsoft.obadiah.ui.adapters.VersePagerAdapter;
 import net.zionsoft.obadiah.ui.fragments.ChapterSelectionFragment;
-import net.zionsoft.obadiah.ui.fragments.TranslationListFragment;
 
 import javax.inject.Singleton;
 
@@ -53,8 +54,6 @@ public interface InjectionComponent {
     public void inject(TranslationManagementActivity translationManagementActivity);
 
     public void inject(ChapterSelectionFragment chapterSelectionFragment);
-
-    public void inject(TranslationListFragment translationListFragment);
 
     public void inject(TranslationListAdapter translationListAdapter);
 
@@ -75,6 +74,8 @@ public interface InjectionComponent {
     ReadingProgressComponent plus(ReadingProgressModule readingProgressModule);
 
     SearchComponent plus(SearchModule searchModule);
+
+    TranslationManagementComponent plus(TranslationManagementModule translationManagementModule);
 
     final class Initializer {
         public static InjectionComponent init(App app) {

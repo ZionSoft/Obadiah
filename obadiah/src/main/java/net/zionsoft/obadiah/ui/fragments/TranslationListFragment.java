@@ -42,10 +42,13 @@ import android.widget.Toast;
 import net.zionsoft.obadiah.App;
 import net.zionsoft.obadiah.Constants;
 import net.zionsoft.obadiah.R;
-import net.zionsoft.obadiah.model.Bible;
+import net.zionsoft.obadiah.injection.components.TranslationManagementComponent;
+import net.zionsoft.obadiah.injection.scopes.ActivityScope;
 import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.translations.TranslationInfo;
 import net.zionsoft.obadiah.model.translations.TranslationManager;
+import net.zionsoft.obadiah.mvp.presenters.TranslationManagementPresenter;
+import net.zionsoft.obadiah.mvp.views.TranslationManagementView;
 import net.zionsoft.obadiah.ui.adapters.TranslationListAdapter;
 import net.zionsoft.obadiah.ui.utils.AnimationHelper;
 import net.zionsoft.obadiah.ui.utils.DialogHelper;
@@ -57,10 +60,15 @@ import javax.inject.Inject;
 import butterknife.Bind;
 
 public class TranslationListFragment extends BaseFragment implements SwipeRefreshLayout.OnRefreshListener,
-        TranslationManager.OnTranslationsLoadedListener, TranslationManager.OnTranslationRemovedListener {
+        TranslationManager.OnTranslationsLoadedListener, TranslationManager.OnTranslationRemovedListener,
+        TranslationManagementView {
     private static final String TAG_DOWNLOAD_DIALOG_FRAGMENT = "net.zionsoft.obadiah.ui.fragments.TranslationListFragment.TAG_DOWNLOAD_DIALOG_FRAGMENT";
     private static final String TAG_REMOVE_DIALOG_FRAGMENT = "net.zionsoft.obadiah.ui.fragments.TranslationListFragment.TAG_REMOVE_DIALOG_FRAGMENT";
     private static final int CONTEXT_MENU_ITEM_DELETE = 0;
+
+    @ActivityScope
+    @Inject
+    TranslationManagementPresenter translationManagementPresenter;
 
     @Inject
     TranslationManager translationManager;
@@ -88,7 +96,8 @@ public class TranslationListFragment extends BaseFragment implements SwipeRefres
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        App.get(getActivity()).getInjectionComponent().inject(this);
+        TranslationManagementComponent.Initializer.init(App.get(getActivity()).getInjectionComponent())
+                .inject(this);
     }
 
     @Override
@@ -205,6 +214,18 @@ public class TranslationListFragment extends BaseFragment implements SwipeRefres
                 }
             }
         });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        translationManagementPresenter.takeView(this);
+    }
+
+    @Override
+    public void onPause() {
+        translationManagementPresenter.dropView();
+        super.onPause();
     }
 
     @Override
