@@ -251,7 +251,7 @@ public class TranslationHelper {
             values.put(DatabaseHelper.COLUMN_TRANSLATION_LANGUAGE, translation.language);
             values.put(DatabaseHelper.COLUMN_TRANSLATION_BLOB_KEY, translation.blobKey);
             values.put(DatabaseHelper.COLUMN_TRANSLATION_SIZE, translation.size);
-            db.insert(DatabaseHelper.TABLE_TRANSLATIONS, null, values);
+            db.insertWithOnConflict(DatabaseHelper.TABLE_TRANSLATIONS, null, values, SQLiteDatabase.CONFLICT_REPLACE);
         }
     }
 
