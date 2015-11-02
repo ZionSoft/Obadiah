@@ -20,6 +20,7 @@ package net.zionsoft.obadiah.model.translations;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.SystemClock;
+import android.support.annotation.NonNull;
 
 import com.crashlytics.android.Crashlytics;
 
@@ -29,13 +30,11 @@ import net.zionsoft.obadiah.model.database.DatabaseHelper;
 import net.zionsoft.obadiah.model.network.NetworkHelper;
 import net.zionsoft.obadiah.utils.SimpleAsyncTask;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URLEncoder;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.zip.ZipEntry;
@@ -61,74 +60,56 @@ public class TranslationManager {
         this.context = context.getApplicationContext();
     }
 
-    public Translations loadTranslations(boolean forceRefresh) {
-        if (!forceRefresh) {
-            final List<TranslationInfo> translations;
-            final List<String> downloaded;
-            SQLiteDatabase db = null;
-            try {
-                db = databaseHelper.openDatabase();
-                if (db != null) {
-                    translations = TranslationHelper.sortByLocale(TranslationHelper.getTranslations(db));
-                    downloaded = TranslationHelper.getDownloadedTranslationShortNames(db);
-                    if (translations.size() > 0) {
-                        return new Translations.Builder()
-                                .translations(translations).downloaded(downloaded)
-                                .build();
-                    }
-                } else {
-                    Analytics.trackException("Failed to open database.");
-                }
-            } finally {
-                if (db != null) {
-                    databaseHelper.closeDatabase();
-                }
-            }
-        }
-
-        final long timestamp = SystemClock.elapsedRealtime();
-
-        List<TranslationInfo> translations = null;
-        try {
-            translations = downloadTranslationList(NetworkHelper.PRIMARY_TRANSLATIONS_LIST_URL);
-        } catch (Exception e) {
-            Crashlytics.getInstance().core.logException(e);
-        }
-        if (translations == null) {
-            try {
-                translations = downloadTranslationList(NetworkHelper.SECONDARY_TRANSLATIONS_LIST_URL);
-            } catch (Exception e) {
-                Crashlytics.getInstance().core.logException(e);
-                Analytics.trackTranslationListDownloading(false, SystemClock.elapsedRealtime() - timestamp);
-                return null;
-            }
-        }
-        translations = TranslationHelper.sortByLocale(translations);
-
-        final List<String> downloaded;
+    @NonNull
+    public List<TranslationInfo> loadTranslations() {
         SQLiteDatabase db = null;
         try {
             db = databaseHelper.openDatabase();
-            if (db == null) {
+            if (db != null) {
+                return TranslationHelper.sortByLocale(TranslationHelper.getTranslations(db));
+            } else {
                 Analytics.trackException("Failed to open database.");
-                Analytics.trackTranslationListDownloading(false, SystemClock.elapsedRealtime() - timestamp);
-                return null;
+                return Collections.emptyList();
             }
-            TranslationHelper.saveTranslations(db, translations);
-            downloaded = TranslationHelper.getDownloadedTranslationShortNames(db);
         } finally {
             if (db != null) {
                 databaseHelper.closeDatabase();
             }
         }
-
-        Analytics.trackTranslationListDownloading(true, SystemClock.elapsedRealtime() - timestamp);
-
-        return new Translations.Builder().translations(translations).downloaded(downloaded).build();
     }
 
-    private static List<TranslationInfo> downloadTranslationList(String url) throws Exception {
-        return TranslationHelper.toTranslationList(new JSONArray(new String(NetworkHelper.get(url), "UTF8")));
+    @NonNull
+    public List<String> loadDownloadedTranslations() {
+        SQLiteDatabase db = null;
+        try {
+            db = databaseHelper.openDatabase();
+            if (db != null) {
+                return TranslationHelper.getDownloadedTranslationShortNames(db);
+            } else {
+                Analytics.trackException("Failed to open database.");
+                return Collections.emptyList();
+            }
+        } finally {
+            if (db != null) {
+                databaseHelper.closeDatabase();
+            }
+        }
+    }
+
+    public void saveTranslations(List<TranslationInfo> translations) {
+        SQLiteDatabase db = null;
+        try {
+            db = databaseHelper.openDatabase();
+            if (db != null) {
+                TranslationHelper.saveTranslations(db, translations);
+            } else {
+                Analytics.trackException("Failed to open database.");
+            }
+        } finally {
+            if (db != null) {
+                databaseHelper.closeDatabase();
+            }
+        }
     }
 
     public boolean removeTranslation(TranslationInfo translation) {
@@ -158,22 +139,6 @@ public class TranslationManager {
                 databaseHelper.closeDatabase();
             }
         }
-    }
-
-    private static <T> List<T> unmodifiableAppend(List<T> original, T toAppend) {
-        final List<T> list = new ArrayList<>(original.size() + 1);
-        list.addAll(original);
-        list.add(toAppend);
-        return Collections.unmodifiableList(list);
-    }
-
-    private static <T> List<T> unmodifiableRemove(List<T> original, T toRemove) {
-        final List<T> list = new ArrayList<>(original.size() - 1);
-        for (T t : original) {
-            if (!t.equals(toRemove))
-                list.add(t);
-        }
-        return Collections.unmodifiableList(list);
     }
 
     public void downloadTranslation(final TranslationInfo translationInfo, final OnTranslationDownloadListener listener) {

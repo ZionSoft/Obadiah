@@ -21,6 +21,7 @@ import net.zionsoft.obadiah.injection.scopes.ActivityScope;
 import net.zionsoft.obadiah.model.translations.TranslationManager;
 import net.zionsoft.obadiah.mvp.models.TranslationManagementModel;
 import net.zionsoft.obadiah.mvp.presenters.TranslationManagementPresenter;
+import net.zionsoft.obadiah.network.BackendInterface;
 
 import dagger.Module;
 import dagger.Provides;
@@ -28,8 +29,8 @@ import dagger.Provides;
 @Module
 public class TranslationManagementModule {
     @Provides
-    public TranslationManagementModel provideTranslationManagementModel(TranslationManager translationManager) {
-        return new TranslationManagementModel(translationManager);
+    public TranslationManagementModel provideTranslationManagementModel(TranslationManager translationManager, BackendInterface backendInterface) {
+        return new TranslationManagementModel(translationManager, backendInterface);
     }
 
     @Provides

@@ -37,25 +37,6 @@ import java.util.List;
 import java.util.Locale;
 
 public class TranslationHelper {
-    public static List<TranslationInfo> toTranslationList(JSONArray jsonArray) throws Exception {
-        final int length = jsonArray.length();
-        final List<TranslationInfo> translations = new ArrayList<TranslationInfo>(length);
-        for (int i = 0; i < length; ++i) {
-            final JSONObject translationObject = jsonArray.getJSONObject(i);
-            final String name = translationObject.getString("name");
-            final String shortName = translationObject.getString("shortName");
-            final String language = translationObject.getString("language");
-            final String blobKey = translationObject.optString("blobKey", null);
-            final int size = translationObject.getInt("size");
-            if (TextUtils.isEmpty(name) || TextUtils.isEmpty(shortName)
-                    || TextUtils.isEmpty(language) || size <= 0) {
-                throw new Exception("Illegal translation info.");
-            }
-            translations.add(new TranslationInfo(name, shortName, language, blobKey, size));
-        }
-        return translations;
-    }
-
     public static List<TranslationInfo> sortByLocale(List<TranslationInfo> translations) {
         Collections.sort(translations, new Comparator<TranslationInfo>() {
             @Override

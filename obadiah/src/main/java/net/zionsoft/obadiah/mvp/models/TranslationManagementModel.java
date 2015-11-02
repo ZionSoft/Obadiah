@@ -20,22 +20,63 @@ package net.zionsoft.obadiah.mvp.models;
 import net.zionsoft.obadiah.model.translations.TranslationInfo;
 import net.zionsoft.obadiah.model.translations.TranslationManager;
 import net.zionsoft.obadiah.model.translations.Translations;
+import net.zionsoft.obadiah.network.BackendInterface;
+
+import java.util.List;
 
 import rx.Observable;
 import rx.Subscriber;
+import rx.functions.Action1;
+import rx.functions.Func1;
 
 public class TranslationManagementModel {
     private final TranslationManager translationManager;
+    private final BackendInterface backendInterface;
 
-    public TranslationManagementModel(TranslationManager translationManager) {
+    public TranslationManagementModel(TranslationManager translationManager, BackendInterface backendInterface) {
         this.translationManager = translationManager;
+        this.backendInterface = backendInterface;
     }
 
     public Observable<Translations> loadTranslations(final boolean forceRefresh) {
-        return Observable.create(new Observable.OnSubscribe<Translations>() {
+        final Observable<List<TranslationInfo>> observable;
+        if (forceRefresh) {
+            observable = loadFromNetwork();
+        } else {
+            observable = Observable.concat(loadFromLocal(), loadFromNetwork())
+                    .first(new Func1<List<TranslationInfo>, Boolean>() {
+                        @Override
+                        public Boolean call(List<TranslationInfo> translations) {
+                            return translations.size() > 0;
+                        }
+                    });
+        }
+        return observable.map(new Func1<List<TranslationInfo>, Translations>() {
             @Override
-            public void call(Subscriber<? super Translations> subscriber) {
-                subscriber.onNext(translationManager.loadTranslations(forceRefresh));
+            public Translations call(List<TranslationInfo> translations) {
+                return new Translations.Builder()
+                        .translations(translations)
+                        .downloaded(translationManager.loadDownloadedTranslations())
+                        .build();
+            }
+        });
+    }
+
+    private Observable<List<TranslationInfo>> loadFromNetwork() {
+        return backendInterface.fetchTranslations()
+                .doOnNext(new Action1<List<TranslationInfo>>() {
+                    @Override
+                    public void call(List<TranslationInfo> translations) {
+                        translationManager.saveTranslations(translations);
+                    }
+                });
+    }
+
+    private Observable<List<TranslationInfo>> loadFromLocal() {
+        return Observable.create(new Observable.OnSubscribe<List<TranslationInfo>>() {
+            @Override
+            public void call(Subscriber<? super List<TranslationInfo>> subscriber) {
+                subscriber.onNext(translationManager.loadTranslations());
                 subscriber.onCompleted();
             }
         });

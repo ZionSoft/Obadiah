@@ -17,6 +17,16 @@
 
 package net.zionsoft.obadiah.network;
 
+import net.zionsoft.obadiah.model.translations.TranslationInfo;
+
+import java.util.List;
+
+import retrofit.http.GET;
+import rx.Observable;
+
 public interface BackendInterface {
     String BASE_URL = "https://z-bible.appspot.com/v1/";
+
+    @GET("translations")
+    Observable<List<TranslationInfo>> fetchTranslations();
 }
