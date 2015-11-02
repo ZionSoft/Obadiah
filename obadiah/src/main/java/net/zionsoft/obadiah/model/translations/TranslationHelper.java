@@ -259,4 +259,43 @@ public class TranslationHelper {
                 String.format("%s = ?", DatabaseHelper.COLUMN_TRANSLATION_SHORT_NAME),
                 new String[]{translationShortName});
     }
+
+    public static void saveTranslations(SQLiteDatabase db, List<TranslationInfo> translations) {
+        final ContentValues values = new ContentValues(5);
+        final int size = translations.size();
+        for (int i = 0; i < size; ++i) {
+            final TranslationInfo translation = translations.get(i);
+            values.put(DatabaseHelper.COLUMN_TRANSLATION_NAME, translation.name);
+            values.put(DatabaseHelper.COLUMN_TRANSLATION_SHORT_NAME, translation.shortName);
+            values.put(DatabaseHelper.COLUMN_TRANSLATION_LANGUAGE, translation.language);
+            values.put(DatabaseHelper.COLUMN_TRANSLATION_BLOB_KEY, translation.blobKey);
+            values.put(DatabaseHelper.COLUMN_TRANSLATION_SIZE, translation.size);
+            db.insert(DatabaseHelper.TABLE_TRANSLATIONS, null, values);
+        }
+    }
+
+    public static List<TranslationInfo> getTranslations(SQLiteDatabase db) {
+        Cursor cursor = null;
+        try {
+            cursor = db.query(DatabaseHelper.TABLE_TRANSLATIONS,
+                    new String[]{DatabaseHelper.COLUMN_TRANSLATION_NAME, DatabaseHelper.COLUMN_TRANSLATION_SHORT_NAME,
+                            DatabaseHelper.COLUMN_TRANSLATION_LANGUAGE, DatabaseHelper.COLUMN_TRANSLATION_BLOB_KEY,
+                            DatabaseHelper.COLUMN_TRANSLATION_SIZE}, null, null, null, null, null, null);
+            final int name = cursor.getColumnIndex(DatabaseHelper.COLUMN_TRANSLATION_NAME);
+            final int shortName = cursor.getColumnIndex(DatabaseHelper.COLUMN_TRANSLATION_SHORT_NAME);
+            final int language = cursor.getColumnIndex(DatabaseHelper.COLUMN_TRANSLATION_LANGUAGE);
+            final int blobKey = cursor.getColumnIndex(DatabaseHelper.COLUMN_TRANSLATION_BLOB_KEY);
+            final int size = cursor.getColumnIndex(DatabaseHelper.COLUMN_TRANSLATION_SIZE);
+            final List<TranslationInfo> translations = new ArrayList<>(cursor.getCount());
+            while (cursor.moveToNext()) {
+                translations.add(new TranslationInfo(cursor.getString(name), cursor.getString(shortName),
+                        cursor.getString(language), cursor.getString(blobKey), cursor.getInt(size)));
+            }
+            return translations;
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+    }
 }
