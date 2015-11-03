@@ -17,25 +17,30 @@
 
 package net.zionsoft.obadiah.mvp.models;
 
-import net.zionsoft.obadiah.model.ReadingProgress;
-import net.zionsoft.obadiah.model.ReadingProgressManager;
+import net.zionsoft.obadiah.model.Bible;
+
+import java.util.List;
 
 import rx.Observable;
 import rx.Subscriber;
 
-public class ReadingProgressModel {
-    private final ReadingProgressManager readingProgressManager;
+public class BibleReadingModel {
+    private final Bible bible;
 
-    public ReadingProgressModel(ReadingProgressManager readingProgressManager) {
-        this.readingProgressManager = readingProgressManager;
+    public BibleReadingModel(Bible bible) {
+        this.bible = bible;
     }
 
-    public Observable<ReadingProgress> loadReadingProgress() {
-        return Observable.create(new Observable.OnSubscribe<ReadingProgress>() {
+    public Observable<List<String>> loadBookNames(final String translation) {
+        return Observable.create(new Observable.OnSubscribe<List<String>>() {
             @Override
-            public void call(Subscriber<? super ReadingProgress> subscriber) {
-                subscriber.onNext(readingProgressManager.loadReadingProgress());
-                subscriber.onCompleted();
+            public void call(Subscriber<? super List<String>> subscriber) {
+                try {
+                    subscriber.onNext(bible.loadBookNames(translation));
+                    subscriber.onCompleted();
+                } catch (Exception e) {
+                    subscriber.onError(e);
+                }
             }
         });
     }

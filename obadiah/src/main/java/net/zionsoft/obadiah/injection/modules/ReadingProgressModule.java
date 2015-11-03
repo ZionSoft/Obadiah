@@ -20,6 +20,7 @@ package net.zionsoft.obadiah.injection.modules;
 import net.zionsoft.obadiah.injection.scopes.ActivityScope;
 import net.zionsoft.obadiah.model.Bible;
 import net.zionsoft.obadiah.model.ReadingProgressManager;
+import net.zionsoft.obadiah.mvp.models.BibleReadingModel;
 import net.zionsoft.obadiah.mvp.models.ReadingProgressModel;
 import net.zionsoft.obadiah.mvp.presenters.ReadingProgressPresenter;
 
@@ -29,14 +30,18 @@ import dagger.Provides;
 @Module
 public class ReadingProgressModule {
     @Provides
-    ReadingProgressModel provideReadingProgressModel(Bible bible,
-                                                     ReadingProgressManager readingProgressManager) {
-        return new ReadingProgressModel(bible, readingProgressManager);
+    BibleReadingModel provideBibleReadingModel(Bible bible) {
+        return new BibleReadingModel(bible);
+    }
+
+    @Provides
+    ReadingProgressModel provideReadingProgressModel(ReadingProgressManager readingProgressManager) {
+        return new ReadingProgressModel(readingProgressManager);
     }
 
     @Provides
     @ActivityScope
-    ReadingProgressPresenter progressPresenter(ReadingProgressModel readingProgressModel) {
-        return new ReadingProgressPresenter(readingProgressModel);
+    ReadingProgressPresenter progressPresenter(BibleReadingModel bibleReadingModel, ReadingProgressModel readingProgressModel) {
+        return new ReadingProgressPresenter(bibleReadingModel, readingProgressModel);
     }
 }

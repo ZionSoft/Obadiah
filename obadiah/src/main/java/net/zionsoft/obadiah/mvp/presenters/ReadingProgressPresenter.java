@@ -18,6 +18,7 @@
 package net.zionsoft.obadiah.mvp.presenters;
 
 import net.zionsoft.obadiah.model.ReadingProgress;
+import net.zionsoft.obadiah.mvp.models.BibleReadingModel;
 import net.zionsoft.obadiah.mvp.models.ReadingProgressModel;
 import net.zionsoft.obadiah.mvp.views.ReadingProgressView;
 
@@ -30,11 +31,13 @@ import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
 public class ReadingProgressPresenter extends MVPPresenter<ReadingProgressView> {
+    private final BibleReadingModel bibleReadingModel;
     private final ReadingProgressModel readingProgressModel;
 
     private CompositeSubscription subscription;
 
-    public ReadingProgressPresenter(ReadingProgressModel readingProgressModel) {
+    public ReadingProgressPresenter(BibleReadingModel bibleReadingModel, ReadingProgressModel readingProgressModel) {
+        this.bibleReadingModel = bibleReadingModel;
         this.readingProgressModel = readingProgressModel;
     }
 
@@ -55,7 +58,7 @@ public class ReadingProgressPresenter extends MVPPresenter<ReadingProgressView> 
     }
 
     public void loadBookNames(String translation) {
-        subscription.add(readingProgressModel.loadBookNames(translation)
+        subscription.add(bibleReadingModel.loadBookNames(translation)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<List<String>>() {
