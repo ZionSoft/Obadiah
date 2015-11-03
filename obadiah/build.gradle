@@ -70,6 +70,7 @@ dependencies {
     provided 'javax.annotation:javax.annotation-api:' + rootProject.ext.javaxAnnotationApiVersion
 
     compile 'io.reactivex:rxandroid:' + rootProject.ext.rxAndroidVersion
+    compile 'io.reactivex:rxjava:' + rootProject.ext.rxJavaVersion
 
     compile 'com.jakewharton:butterknife:' + rootProject.ext.butterKnifeVersion
 

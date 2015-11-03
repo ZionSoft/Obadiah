@@ -8,7 +8,7 @@ buildscript {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.7'
+    gradleVersion = '2.8'
 }
 
 ext {
@@ -28,6 +28,7 @@ ext {
     javaxAnnotationApiVersion = '1.2'
     butterKnifeVersion = '7.0.1'
     rxAndroidVersion = '1.0.1'
+    rxJavaVersion = '1.0.15'
 
     stethoVersion = '1.2.0'
 }
