@@ -17,25 +17,12 @@
 
 package net.zionsoft.obadiah.network;
 
-import com.squareup.okhttp.ResponseBody;
-
-import net.zionsoft.obadiah.model.translations.TranslationInfo;
-
 import java.util.List;
 
-import retrofit.Call;
-import retrofit.http.GET;
-import retrofit.http.Query;
-import retrofit.http.Streaming;
-import rx.Observable;
+public class BackendChapter {
+    public final List<String> verses;
 
-public interface BackendInterface {
-    String BASE_URL = "https://z-bible.appspot.com/v1/";
-
-    @GET("translations")
-    Observable<List<TranslationInfo>> fetchTranslations();
-
-    @GET("translation")
-    @Streaming
-    Call<ResponseBody> fetchTranslation(@Query("blobKey") String blobKey);
+    public BackendChapter(List<String> verses) {
+        this.verses = verses;
+    }
 }

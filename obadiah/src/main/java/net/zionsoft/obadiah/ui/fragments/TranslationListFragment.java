@@ -46,7 +46,6 @@ import net.zionsoft.obadiah.injection.components.TranslationManagementComponent;
 import net.zionsoft.obadiah.injection.scopes.ActivityScope;
 import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.translations.TranslationInfo;
-import net.zionsoft.obadiah.model.translations.TranslationManager;
 import net.zionsoft.obadiah.model.translations.Translations;
 import net.zionsoft.obadiah.mvp.presenters.TranslationManagementPresenter;
 import net.zionsoft.obadiah.mvp.views.TranslationManagementView;
@@ -67,9 +66,6 @@ public class TranslationListFragment extends BaseFragment
     @ActivityScope
     @Inject
     TranslationManagementPresenter translationManagementPresenter;
-
-    @Inject
-    TranslationManager translationManager;
 
     @Bind(R.id.swipe_container)
     SwipeRefreshLayout swipeContainer;
@@ -156,56 +152,12 @@ public class TranslationListFragment extends BaseFragment
         translationManagementPresenter.loadTranslations(forceRefresh);
     }
 
-    private void downloadTranslation(final TranslationInfo translationInfo) {
+    private void downloadTranslation(TranslationInfo translationInfo) {
         final FragmentManager fm = getChildFragmentManager();
         ProgressDialogFragment.newInstance(R.string.progress_dialog_translation_downloading, 100).show(fm, TAG_DOWNLOAD_DIALOG_FRAGMENT);
         fm.executePendingTransactions();
 
-        translationManager.downloadTranslation(translationInfo, new TranslationManager.OnTranslationDownloadListener() {
-            @Override
-            public void onTranslationDownloaded(String translation, boolean isSuccessful) {
-                if (!isAdded())
-                    return;
-
-                final DialogFragment dialogFragment = (DialogFragment) getChildFragmentManager()
-                        .findFragmentByTag(TAG_DOWNLOAD_DIALOG_FRAGMENT);
-                if (dialogFragment != null) {
-                    dialogFragment.dismissAllowingStateLoss();
-                }
-
-                if (isSuccessful) {
-                    Toast.makeText(getActivity(), R.string.toast_translation_downloaded, Toast.LENGTH_SHORT).show();
-                    if (currentTranslation == null) {
-                        Analytics.trackTranslationSelection(translation);
-
-                        currentTranslation = translation;
-                        preferences.edit()
-                                .putString(Constants.PREF_KEY_LAST_READ_TRANSLATION, currentTranslation)
-                                .apply();
-                    }
-                    loadTranslations(false);
-                } else {
-                    DialogHelper.showDialog(getActivity(), true, R.string.dialog_retry_network,
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
-                                    downloadTranslation(translationInfo);
-                                }
-                            }, null);
-                }
-            }
-
-            @Override
-            public void onTranslationDownloadProgress(String translation, int progress) {
-                if (!isAdded())
-                    return;
-
-                final DialogFragment dialogFragment = (DialogFragment) getChildFragmentManager()
-                        .findFragmentByTag(TAG_DOWNLOAD_DIALOG_FRAGMENT);
-                if (dialogFragment != null) {
-                    ((ProgressDialog) dialogFragment.getDialog()).setProgress(progress);
-                }
-            }
-        });
+        translationManagementPresenter.fetchTranslation(translationInfo);
     }
 
     @Override
@@ -321,7 +273,7 @@ public class TranslationListFragment extends BaseFragment
     }
 
     @Override
-    public void onTranslationRemoved() {
+    public void onTranslationRemoved(TranslationInfo translation) {
         ((DialogFragment) getChildFragmentManager().findFragmentByTag(TAG_REMOVE_DIALOG_FRAGMENT))
                 .dismissAllowingStateLoss();
 
@@ -338,6 +290,51 @@ public class TranslationListFragment extends BaseFragment
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         removeTranslation(translation);
+                    }
+                }, null);
+    }
+
+    @Override
+    public void onTranslationDownloadProgressed(TranslationInfo translation, int progress) {
+        final DialogFragment dialogFragment = (DialogFragment) getChildFragmentManager()
+                .findFragmentByTag(TAG_DOWNLOAD_DIALOG_FRAGMENT);
+        if (dialogFragment != null) {
+            ((ProgressDialog) dialogFragment.getDialog()).setProgress(progress);
+        }
+    }
+
+    @Override
+    public void onTranslationDownloaded(TranslationInfo translation) {
+        dismissDownloadProgressDialog();
+
+        Toast.makeText(getActivity(), R.string.toast_translation_downloaded, Toast.LENGTH_SHORT).show();
+        if (currentTranslation == null) {
+            Analytics.trackTranslationSelection(translation.shortName);
+
+            currentTranslation = translation.shortName;
+            preferences.edit()
+                    .putString(Constants.PREF_KEY_LAST_READ_TRANSLATION, currentTranslation)
+                    .apply();
+        }
+        loadTranslations(false);
+    }
+
+    private void dismissDownloadProgressDialog() {
+        final DialogFragment dialogFragment = (DialogFragment) getChildFragmentManager()
+                .findFragmentByTag(TAG_DOWNLOAD_DIALOG_FRAGMENT);
+        if (dialogFragment != null) {
+            dialogFragment.dismissAllowingStateLoss();
+        }
+    }
+
+    @Override
+    public void onTranslationDownloadFailed(final TranslationInfo translation) {
+        dismissDownloadProgressDialog();
+
+        DialogHelper.showDialog(getActivity(), true, R.string.dialog_retry_network,
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        downloadTranslation(translation);
                     }
                 }, null);
     }

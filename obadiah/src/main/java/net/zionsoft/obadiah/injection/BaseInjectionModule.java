@@ -19,6 +19,7 @@ package net.zionsoft.obadiah.injection;
 
 import android.content.Context;
 
+import com.squareup.moshi.Moshi;
 import com.squareup.okhttp.OkHttpClient;
 
 import net.zionsoft.obadiah.App;
@@ -85,6 +86,12 @@ public class BaseInjectionModule {
 
     @Provides
     @Singleton
+    public Moshi provideMoshi() {
+        return new Moshi.Builder().build();
+    }
+
+    @Provides
+    @Singleton
     public OkHttpClient provideOkHttpClient() {
         final OkHttpClient okHttpClient = new OkHttpClient();
         okHttpClient.setConnectTimeout(30L, TimeUnit.SECONDS);
@@ -95,11 +102,11 @@ public class BaseInjectionModule {
 
     @Provides
     @Singleton
-    public Retrofit provideRetrofit(OkHttpClient okHttpClient) {
+    public Retrofit provideRetrofit(Moshi moshi, OkHttpClient okHttpClient) {
         return new Retrofit.Builder()
                 .baseUrl(BackendInterface.BASE_URL)
                 .client(okHttpClient)
-                .addConverterFactory(MoshiConverterFactory.create())
+                .addConverterFactory(MoshiConverterFactory.create(moshi))
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .build();
     }

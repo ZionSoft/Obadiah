@@ -17,7 +17,10 @@
 
 package net.zionsoft.obadiah.injection.modules;
 
+import com.squareup.moshi.Moshi;
+
 import net.zionsoft.obadiah.injection.scopes.ActivityScope;
+import net.zionsoft.obadiah.model.database.DatabaseHelper;
 import net.zionsoft.obadiah.model.translations.TranslationManager;
 import net.zionsoft.obadiah.mvp.models.TranslationManagementModel;
 import net.zionsoft.obadiah.mvp.presenters.TranslationManagementPresenter;
@@ -29,8 +32,10 @@ import dagger.Provides;
 @Module
 public class TranslationManagementModule {
     @Provides
-    public TranslationManagementModel provideTranslationManagementModel(TranslationManager translationManager, BackendInterface backendInterface) {
-        return new TranslationManagementModel(translationManager, backendInterface);
+    public TranslationManagementModel provideTranslationManagementModel(
+            DatabaseHelper databaseHelper, TranslationManager translationManager,
+            Moshi moshi, BackendInterface backendInterface) {
+        return new TranslationManagementModel(databaseHelper, translationManager, moshi, backendInterface);
     }
 
     @Provides

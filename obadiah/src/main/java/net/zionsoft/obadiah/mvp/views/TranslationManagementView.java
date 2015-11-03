@@ -25,7 +25,13 @@ public interface TranslationManagementView extends MVPView {
 
     void onTranslationLoadFailed();
 
-    void onTranslationRemoved();
+    void onTranslationRemoved(TranslationInfo translation);
 
     void onTranslationRemovalFailed(TranslationInfo translation);
+
+    void onTranslationDownloadProgressed(TranslationInfo translation, int progress);
+
+    void onTranslationDownloaded(TranslationInfo translation);
+
+    void onTranslationDownloadFailed(TranslationInfo translation);
 }

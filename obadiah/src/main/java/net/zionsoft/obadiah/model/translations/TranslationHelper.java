@@ -21,14 +21,11 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.Nullable;
-import android.text.TextUtils;
 
 import net.zionsoft.obadiah.model.Bible;
 import net.zionsoft.obadiah.model.Verse;
 import net.zionsoft.obadiah.model.database.DatabaseHelper;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
+import net.zionsoft.obadiah.network.BackendTranslationInfo;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -192,44 +189,27 @@ public class TranslationHelper {
                 DatabaseHelper.COLUMN_CHAPTER_INDEX, DatabaseHelper.COLUMN_VERSE_INDEX));
     }
 
-    public static void saveBookNames(SQLiteDatabase db, JSONObject booksInfoObject) throws Exception {
-        final String translationShortName = booksInfoObject.getString("shortName");
+    public static void saveBookNames(SQLiteDatabase db, BackendTranslationInfo translation) {
         final ContentValues bookNamesValues = new ContentValues(3);
-        bookNamesValues.put(DatabaseHelper.COLUMN_TRANSLATION_SHORT_NAME, translationShortName);
-        final JSONArray booksArray = booksInfoObject.getJSONArray("books");
-        for (int i = 0; i < Bible.getBookCount(); ++i) {
+        bookNamesValues.put(DatabaseHelper.COLUMN_TRANSLATION_SHORT_NAME, translation.shortName);
+        final List<String> books = translation.books;
+        final int count = books.size();
+        for (int i = 0; i < count; ++i) {
             bookNamesValues.put(DatabaseHelper.COLUMN_BOOK_INDEX, i);
-
-            final String bookName = booksArray.getString(i);
-            if (TextUtils.isEmpty(bookName))
-                throw new Exception("Illegal books.json file: " + translationShortName);
-            bookNamesValues.put(DatabaseHelper.COLUMN_BOOK_NAME, bookName);
-
+            bookNamesValues.put(DatabaseHelper.COLUMN_BOOK_NAME, books.get(i));
             db.insert(DatabaseHelper.TABLE_BOOK_NAMES, null, bookNamesValues);
         }
     }
 
-    public static void saveVerses(SQLiteDatabase db, String translationShortName,
-                                  int bookIndex, int chapterIndex, JSONObject versesObject) throws Exception {
+    public static void saveVerses(SQLiteDatabase db, String translation, int book, int chapter, List<String> verses) {
         final ContentValues versesValues = new ContentValues(4);
-        versesValues.put(DatabaseHelper.COLUMN_BOOK_INDEX, bookIndex);
-        versesValues.put(DatabaseHelper.COLUMN_CHAPTER_INDEX, chapterIndex);
-        final JSONArray paragraphArray = versesObject.getJSONArray("verses");
-        final int paragraphCount = paragraphArray.length();
-        boolean hasNonEmptyVerse = false;
-        for (int verseIndex = 0; verseIndex < paragraphCount; ++verseIndex) {
-            versesValues.put(DatabaseHelper.COLUMN_VERSE_INDEX, verseIndex);
-
-            final String verse = paragraphArray.getString(verseIndex);
-            if (!hasNonEmptyVerse && !TextUtils.isEmpty(verse))
-                hasNonEmptyVerse = true;
-            versesValues.put(DatabaseHelper.COLUMN_TEXT, verse);
-
-            db.insert(translationShortName, null, versesValues);
-        }
-        if (!hasNonEmptyVerse) {
-            throw new Exception(String.format("Empty chapter: %s %d-%d",
-                    translationShortName, bookIndex, chapterIndex));
+        versesValues.put(DatabaseHelper.COLUMN_BOOK_INDEX, book);
+        versesValues.put(DatabaseHelper.COLUMN_CHAPTER_INDEX, chapter);
+        final int versesCount = verses.size();
+        for (int i = 0; i < versesCount; ++i) {
+            versesValues.put(DatabaseHelper.COLUMN_VERSE_INDEX, i);
+            versesValues.put(DatabaseHelper.COLUMN_TEXT, verses.get(i));
+            db.insert(translation, null, versesValues);
         }
     }
 

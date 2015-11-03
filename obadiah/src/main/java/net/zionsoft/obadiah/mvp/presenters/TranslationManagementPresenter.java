@@ -22,6 +22,7 @@ import net.zionsoft.obadiah.model.translations.Translations;
 import net.zionsoft.obadiah.mvp.models.TranslationManagementModel;
 import net.zionsoft.obadiah.mvp.views.TranslationManagementView;
 
+import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.schedulers.Schedulers;
@@ -81,10 +82,41 @@ public class TranslationManagementPresenter extends MVPPresenter<TranslationMana
                         final TranslationManagementView v = getView();
                         if (v != null) {
                             if (removed) {
-                                v.onTranslationRemoved();
+                                v.onTranslationRemoved(translation);
                             } else {
                                 v.onTranslationRemovalFailed(translation);
                             }
+                        }
+                    }
+                }));
+    }
+
+    public void fetchTranslation(final TranslationInfo translation) {
+        subscription.add(translationManagementModel.fetchTranslation(translation)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<Integer>() {
+                    @Override
+                    public void onCompleted() {
+                        final TranslationManagementView v = getView();
+                        if (v != null) {
+                            v.onTranslationDownloaded(translation);
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        final TranslationManagementView v = getView();
+                        if (v != null) {
+                            v.onTranslationDownloadFailed(translation);
+                        }
+                    }
+
+                    @Override
+                    public void onNext(Integer progress) {
+                        final TranslationManagementView v = getView();
+                        if (v != null) {
+                            v.onTranslationDownloadProgressed(translation, progress);
                         }
                     }
                 }));
