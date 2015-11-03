@@ -76,17 +76,26 @@ public class TranslationManagementPresenter extends MVPPresenter<TranslationMana
         subscription.add(translationManagementModel.removeTranslation(translation)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Action1<Boolean>() {
+                .subscribe(new Subscriber<Void>() {
                     @Override
-                    public void call(Boolean removed) {
+                    public void onCompleted() {
                         final TranslationManagementView v = getView();
                         if (v != null) {
-                            if (removed) {
-                                v.onTranslationRemoved(translation);
-                            } else {
-                                v.onTranslationRemovalFailed(translation);
-                            }
+                            v.onTranslationRemoved(translation);
                         }
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        final TranslationManagementView v = getView();
+                        if (v != null) {
+                            v.onTranslationRemovalFailed(translation);
+                        }
+                    }
+
+                    @Override
+                    public void onNext(Void aVoid) {
+                        // won't reach here
                     }
                 }));
     }

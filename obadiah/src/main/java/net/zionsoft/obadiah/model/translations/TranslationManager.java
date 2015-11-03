@@ -91,25 +91,13 @@ public class TranslationManager {
         }
     }
 
-    public boolean removeTranslation(TranslationInfo translation) {
-        final boolean removed = removeTranslation(translation.shortName);
-        Analytics.trackTranslationRemoval(translation.shortName, removed);
-        return removed;
-    }
-
-    private boolean removeTranslation(String translationShortName) {
+    public void removeTranslation(TranslationInfo translation) {
         SQLiteDatabase db = null;
         try {
             db = databaseHelper.openDatabase();
-            if (db == null) {
-                Analytics.trackException("Failed to open database.");
-                return false;
-            }
             db.beginTransaction();
-            TranslationHelper.removeTranslation(db, translationShortName);
+            TranslationHelper.removeTranslation(db, translation.shortName);
             db.setTransactionSuccessful();
-
-            return true;
         } finally {
             if (db != null) {
                 if (db.inTransaction()) {

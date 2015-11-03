@@ -107,12 +107,16 @@ public class TranslationManagementModel {
         });
     }
 
-    public Observable<Boolean> removeTranslation(final TranslationInfo translation) {
-        return Observable.create(new Observable.OnSubscribe<Boolean>() {
+    public Observable<Void> removeTranslation(final TranslationInfo translation) {
+        return Observable.create(new Observable.OnSubscribe<Void>() {
             @Override
-            public void call(Subscriber<? super Boolean> subscriber) {
-                subscriber.onNext(translationManager.removeTranslation(translation));
-                subscriber.onCompleted();
+            public void call(Subscriber<? super Void> subscriber) {
+                try {
+                    translationManager.removeTranslation(translation);
+                    subscriber.onCompleted();
+                } catch (Exception e) {
+                    subscriber.onError(e);
+                }
             }
         });
     }
