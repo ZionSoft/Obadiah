@@ -23,9 +23,9 @@ import net.zionsoft.obadiah.mvp.views.SearchView;
 
 import java.util.List;
 
+import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
 public class SearchPresenter extends MVPPresenter<SearchView> {
@@ -51,16 +51,25 @@ public class SearchPresenter extends MVPPresenter<SearchView> {
         subscription = searchModel.search(translation, query)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Action1<List<Verse>>() {
+                .subscribe(new Subscriber<List<Verse>>() {
                     @Override
-                    public void call(List<Verse> verses) {
+                    public void onCompleted() {
+                        // do nothing
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
                         SearchView v = getView();
                         if (v != null) {
-                            if (verses != null) {
-                                v.onVersesSearched(verses);
-                            } else {
-                                v.onVersesSearchFailed();
-                            }
+                            v.onVersesSearchFailed();
+                        }
+                    }
+
+                    @Override
+                    public void onNext(List<Verse> verses) {
+                        SearchView v = getView();
+                        if (v != null) {
+                            v.onVersesSearched(verses);
                         }
                     }
                 });

@@ -23,6 +23,7 @@ import net.zionsoft.obadiah.mvp.views.ReadingProgressView;
 
 import java.util.List;
 
+import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.schedulers.Schedulers;
@@ -57,12 +58,25 @@ public class ReadingProgressPresenter extends MVPPresenter<ReadingProgressView> 
         subscription.add(readingProgressModel.loadBookNames(translation)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Action1<List<String>>() {
+                .subscribe(new Subscriber<List<String>>() {
                     @Override
-                    public void call(List<String> bookNames) {
+                    public void onCompleted() {
+                        // do nothing
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
                         ReadingProgressView v = getView();
                         if (v != null) {
-                            if (bookNames != null && bookNames.size() > 0) {
+                            v.onBookNamesLoadFailed();
+                        }
+                    }
+
+                    @Override
+                    public void onNext(List<String> bookNames) {
+                        ReadingProgressView v = getView();
+                        if (v != null) {
+                            if (bookNames.size() > 0) {
                                 v.onBookNamesLoaded(bookNames);
                             } else {
                                 v.onBookNamesLoadFailed();

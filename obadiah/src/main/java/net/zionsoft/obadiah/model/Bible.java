@@ -19,7 +19,7 @@ package net.zionsoft.obadiah.model;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
-import android.support.annotation.Nullable;
+import android.support.annotation.NonNull;
 import android.support.v4.util.LruCache;
 
 import net.zionsoft.obadiah.App;
@@ -138,17 +138,13 @@ public class Bible {
         }.start();
     }
 
-    @Nullable
+    @NonNull
     public List<String> loadBookNames(String translationShortName) {
         List<String> bookNames = bookNameCache.get(translationShortName);
         if (bookNames == null) {
             SQLiteDatabase db = null;
             try {
                 db = databaseHelper.openDatabase();
-                if (db == null) {
-                    Analytics.trackException("Failed to open database.");
-                    return null;
-                }
                 bookNames = Collections.unmodifiableList(
                         TranslationHelper.getBookNames(db, translationShortName));
             } finally {
@@ -225,15 +221,11 @@ public class Bible {
         return String.format("%s-%d-%d", translationShortName, book, chapter);
     }
 
-    @Nullable
+    @NonNull
     public List<Verse> search(String translationShortName, String query) {
         SQLiteDatabase db = null;
         try {
             db = databaseHelper.openDatabase();
-            if (db == null) {
-                Analytics.trackException("Failed to open database.");
-                return null;
-            }
             List<String> bookNames = bookNameCache.get(translationShortName);
             if (bookNames == null) {
                 // this should not happen, but just in case

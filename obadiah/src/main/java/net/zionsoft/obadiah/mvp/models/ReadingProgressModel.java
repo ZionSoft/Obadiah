@@ -39,8 +39,12 @@ public class ReadingProgressModel {
         return Observable.create(new Observable.OnSubscribe<List<String>>() {
             @Override
             public void call(Subscriber<? super List<String>> subscriber) {
-                subscriber.onNext(bible.loadBookNames(translation));
-                subscriber.onCompleted();
+                try {
+                    subscriber.onNext(bible.loadBookNames(translation));
+                    subscriber.onCompleted();
+                } catch (Exception e) {
+                    subscriber.onError(e);
+                }
             }
         });
     }

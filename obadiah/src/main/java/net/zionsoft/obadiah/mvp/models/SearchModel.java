@@ -44,8 +44,12 @@ public class SearchModel {
         return Observable.create(new Observable.OnSubscribe<List<Verse>>() {
             @Override
             public void call(Subscriber<? super List<Verse>> subscriber) {
-                subscriber.onNext(bible.search(translation, query));
-                subscriber.onCompleted();
+                try {
+                    subscriber.onNext(bible.search(translation, query));
+                    subscriber.onCompleted();
+                } catch (Exception e) {
+                    subscriber.onError(e);
+                }
             }
         });
     }
