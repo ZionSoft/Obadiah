@@ -17,8 +17,11 @@
 
 package net.zionsoft.obadiah.mvp.presenters;
 
+import android.text.TextUtils;
+
 import net.zionsoft.obadiah.model.translations.TranslationInfo;
 import net.zionsoft.obadiah.model.translations.Translations;
+import net.zionsoft.obadiah.mvp.models.BibleReadingModel;
 import net.zionsoft.obadiah.mvp.models.TranslationManagementModel;
 import net.zionsoft.obadiah.mvp.views.TranslationManagementView;
 
@@ -29,11 +32,14 @@ import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
 public class TranslationManagementPresenter extends MVPPresenter<TranslationManagementView> {
+    private final BibleReadingModel bibleReadingModel;
     private final TranslationManagementModel translationManagementModel;
 
     private CompositeSubscription subscription;
 
-    public TranslationManagementPresenter(TranslationManagementModel translationManagementModel) {
+    public TranslationManagementPresenter(BibleReadingModel bibleReadingModel,
+                                          TranslationManagementModel translationManagementModel) {
+        this.bibleReadingModel = bibleReadingModel;
         this.translationManagementModel = translationManagementModel;
     }
 
@@ -51,6 +57,14 @@ public class TranslationManagementPresenter extends MVPPresenter<TranslationMana
         }
 
         super.onViewDropped();
+    }
+
+    public String loadCurrentTranslation() {
+        return bibleReadingModel.loadCurrentTranslation();
+    }
+
+    public void saveCurrentTranslation(TranslationInfo translation) {
+        bibleReadingModel.saveCurrentTranslation(translation);
     }
 
     public void loadTranslations(boolean forceRefresh) {
@@ -107,6 +121,10 @@ public class TranslationManagementPresenter extends MVPPresenter<TranslationMana
                 .subscribe(new Subscriber<Integer>() {
                     @Override
                     public void onCompleted() {
+                        if (TextUtils.isEmpty(bibleReadingModel.loadCurrentTranslation())) {
+                            bibleReadingModel.saveCurrentTranslation(translation);
+                        }
+
                         final TranslationManagementView v = getView();
                         if (v != null) {
                             v.onTranslationDownloaded(translation);

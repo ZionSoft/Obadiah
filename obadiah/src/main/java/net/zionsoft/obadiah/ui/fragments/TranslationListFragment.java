@@ -19,9 +19,7 @@ package net.zionsoft.obadiah.ui.fragments;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
@@ -40,11 +38,9 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import net.zionsoft.obadiah.App;
-import net.zionsoft.obadiah.Constants;
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.injection.components.TranslationManagementComponent;
 import net.zionsoft.obadiah.injection.scopes.ActivityScope;
-import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.translations.TranslationInfo;
 import net.zionsoft.obadiah.model.translations.Translations;
 import net.zionsoft.obadiah.mvp.presenters.TranslationManagementPresenter;
@@ -73,9 +69,6 @@ public class TranslationListFragment extends BaseFragment
     @Bind(R.id.translation_list_view)
     ListView translationListView;
 
-    private SharedPreferences preferences;
-    private String currentTranslation;
-
     private TranslationListAdapter translationListAdapter;
 
     @Override
@@ -83,8 +76,6 @@ public class TranslationListFragment extends BaseFragment
         super.onAttach(activity);
 
         setRetainInstance(true);
-        preferences = activity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-        currentTranslation = preferences.getString(Constants.PREF_KEY_LAST_READ_TRANSLATION, null);
     }
 
     @Override
@@ -114,7 +105,8 @@ public class TranslationListFragment extends BaseFragment
                 (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24, getResources().getDisplayMetrics()));
         swipeContainer.setRefreshing(true);
 
-        translationListAdapter = new TranslationListAdapter(getActivity(), currentTranslation);
+        translationListAdapter = new TranslationListAdapter(getActivity(),
+                translationManagementPresenter.loadCurrentTranslation());
         translationListView.setAdapter(translationListAdapter);
         translationListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -130,11 +122,7 @@ public class TranslationListFragment extends BaseFragment
                 }
 
                 if (translation.second) {
-                    Analytics.trackTranslationSelection(translation.first.shortName);
-
-                    preferences.edit()
-                            .putString(Constants.PREF_KEY_LAST_READ_TRANSLATION, translation.first.shortName)
-                            .apply();
+                    translationManagementPresenter.saveCurrentTranslation(translation.first);
 
                     Activity activity = getActivity();
                     activity.finish();
@@ -189,7 +177,8 @@ public class TranslationListFragment extends BaseFragment
 
         final TranslationInfo translationInfo
                 = getTranslationInfo((AdapterView.AdapterContextMenuInfo) menuInfo);
-        if (translationInfo == null || currentTranslation.equals(translationInfo.name)) {
+        if (translationInfo == null
+                || translationManagementPresenter.loadCurrentTranslation().equals(translationInfo.name)) {
             return;
         }
 
@@ -308,14 +297,6 @@ public class TranslationListFragment extends BaseFragment
         dismissDownloadProgressDialog();
 
         Toast.makeText(getActivity(), R.string.toast_translation_downloaded, Toast.LENGTH_SHORT).show();
-        if (currentTranslation == null) {
-            Analytics.trackTranslationSelection(translation.shortName);
-
-            currentTranslation = translation.shortName;
-            preferences.edit()
-                    .putString(Constants.PREF_KEY_LAST_READ_TRANSLATION, currentTranslation)
-                    .apply();
-        }
         loadTranslations(false);
     }
 

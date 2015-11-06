@@ -17,6 +17,8 @@
 
 package net.zionsoft.obadiah.injection.modules;
 
+import android.content.Context;
+
 import net.zionsoft.obadiah.injection.scopes.ActivityScope;
 import net.zionsoft.obadiah.model.Bible;
 import net.zionsoft.obadiah.model.ReadingProgressManager;
@@ -30,8 +32,8 @@ import dagger.Provides;
 @Module
 public class ReadingProgressModule {
     @Provides
-    BibleReadingModel provideBibleReadingModel(Bible bible) {
-        return new BibleReadingModel(bible);
+    BibleReadingModel provideBibleReadingModel(Context context, Bible bible) {
+        return new BibleReadingModel(context, bible);
     }
 
     @Provides

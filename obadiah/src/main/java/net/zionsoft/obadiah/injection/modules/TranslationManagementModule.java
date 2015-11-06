@@ -17,11 +17,15 @@
 
 package net.zionsoft.obadiah.injection.modules;
 
+import android.content.Context;
+
 import com.squareup.moshi.Moshi;
 
 import net.zionsoft.obadiah.injection.scopes.ActivityScope;
+import net.zionsoft.obadiah.model.Bible;
 import net.zionsoft.obadiah.model.database.DatabaseHelper;
 import net.zionsoft.obadiah.model.translations.TranslationManager;
+import net.zionsoft.obadiah.mvp.models.BibleReadingModel;
 import net.zionsoft.obadiah.mvp.models.TranslationManagementModel;
 import net.zionsoft.obadiah.mvp.presenters.TranslationManagementPresenter;
 import net.zionsoft.obadiah.network.BackendInterface;
@@ -32,6 +36,11 @@ import dagger.Provides;
 @Module
 public class TranslationManagementModule {
     @Provides
+    BibleReadingModel provideBibleReadingModel(Context context, Bible bible) {
+        return new BibleReadingModel(context, bible);
+    }
+
+    @Provides
     public TranslationManagementModel provideTranslationManagementModel(
             DatabaseHelper databaseHelper, TranslationManager translationManager,
             Moshi moshi, BackendInterface backendInterface) {
@@ -40,7 +49,7 @@ public class TranslationManagementModule {
 
     @Provides
     @ActivityScope
-    public TranslationManagementPresenter provideTranslationManagementPresenter(TranslationManagementModel translationManagementModel) {
-        return new TranslationManagementPresenter(translationManagementModel);
+    public TranslationManagementPresenter provideTranslationManagementPresenter(BibleReadingModel bibleReadingModel, TranslationManagementModel translationManagementModel) {
+        return new TranslationManagementPresenter(bibleReadingModel, translationManagementModel);
     }
 }
