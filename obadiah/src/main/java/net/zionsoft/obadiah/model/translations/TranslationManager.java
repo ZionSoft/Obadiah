@@ -45,7 +45,7 @@ public class TranslationManager {
         try {
             db = databaseHelper.openDatabase();
             if (db != null) {
-                return TranslationHelper.sortByLocale(TranslationHelper.getTranslations(db));
+                return TranslationHelper.getTranslations(db);
             } else {
                 Analytics.trackException("Failed to open database.");
                 return Collections.emptyList();

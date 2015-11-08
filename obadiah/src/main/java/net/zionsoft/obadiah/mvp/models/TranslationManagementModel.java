@@ -80,7 +80,7 @@ public class TranslationManagementModel {
             @Override
             public Translations call(List<TranslationInfo> translations) {
                 return new Translations.Builder()
-                        .translations(translations)
+                        .translations(TranslationHelper.sortByLocale(translations))
                         .downloaded(translationManager.loadDownloadedTranslations())
                         .build();
             }
