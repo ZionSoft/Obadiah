@@ -167,6 +167,7 @@ public class TranslationManagementModel {
                     is = new ZipInputStream(response.body().byteStream());
                     ZipEntry entry;
                     int downloaded = 0;
+                    int progress = -1;
                     while ((entry = is.getNextEntry()) != null) {
                         final String entryName = entry.getName();
                         BufferedSource bufferedSource = Okio.buffer(Okio.source(is));
@@ -181,10 +182,16 @@ public class TranslationManagementModel {
                                     chapterJsonAdapter.fromJson(bufferedSource).verses);
                         }
 
-                        // the progress should be less or equal than 100
-                        // in this case, with Integer.valueOf() no small object will be created
-                        //noinspection UnnecessaryBoxing
-                        subscriber.onNext(Integer.valueOf(++downloaded / 12));
+                        // only emits if the progress is actually changed
+                        // should I move this logic to a filter?
+                        final int currentProgress = ++downloaded / 12;
+                        if (currentProgress > progress) {
+                            progress = currentProgress;
+                            // the progress should be less or equal than 100
+                            // in this case, with Integer.valueOf() no small object will be created
+                            //noinspection UnnecessaryBoxing
+                            subscriber.onNext(Integer.valueOf(progress));
+                        }
                     }
                     db.setTransactionSuccessful();
                     subscriber.onCompleted();
