@@ -46,6 +46,7 @@ import rx.Observable;
 import rx.Subscriber;
 import rx.functions.Action1;
 import rx.functions.Func1;
+import rx.functions.Func2;
 
 public class TranslationManagementModel {
     private final DatabaseHelper databaseHelper;
@@ -63,12 +64,12 @@ public class TranslationManagementModel {
         this.chapterJsonAdapter = moshi.adapter(BackendChapter.class);
     }
 
-    public Observable<Translations> loadTranslations(final boolean forceRefresh) {
-        final Observable<List<TranslationInfo>> observable;
+    public Observable<Translations> loadTranslations(boolean forceRefresh) {
+        Observable<List<TranslationInfo>> translations;
         if (forceRefresh) {
-            observable = loadFromNetwork();
+            translations = loadFromNetwork();
         } else {
-            observable = Observable.concat(loadFromLocal(), loadFromNetwork())
+            translations = Observable.concat(loadFromLocal(), loadFromNetwork())
                     .first(new Func1<List<TranslationInfo>, Boolean>() {
                         @Override
                         public Boolean call(List<TranslationInfo> translations) {
@@ -76,12 +77,30 @@ public class TranslationManagementModel {
                         }
                     });
         }
-        return observable.map(new Func1<List<TranslationInfo>, Translations>() {
+        translations = translations.map(new Func1<List<TranslationInfo>, List<TranslationInfo>>() {
             @Override
-            public Translations call(List<TranslationInfo> translations) {
+            public List<TranslationInfo> call(List<TranslationInfo> translations) {
+                return TranslationHelper.sortByLocale(translations);
+            }
+        });
+        final Observable<List<String>> downloaded = Observable.create(
+                new Observable.OnSubscribe<List<String>>() {
+                    @Override
+                    public void call(Subscriber<? super List<String>> subscriber) {
+                        try {
+                            subscriber.onNext(translationManager.loadDownloadedTranslations());
+                            subscriber.onCompleted();
+                        } catch (Exception e) {
+                            subscriber.onError(e);
+                        }
+                    }
+                });
+        return Observable.zip(translations, downloaded, new Func2<List<TranslationInfo>, List<String>, Translations>() {
+            @Override
+            public Translations call(List<TranslationInfo> translations, List<String> downloaded) {
                 return new Translations.Builder()
-                        .translations(TranslationHelper.sortByLocale(translations))
-                        .downloaded(translationManager.loadDownloadedTranslations())
+                        .translations(translations)
+                        .downloaded(downloaded)
                         .build();
             }
         });
@@ -101,8 +120,12 @@ public class TranslationManagementModel {
         return Observable.create(new Observable.OnSubscribe<List<TranslationInfo>>() {
             @Override
             public void call(Subscriber<? super List<TranslationInfo>> subscriber) {
-                subscriber.onNext(translationManager.loadTranslations());
-                subscriber.onCompleted();
+                try {
+                    subscriber.onNext(translationManager.loadTranslations());
+                    subscriber.onCompleted();
+                } catch (Exception e) {
+                    subscriber.onError(e);
+                }
             }
         });
     }

@@ -27,7 +27,6 @@ import net.zionsoft.obadiah.mvp.views.TranslationManagementView;
 
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
@@ -71,16 +70,25 @@ public class TranslationManagementPresenter extends MVPPresenter<TranslationMana
         subscription.add(translationManagementModel.loadTranslations(forceRefresh)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Action1<Translations>() {
+                .subscribe(new Subscriber<Translations>() {
                     @Override
-                    public void call(Translations translations) {
+                    public void onCompleted() {
+                        // do nothing
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
                         final TranslationManagementView v = getView();
                         if (v != null) {
-                            if (translations != null) {
-                                v.onTranslationLoaded(translations);
-                            } else {
-                                v.onTranslationLoadFailed();
-                            }
+                            v.onTranslationLoadFailed();
+                        }
+                    }
+
+                    @Override
+                    public void onNext(Translations translations) {
+                        final TranslationManagementView v = getView();
+                        if (v != null) {
+                            v.onTranslationLoaded(translations);
                         }
                     }
                 }));

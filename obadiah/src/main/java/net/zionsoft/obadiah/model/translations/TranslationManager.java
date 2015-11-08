@@ -22,10 +22,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.NonNull;
 
 import net.zionsoft.obadiah.App;
-import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.database.DatabaseHelper;
 
-import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -44,12 +42,7 @@ public class TranslationManager {
         SQLiteDatabase db = null;
         try {
             db = databaseHelper.openDatabase();
-            if (db != null) {
-                return TranslationHelper.getTranslations(db);
-            } else {
-                Analytics.trackException("Failed to open database.");
-                return Collections.emptyList();
-            }
+            return TranslationHelper.getTranslations(db);
         } finally {
             if (db != null) {
                 databaseHelper.closeDatabase();
@@ -62,12 +55,7 @@ public class TranslationManager {
         SQLiteDatabase db = null;
         try {
             db = databaseHelper.openDatabase();
-            if (db != null) {
-                return TranslationHelper.getDownloadedTranslationShortNames(db);
-            } else {
-                Analytics.trackException("Failed to open database.");
-                return Collections.emptyList();
-            }
+            return TranslationHelper.getDownloadedTranslationShortNames(db);
         } finally {
             if (db != null) {
                 databaseHelper.closeDatabase();
@@ -79,13 +67,14 @@ public class TranslationManager {
         SQLiteDatabase db = null;
         try {
             db = databaseHelper.openDatabase();
-            if (db != null) {
-                TranslationHelper.saveTranslations(db, translations);
-            } else {
-                Analytics.trackException("Failed to open database.");
-            }
+            db.beginTransaction();
+            TranslationHelper.saveTranslations(db, translations);
+            db.setTransactionSuccessful();
         } finally {
             if (db != null) {
+                if (db.inTransaction()) {
+                    db.endTransaction();
+                }
                 databaseHelper.closeDatabase();
             }
         }
