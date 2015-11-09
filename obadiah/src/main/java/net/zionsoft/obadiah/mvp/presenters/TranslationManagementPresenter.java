@@ -26,15 +26,18 @@ import net.zionsoft.obadiah.mvp.models.TranslationManagementModel;
 import net.zionsoft.obadiah.mvp.views.TranslationManagementView;
 
 import rx.Subscriber;
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action0;
 import rx.schedulers.Schedulers;
-import rx.subscriptions.CompositeSubscription;
 
 public class TranslationManagementPresenter extends MVPPresenter<TranslationManagementView> {
     private final BibleReadingModel bibleReadingModel;
     private final TranslationManagementModel translationManagementModel;
 
-    private CompositeSubscription subscription;
+    private Subscription loadTranslationsSubscription;
+    private Subscription removeTranslationSubscription;
+    private Subscription fetchTranslationSubscription;
 
     public TranslationManagementPresenter(BibleReadingModel bibleReadingModel,
                                           TranslationManagementModel translationManagementModel) {
@@ -43,16 +46,10 @@ public class TranslationManagementPresenter extends MVPPresenter<TranslationMana
     }
 
     @Override
-    protected void onViewTaken() {
-        super.onViewTaken();
-        subscription = new CompositeSubscription();
-    }
-
-    @Override
     protected void onViewDropped() {
-        if (subscription != null) {
-            subscription.unsubscribe();
-            subscription = null;
+        if (loadTranslationsSubscription != null) {
+            loadTranslationsSubscription.unsubscribe();
+            loadTranslationsSubscription = null;
         }
 
         super.onViewDropped();
@@ -67,8 +64,13 @@ public class TranslationManagementPresenter extends MVPPresenter<TranslationMana
     }
 
     public void loadTranslations(boolean forceRefresh) {
-        subscription.add(translationManagementModel.loadTranslations(forceRefresh)
-                .subscribeOn(Schedulers.io())
+        loadTranslationsSubscription = translationManagementModel.loadTranslations(forceRefresh)
+                .finallyDo(new Action0() {
+                    @Override
+                    public void call() {
+                        loadTranslationsSubscription = null;
+                    }
+                }).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<Translations>() {
                     @Override
@@ -91,12 +93,21 @@ public class TranslationManagementPresenter extends MVPPresenter<TranslationMana
                             v.onTranslationLoaded(translations);
                         }
                     }
-                }));
+                });
     }
 
     public void removeTranslation(final TranslationInfo translation) {
-        subscription.add(translationManagementModel.removeTranslation(translation)
-                .subscribeOn(Schedulers.io())
+        if (removeTranslationSubscription != null) {
+            return;
+        }
+
+        removeTranslationSubscription = translationManagementModel.removeTranslation(translation)
+                .finallyDo(new Action0() {
+                    @Override
+                    public void call() {
+                        removeTranslationSubscription = null;
+                    }
+                }).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<Void>() {
                     @Override
@@ -119,12 +130,28 @@ public class TranslationManagementPresenter extends MVPPresenter<TranslationMana
                     public void onNext(Void aVoid) {
                         // won't reach here
                     }
-                }));
+                });
+    }
+
+    public void cancelRemoveTranslation() {
+        if (removeTranslationSubscription != null) {
+            removeTranslationSubscription.unsubscribe();
+            removeTranslationSubscription = null;
+        }
     }
 
     public void fetchTranslation(final TranslationInfo translation) {
-        subscription.add(translationManagementModel.fetchTranslation(translation)
-                .subscribeOn(Schedulers.io())
+        if (fetchTranslationSubscription != null) {
+            return;
+        }
+
+        fetchTranslationSubscription = translationManagementModel.fetchTranslation(translation)
+                .finallyDo(new Action0() {
+                    @Override
+                    public void call() {
+                        fetchTranslationSubscription = null;
+                    }
+                }).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<Integer>() {
                     @Override
@@ -154,6 +181,13 @@ public class TranslationManagementPresenter extends MVPPresenter<TranslationMana
                             v.onTranslationDownloadProgressed(translation, progress);
                         }
                     }
-                }));
+                });
+    }
+
+    public void cancelFetchTranslation() {
+        if (fetchTranslationSubscription != null) {
+            fetchTranslationSubscription.unsubscribe();
+            fetchTranslationSubscription = null;
+        }
     }
 }

@@ -18,12 +18,10 @@
 package net.zionsoft.obadiah.ui.fragments;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.util.Pair;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.TypedValue;
@@ -48,6 +46,7 @@ import net.zionsoft.obadiah.mvp.views.TranslationManagementView;
 import net.zionsoft.obadiah.ui.adapters.TranslationListAdapter;
 import net.zionsoft.obadiah.ui.utils.AnimationHelper;
 import net.zionsoft.obadiah.ui.utils.DialogHelper;
+import net.zionsoft.obadiah.ui.widget.ProgressDialog;
 
 import javax.inject.Inject;
 
@@ -55,8 +54,6 @@ import butterknife.Bind;
 
 public class TranslationListFragment extends BaseFragment
         implements SwipeRefreshLayout.OnRefreshListener, TranslationManagementView {
-    private static final String TAG_DOWNLOAD_DIALOG_FRAGMENT = "net.zionsoft.obadiah.ui.fragments.TranslationListFragment.TAG_DOWNLOAD_DIALOG_FRAGMENT";
-    private static final String TAG_REMOVE_DIALOG_FRAGMENT = "net.zionsoft.obadiah.ui.fragments.TranslationListFragment.TAG_REMOVE_DIALOG_FRAGMENT";
     private static final int CONTEXT_MENU_ITEM_DELETE = 0;
 
     @ActivityScope
@@ -70,6 +67,9 @@ public class TranslationListFragment extends BaseFragment
     ListView translationListView;
 
     private TranslationListAdapter translationListAdapter;
+
+    private ProgressDialog removeTranslationProgressDialog;
+    private ProgressDialog downloadTranslationProgressDialog;
 
     @Override
     public void onAttach(Activity activity) {
@@ -141,11 +141,17 @@ public class TranslationListFragment extends BaseFragment
     }
 
     private void downloadTranslation(TranslationInfo translationInfo) {
-        final FragmentManager fm = getChildFragmentManager();
-        ProgressDialogFragment.newInstance(R.string.progress_dialog_translation_downloading, 100).show(fm, TAG_DOWNLOAD_DIALOG_FRAGMENT);
-        fm.executePendingTransactions();
-
+        getOrCreateDownloadDialog();
         translationManagementPresenter.fetchTranslation(translationInfo);
+    }
+
+    @NonNull
+    private ProgressDialog getOrCreateDownloadDialog() {
+        if (downloadTranslationProgressDialog == null) {
+            downloadTranslationProgressDialog = ProgressDialog.showProgressDialog(
+                    getActivity(), R.string.progress_dialog_translation_downloading, 100);
+        }
+        return downloadTranslationProgressDialog;
     }
 
     @Override
@@ -164,8 +170,17 @@ public class TranslationListFragment extends BaseFragment
     @Override
     public void onDestroyView() {
         unregisterForContextMenu(translationListView);
+        dismissRemoveProgressDialog();
+        dismissDownloadProgressDialog();
 
         super.onDestroyView();
+    }
+
+    @Override
+    public void onDestroy() {
+        translationManagementPresenter.cancelRemoveTranslation();
+        translationManagementPresenter.cancelFetchTranslation();
+        super.onDestroy();
     }
 
     @Override
@@ -221,9 +236,8 @@ public class TranslationListFragment extends BaseFragment
     }
 
     private void removeTranslation(TranslationInfo translation) {
-        final FragmentManager fm = getChildFragmentManager();
-        ProgressDialogFragment.newInstance(R.string.progress_dialog_translation_deleting).show(fm, TAG_REMOVE_DIALOG_FRAGMENT);
-        fm.executePendingTransactions();
+        removeTranslationProgressDialog = ProgressDialog.showIndeterminateProgressDialog(
+                getActivity(), R.string.progress_dialog_translation_deleting);
 
         translationManagementPresenter.removeTranslation(translation);
     }
@@ -263,17 +277,21 @@ public class TranslationListFragment extends BaseFragment
 
     @Override
     public void onTranslationRemoved(TranslationInfo translation) {
-        ((DialogFragment) getChildFragmentManager().findFragmentByTag(TAG_REMOVE_DIALOG_FRAGMENT))
-                .dismissAllowingStateLoss();
-
+        dismissRemoveProgressDialog();
         Toast.makeText(getActivity(), R.string.toast_translation_deleted, Toast.LENGTH_SHORT).show();
         loadTranslations(false);
     }
 
+    private void dismissRemoveProgressDialog() {
+        if (removeTranslationProgressDialog != null) {
+            removeTranslationProgressDialog.dismiss();
+            removeTranslationProgressDialog = null;
+        }
+    }
+
     @Override
     public void onTranslationRemovalFailed(final TranslationInfo translation) {
-        ((DialogFragment) getChildFragmentManager().findFragmentByTag(TAG_REMOVE_DIALOG_FRAGMENT))
-                .dismissAllowingStateLoss();
+        dismissRemoveProgressDialog();
 
         DialogHelper.showDialog(getActivity(), true, R.string.dialog_translation_remove_failure_message,
                 new DialogInterface.OnClickListener() {
@@ -285,11 +303,7 @@ public class TranslationListFragment extends BaseFragment
 
     @Override
     public void onTranslationDownloadProgressed(TranslationInfo translation, int progress) {
-        final DialogFragment dialogFragment = (DialogFragment) getChildFragmentManager()
-                .findFragmentByTag(TAG_DOWNLOAD_DIALOG_FRAGMENT);
-        if (dialogFragment != null) {
-            ((ProgressDialog) dialogFragment.getDialog()).setProgress(progress);
-        }
+        getOrCreateDownloadDialog().setProgress(progress);
     }
 
     @Override
@@ -301,10 +315,9 @@ public class TranslationListFragment extends BaseFragment
     }
 
     private void dismissDownloadProgressDialog() {
-        final DialogFragment dialogFragment = (DialogFragment) getChildFragmentManager()
-                .findFragmentByTag(TAG_DOWNLOAD_DIALOG_FRAGMENT);
-        if (dialogFragment != null) {
-            dialogFragment.dismissAllowingStateLoss();
+        if (downloadTranslationProgressDialog != null) {
+            downloadTranslationProgressDialog.dismiss();
+            downloadTranslationProgressDialog = null;
         }
     }
 
