@@ -22,8 +22,9 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.util.Pair;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.TypedValue;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
@@ -31,14 +32,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import net.zionsoft.obadiah.App;
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.injection.components.TranslationManagementComponent;
 import net.zionsoft.obadiah.injection.scopes.ActivityScope;
+import net.zionsoft.obadiah.model.Settings;
 import net.zionsoft.obadiah.model.translations.TranslationInfo;
 import net.zionsoft.obadiah.model.translations.Translations;
 import net.zionsoft.obadiah.mvp.presenters.TranslationManagementPresenter;
@@ -52,19 +52,23 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 
-public class TranslationListFragment extends BaseFragment
-        implements SwipeRefreshLayout.OnRefreshListener, TranslationManagementView {
+public class TranslationListFragment extends BaseFragment implements SwipeRefreshLayout.OnRefreshListener,
+        TranslationManagementView, RecyclerView.OnChildAttachStateChangeListener, View.OnClickListener,
+        View.OnCreateContextMenuListener {
     private static final int CONTEXT_MENU_ITEM_DELETE = 0;
 
     @ActivityScope
     @Inject
     TranslationManagementPresenter translationManagementPresenter;
 
+    @Inject
+    Settings settings;
+
     @Bind(R.id.swipe_container)
     SwipeRefreshLayout swipeContainer;
 
-    @Bind(R.id.translation_list_view)
-    ListView translationListView;
+    @Bind(R.id.translation_list)
+    RecyclerView translationList;
 
     private TranslationListAdapter translationListAdapter;
 
@@ -105,38 +109,16 @@ public class TranslationListFragment extends BaseFragment
                 (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24, getResources().getDisplayMetrics()));
         swipeContainer.setRefreshing(true);
 
-        translationListAdapter = new TranslationListAdapter(getActivity(),
+        translationList.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
+        translationList.addOnChildAttachStateChangeListener(this);
+
+        translationListAdapter = new TranslationListAdapter(getActivity(), settings,
                 translationManagementPresenter.loadCurrentTranslation());
-        translationListView.setAdapter(translationListAdapter);
-        translationListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (!isAdded()) {
-                    return;
-                }
-
-                final Pair<TranslationInfo, Boolean> translation
-                        = translationListAdapter.getTranslation(position);
-                if (translation == null) {
-                    return;
-                }
-
-                if (translation.second) {
-                    translationManagementPresenter.saveCurrentTranslation(translation.first);
-
-                    Activity activity = getActivity();
-                    activity.finish();
-                    activity.overridePendingTransition(R.anim.fade_in, R.anim.slide_out_left_to_right);
-                } else {
-                    downloadTranslation(translation.first);
-                }
-            }
-        });
-        registerForContextMenu(translationListView);
+        translationList.setAdapter(translationListAdapter);
     }
 
     private void loadTranslations(final boolean forceRefresh) {
-        translationListView.setVisibility(View.GONE);
+        translationList.setVisibility(View.GONE);
         translationManagementPresenter.loadTranslations(forceRefresh);
     }
 
@@ -169,7 +151,6 @@ public class TranslationListFragment extends BaseFragment
 
     @Override
     public void onDestroyView() {
-        unregisterForContextMenu(translationListView);
         dismissRemoveProgressDialog();
         dismissDownloadProgressDialog();
 
@@ -184,65 +165,6 @@ public class TranslationListFragment extends BaseFragment
     }
 
     @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-        if (v != translationListView) {
-            super.onCreateContextMenu(menu, v, menuInfo);
-            return;
-        }
-
-        final TranslationInfo translationInfo
-                = getTranslationInfo((AdapterView.AdapterContextMenuInfo) menuInfo);
-        if (translationInfo == null
-                || translationManagementPresenter.loadCurrentTranslation().equals(translationInfo.name)) {
-            return;
-        }
-
-        menu.setHeaderTitle(translationInfo.name);
-        menu.add(Menu.NONE, CONTEXT_MENU_ITEM_DELETE, Menu.NONE, R.string.action_delete_translation);
-    }
-
-    @Override
-    public boolean onContextItemSelected(MenuItem item) {
-        AdapterView.AdapterContextMenuInfo contextMenuInfo
-                = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-        if (contextMenuInfo == null)
-            return super.onContextItemSelected(item);
-
-        final TranslationInfo translationInfo = getTranslationInfo(contextMenuInfo);
-        if (translationInfo == null) {
-            return super.onContextItemSelected(item);
-        }
-
-        switch (item.getItemId()) {
-            case CONTEXT_MENU_ITEM_DELETE:
-                DialogHelper.showDialog(getActivity(), true, R.string.dialog_translation_delete_confirm_message,
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                removeTranslation(translationInfo);
-                            }
-                        }, null
-                );
-                return true;
-            default:
-                return super.onContextItemSelected(item);
-        }
-    }
-
-    @Nullable
-    private TranslationInfo getTranslationInfo(AdapterView.AdapterContextMenuInfo contextMenuInfo) {
-        final Pair<TranslationInfo, Boolean> translation
-                = translationListAdapter.getTranslation(contextMenuInfo.position);
-        return translation != null && translation.second ? translation.first : null;
-    }
-
-    private void removeTranslation(TranslationInfo translation) {
-        removeTranslationProgressDialog = ProgressDialog.showIndeterminateProgressDialog(
-                getActivity(), R.string.progress_dialog_translation_deleting);
-
-        translationManagementPresenter.removeTranslation(translation);
-    }
-
-    @Override
     public void onRefresh() {
         loadTranslations(true);
     }
@@ -250,9 +172,9 @@ public class TranslationListFragment extends BaseFragment
     @Override
     public void onTranslationLoaded(Translations translations) {
         swipeContainer.setRefreshing(false);
-        AnimationHelper.fadeIn(translationListView);
+        AnimationHelper.fadeIn(translationList);
 
-        translationListAdapter.setTranslations(translations.downloaded, translations.available);
+        translationListAdapter.setTranslations(translations);
         translationListAdapter.notifyDataSetChanged();
     }
 
@@ -331,5 +253,84 @@ public class TranslationListFragment extends BaseFragment
                         downloadTranslation(translation);
                     }
                 }, null);
+    }
+
+    @Override
+    public void onChildViewAttachedToWindow(View view) {
+        view.setOnClickListener(this);
+        view.setOnCreateContextMenuListener(this);
+    }
+
+    @Override
+    public void onChildViewDetachedFromWindow(View view) {
+        view.setOnClickListener(null);
+        view.setOnCreateContextMenuListener(null);
+    }
+
+    @Override
+    public void onClick(View v) {
+        final TranslationListAdapter.TranslationViewHolder translationViewHolder = getTranslationViewHolder(v);
+        if (translationViewHolder == null) {
+            return;
+        }
+        if (translationViewHolder.isDownloaded()) {
+            translationManagementPresenter.saveCurrentTranslation(translationViewHolder.getTranslationInfo());
+
+            Activity activity = getActivity();
+            activity.finish();
+            activity.overridePendingTransition(R.anim.fade_in, R.anim.slide_out_left_to_right);
+        } else {
+            downloadTranslation(translationViewHolder.getTranslationInfo());
+        }
+    }
+
+    @Nullable
+    private TranslationListAdapter.TranslationViewHolder getTranslationViewHolder(View v) {
+        final int position = translationList.getChildAdapterPosition(v);
+        if (position == RecyclerView.NO_POSITION) {
+            return null;
+        }
+        final RecyclerView.ViewHolder viewHolder = translationList.findViewHolderForAdapterPosition(position);
+        if (!(viewHolder instanceof TranslationListAdapter.TranslationViewHolder)) {
+            return null;
+        }
+        return (TranslationListAdapter.TranslationViewHolder) viewHolder;
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        final TranslationListAdapter.TranslationViewHolder translationViewHolder = getTranslationViewHolder(v);
+        if (translationViewHolder == null) {
+            return;
+        }
+        if (translationViewHolder.isDownloaded()) {
+            menu.setHeaderTitle(translationViewHolder.getTranslationInfo().name);
+            menu.add(Menu.NONE, CONTEXT_MENU_ITEM_DELETE, Menu.NONE, R.string.action_delete_translation)
+                    .setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                        @Override
+                        public boolean onMenuItemClick(MenuItem item) {
+                            switch (item.getItemId()) {
+                                case CONTEXT_MENU_ITEM_DELETE:
+                                    DialogHelper.showDialog(getActivity(), true,
+                                            R.string.dialog_translation_delete_confirm_message,
+                                            new DialogInterface.OnClickListener() {
+                                                public void onClick(DialogInterface dialog, int id) {
+                                                    removeTranslation(translationViewHolder.getTranslationInfo());
+                                                }
+                                            }, null);
+                                    return true;
+                                default:
+                                    return false;
+                            }
+                        }
+                    });
+        }
+    }
+
+    private void removeTranslation(TranslationInfo translation) {
+        removeTranslationProgressDialog = ProgressDialog.showIndeterminateProgressDialog(
+                getActivity(), R.string.progress_dialog_translation_deleting);
+
+        translationManagementPresenter.removeTranslation(translation);
     }
 }

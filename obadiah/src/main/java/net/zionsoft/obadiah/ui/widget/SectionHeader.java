@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.ui.widget.settings;
+package net.zionsoft.obadiah.ui.widget;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -33,27 +33,27 @@ import net.zionsoft.obadiah.R;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-public class SettingSectionHeader extends FrameLayout {
+public class SectionHeader extends FrameLayout {
     @Bind(R.id.header_text_view)
     TextView headerTextView;
 
-    public SettingSectionHeader(Context context) {
+    public SectionHeader(Context context) {
         super(context);
         init(context, null);
     }
 
-    public SettingSectionHeader(Context context, AttributeSet attrs) {
+    public SectionHeader(Context context, AttributeSet attrs) {
         super(context, attrs);
         init(context, attrs);
     }
 
-    public SettingSectionHeader(Context context, AttributeSet attrs, int defStyleAttr) {
+    public SectionHeader(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init(context, attrs);
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    public SettingSectionHeader(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+    public SectionHeader(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
         init(context, attrs);
     }
@@ -63,18 +63,22 @@ public class SettingSectionHeader extends FrameLayout {
         ButterKnife.bind(this, this);
 
         if (attrs != null) {
-            final TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.SettingSectionHeader);
-            final int headerResourceId = a.getResourceId(R.styleable.SettingSectionHeader_settingSectionHeaderText, -1);
+            final TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.SectionHeader);
+            final int headerResourceId = a.getResourceId(R.styleable.SectionHeader_settingSectionHeaderText, -1);
             if (headerResourceId != -1) {
                 headerTextView.setText(headerResourceId);
             } else {
-                final String headerText = a.getString(R.styleable.SettingSectionHeader_settingSectionHeaderText);
+                final String headerText = a.getString(R.styleable.SectionHeader_settingSectionHeaderText);
                 if (!TextUtils.isEmpty(headerText)) {
                     headerTextView.setText(headerText);
                 }
             }
             a.recycle();
         }
+    }
+
+    public void setHeaderText(CharSequence text) {
+        headerTextView.setText(text);
     }
 
     public void setHeaderTextSize(int unit, float size) {

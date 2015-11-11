@@ -1,8 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+<net.zionsoft.obadiah.ui.widget.SectionHeader xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/header_height"
-    android:paddingLeft="@dimen/paddingLeft"
-    android:gravity="center_vertical"
-    android:textColor="@color/blue"
-    android:textStyle="bold" />
+    android:layout_height="wrap_content" />

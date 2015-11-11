@@ -19,87 +19,79 @@ package net.zionsoft.obadiah.ui.adapters;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.support.annotation.Nullable;
-import android.support.v4.util.Pair;
+import android.support.v7.widget.RecyclerView;
 import android.text.SpannableStringBuilder;
 import android.text.style.AbsoluteSizeSpan;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import net.zionsoft.obadiah.App;
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.Settings;
 import net.zionsoft.obadiah.model.translations.TranslationInfo;
+import net.zionsoft.obadiah.model.translations.Translations;
+import net.zionsoft.obadiah.ui.widget.SectionHeader;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 
-import javax.inject.Inject;
-
-public class TranslationListAdapter extends BaseAdapter {
+public class TranslationListAdapter extends RecyclerView.Adapter {
     private static final int VIEW_TYPE_HEADER = 0;
     private static final int VIEW_TYPE_TRANSLATION = 1;
-    private static final int VIEW_TYPE_COUNT = 2;
 
     private static class TranslationInfoHolder {
-        final TranslationInfo translationInfo;
-        final SpannableStringBuilder title;
-        final boolean downloaded;
+        private final TranslationInfo translationInfo;
+        private final SpannableStringBuilder title;
+        private final boolean downloaded;
 
-        TranslationInfoHolder(TranslationInfo translationInfo, SpannableStringBuilder title, boolean downloaded) {
+        private TranslationInfoHolder(TranslationInfo translationInfo, SpannableStringBuilder title, boolean downloaded) {
             this.translationInfo = translationInfo;
             this.title = title;
             this.downloaded = downloaded;
         }
     }
 
-    @Inject
-    Settings settings;
+    public static class TranslationViewHolder extends RecyclerView.ViewHolder {
+        private TranslationInfo translationInfo;
+        private boolean downloaded;
+
+        private TranslationViewHolder(View itemView) {
+            super(itemView);
+        }
+
+        public TranslationInfo getTranslationInfo() {
+            return translationInfo;
+        }
+
+        public boolean isDownloaded() {
+            return downloaded;
+        }
+    }
 
     private final LayoutInflater inflater;
     private final Resources resources;
-    private final String currentTranslation;
-    private final String downloadedTranslationsTitle;
 
     private final int textColor;
     private final float textSize;
     private final AbsoluteSizeSpan mediumSizeSpan;
     private final AbsoluteSizeSpan smallSizeSpan;
 
-    private final List<String> sectionHeaders = new ArrayList<>();
-    private final List<List<TranslationInfoHolder>> translations = new ArrayList<>();
+    private final String currentTranslation;
+    private final ArrayList<String> sectionHeaders = new ArrayList<>();
+    private final ArrayList<ArrayList<TranslationInfoHolder>> translationList = new ArrayList<>();
     private int count = 0;
 
-    public TranslationListAdapter(Context context, String currentTranslation) {
-        App.get(context).getInjectionComponent().inject(this);
-
-        inflater = LayoutInflater.from(context);
-        resources = context.getResources();
+    public TranslationListAdapter(Context context, Settings settings, String currentTranslation) {
+        this.inflater = LayoutInflater.from(context);
+        this.resources = context.getResources();
         this.currentTranslation = currentTranslation;
 
-        downloadedTranslationsTitle = resources.getString(R.string.text_downloaded_translations);
-
-        textColor = settings.getTextColor();
-
-        textSize = resources.getDimension(settings.getTextSize().textSize);
-        mediumSizeSpan = new AbsoluteSizeSpan((int) textSize);
-        smallSizeSpan = new AbsoluteSizeSpan(
-                (int) resources.getDimension(settings.getTextSize().smallerTextSize));
-    }
-
-    @Override
-    public int getCount() {
-        return count;
-    }
-
-    @Override
-    public int getViewTypeCount() {
-        return VIEW_TYPE_COUNT;
+        this.textColor = settings.getTextColor();
+        this.textSize = resources.getDimension(settings.getTextSize().textSize);
+        this.mediumSizeSpan = new AbsoluteSizeSpan((int) textSize);
+        this.smallSizeSpan = new AbsoluteSizeSpan((int) resources.getDimension(settings.getTextSize().smallerTextSize));
     }
 
     @Override
@@ -107,135 +99,132 @@ public class TranslationListAdapter extends BaseAdapter {
         if (position == 0) {
             return VIEW_TYPE_HEADER;
         }
-        for (List<TranslationInfoHolder> translations : this.translations) {
-            position -= translations.size() + 1;
+
+        final int size = translationList.size();
+        for (int i = 0; i < size; ++i) {
+            position -= translationList.get(i).size() + 1;
             if (position < 0) {
                 return VIEW_TYPE_TRANSLATION;
             } else if (position == 0) {
                 return VIEW_TYPE_HEADER;
             }
         }
-        return -1;
+
+        throw new IllegalStateException("Unknown view type for position - " + position);
     }
 
     @Override
-    public Object getItem(int position) {
-        int index = 0;
-        if (position == 0) {
-            return sectionHeaders.get(index);
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        switch (viewType) {
+            case VIEW_TYPE_HEADER:
+                final SectionHeader header = (SectionHeader)
+                        inflater.inflate(R.layout.item_translation_section, parent, false);
+                header.setHeaderTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+                return new RecyclerView.ViewHolder(header) {
+                };
+            case VIEW_TYPE_TRANSLATION:
+                final TextView translation = (TextView)
+                        inflater.inflate(R.layout.item_translation, parent, false);
+                translation.setTextColor(textColor);
+                return new TranslationViewHolder(translation);
+            default:
+                throw new IllegalStateException("Unknown view type - " + viewType);
         }
-        for (List<TranslationInfoHolder> translations : this.translations) {
+    }
+
+    @Override
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+        if (position == 0) {
+            // VIEW_TYPE_HEADER
+            ((SectionHeader) holder.itemView).setHeaderText(sectionHeaders.get(0));
+            return;
+        }
+
+        final int translationListSize = translationList.size();
+        for (int i = 0; i < translationListSize; ++i) {
+            final ArrayList<TranslationInfoHolder> translations = translationList.get(i);
             --position;
             final int size = translations.size();
             if (position < size) {
-                return translations.get(position);
+                // VIEW_TYPE_TRANSLATION
+                final TextView textView = ((TextView) holder.itemView);
+                final TranslationInfoHolder translation = translations.get(position);
+                textView.setText(translations.get(position).title);
+                textView.setCompoundDrawablesWithIntrinsicBounds(0, 0,
+                        translation.translationInfo.shortName.equals(currentTranslation) ? R.drawable.ic_check : 0, 0);
+
+                final TranslationViewHolder viewHolder = (TranslationViewHolder) holder;
+                viewHolder.translationInfo = translation.translationInfo;
+                viewHolder.downloaded = translation.downloaded;
+
+                return;
             }
 
             position -= size;
-            ++index;
             if (position == 0) {
-                return sectionHeaders.get(index);
+                // VIEW_TYPE_HEADER
+                ((SectionHeader) holder.itemView).setHeaderText(sectionHeaders.get(i + 1));
+                return;
             }
         }
-        return null;
+
+        throw new IllegalStateException("Unknown view type for position - " + position);
     }
 
     @Override
-    public long getItemId(int position) {
-        return position;
+    public int getItemCount() {
+        return count;
     }
 
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        switch (getItemViewType(position)) {
-            case VIEW_TYPE_HEADER:
-                return getHeaderView(position, convertView, parent);
-            case VIEW_TYPE_TRANSLATION:
-                return getTranslationView(position, convertView, parent);
-            default:
-                return null;
-        }
-    }
-
-    private View getHeaderView(int position, View convertView, ViewGroup parent) {
-        final TextView textView = (TextView) (convertView == null
-                ? inflater.inflate(R.layout.item_translation_section, parent, false) : convertView);
-        textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
-        textView.setText((String) getItem(position));
-        return textView;
-    }
-
-    private View getTranslationView(int position, View convertView, ViewGroup parent) {
-        final TextView textView = (TextView) (convertView == null
-                ? inflater.inflate(R.layout.item_translation, parent, false) : convertView);
-
-        final TranslationInfoHolder translation = (TranslationInfoHolder) getItem(position);
-        textView.setCompoundDrawablesWithIntrinsicBounds(0, 0,
-                translation.translationInfo.shortName.equals(currentTranslation) ? R.drawable.ic_check : 0, 0);
-        textView.setText(translation.title);
-        textView.setTextColor(textColor);
-
-        return textView;
-    }
-
-    public void setTranslations(@Nullable List<TranslationInfo> downloaded,
-                                @Nullable List<TranslationInfo> available) {
+    public void setTranslations(Translations translations) {
         sectionHeaders.clear();
-        translations.clear();
+        translationList.clear();
         count = 0;
-        if (downloaded != null && downloaded.size() > 0) {
-            final List<TranslationInfoHolder> translations
-                    = new ArrayList<TranslationInfoHolder>(downloaded.size());
-            for (TranslationInfo translationInfo : downloaded) {
+
+        final int downloaded = translations.downloaded.size();
+        if (downloaded > 0) {
+            final ArrayList<TranslationInfoHolder> downloadedTranslations = new ArrayList<>(downloaded);
+            for (int i = 0; i < downloaded; ++i) {
+                final TranslationInfo translationInfo = translations.downloaded.get(i);
                 final SpannableStringBuilder text = new SpannableStringBuilder(translationInfo.name);
                 text.setSpan(mediumSizeSpan, 0, translationInfo.name.length(), 0);
-
-                translations.add(new TranslationInfoHolder(translationInfo, text, true));
+                downloadedTranslations.add(new TranslationInfoHolder(translationInfo, text, true));
             }
-            sectionHeaders.add(downloadedTranslationsTitle);
-            this.translations.add(translations);
-            count = downloaded.size() + 1;
+
+            sectionHeaders.add(resources.getString(R.string.text_downloaded_translations));
+            translationList.add(downloadedTranslations);
+            count = downloaded + 1;
         }
 
-        if (available != null) {
-            for (TranslationInfo translationInfo : available) {
-                final String language = new Locale(translationInfo.language.split("_")[0]).getDisplayLanguage();
-                int index = 0;
-                List<TranslationInfoHolder> translations = null;
-                for (String sectionHeader : sectionHeaders) {
-                    if (sectionHeader.equals(language)) {
-                        translations = this.translations.get(index);
-                        break;
-                    }
-                    ++index;
-                }
-                if (translations == null) {
-                    translations = new ArrayList<TranslationInfoHolder>();
-                    sectionHeaders.add(language);
-                    this.translations.add(translations);
-                    ++count;
-                }
+        final int available = translations.available.size();
+        for (int i = 0; i < available; ++i) {
+            final TranslationInfo translationInfo = translations.available.get(i);
 
-                final SpannableStringBuilder text = new SpannableStringBuilder(
-                        resources.getString(R.string.text_available_translation_info,
-                                translationInfo.name, translationInfo.size / 1024)
-                );
-                text.setSpan(mediumSizeSpan, 0, translationInfo.name.length(), 0);
-                text.setSpan(smallSizeSpan, translationInfo.name.length(), text.length(), 0);
-
-                translations.add(new TranslationInfoHolder(translationInfo, text, false));
+            ArrayList<TranslationInfoHolder> availableTranslations = null;
+            final String language = new Locale(translationInfo.language.split("_")[0]).getDisplayLanguage();
+            final int sections = sectionHeaders.size();
+            for (int j = 0; j < sections; ++j) {
+                if (sectionHeaders.get(j).equals(language)) {
+                    availableTranslations = translationList.get(j);
+                    break;
+                }
+            }
+            if (availableTranslations == null) {
+                availableTranslations = new ArrayList<>();
+                sectionHeaders.add(language);
+                translationList.add(availableTranslations);
                 ++count;
             }
-        }
-    }
 
-    @Nullable
-    public Pair<TranslationInfo, Boolean> getTranslation(int position) {
-        final Object item = getItem(position);
-        if (!(item instanceof TranslationInfoHolder)) {
-            return null;
+            final SpannableStringBuilder text = new SpannableStringBuilder(
+                    resources.getString(R.string.text_available_translation_info,
+                            translationInfo.name, translationInfo.size / 1024)
+            );
+            text.setSpan(mediumSizeSpan, 0, translationInfo.name.length(), 0);
+            text.setSpan(smallSizeSpan, translationInfo.name.length(), text.length(), 0);
+
+            availableTranslations.add(new TranslationInfoHolder(translationInfo, text, false));
+            ++count;
         }
-        final TranslationInfoHolder translation = (TranslationInfoHolder) item;
-        return new Pair<TranslationInfo, Boolean>(translation.translationInfo, translation.downloaded);
     }
 }
