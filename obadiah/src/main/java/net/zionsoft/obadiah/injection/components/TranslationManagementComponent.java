@@ -20,14 +20,14 @@ package net.zionsoft.obadiah.injection.components;
 import net.zionsoft.obadiah.injection.InjectionComponent;
 import net.zionsoft.obadiah.injection.modules.TranslationManagementModule;
 import net.zionsoft.obadiah.injection.scopes.ActivityScope;
-import net.zionsoft.obadiah.ui.fragments.TranslationListFragment;
+import net.zionsoft.obadiah.ui.activities.TranslationManagementActivity;
 
 import dagger.Subcomponent;
 
 @ActivityScope
 @Subcomponent(modules = TranslationManagementModule.class)
 public interface TranslationManagementComponent extends Component {
-    void inject(TranslationListFragment translationListFragment);
+    void inject(TranslationManagementActivity translationManagementActivity);
 
     final class Initializer {
         public static TranslationManagementComponent init(InjectionComponent injectionComponent) {
