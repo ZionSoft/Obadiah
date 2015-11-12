@@ -47,6 +47,7 @@ import rx.Subscriber;
 import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.functions.Func2;
+import rx.schedulers.Schedulers;
 
 public class TranslationManagementModel {
     private final DatabaseHelper databaseHelper;
@@ -113,7 +114,11 @@ public class TranslationManagementModel {
                     public void call(List<TranslationInfo> translations) {
                         translationManager.saveTranslations(translations);
                     }
-                });
+                })
+                // workaround for Retrofit / okhttp issue (of sorts)
+                // https://github.com/square/retrofit/issues/1046
+                // https://github.com/square/okhttp/issues/1592
+                .unsubscribeOn(Schedulers.io());
     }
 
     private Observable<List<TranslationInfo>> loadFromLocal() {
