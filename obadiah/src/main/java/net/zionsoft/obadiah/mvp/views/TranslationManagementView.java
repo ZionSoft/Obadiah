@@ -34,4 +34,8 @@ public interface TranslationManagementView extends MVPView {
     void onTranslationDownloaded(TranslationInfo translation);
 
     void onTranslationDownloadFailed(TranslationInfo translation);
+
+    void showAds();
+
+    void hideAds();
 }

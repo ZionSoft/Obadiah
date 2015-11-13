@@ -25,6 +25,7 @@ import net.zionsoft.obadiah.injection.scopes.ActivityScope;
 import net.zionsoft.obadiah.model.Bible;
 import net.zionsoft.obadiah.model.database.DatabaseHelper;
 import net.zionsoft.obadiah.model.translations.TranslationManager;
+import net.zionsoft.obadiah.mvp.models.AdsModel;
 import net.zionsoft.obadiah.mvp.models.BibleReadingModel;
 import net.zionsoft.obadiah.mvp.models.TranslationManagementModel;
 import net.zionsoft.obadiah.mvp.presenters.TranslationManagementPresenter;
@@ -35,6 +36,11 @@ import dagger.Provides;
 
 @Module
 public class TranslationManagementModule {
+    @Provides
+    AdsModel provideAdsModel(Context context) {
+        return new AdsModel(context);
+    }
+
     @Provides
     BibleReadingModel provideBibleReadingModel(Context context, Bible bible) {
         return new BibleReadingModel(context, bible);
@@ -49,7 +55,9 @@ public class TranslationManagementModule {
 
     @Provides
     @ActivityScope
-    public TranslationManagementPresenter provideTranslationManagementPresenter(BibleReadingModel bibleReadingModel, TranslationManagementModel translationManagementModel) {
-        return new TranslationManagementPresenter(bibleReadingModel, translationManagementModel);
+    public TranslationManagementPresenter provideTranslationManagementPresenter(
+            AdsModel adsModel, BibleReadingModel bibleReadingModel,
+            TranslationManagementModel translationManagementModel) {
+        return new TranslationManagementPresenter(adsModel, bibleReadingModel, translationManagementModel);
     }
 }

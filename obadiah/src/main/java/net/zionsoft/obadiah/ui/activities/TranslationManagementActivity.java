@@ -44,7 +44,6 @@ import com.google.android.gms.ads.AdView;
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.injection.components.fragments.TranslationManagementComponentFragment;
 import net.zionsoft.obadiah.injection.scopes.ActivityScope;
-import net.zionsoft.obadiah.model.InAppBillingHelper;
 import net.zionsoft.obadiah.model.Settings;
 import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.translations.TranslationInfo;
@@ -102,8 +101,6 @@ public class TranslationManagementActivity extends BaseAppCompatActivity
 
     private MenuItem removeAdsMenuItem;
 
-    private InAppBillingHelper inAppBillingHelper;
-
     private TranslationListAdapter translationListAdapter;
 
     private ProgressDialog removeTranslationProgressDialog;
@@ -122,7 +119,6 @@ public class TranslationManagementActivity extends BaseAppCompatActivity
         }
 
         initializeUi();
-        initializeInAppBillingHelper();
         checkDeepLink();
     }
 
@@ -145,32 +141,6 @@ public class TranslationManagementActivity extends BaseAppCompatActivity
         translationList.addOnChildAttachStateChangeListener(this);
     }
 
-    private void initializeInAppBillingHelper() {
-        inAppBillingHelper = new InAppBillingHelper();
-        inAppBillingHelper.initialize(this, new InAppBillingHelper.OnInitializationFinishedListener() {
-            @Override
-            public void onInitializationFinished(boolean isSuccessful) {
-                if (isSuccessful) {
-                    inAppBillingHelper.loadAdsRemovalState(new InAppBillingHelper.OnAdsRemovalStateLoadedListener() {
-                        @Override
-                        public void onAdsRemovalStateLoaded(boolean isRemoved) {
-                            if (isRemoved)
-                                hideAds();
-                            else
-                                showAds();
-                        }
-                    });
-                } else {
-                    showAds();
-
-                    // billing can't be initialized, then makes no sense to show the menu item
-                    if (removeAdsMenuItem != null)
-                        removeAdsMenuItem.setVisible(false);
-                }
-            }
-        });
-    }
-
     private void checkDeepLink() {
         final Intent startIntent = getIntent();
         final String messageType = startIntent.getStringExtra(KEY_MESSAGE_TYPE);
@@ -178,23 +148,6 @@ public class TranslationManagementActivity extends BaseAppCompatActivity
             return;
         }
         Analytics.trackNotificationEvent("notification_opened", messageType);
-    }
-
-    private void hideAds() {
-        if (removeAdsMenuItem != null)
-            removeAdsMenuItem.setVisible(false);
-
-        adView.setVisibility(View.GONE);
-    }
-
-    private void showAds() {
-        if (removeAdsMenuItem != null)
-            removeAdsMenuItem.setVisible(true);
-
-        adView.setVisibility(View.VISIBLE);
-        adView.loadAd(new AdRequest.Builder()
-                .addKeyword("bible").addKeyword("jesus").addKeyword("christian")
-                .build());
     }
 
     @Override
@@ -225,6 +178,7 @@ public class TranslationManagementActivity extends BaseAppCompatActivity
     protected void onResumeFragments() {
         super.onResumeFragments();
         translationManagementPresenter.takeView(this);
+        translationManagementPresenter.loadAdsStatus();
         loadTranslations(true);
     }
 
@@ -243,7 +197,10 @@ public class TranslationManagementActivity extends BaseAppCompatActivity
     @Override
     public void onDestroy() {
         adView.destroy();
-        inAppBillingHelper.cleanup();
+
+        if (isFinishing()) {
+            translationManagementPresenter.cleanup();
+        }
 
         translationManagementPresenter.cancelRemoveTranslation();
         translationManagementPresenter.cancelFetchTranslation();
@@ -279,31 +236,19 @@ public class TranslationManagementActivity extends BaseAppCompatActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_remove_ads:
-                removeAds();
+                Analytics.trackUIEvent("remove_ads");
+                translationManagementPresenter.removeAds(this);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
-    private void removeAds() {
-        Analytics.trackUIEvent("remove_ads");
-
-        inAppBillingHelper.purchaseAdsRemoval(new InAppBillingHelper.OnAdsRemovalPurchasedListener() {
-            @Override
-            public void onAdsRemovalPurchased(boolean isSuccessful) {
-                if (isSuccessful)
-                    hideAds();
-
-                // TODO error handling
-            }
-        });
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (!inAppBillingHelper.handleActivityResult(requestCode, resultCode, data))
+        if (!translationManagementPresenter.handleActivityResult(requestCode, resultCode, data)) {
             super.onActivityResult(requestCode, resultCode, data);
+        }
     }
 
     @Override
@@ -472,5 +417,26 @@ public class TranslationManagementActivity extends BaseAppCompatActivity
                         }
                     });
         }
+    }
+
+    @Override
+    public void showAds() {
+        if (removeAdsMenuItem != null) {
+            removeAdsMenuItem.setVisible(true);
+        }
+
+        adView.setVisibility(View.VISIBLE);
+        adView.loadAd(new AdRequest.Builder()
+                .addKeyword("bible").addKeyword("jesus").addKeyword("christian")
+                .build());
+    }
+
+    @Override
+    public void hideAds() {
+        if (removeAdsMenuItem != null) {
+            removeAdsMenuItem.setVisible(false);
+        }
+
+        adView.setVisibility(View.GONE);
     }
 }

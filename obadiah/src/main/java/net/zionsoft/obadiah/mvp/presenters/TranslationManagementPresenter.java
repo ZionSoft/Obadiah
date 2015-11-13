@@ -17,10 +17,13 @@
 
 package net.zionsoft.obadiah.mvp.presenters;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.text.TextUtils;
 
 import net.zionsoft.obadiah.model.translations.TranslationInfo;
 import net.zionsoft.obadiah.model.translations.Translations;
+import net.zionsoft.obadiah.mvp.models.AdsModel;
 import net.zionsoft.obadiah.mvp.models.BibleReadingModel;
 import net.zionsoft.obadiah.mvp.models.TranslationManagementModel;
 import net.zionsoft.obadiah.mvp.views.TranslationManagementView;
@@ -30,26 +33,36 @@ import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action0;
 import rx.schedulers.Schedulers;
+import rx.subscriptions.CompositeSubscription;
 
-public class TranslationManagementPresenter extends MVPPresenter<TranslationManagementView> {
+public class TranslationManagementPresenter extends MVPPresenter<TranslationManagementView>
+        implements AdsModel.OnAdsRemovalPurchasedListener {
+    private final AdsModel adsModel;
     private final BibleReadingModel bibleReadingModel;
     private final TranslationManagementModel translationManagementModel;
 
-    private Subscription loadTranslationsSubscription;
+    private CompositeSubscription subscription;
     private Subscription removeTranslationSubscription;
     private Subscription fetchTranslationSubscription;
 
-    public TranslationManagementPresenter(BibleReadingModel bibleReadingModel,
+    public TranslationManagementPresenter(AdsModel adsModel, BibleReadingModel bibleReadingModel,
                                           TranslationManagementModel translationManagementModel) {
+        this.adsModel = adsModel;
         this.bibleReadingModel = bibleReadingModel;
         this.translationManagementModel = translationManagementModel;
     }
 
     @Override
+    protected void onViewTaken() {
+        super.onViewTaken();
+        subscription = new CompositeSubscription();
+    }
+
+    @Override
     protected void onViewDropped() {
-        if (loadTranslationsSubscription != null) {
-            loadTranslationsSubscription.unsubscribe();
-            loadTranslationsSubscription = null;
+        if (subscription != null) {
+            subscription.unsubscribe();
+            subscription = null;
         }
 
         super.onViewDropped();
@@ -64,11 +77,11 @@ public class TranslationManagementPresenter extends MVPPresenter<TranslationMana
     }
 
     public void loadTranslations(boolean forceRefresh) {
-        loadTranslationsSubscription = translationManagementModel.loadTranslations(forceRefresh)
+        subscription.add(translationManagementModel.loadTranslations(forceRefresh)
                 .finallyDo(new Action0() {
                     @Override
                     public void call() {
-                        loadTranslationsSubscription = null;
+                        subscription = null;
                     }
                 }).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -93,7 +106,7 @@ public class TranslationManagementPresenter extends MVPPresenter<TranslationMana
                             v.onTranslationLoaded(translations);
                         }
                     }
-                });
+                }));
     }
 
     public void removeTranslation(final TranslationInfo translation) {
@@ -188,6 +201,61 @@ public class TranslationManagementPresenter extends MVPPresenter<TranslationMana
         if (fetchTranslationSubscription != null) {
             fetchTranslationSubscription.unsubscribe();
             fetchTranslationSubscription = null;
+        }
+    }
+
+    public void loadAdsStatus() {
+        subscription.add(adsModel.shouldHideAds()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<Boolean>() {
+                    @Override
+                    public void onCompleted() {
+                        // do nothing
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        final TranslationManagementView v = getView();
+                        if (v != null) {
+                            v.showAds();
+                        }
+                    }
+
+                    @Override
+                    public void onNext(Boolean shouldHideAds) {
+                        final TranslationManagementView v = getView();
+                        if (v != null) {
+                            if (shouldHideAds) {
+                                v.hideAds();
+                            } else {
+                                v.showAds();
+                            }
+                        }
+                    }
+                }));
+    }
+
+    public void removeAds(Activity activity) {
+        adsModel.purchaseAdsRemoval(activity, this);
+    }
+
+    public boolean handleActivityResult(int requestCode, int resultCode, Intent data) {
+        return adsModel.handleActivityResult(requestCode, resultCode, data);
+    }
+
+    public void cleanup() {
+        adsModel.cleanup();
+    }
+
+    @Override
+    public void onAdsRemovalPurchased(boolean purchased) {
+        final TranslationManagementView v = getView();
+        if (v != null) {
+            if (purchased) {
+                v.hideAds();
+            } else {
+                v.showAds();
+            }
         }
     }
 }
