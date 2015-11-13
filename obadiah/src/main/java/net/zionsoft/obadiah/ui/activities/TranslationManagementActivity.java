@@ -139,6 +139,7 @@ public class TranslationManagementActivity extends BaseAppCompatActivity
 
         translationList.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         translationList.addOnChildAttachStateChangeListener(this);
+        initializeAdapter();
     }
 
     private void checkDeepLink() {
@@ -161,10 +162,22 @@ public class TranslationManagementActivity extends BaseAppCompatActivity
             rootView.setBackgroundColor(settings.getBackgroundColor());
             rootView.setKeepScreenOn(settings.keepScreenOn());
 
-            translationListAdapter = new TranslationListAdapter(this, settings,
-                    translationManagementPresenter.loadCurrentTranslation());
-            translationList.setAdapter(translationListAdapter);
+            initializeAdapter();
         }
+    }
+
+    private void initializeAdapter() {
+        if (translationList == null || settings == null || translationListAdapter != null) {
+            // if the activity is recreated due to screen orientation change, the component fragment
+            // is called before the UI is initialized, i.e. onAttachFragment() is called inside
+            // super.onCreate()
+            // therefore, we try to do the initialization in both places
+            return;
+        }
+
+        translationListAdapter = new TranslationListAdapter(this, settings,
+                translationManagementPresenter.loadCurrentTranslation());
+        translationList.setAdapter(translationListAdapter);
     }
 
     @Override
