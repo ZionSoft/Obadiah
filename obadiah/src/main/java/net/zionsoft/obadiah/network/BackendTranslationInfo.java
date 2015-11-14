@@ -19,6 +19,9 @@ package net.zionsoft.obadiah.network;
 
 import java.util.List;
 
+/**
+ * Used to parse the books.json file.
+ */
 public class BackendTranslationInfo {
     public final String name;
     public final String shortName;

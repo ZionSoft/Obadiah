@@ -19,6 +19,9 @@ package net.zionsoft.obadiah.network;
 
 import java.util.List;
 
+/**
+ * Used to parse one single chapter.
+ */
 public class BackendChapter {
     public final List<String> verses;
 
