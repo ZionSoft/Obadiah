@@ -36,8 +36,8 @@ import dagger.Provides;
 @Module
 public class TranslationManagementModule {
     @Provides
-    AdsModel provideAdsModel(Context context) {
-        return new AdsModel(context);
+    AdsModel provideAdsModel(Context context, Moshi moshi) {
+        return new AdsModel(context, moshi);
     }
 
     @Provides

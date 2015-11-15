@@ -31,13 +31,13 @@ import android.support.annotation.IntDef;
 
 import com.android.vending.billing.IInAppBillingService;
 import com.crashlytics.android.Crashlytics;
+import com.squareup.moshi.JsonAdapter;
+import com.squareup.moshi.Moshi;
 
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.analytics.Analytics;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
+import java.io.IOException;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
@@ -68,14 +68,18 @@ public class InAppBilling implements ServiceConnection {
     private static final String ITEM_TYPE_INAPP = "inapp";
 
     private final Context applicationContext;
+    private final JsonAdapter<InAppPurchaseData> inAppPurchaseDataJsonAdapter;
+
     private IInAppBillingService inAppBillingService;
     private OnAdsRemovalPurchasedListener onAdsRemovalPurchasedListener;
 
     @Status
     private int status = STATUS_UNKNOWN;
 
-    public InAppBilling(Context context) {
+    public InAppBilling(Context context, Moshi moshi) {
         applicationContext = context.getApplicationContext();
+        inAppPurchaseDataJsonAdapter = moshi.adapter(InAppPurchaseData.class);
+
         status = STATUS_INITIALIZING;
 
         applicationContext.bindService(
@@ -155,9 +159,10 @@ public class InAppBilling implements ServiceConnection {
             if (purchaseData != null) {
                 final int size = purchaseData.size();
                 for (int i = 0; i < size; ++i) {
-                    final JSONObject purchaseObject = new JSONObject(purchaseData.get(i));
-                    if (purchaseObject.getString("productId").equals(adsProductId)
-                            && purchaseObject.getInt("purchaseState") == 0) {
+                    final InAppPurchaseData inAppPurchaseData
+                            = inAppPurchaseDataJsonAdapter.fromJson(purchaseData.get(i));
+                    if (inAppPurchaseData.productId.equals(adsProductId)
+                            && inAppPurchaseData.purchaseState == InAppPurchaseData.STATUS_PURCHASED) {
                         return true;
                     }
                 }
@@ -192,16 +197,16 @@ public class InAppBilling implements ServiceConnection {
         }
 
         try {
-            final JSONObject purchaseObject = new JSONObject(data.getStringExtra("INAPP_PURCHASE_DATA"));
-            final String productId = purchaseObject.getString("productId");
+            final InAppPurchaseData inAppPurchaseData
+                    = inAppPurchaseDataJsonAdapter.fromJson(data.getStringExtra("INAPP_PURCHASE_DATA"));
             final boolean isPurchased =
-                    productId.equals(applicationContext.getString(R.string.in_app_product_no_ads))
-                            && purchaseObject.getInt("purchaseState") == 0;
+                    inAppPurchaseData.productId.equals(applicationContext.getString(R.string.in_app_product_no_ads))
+                            && inAppPurchaseData.purchaseState == InAppPurchaseData.STATUS_PURCHASED;
             if (isPurchased) {
                 Analytics.trackBillingPurchase("remove_ads");
             }
             informAdsRemovalPurchased(isPurchased);
-        } catch (JSONException e) {
+        } catch (IOException e) {
             Crashlytics.getInstance().core.logException(e);
             informAdsRemovalPurchased(false);
         }

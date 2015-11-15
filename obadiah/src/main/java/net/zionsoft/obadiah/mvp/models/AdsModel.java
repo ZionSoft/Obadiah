@@ -21,6 +21,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 
+import com.squareup.moshi.Moshi;
+
 import net.zionsoft.obadiah.billing.InAppBilling;
 
 import java.util.concurrent.TimeUnit;
@@ -37,8 +39,8 @@ public class AdsModel implements InAppBilling.OnAdsRemovalPurchasedListener {
     private final InAppBilling inAppBilling;
     private OnAdsRemovalPurchasedListener onAdsRemovalPurchasedListener;
 
-    public AdsModel(Context context) {
-        inAppBilling = new InAppBilling(context);
+    public AdsModel(Context context, Moshi moshi) {
+        inAppBilling = new InAppBilling(context, moshi);
     }
 
     public Observable<Boolean> shouldHideAds() {
