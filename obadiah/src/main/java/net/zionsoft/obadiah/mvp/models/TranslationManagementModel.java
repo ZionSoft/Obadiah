@@ -28,7 +28,6 @@ import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.database.DatabaseHelper;
 import net.zionsoft.obadiah.model.translations.TranslationHelper;
 import net.zionsoft.obadiah.model.translations.TranslationInfo;
-import net.zionsoft.obadiah.model.translations.TranslationManager;
 import net.zionsoft.obadiah.model.translations.Translations;
 import net.zionsoft.obadiah.network.BackendChapter;
 import net.zionsoft.obadiah.network.BackendInterface;
@@ -51,15 +50,12 @@ import rx.schedulers.Schedulers;
 
 public class TranslationManagementModel {
     private final DatabaseHelper databaseHelper;
-    private final TranslationManager translationManager;
     private final BackendInterface backendInterface;
     private final JsonAdapter<BackendTranslationInfo> translationInfoJsonAdapter;
     private final JsonAdapter<BackendChapter> chapterJsonAdapter;
 
-    public TranslationManagementModel(DatabaseHelper databaseHelper, TranslationManager translationManager,
-                                      Moshi moshi, BackendInterface backendInterface) {
+    public TranslationManagementModel(DatabaseHelper databaseHelper, Moshi moshi, BackendInterface backendInterface) {
         this.databaseHelper = databaseHelper;
-        this.translationManager = translationManager;
         this.backendInterface = backendInterface;
         this.translationInfoJsonAdapter = moshi.adapter(BackendTranslationInfo.class);
         this.chapterJsonAdapter = moshi.adapter(BackendChapter.class);
@@ -88,11 +84,17 @@ public class TranslationManagementModel {
                 new Observable.OnSubscribe<List<String>>() {
                     @Override
                     public void call(Subscriber<? super List<String>> subscriber) {
+                        SQLiteDatabase db = null;
                         try {
-                            subscriber.onNext(translationManager.loadDownloadedTranslations());
+                            db = databaseHelper.openDatabase();
+                            subscriber.onNext(TranslationHelper.getDownloadedTranslationShortNames(db));
                             subscriber.onCompleted();
                         } catch (Exception e) {
                             subscriber.onError(e);
+                        } finally {
+                            if (db != null) {
+                                databaseHelper.closeDatabase();
+                            }
                         }
                     }
                 });
@@ -112,7 +114,20 @@ public class TranslationManagementModel {
                 .doOnNext(new Action1<List<TranslationInfo>>() {
                     @Override
                     public void call(List<TranslationInfo> translations) {
-                        translationManager.saveTranslations(translations);
+                        SQLiteDatabase db = null;
+                        try {
+                            db = databaseHelper.openDatabase();
+                            db.beginTransaction();
+                            TranslationHelper.saveTranslations(db, translations);
+                            db.setTransactionSuccessful();
+                        } finally {
+                            if (db != null) {
+                                if (db.inTransaction()) {
+                                    db.endTransaction();
+                                }
+                                databaseHelper.closeDatabase();
+                            }
+                        }
                     }
                 })
                 // workaround for Retrofit / okhttp issue (of sorts)
@@ -125,11 +140,17 @@ public class TranslationManagementModel {
         return Observable.create(new Observable.OnSubscribe<List<TranslationInfo>>() {
             @Override
             public void call(Subscriber<? super List<TranslationInfo>> subscriber) {
+                SQLiteDatabase db = null;
                 try {
-                    subscriber.onNext(translationManager.loadTranslations());
+                    db = databaseHelper.openDatabase();
+                    subscriber.onNext(TranslationHelper.getTranslations(db));
                     subscriber.onCompleted();
                 } catch (Exception e) {
                     subscriber.onError(e);
+                } finally {
+                    if (db != null) {
+                        databaseHelper.closeDatabase();
+                    }
                 }
             }
         });
@@ -140,7 +161,20 @@ public class TranslationManagementModel {
             @Override
             public void call(Subscriber<? super Void> subscriber) {
                 try {
-                    translationManager.removeTranslation(translation);
+                    SQLiteDatabase db = null;
+                    try {
+                        db = databaseHelper.openDatabase();
+                        db.beginTransaction();
+                        TranslationHelper.removeTranslation(db, translation.shortName);
+                        db.setTransactionSuccessful();
+                    } finally {
+                        if (db != null) {
+                            if (db.inTransaction()) {
+                                db.endTransaction();
+                            }
+                            databaseHelper.closeDatabase();
+                        }
+                    }
                     subscriber.onCompleted();
                 } catch (Exception e) {
                     subscriber.onError(e);

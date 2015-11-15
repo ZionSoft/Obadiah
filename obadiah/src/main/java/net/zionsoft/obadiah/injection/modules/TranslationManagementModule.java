@@ -24,7 +24,6 @@ import com.squareup.moshi.Moshi;
 import net.zionsoft.obadiah.injection.scopes.ActivityScope;
 import net.zionsoft.obadiah.model.Bible;
 import net.zionsoft.obadiah.model.database.DatabaseHelper;
-import net.zionsoft.obadiah.model.translations.TranslationManager;
 import net.zionsoft.obadiah.mvp.models.AdsModel;
 import net.zionsoft.obadiah.mvp.models.BibleReadingModel;
 import net.zionsoft.obadiah.mvp.models.TranslationManagementModel;
@@ -48,9 +47,8 @@ public class TranslationManagementModule {
 
     @Provides
     public TranslationManagementModel provideTranslationManagementModel(
-            DatabaseHelper databaseHelper, TranslationManager translationManager,
-            Moshi moshi, BackendInterface backendInterface) {
-        return new TranslationManagementModel(databaseHelper, translationManager, moshi, backendInterface);
+            DatabaseHelper databaseHelper, Moshi moshi, BackendInterface backendInterface) {
+        return new TranslationManagementModel(databaseHelper, moshi, backendInterface);
     }
 
     @Provides

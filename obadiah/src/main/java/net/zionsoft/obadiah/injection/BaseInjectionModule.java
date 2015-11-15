@@ -27,7 +27,6 @@ import net.zionsoft.obadiah.model.Bible;
 import net.zionsoft.obadiah.model.ReadingProgressManager;
 import net.zionsoft.obadiah.model.Settings;
 import net.zionsoft.obadiah.model.database.DatabaseHelper;
-import net.zionsoft.obadiah.model.translations.TranslationManager;
 import net.zionsoft.obadiah.network.BackendInterface;
 
 import java.util.concurrent.TimeUnit;
@@ -76,12 +75,6 @@ public class BaseInjectionModule {
     @Singleton
     public Settings provideSettings() {
         return new Settings(application);
-    }
-
-    @Provides
-    @Singleton
-    public TranslationManager provideTranslationManager() {
-        return new TranslationManager(application);
     }
 
     @Provides

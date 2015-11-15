@@ -30,7 +30,6 @@ import net.zionsoft.obadiah.injection.modules.TranslationManagementModule;
 import net.zionsoft.obadiah.model.Bible;
 import net.zionsoft.obadiah.model.ReadingProgressManager;
 import net.zionsoft.obadiah.model.notification.PushNotificationHandler;
-import net.zionsoft.obadiah.model.translations.TranslationManager;
 import net.zionsoft.obadiah.ui.activities.SettingsActivity;
 import net.zionsoft.obadiah.ui.adapters.VerseListAdapter;
 import net.zionsoft.obadiah.ui.adapters.VersePagerAdapter;
@@ -60,8 +59,6 @@ public interface InjectionComponent {
     public void inject(Bible bible);
 
     public void inject(ReadingProgressManager readingProgressManager);
-
-    public void inject(TranslationManager translationManager);
 
     OpenSourceLicenseComponent plus(OpenSourceLicenseModule openSourceLicenseModule);
 
