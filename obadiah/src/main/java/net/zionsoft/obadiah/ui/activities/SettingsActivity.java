@@ -40,7 +40,7 @@ import net.zionsoft.obadiah.model.Settings;
 import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.ui.utils.AnimationHelper;
 import net.zionsoft.obadiah.ui.utils.DialogHelper;
-import net.zionsoft.obadiah.ui.widget.settings.SettingSectionHeader;
+import net.zionsoft.obadiah.ui.widget.SectionHeader;
 import net.zionsoft.obadiah.ui.widget.settings.SettingSwitch;
 import net.zionsoft.obadiah.ui.widget.settings.SettingTitleDescriptionButton;
 
@@ -62,7 +62,7 @@ public class SettingsActivity extends BaseAppCompatActivity {
     Toolbar toolbar;
 
     @Bind(R.id.display_section_header)
-    SettingSectionHeader displaySectionHeader;
+    SectionHeader displaySectionHeader;
 
     @Bind(R.id.screen_on_switch)
     SettingSwitch screenOnSwitch;
@@ -74,7 +74,7 @@ public class SettingsActivity extends BaseAppCompatActivity {
     SettingTitleDescriptionButton textSizeSettingButton;
 
     @Bind(R.id.about_section_header)
-    SettingSectionHeader aboutSectionHeader;
+    SectionHeader aboutSectionHeader;
 
     @Bind(R.id.rate_me_setting_button)
     SettingTitleDescriptionButton rateMeSettingButton;

@@ -15,7 +15,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <net.zionsoft.obadiah.ui.widget.settings.SettingSectionHeader
+            <net.zionsoft.obadiah.ui.widget.SectionHeader
                 android:id="@+id/display_section_header"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -43,7 +43,7 @@
                 obadiah:settingTitleDescriptionButtonDividerVisible="false"
                 obadiah:settingTitleDescriptionButtonTitle="@string/pref_text_size" />
 
-            <net.zionsoft.obadiah.ui.widget.settings.SettingSectionHeader
+            <net.zionsoft.obadiah.ui.widget.SectionHeader
                 android:id="@+id/about_section_header"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

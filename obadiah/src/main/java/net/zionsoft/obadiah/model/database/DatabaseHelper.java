@@ -30,6 +30,7 @@ import javax.inject.Singleton;
 public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String TABLE_BOOK_NAMES = "TABLE_BOOK_NAMES";
     public static final String TABLE_READING_PROGRESS = "TABLE_READING_PROGRESS";
+    public static final String TABLE_TRANSLATIONS = "TABLE_TRANSLATIONS";
     private static final String TABLE_METADATA = "TABLE_METADATA";
     private static final String INDEX_TABLE_BOOK_NAMES = "INDEX_TABLE_BOOK_NAMES";
 
@@ -40,13 +41,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COLUMN_BOOK_NAME = "COLUMN_BOOK_NAME";
     public static final String COLUMN_TEXT = "COLUMN_TEXT";
     public static final String COLUMN_LAST_READING_TIMESTAMP = "COLUMN_LAST_READING_TIMESTAMP";
+    public static final String COLUMN_TRANSLATION_NAME = "COLUMN_TRANSLATION_NAME";
+    public static final String COLUMN_TRANSLATION_LANGUAGE = "COLUMN_TRANSLATION_LANGUAGE";
+    public static final String COLUMN_TRANSLATION_BLOB_KEY = "COLUMN_TRANSLATION_BLOB_KEY";
+    public static final String COLUMN_TRANSLATION_SIZE = "COLUMN_TRANSLATION_SIZE";
     private static final String COLUMN_KEY = "COLUMN_KEY";
     private static final String COLUMN_VALUE = "COLUMN_VALUE";
 
     public static final String KEY_LAST_READING_TIMESTAMP = "KEY_LAST_READING_TIMESTAMP";
     public static final String KEY_CONTINUOUS_READING_DAYS = "KEY_CONTINUOUS_READING_DAYS";
 
-    private static final int DATABASE_VERSION = 5;
+    private static final int DATABASE_VERSION = 6;
     private static final String DATABASE_NAME = "DB_OBADIAH";
 
     private int counter;
@@ -86,6 +91,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
             createReadingProgressTable(db);
             createMetadataTable(db);
+            createTranslationTable(db);
 
             db.setTransactionSuccessful();
         } finally {
@@ -104,25 +110,40 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 TABLE_METADATA, COLUMN_KEY, COLUMN_VALUE));
     }
 
+    private static void createTranslationTable(SQLiteDatabase db) {
+        db.execSQL(String.format("CREATE TABLE %s (%s TEXT PRIMARY KEY, %s TEXT NOT NULL, %s TEXT NOT NULL, %s TEXT NOT NULL, %s INTEGER NOT NULL);",
+                TABLE_TRANSLATIONS, COLUMN_TRANSLATION_NAME, COLUMN_TRANSLATION_SHORT_NAME,
+                COLUMN_TRANSLATION_LANGUAGE, COLUMN_TRANSLATION_BLOB_KEY, COLUMN_TRANSLATION_SIZE));
+    }
+
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.beginTransaction();
         try {
             // version 2 introduced in 1.7.0
-            if (oldVersion < 2)
+            if (oldVersion < 2) {
                 db.execSQL("DROP TABLE IF EXISTS TABLE_TRANSLATIONS");
+            }
 
             // version 3 introduced in 1.8.0
-            if (oldVersion < 3)
+            if (oldVersion < 3) {
                 db.execSQL("DROP TABLE IF EXISTS TABLE_TRANSLATION_LIST");
+            }
 
             // version 4 introduced in 1.8.2
-            if (oldVersion < 4)
+            if (oldVersion < 4) {
                 createReadingProgressTable(db);
+            }
 
             // version 5 introduced in 1.9.0
-            if (oldVersion < 5)
+            if (oldVersion < 5) {
                 createMetadataTable(db);
+            }
+
+            // version 6 introduced in 1.13.0
+            if (oldVersion < 6) {
+                createTranslationTable(db);
+            }
 
             db.setTransactionSuccessful();
         } finally {

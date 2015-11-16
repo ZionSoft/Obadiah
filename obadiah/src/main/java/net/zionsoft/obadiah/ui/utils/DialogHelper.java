@@ -42,7 +42,7 @@ public class DialogHelper {
                 .create().show();
     }
 
-    public static void showDialog(Context context, boolean cancelable, int message,
+    public static void showDialog(Context context, boolean cancelable, @StringRes int message,
                                   DialogInterface.OnClickListener onPositive,
                                   DialogInterface.OnClickListener onNegative) {
         new AlertDialog.Builder(context)

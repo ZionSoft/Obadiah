@@ -21,14 +21,11 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.Nullable;
-import android.text.TextUtils;
 
 import net.zionsoft.obadiah.model.Bible;
 import net.zionsoft.obadiah.model.Verse;
 import net.zionsoft.obadiah.model.database.DatabaseHelper;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
+import net.zionsoft.obadiah.network.BackendTranslationInfo;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,25 +34,6 @@ import java.util.List;
 import java.util.Locale;
 
 public class TranslationHelper {
-    public static List<TranslationInfo> toTranslationList(JSONArray jsonArray) throws Exception {
-        final int length = jsonArray.length();
-        final List<TranslationInfo> translations = new ArrayList<TranslationInfo>(length);
-        for (int i = 0; i < length; ++i) {
-            final JSONObject translationObject = jsonArray.getJSONObject(i);
-            final String name = translationObject.getString("name");
-            final String shortName = translationObject.getString("shortName");
-            final String language = translationObject.getString("language");
-            final String blobKey = translationObject.optString("blobKey", null);
-            final int size = translationObject.getInt("size");
-            if (TextUtils.isEmpty(name) || TextUtils.isEmpty(shortName)
-                    || TextUtils.isEmpty(language) || size <= 0) {
-                throw new Exception("Illegal translation info.");
-            }
-            translations.add(new TranslationInfo(name, shortName, language, blobKey, size));
-        }
-        return translations;
-    }
-
     public static List<TranslationInfo> sortByLocale(List<TranslationInfo> translations) {
         Collections.sort(translations, new Comparator<TranslationInfo>() {
             @Override
@@ -211,44 +189,27 @@ public class TranslationHelper {
                 DatabaseHelper.COLUMN_CHAPTER_INDEX, DatabaseHelper.COLUMN_VERSE_INDEX));
     }
 
-    public static void saveBookNames(SQLiteDatabase db, JSONObject booksInfoObject) throws Exception {
-        final String translationShortName = booksInfoObject.getString("shortName");
+    public static void saveBookNames(SQLiteDatabase db, BackendTranslationInfo translation) {
         final ContentValues bookNamesValues = new ContentValues(3);
-        bookNamesValues.put(DatabaseHelper.COLUMN_TRANSLATION_SHORT_NAME, translationShortName);
-        final JSONArray booksArray = booksInfoObject.getJSONArray("books");
-        for (int i = 0; i < Bible.getBookCount(); ++i) {
+        bookNamesValues.put(DatabaseHelper.COLUMN_TRANSLATION_SHORT_NAME, translation.shortName);
+        final List<String> books = translation.books;
+        final int count = books.size();
+        for (int i = 0; i < count; ++i) {
             bookNamesValues.put(DatabaseHelper.COLUMN_BOOK_INDEX, i);
-
-            final String bookName = booksArray.getString(i);
-            if (TextUtils.isEmpty(bookName))
-                throw new Exception("Illegal books.json file: " + translationShortName);
-            bookNamesValues.put(DatabaseHelper.COLUMN_BOOK_NAME, bookName);
-
+            bookNamesValues.put(DatabaseHelper.COLUMN_BOOK_NAME, books.get(i));
             db.insert(DatabaseHelper.TABLE_BOOK_NAMES, null, bookNamesValues);
         }
     }
 
-    public static void saveVerses(SQLiteDatabase db, String translationShortName,
-                                  int bookIndex, int chapterIndex, JSONObject versesObject) throws Exception {
+    public static void saveVerses(SQLiteDatabase db, String translation, int book, int chapter, List<String> verses) {
         final ContentValues versesValues = new ContentValues(4);
-        versesValues.put(DatabaseHelper.COLUMN_BOOK_INDEX, bookIndex);
-        versesValues.put(DatabaseHelper.COLUMN_CHAPTER_INDEX, chapterIndex);
-        final JSONArray paragraphArray = versesObject.getJSONArray("verses");
-        final int paragraphCount = paragraphArray.length();
-        boolean hasNonEmptyVerse = false;
-        for (int verseIndex = 0; verseIndex < paragraphCount; ++verseIndex) {
-            versesValues.put(DatabaseHelper.COLUMN_VERSE_INDEX, verseIndex);
-
-            final String verse = paragraphArray.getString(verseIndex);
-            if (!hasNonEmptyVerse && !TextUtils.isEmpty(verse))
-                hasNonEmptyVerse = true;
-            versesValues.put(DatabaseHelper.COLUMN_TEXT, verse);
-
-            db.insert(translationShortName, null, versesValues);
-        }
-        if (!hasNonEmptyVerse) {
-            throw new Exception(String.format("Empty chapter: %s %d-%d",
-                    translationShortName, bookIndex, chapterIndex));
+        versesValues.put(DatabaseHelper.COLUMN_BOOK_INDEX, book);
+        versesValues.put(DatabaseHelper.COLUMN_CHAPTER_INDEX, chapter);
+        final int versesCount = verses.size();
+        for (int i = 0; i < versesCount; ++i) {
+            versesValues.put(DatabaseHelper.COLUMN_VERSE_INDEX, i);
+            versesValues.put(DatabaseHelper.COLUMN_TEXT, verses.get(i));
+            db.insert(translation, null, versesValues);
         }
     }
 
@@ -258,5 +219,44 @@ public class TranslationHelper {
         db.delete(DatabaseHelper.TABLE_BOOK_NAMES,
                 String.format("%s = ?", DatabaseHelper.COLUMN_TRANSLATION_SHORT_NAME),
                 new String[]{translationShortName});
+    }
+
+    public static void saveTranslations(SQLiteDatabase db, List<TranslationInfo> translations) {
+        final ContentValues values = new ContentValues(5);
+        final int size = translations.size();
+        for (int i = 0; i < size; ++i) {
+            final TranslationInfo translation = translations.get(i);
+            values.put(DatabaseHelper.COLUMN_TRANSLATION_NAME, translation.name);
+            values.put(DatabaseHelper.COLUMN_TRANSLATION_SHORT_NAME, translation.shortName);
+            values.put(DatabaseHelper.COLUMN_TRANSLATION_LANGUAGE, translation.language);
+            values.put(DatabaseHelper.COLUMN_TRANSLATION_BLOB_KEY, translation.blobKey);
+            values.put(DatabaseHelper.COLUMN_TRANSLATION_SIZE, translation.size);
+            db.insertWithOnConflict(DatabaseHelper.TABLE_TRANSLATIONS, null, values, SQLiteDatabase.CONFLICT_REPLACE);
+        }
+    }
+
+    public static List<TranslationInfo> getTranslations(SQLiteDatabase db) {
+        Cursor cursor = null;
+        try {
+            cursor = db.query(DatabaseHelper.TABLE_TRANSLATIONS,
+                    new String[]{DatabaseHelper.COLUMN_TRANSLATION_NAME, DatabaseHelper.COLUMN_TRANSLATION_SHORT_NAME,
+                            DatabaseHelper.COLUMN_TRANSLATION_LANGUAGE, DatabaseHelper.COLUMN_TRANSLATION_BLOB_KEY,
+                            DatabaseHelper.COLUMN_TRANSLATION_SIZE}, null, null, null, null, null, null);
+            final int name = cursor.getColumnIndex(DatabaseHelper.COLUMN_TRANSLATION_NAME);
+            final int shortName = cursor.getColumnIndex(DatabaseHelper.COLUMN_TRANSLATION_SHORT_NAME);
+            final int language = cursor.getColumnIndex(DatabaseHelper.COLUMN_TRANSLATION_LANGUAGE);
+            final int blobKey = cursor.getColumnIndex(DatabaseHelper.COLUMN_TRANSLATION_BLOB_KEY);
+            final int size = cursor.getColumnIndex(DatabaseHelper.COLUMN_TRANSLATION_SIZE);
+            final List<TranslationInfo> translations = new ArrayList<>(cursor.getCount());
+            while (cursor.moveToNext()) {
+                translations.add(new TranslationInfo(cursor.getString(name), cursor.getString(shortName),
+                        cursor.getString(language), cursor.getString(blobKey), cursor.getInt(size)));
+            }
+            return translations;
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
     }
 }

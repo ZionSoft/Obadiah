@@ -19,31 +19,43 @@ package net.zionsoft.obadiah.injection.modules;
 
 import android.content.Context;
 
+import com.squareup.moshi.Moshi;
+
 import net.zionsoft.obadiah.injection.scopes.ActivityScope;
 import net.zionsoft.obadiah.model.Bible;
-import net.zionsoft.obadiah.model.ReadingProgressManager;
+import net.zionsoft.obadiah.model.database.DatabaseHelper;
+import net.zionsoft.obadiah.mvp.models.AdsModel;
 import net.zionsoft.obadiah.mvp.models.BibleReadingModel;
-import net.zionsoft.obadiah.mvp.models.ReadingProgressModel;
-import net.zionsoft.obadiah.mvp.presenters.ReadingProgressPresenter;
+import net.zionsoft.obadiah.mvp.models.TranslationManagementModel;
+import net.zionsoft.obadiah.mvp.presenters.TranslationManagementPresenter;
+import net.zionsoft.obadiah.network.BackendInterface;
 
 import dagger.Module;
 import dagger.Provides;
 
 @Module
-public class ReadingProgressModule {
+public class TranslationManagementModule {
+    @Provides
+    AdsModel provideAdsModel(Context context, Moshi moshi) {
+        return new AdsModel(context, moshi);
+    }
+
     @Provides
     BibleReadingModel provideBibleReadingModel(Context context, Bible bible) {
         return new BibleReadingModel(context, bible);
     }
 
     @Provides
-    ReadingProgressModel provideReadingProgressModel(ReadingProgressManager readingProgressManager) {
-        return new ReadingProgressModel(readingProgressManager);
+    public TranslationManagementModel provideTranslationManagementModel(
+            DatabaseHelper databaseHelper, Moshi moshi, BackendInterface backendInterface) {
+        return new TranslationManagementModel(databaseHelper, moshi, backendInterface);
     }
 
     @Provides
     @ActivityScope
-    ReadingProgressPresenter progressPresenter(BibleReadingModel bibleReadingModel, ReadingProgressModel readingProgressModel) {
-        return new ReadingProgressPresenter(bibleReadingModel, readingProgressModel);
+    public TranslationManagementPresenter provideTranslationManagementPresenter(
+            AdsModel adsModel, BibleReadingModel bibleReadingModel,
+            TranslationManagementModel translationManagementModel) {
+        return new TranslationManagementPresenter(adsModel, bibleReadingModel, translationManagementModel);
     }
 }

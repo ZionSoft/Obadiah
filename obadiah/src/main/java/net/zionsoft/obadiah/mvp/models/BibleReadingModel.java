@@ -17,7 +17,13 @@
 
 package net.zionsoft.obadiah.mvp.models;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+
+import net.zionsoft.obadiah.Constants;
 import net.zionsoft.obadiah.model.Bible;
+import net.zionsoft.obadiah.model.analytics.Analytics;
+import net.zionsoft.obadiah.model.translations.TranslationInfo;
 
 import java.util.List;
 
@@ -25,10 +31,22 @@ import rx.Observable;
 import rx.Subscriber;
 
 public class BibleReadingModel {
+    private final SharedPreferences preferences;
     private final Bible bible;
 
-    public BibleReadingModel(Bible bible) {
+    public BibleReadingModel(Context context, Bible bible) {
+        this.preferences = context.getApplicationContext()
+                .getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
         this.bible = bible;
+    }
+
+    public String loadCurrentTranslation() {
+        return preferences.getString(Constants.PREF_KEY_LAST_READ_TRANSLATION, null);
+    }
+
+    public void saveCurrentTranslation(TranslationInfo translation) {
+        preferences.edit().putString(Constants.PREF_KEY_LAST_READ_TRANSLATION, translation.shortName).apply();
+        Analytics.trackTranslationSelection(translation.shortName);
     }
 
     public Observable<List<String>> loadBookNames(final String translation) {

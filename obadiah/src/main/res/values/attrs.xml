@@ -6,7 +6,7 @@
         <attr name="textPadding" format="dimension" />
     </declare-styleable>
 
-    <declare-styleable name="SettingSectionHeader">
+    <declare-styleable name="SectionHeader">
         <attr name="settingSectionHeaderText" format="string|reference" />
     </declare-styleable>
 

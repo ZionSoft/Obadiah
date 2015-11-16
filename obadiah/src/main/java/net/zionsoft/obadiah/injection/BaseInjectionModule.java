@@ -19,23 +19,31 @@ package net.zionsoft.obadiah.injection;
 
 import android.content.Context;
 
+import com.squareup.moshi.Moshi;
+import com.squareup.okhttp.OkHttpClient;
+
 import net.zionsoft.obadiah.App;
 import net.zionsoft.obadiah.model.Bible;
 import net.zionsoft.obadiah.model.ReadingProgressManager;
 import net.zionsoft.obadiah.model.Settings;
 import net.zionsoft.obadiah.model.database.DatabaseHelper;
-import net.zionsoft.obadiah.model.translations.TranslationManager;
+import net.zionsoft.obadiah.network.BackendInterface;
+
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
+import retrofit.MoshiConverterFactory;
+import retrofit.Retrofit;
+import retrofit.RxJavaCallAdapterFactory;
 
 @Module
-public final class InjectionModule {
+public class BaseInjectionModule {
     private final App application;
 
-    public InjectionModule(App application) {
+    public BaseInjectionModule(App application) {
         this.application = application;
     }
 
@@ -71,7 +79,34 @@ public final class InjectionModule {
 
     @Provides
     @Singleton
-    public TranslationManager provideTranslationManager() {
-        return new TranslationManager(application);
+    public Moshi provideMoshi() {
+        return new Moshi.Builder().build();
+    }
+
+    @Provides
+    @Singleton
+    public OkHttpClient provideOkHttpClient() {
+        final OkHttpClient okHttpClient = new OkHttpClient();
+        okHttpClient.setConnectTimeout(30L, TimeUnit.SECONDS);
+        okHttpClient.setReadTimeout(30L, TimeUnit.SECONDS);
+        okHttpClient.setWriteTimeout(30L, TimeUnit.SECONDS);
+        return okHttpClient;
+    }
+
+    @Provides
+    @Singleton
+    public Retrofit provideRetrofit(Moshi moshi, OkHttpClient okHttpClient) {
+        return new Retrofit.Builder()
+                .baseUrl(BackendInterface.BASE_URL)
+                .client(okHttpClient)
+                .addConverterFactory(MoshiConverterFactory.create(moshi))
+                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .build();
+    }
+
+    @Provides
+    @Singleton
+    public BackendInterface provideBackendInterface(Retrofit retrofit) {
+        return retrofit.create(BackendInterface.class);
     }
 }
