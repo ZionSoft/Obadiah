@@ -17,6 +17,8 @@
         <item name="titleTextColor">@android:color/white</item>
         <item name="android:colorForeground">@color/dark_gray</item>
         <item name="android:dropDownListViewStyle">@style/AppSpinnerStyle</item>
+        <item name="android:scrollbarSize">2dp</item>
+        <item name="android:scrollbarThumbVertical">@color/dark_gray</item>
     </style>
 
     <style name="AppSpinnerStyle" parent="android:style/Widget.ListView.DropDown">
