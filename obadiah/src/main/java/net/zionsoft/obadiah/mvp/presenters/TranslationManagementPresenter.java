@@ -41,7 +41,7 @@ public class TranslationManagementPresenter extends MVPPresenter<TranslationMana
     private final BibleReadingModel bibleReadingModel;
     private final TranslationManagementModel translationManagementModel;
 
-    private CompositeSubscription subscription;
+    private CompositeSubscription subscription = new CompositeSubscription();
     private Subscription removeTranslationSubscription;
     private Subscription fetchTranslationSubscription;
 
@@ -55,7 +55,9 @@ public class TranslationManagementPresenter extends MVPPresenter<TranslationMana
     @Override
     protected void onViewTaken() {
         super.onViewTaken();
-        subscription = new CompositeSubscription();
+        if (subscription == null) {
+            subscription = new CompositeSubscription();
+        }
     }
 
     @Override
@@ -78,12 +80,7 @@ public class TranslationManagementPresenter extends MVPPresenter<TranslationMana
 
     public void loadTranslations(boolean forceRefresh) {
         subscription.add(translationManagementModel.loadTranslations(forceRefresh)
-                .finallyDo(new Action0() {
-                    @Override
-                    public void call() {
-                        subscription = null;
-                    }
-                }).subscribeOn(Schedulers.io())
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<Translations>() {
                     @Override
