@@ -463,7 +463,7 @@ public class BookSelectionActivity extends BaseAppCompatActivity implements Bibl
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         final Adapter adapter = parent.getAdapter();
-        if (position == adapter.getCount()) {
+        if (position == adapter.getCount() - 1) {
             // last item ("More") selected, opens the translation management activity
             AnimationHelper.slideIn(BookSelectionActivity.this,
                     TranslationManagementActivity.newStartIntent(BookSelectionActivity.this));
