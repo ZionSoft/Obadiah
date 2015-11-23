@@ -36,6 +36,7 @@ import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
@@ -69,7 +70,7 @@ import javax.inject.Inject;
 import butterknife.Bind;
 
 public class BookSelectionActivity extends BaseAppCompatActivity implements BibleReadingView,
-        ChapterSelectionFragment.Listener, TextFragment.Listener {
+        ChapterSelectionFragment.Listener, TextFragment.Listener, AdapterView.OnItemSelectedListener {
     private static final String KEY_MESSAGE_TYPE = "net.zionsoft.obadiah.BookSelectionActivity.KEY_MESSAGE_TYPE";
     private static final String KEY_BOOK_INDEX = "net.zionsoft.obadiah.BookSelectionActivity.KEY_BOOK_INDEX";
     private static final String KEY_CHAPTER_INDEX = "net.zionsoft.obadiah.BookSelectionActivity.KEY_CHAPTER_INDEX";
@@ -269,107 +270,11 @@ public class BookSelectionActivity extends BaseAppCompatActivity implements Bibl
 
         currentTranslation = preferences.getString(Constants.PREF_KEY_LAST_READ_TRANSLATION, null);
         if (currentTranslation == null) {
-            DialogHelper.showDialog(this, false, R.string.dialog_no_translation,
-                    new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            AnimationHelper.slideIn(BookSelectionActivity.this,
-                                    TranslationManagementActivity.newStartIntent(BookSelectionActivity.this));
-                        }
-                    }, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            finish();
-                        }
-                    }
-            );
             return;
         }
 
         currentBook = preferences.getInt(Constants.PREF_KEY_LAST_READ_BOOK, 0);
         currentChapter = preferences.getInt(Constants.PREF_KEY_LAST_READ_CHAPTER, 0);
-
-        loadTranslations();
-    }
-
-    private void loadTranslations() {
-        if (translationsSpinner == null)
-            return;
-
-        bible.loadDownloadedTranslations(new Bible.OnStringsLoadedListener() {
-            @Override
-            public void onStringsLoaded(List<String> strings) {
-                if (strings == null || strings.size() == 0) {
-                    if (currentTranslation != null) {
-                        DialogHelper.showDialog(BookSelectionActivity.this, false, R.string.dialog_retry,
-                                new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        loadTranslations();
-                                    }
-                                }, null
-                        );
-                    }
-                    return;
-                }
-
-                int selected = 0;
-                boolean hasSelectedTranslation = false;
-                for (String translation : strings) {
-                    if (translation.equals(currentTranslation)) {
-                        hasSelectedTranslation = true;
-                        break;
-                    }
-                    ++selected;
-                }
-                if (!hasSelectedTranslation) {
-                    // the requested translation is not available
-                    currentTranslation = strings.get(0);
-                    selected = 0;
-                    preferences.edit()
-                            .putString(Constants.PREF_KEY_LAST_READ_TRANSLATION, currentTranslation)
-                            .apply();
-                }
-
-                final int translationsCount = strings.size();
-                final List<String> translations = new ArrayList<String>(translationsCount + 1);
-                translations.addAll(strings);
-                translations.add(getResources().getString(R.string.text_more_translations));
-                translationsSpinner.setAdapter(new ArrayAdapter<String>(
-                        getSupportActionBar().getThemedContext(), R.layout.item_drop_down, translations));
-                translationsSpinner.setSelection(selected);
-                translationsSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                    @Override
-                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                        if (position == translationsCount) {
-                            AnimationHelper.slideIn(BookSelectionActivity.this,
-                                    TranslationManagementActivity.newStartIntent(BookSelectionActivity.this));
-                            return;
-                        }
-
-                        final String selected = translations.get(position);
-                        if (selected.equals(currentTranslation))
-                            return;
-
-                        Analytics.trackTranslationSelection(selected);
-                        currentTranslation = selected;
-                        preferences.edit()
-                                .putString(Constants.PREF_KEY_LAST_READ_TRANSLATION, selected)
-                                .putInt(Constants.PREF_KEY_LAST_READ_VERSE, textFragment.getCurrentVerse())
-                                .apply();
-
-                        loadTexts();
-                    }
-
-                    @Override
-                    public void onNothingSelected(AdapterView<?> parent) {
-                        // do nothing
-                    }
-                });
-
-                loadTexts();
-            }
-        });
     }
 
     private void loadTexts() {
@@ -415,6 +320,14 @@ public class BookSelectionActivity extends BaseAppCompatActivity implements Bibl
     protected void onResumeFragments() {
         super.onResumeFragments();
         bibleReadingPresenter.takeView(this);
+        loadTranslations();
+    }
+
+    private void loadTranslations() {
+        // we should wait until the menu is inflated
+        if (translationsSpinner != null) {
+            bibleReadingPresenter.loadTranslations();
+        }
     }
 
     @Override
@@ -492,5 +405,89 @@ public class BookSelectionActivity extends BaseAppCompatActivity implements Bibl
 
         chapterSelectionFragment.setSelected(currentBook, currentChapter);
         updateTitle();
+    }
+
+    @Override
+    public void onTranslationsLoaded(List<String> translations) {
+        final int translationsCount = translations.size();
+        int selected;
+        for (selected = 0; selected < translationsCount; ++selected) {
+            if (translations.get(selected).equals(currentTranslation)) {
+                break;
+            }
+        }
+        if (selected == translationsCount) {
+            // the requested translation is not available, use the first one in the list
+            selected = 0;
+            currentTranslation = translations.get(0);
+            bibleReadingPresenter.setCurrentTranslation(currentTranslation);
+        }
+
+        // appends "More" to end of list that is to be shown in spinner
+        final List<String> names = new ArrayList<>(translationsCount + 1);
+        names.addAll(translations);
+        names.add(getString(R.string.text_more_translations));
+        translationsSpinner.setAdapter(new ArrayAdapter<>(
+                getSupportActionBar().getThemedContext(), R.layout.item_drop_down, names));
+        translationsSpinner.setSelection(selected);
+        translationsSpinner.setOnItemSelectedListener(this);
+
+        loadTexts();
+    }
+
+    @Override
+    public void onTranslationsLoadFailed() {
+        DialogHelper.showDialog(this, false, R.string.dialog_retry,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        bibleReadingPresenter.loadTranslations();
+                    }
+                }, null);
+    }
+
+    @Override
+    public void informNoTranslationDownloaded() {
+        DialogHelper.showDialog(this, false, R.string.dialog_no_translation,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        AnimationHelper.slideIn(BookSelectionActivity.this,
+                                TranslationManagementActivity.newStartIntent(BookSelectionActivity.this));
+                    }
+                }, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        finish();
+                    }
+                }
+        );
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        final Adapter adapter = parent.getAdapter();
+        if (position == adapter.getCount()) {
+            // last item ("More") selected, opens the translation management activity
+            AnimationHelper.slideIn(BookSelectionActivity.this,
+                    TranslationManagementActivity.newStartIntent(BookSelectionActivity.this));
+            return;
+        }
+
+        final String selected = (String) adapter.getItem(position);
+        if (selected == null || selected.equals(currentTranslation)) {
+            return;
+        }
+
+        Analytics.trackTranslationSelection(selected);
+        currentTranslation = selected;
+        bibleReadingPresenter.storeReadingProgress(currentBook, currentChapter, textFragment.getCurrentVerse());
+
+        loadTexts();
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+        // do nothing
     }
 }

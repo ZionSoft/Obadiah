@@ -17,5 +17,12 @@
 
 package net.zionsoft.obadiah.mvp.views;
 
+import java.util.List;
+
 public interface BibleReadingView extends MVPView {
+    void onTranslationsLoaded(List<String> translations);
+
+    void onTranslationsLoadFailed();
+
+    void informNoTranslationDownloaded();
 }

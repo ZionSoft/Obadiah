@@ -21,6 +21,11 @@ import net.zionsoft.obadiah.mvp.models.BibleReadingModel;
 import net.zionsoft.obadiah.mvp.models.ReadingProgressModel;
 import net.zionsoft.obadiah.mvp.views.BibleReadingView;
 
+import java.util.List;
+
+import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
 public class BibleReadingPresenter extends MVPPresenter<BibleReadingView> {
@@ -48,5 +53,53 @@ public class BibleReadingPresenter extends MVPPresenter<BibleReadingView> {
         }
 
         super.onViewDropped();
+    }
+
+    public void loadTranslations() {
+        if (bibleReadingModel.hasDownloadedTranslation()) {
+            subscription.add(bibleReadingModel.loadTranslations()
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Subscriber<List<String>>() {
+                        @Override
+                        public void onCompleted() {
+                            // do nothing
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            final BibleReadingView v = getView();
+                            if (v != null) {
+                                v.onTranslationsLoadFailed();
+                            }
+                        }
+
+                        @Override
+                        public void onNext(List<String> translations) {
+                            final BibleReadingView v = getView();
+                            if (v != null) {
+                                if (translations.size() > 0) {
+                                    v.onTranslationsLoaded(translations);
+                                } else {
+                                    // Would it ever reach here?
+                                    v.informNoTranslationDownloaded();
+                                }
+                            }
+                        }
+                    }));
+        } else {
+            final BibleReadingView v = getView();
+            if (v != null) {
+                v.informNoTranslationDownloaded();
+            }
+        }
+    }
+
+    public void setCurrentTranslation(String translation) {
+        bibleReadingModel.setCurrentTranslation(translation);
+    }
+
+    public void storeReadingProgress(int book, int chapter, int verse) {
+        bibleReadingModel.storeReadingProgress(book, chapter, verse);
     }
 }
