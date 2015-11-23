@@ -17,6 +17,8 @@
 
 package net.zionsoft.obadiah.mvp.presenters;
 
+import android.support.annotation.Nullable;
+
 import net.zionsoft.obadiah.mvp.models.BibleReadingModel;
 import net.zionsoft.obadiah.mvp.models.ReadingProgressModel;
 import net.zionsoft.obadiah.mvp.views.BibleReadingView;
@@ -55,8 +57,29 @@ public class BibleReadingPresenter extends MVPPresenter<BibleReadingView> {
         super.onViewDropped();
     }
 
+    @Nullable
+    public String loadCurrentTranslation() {
+        return bibleReadingModel.loadCurrentTranslation();
+    }
+
     public void setCurrentTranslation(String translation) {
         bibleReadingModel.setCurrentTranslation(translation);
+    }
+
+    public boolean hasDownloadedTranslation() {
+        return bibleReadingModel.hasDownloadedTranslation();
+    }
+
+    public int loadCurrentBook() {
+        return bibleReadingModel.loadCurrentBook();
+    }
+
+    public int loadCurrentChapter() {
+        return bibleReadingModel.loadCurrentChapter();
+    }
+
+    public int loadCurrentVerse() {
+        return bibleReadingModel.loadCurrentVerse();
     }
 
     public void storeReadingProgress(int book, int chapter, int verse) {

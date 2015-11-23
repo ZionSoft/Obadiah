@@ -17,6 +17,7 @@
 
 package net.zionsoft.obadiah.model.utils;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.support.annotation.NonNull;
@@ -29,7 +30,7 @@ import net.zionsoft.obadiah.model.Bible;
 import net.zionsoft.obadiah.model.analytics.Analytics;
 
 public class UriHelper {
-    public static void checkDeepLink(@NonNull SharedPreferences preferences, @NonNull Uri uri) {
+    public static void checkDeepLink(@NonNull Context context, @NonNull Uri uri) {
         final String path = uri.getPath();
         if (TextUtils.isEmpty(path)) {
             return;
@@ -42,7 +43,8 @@ public class UriHelper {
         }
 
         try {
-            final SharedPreferences.Editor editor = preferences.edit();
+            final SharedPreferences.Editor editor = context
+                    .getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE).edit();
 
             // validity of translation short name will be checked later
             final String translationShortName = parts[2];

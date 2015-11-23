@@ -37,11 +37,11 @@ public class BibleReadingModel {
     private final SharedPreferences preferences;
 
     public BibleReadingModel(Context context, Bible bible) {
-        this.preferences = context.getApplicationContext()
-                .getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+        this.preferences = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
         this.bible = bible;
     }
 
+    @Nullable
     public String loadCurrentTranslation() {
         return preferences.getString(Constants.PREF_KEY_LAST_READ_TRANSLATION, null);
     }
@@ -52,12 +52,19 @@ public class BibleReadingModel {
     }
 
     public boolean hasDownloadedTranslation() {
-        return !TextUtils.isEmpty(getCurrentTranslation());
+        return !TextUtils.isEmpty(loadCurrentTranslation());
     }
 
-    @Nullable
-    public String getCurrentTranslation() {
-        return preferences.getString(Constants.PREF_KEY_LAST_READ_TRANSLATION, null);
+    public int loadCurrentBook() {
+        return preferences.getInt(Constants.PREF_KEY_LAST_READ_BOOK, 0);
+    }
+
+    public int loadCurrentChapter() {
+        return preferences.getInt(Constants.PREF_KEY_LAST_READ_CHAPTER, 0);
+    }
+
+    public int loadCurrentVerse() {
+        return preferences.getInt(Constants.PREF_KEY_LAST_READ_VERSE, 0);
     }
 
     public void setCurrentTranslation(String translation) {

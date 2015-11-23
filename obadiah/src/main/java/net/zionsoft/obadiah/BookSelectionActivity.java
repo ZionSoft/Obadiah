@@ -21,7 +21,6 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Build;
@@ -116,7 +115,6 @@ public class BookSelectionActivity extends BaseAppCompatActivity implements Bibl
     DrawerLayout drawerLayout;
 
     private AppIndexingManager appIndexingManager;
-    private SharedPreferences preferences;
 
     private String currentTranslation;
     private List<String> bookNames;
@@ -143,7 +141,6 @@ public class BookSelectionActivity extends BaseAppCompatActivity implements Bibl
         }
 
         appIndexingManager = new AppIndexingManager(this);
-        preferences = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE);
 
         initializeUi();
         checkDeepLink();
@@ -170,7 +167,7 @@ public class BookSelectionActivity extends BaseAppCompatActivity implements Bibl
         final Intent startIntent = getIntent();
         final Uri uri = startIntent.getData();
         if (uri != null) {
-            UriHelper.checkDeepLink(preferences, uri);
+            UriHelper.checkDeepLink(this, uri);
         } else {
             final String messageType = startIntent.getStringExtra(KEY_MESSAGE_TYPE);
             if (TextUtils.isEmpty(messageType)) {
@@ -189,11 +186,7 @@ public class BookSelectionActivity extends BaseAppCompatActivity implements Bibl
                 return;
             }
 
-            preferences.edit()
-                    .putInt(Constants.PREF_KEY_LAST_READ_BOOK, bookIndex)
-                    .putInt(Constants.PREF_KEY_LAST_READ_CHAPTER, chapterIndex)
-                    .putInt(Constants.PREF_KEY_LAST_READ_VERSE, verseIndex)
-                    .apply();
+            bibleReadingPresenter.storeReadingProgress(bookIndex, chapterIndex, verseIndex);
 
             Analytics.trackNotificationEvent("notification_opened", messageType);
         }
@@ -229,7 +222,7 @@ public class BookSelectionActivity extends BaseAppCompatActivity implements Bibl
     }
 
     private void showUpdateDialog() {
-        if (TextUtils.isEmpty(preferences.getString(Constants.PREF_KEY_LAST_READ_TRANSLATION, null))) {
+        if (!bibleReadingPresenter.hasDownloadedTranslation()) {
             // do nothing if there's no translation installed (most likely it's the 1st time use)
             return;
         }
@@ -268,13 +261,13 @@ public class BookSelectionActivity extends BaseAppCompatActivity implements Bibl
         rootView.setKeepScreenOn(settings.keepScreenOn());
         rootView.setBackgroundColor(settings.getBackgroundColor());
 
-        currentTranslation = preferences.getString(Constants.PREF_KEY_LAST_READ_TRANSLATION, null);
-        if (currentTranslation == null) {
+        currentTranslation = bibleReadingPresenter.loadCurrentTranslation();
+        if (TextUtils.isEmpty(currentTranslation)) {
             return;
         }
 
-        currentBook = preferences.getInt(Constants.PREF_KEY_LAST_READ_BOOK, 0);
-        currentChapter = preferences.getInt(Constants.PREF_KEY_LAST_READ_CHAPTER, 0);
+        currentBook = bibleReadingPresenter.loadCurrentBook();
+        currentChapter = bibleReadingPresenter.loadCurrentChapter();
     }
 
     private void updateTitle() {
@@ -308,11 +301,7 @@ public class BookSelectionActivity extends BaseAppCompatActivity implements Bibl
 
     @Override
     protected void onStop() {
-        preferences.edit()
-                .putInt(Constants.PREF_KEY_LAST_READ_BOOK, currentBook)
-                .putInt(Constants.PREF_KEY_LAST_READ_CHAPTER, currentChapter)
-                .putInt(Constants.PREF_KEY_LAST_READ_VERSE, textFragment.getCurrentVerse())
-                .apply();
+        bibleReadingPresenter.storeReadingProgress(currentBook, currentChapter, textFragment.getCurrentVerse());
         appIndexingManager.onStop();
 
         super.onStop();
@@ -409,7 +398,7 @@ public class BookSelectionActivity extends BaseAppCompatActivity implements Bibl
         bibleReadingPresenter.loadBookNames(currentTranslation);
         chapterSelectionFragment.setSelected(currentTranslation, currentBook, currentChapter);
         textFragment.setSelected(currentTranslation, currentBook, currentChapter,
-                preferences.getInt(Constants.PREF_KEY_LAST_READ_VERSE, 0));
+                bibleReadingPresenter.loadCurrentVerse());
     }
 
     @Override
