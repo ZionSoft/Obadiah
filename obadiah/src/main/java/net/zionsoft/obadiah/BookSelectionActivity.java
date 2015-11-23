@@ -42,7 +42,6 @@ import android.widget.Spinner;
 
 import net.zionsoft.obadiah.injection.components.fragments.BibleReadingComponentFragment;
 import net.zionsoft.obadiah.injection.scopes.ActivityScope;
-import net.zionsoft.obadiah.model.Bible;
 import net.zionsoft.obadiah.model.Settings;
 import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.appindexing.AppIndexingManager;
@@ -100,9 +99,6 @@ public class BookSelectionActivity extends BaseAppCompatActivity implements Bibl
     @ActivityScope
     @Inject
     BibleReadingPresenter bibleReadingPresenter;
-
-    @Inject
-    Bible bible;
 
     @Inject
     Settings settings;
