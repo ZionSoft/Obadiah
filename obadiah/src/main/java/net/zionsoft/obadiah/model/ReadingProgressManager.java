@@ -45,7 +45,7 @@ public class ReadingProgressManager {
         App.get(context).getInjectionComponent().inject(this);
     }
 
-    public void trackChapterReading(final int book, final int chapter) {
+    public void trackReadingProgress(final int book, final int chapter) {
         SQLiteDatabase db = null;
         try {
             db = databaseHelper.openDatabase();

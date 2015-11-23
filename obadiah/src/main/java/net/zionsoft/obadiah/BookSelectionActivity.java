@@ -43,7 +43,6 @@ import android.widget.Spinner;
 import net.zionsoft.obadiah.injection.components.fragments.BibleReadingComponentFragment;
 import net.zionsoft.obadiah.injection.scopes.ActivityScope;
 import net.zionsoft.obadiah.model.Bible;
-import net.zionsoft.obadiah.model.ReadingProgressManager;
 import net.zionsoft.obadiah.model.Settings;
 import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.appindexing.AppIndexingManager;
@@ -104,9 +103,6 @@ public class BookSelectionActivity extends BaseAppCompatActivity implements Bibl
 
     @Inject
     Bible bible;
-
-    @Inject
-    ReadingProgressManager readingProgressManager;
 
     @Inject
     Settings settings;
@@ -276,7 +272,7 @@ public class BookSelectionActivity extends BaseAppCompatActivity implements Bibl
         appIndexingManager.onView(currentTranslation, bookName, currentBook, currentChapter);
 
         // TODO get an improved tracking algorithm, e.g. only consider as "read" if the user stays for a while
-        readingProgressManager.trackChapterReading(currentBook, currentChapter);
+        bibleReadingPresenter.trackReadingProgress(currentBook, currentChapter);
     }
 
     @Override
