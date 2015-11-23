@@ -277,36 +277,6 @@ public class BookSelectionActivity extends BaseAppCompatActivity implements Bibl
         currentChapter = preferences.getInt(Constants.PREF_KEY_LAST_READ_CHAPTER, 0);
     }
 
-    private void loadTexts() {
-        bible.loadBookNames(currentTranslation, new Bible.OnStringsLoadedListener() {
-                    @Override
-                    public void onStringsLoaded(List<String> strings) {
-                        if (strings == null || strings.size() == 0) {
-                            if (currentTranslation != null) {
-                                DialogHelper.showDialog(BookSelectionActivity.this, false, R.string.dialog_retry,
-                                        new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialog, int which) {
-                                                loadTexts();
-                                            }
-                                        }, null
-                                );
-                            }
-                            return;
-                        }
-
-                        bookNames = strings;
-                        updateTitle();
-                    }
-                }
-        );
-
-        chapterSelectionFragment.setSelected(currentTranslation, currentBook, currentChapter);
-
-        textFragment.setSelected(currentTranslation, currentBook, currentChapter,
-                preferences.getInt(Constants.PREF_KEY_LAST_READ_VERSE, 0));
-    }
-
     private void updateTitle() {
         final String bookName = bookNames.get(currentBook);
         setTitle(String.format("%s, %d", bookName, currentChapter + 1));
@@ -435,6 +405,13 @@ public class BookSelectionActivity extends BaseAppCompatActivity implements Bibl
         loadTexts();
     }
 
+    private void loadTexts() {
+        bibleReadingPresenter.loadBookNames(currentTranslation);
+        chapterSelectionFragment.setSelected(currentTranslation, currentBook, currentChapter);
+        textFragment.setSelected(currentTranslation, currentBook, currentChapter,
+                preferences.getInt(Constants.PREF_KEY_LAST_READ_VERSE, 0));
+    }
+
     @Override
     public void onTranslationsLoadFailed() {
         DialogHelper.showDialog(this, false, R.string.dialog_retry,
@@ -447,7 +424,7 @@ public class BookSelectionActivity extends BaseAppCompatActivity implements Bibl
     }
 
     @Override
-    public void informNoTranslationDownloaded() {
+    public void onNoTranslationAvailable() {
         DialogHelper.showDialog(this, false, R.string.dialog_no_translation,
                 new DialogInterface.OnClickListener() {
                     @Override
@@ -462,6 +439,25 @@ public class BookSelectionActivity extends BaseAppCompatActivity implements Bibl
                     }
                 }
         );
+    }
+
+    @Override
+    public void onBookNamesLoaded(List<String> bookNames) {
+        this.bookNames = bookNames;
+        updateTitle();
+    }
+
+    @Override
+    public void onBookNamesLoadFailed() {
+        if (currentTranslation != null) {
+            DialogHelper.showDialog(this, false, R.string.dialog_retry,
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            loadTexts();
+                        }
+                    }, null);
+        }
     }
 
     @Override

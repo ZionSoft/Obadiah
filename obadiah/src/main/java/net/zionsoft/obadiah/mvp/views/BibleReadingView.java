@@ -24,5 +24,9 @@ public interface BibleReadingView extends MVPView {
 
     void onTranslationsLoadFailed();
 
-    void informNoTranslationDownloaded();
+    void onNoTranslationAvailable();
+
+    void onBookNamesLoaded(List<String> bookNames);
+
+    void onBookNamesLoadFailed();
 }

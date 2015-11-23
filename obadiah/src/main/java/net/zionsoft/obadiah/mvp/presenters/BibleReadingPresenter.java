@@ -55,6 +55,14 @@ public class BibleReadingPresenter extends MVPPresenter<BibleReadingView> {
         super.onViewDropped();
     }
 
+    public void setCurrentTranslation(String translation) {
+        bibleReadingModel.setCurrentTranslation(translation);
+    }
+
+    public void storeReadingProgress(int book, int chapter, int verse) {
+        bibleReadingModel.storeReadingProgress(book, chapter, verse);
+    }
+
     public void loadTranslations() {
         if (bibleReadingModel.hasDownloadedTranslation()) {
             subscription.add(bibleReadingModel.loadTranslations()
@@ -82,7 +90,7 @@ public class BibleReadingPresenter extends MVPPresenter<BibleReadingView> {
                                     v.onTranslationsLoaded(translations);
                                 } else {
                                     // Would it ever reach here?
-                                    v.informNoTranslationDownloaded();
+                                    v.onNoTranslationAvailable();
                                 }
                             }
                         }
@@ -90,16 +98,40 @@ public class BibleReadingPresenter extends MVPPresenter<BibleReadingView> {
         } else {
             final BibleReadingView v = getView();
             if (v != null) {
-                v.informNoTranslationDownloaded();
+                v.onNoTranslationAvailable();
             }
         }
     }
 
-    public void setCurrentTranslation(String translation) {
-        bibleReadingModel.setCurrentTranslation(translation);
-    }
+    public void loadBookNames(String translation) {
+        subscription.add(bibleReadingModel.loadBookNames(translation)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<List<String>>() {
+                    @Override
+                    public void onCompleted() {
+                        // do nothing
+                    }
 
-    public void storeReadingProgress(int book, int chapter, int verse) {
-        bibleReadingModel.storeReadingProgress(book, chapter, verse);
+                    @Override
+                    public void onError(Throwable e) {
+                        final BibleReadingView v = getView();
+                        if (v != null) {
+                            v.onBookNamesLoadFailed();
+                        }
+                    }
+
+                    @Override
+                    public void onNext(List<String> bookNames) {
+                        final BibleReadingView v = getView();
+                        if (v != null) {
+                            if (bookNames.size() > 0) {
+                                v.onBookNamesLoaded(bookNames);
+                            } else {
+                                v.onBookNamesLoadFailed();
+                            }
+                        }
+                    }
+                }));
     }
 }
