@@ -34,7 +34,6 @@ import net.zionsoft.obadiah.model.notification.PushNotificationHandler;
 import net.zionsoft.obadiah.ui.activities.SettingsActivity;
 import net.zionsoft.obadiah.ui.adapters.VerseListAdapter;
 import net.zionsoft.obadiah.ui.adapters.VersePagerAdapter;
-import net.zionsoft.obadiah.ui.fragments.ChapterSelectionFragment;
 
 import javax.inject.Singleton;
 
@@ -46,8 +45,6 @@ public interface InjectionComponent {
     public void inject(App app);
 
     public void inject(SettingsActivity settingsActivity);
-
-    public void inject(ChapterSelectionFragment chapterSelectionFragment);
 
     public void inject(VerseListAdapter verseListAdapter);
 

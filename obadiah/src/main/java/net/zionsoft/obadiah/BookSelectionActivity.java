@@ -38,6 +38,7 @@ import android.view.View;
 import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ExpandableListView;
 import android.widget.Spinner;
 
 import net.zionsoft.obadiah.injection.components.fragments.BibleReadingComponentFragment;
@@ -54,7 +55,7 @@ import net.zionsoft.obadiah.ui.activities.ReadingProgressActivity;
 import net.zionsoft.obadiah.ui.activities.SearchActivity;
 import net.zionsoft.obadiah.ui.activities.SettingsActivity;
 import net.zionsoft.obadiah.ui.activities.TranslationManagementActivity;
-import net.zionsoft.obadiah.ui.fragments.ChapterSelectionFragment;
+import net.zionsoft.obadiah.ui.adapters.BookExpandableListAdapter;
 import net.zionsoft.obadiah.ui.fragments.TextFragment;
 import net.zionsoft.obadiah.ui.utils.AnimationHelper;
 import net.zionsoft.obadiah.ui.utils.DialogHelper;
@@ -67,7 +68,7 @@ import javax.inject.Inject;
 import butterknife.Bind;
 
 public class BookSelectionActivity extends BaseAppCompatActivity implements BibleReadingView,
-        ChapterSelectionFragment.Listener, TextFragment.Listener, AdapterView.OnItemSelectedListener {
+        TextFragment.Listener, AdapterView.OnItemSelectedListener {
     private static final String KEY_MESSAGE_TYPE = "net.zionsoft.obadiah.BookSelectionActivity.KEY_MESSAGE_TYPE";
     private static final String KEY_BOOK_INDEX = "net.zionsoft.obadiah.BookSelectionActivity.KEY_BOOK_INDEX";
     private static final String KEY_CHAPTER_INDEX = "net.zionsoft.obadiah.BookSelectionActivity.KEY_CHAPTER_INDEX";
@@ -106,6 +107,9 @@ public class BookSelectionActivity extends BaseAppCompatActivity implements Bibl
     @Bind(R.id.drawer_layout)
     DrawerLayout drawerLayout;
 
+    @Bind(R.id.book_list)
+    ExpandableListView bookList;
+
     private AppIndexingManager appIndexingManager;
 
     private String currentTranslation;
@@ -113,7 +117,9 @@ public class BookSelectionActivity extends BaseAppCompatActivity implements Bibl
     private int currentBook;
     private int currentChapter;
 
-    private ChapterSelectionFragment chapterSelectionFragment;
+    private BookExpandableListAdapter bookListAdapter;
+    private int lastExpandedGroup;
+
     private TextFragment textFragment;
 
     private ActionBarDrawerToggle drawerToggle;
@@ -150,8 +156,45 @@ public class BookSelectionActivity extends BaseAppCompatActivity implements Bibl
         drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, 0, 0);
         drawerLayout.setDrawerListener(drawerToggle);
 
+        bookListAdapter = new BookExpandableListAdapter(this,
+                new BookExpandableListAdapter.OnChapterClickListener() {
+                    @Override
+                    public void onChapterClicked(int book, int chapter) {
+                        if (currentBook == book && currentChapter == chapter) {
+                            return;
+                        }
+
+                        currentBook = book;
+                        currentChapter = chapter;
+
+                        bookListAdapter.setSelected(currentBook, currentChapter);
+                        bookListAdapter.notifyDataSetChanged();
+
+                        drawerLayout.closeDrawers();
+                        textFragment.setSelected(currentBook, currentChapter, 0);
+
+                        updateTitle();
+                    }
+                });
+        bookList.setAdapter(bookListAdapter);
+        bookList.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
+            @Override
+            public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
+                parent.smoothScrollToPosition(groupPosition);
+                if (parent.isGroupExpanded(groupPosition)) {
+                    parent.collapseGroup(groupPosition);
+                } else {
+                    parent.expandGroup(groupPosition);
+                    if (lastExpandedGroup != groupPosition) {
+                        parent.collapseGroup(lastExpandedGroup);
+                        lastExpandedGroup = groupPosition;
+                    }
+                }
+                return true;
+            }
+        });
+
         final FragmentManager fm = getSupportFragmentManager();
-        chapterSelectionFragment = (ChapterSelectionFragment) fm.findFragmentById(R.id.left_drawer);
         textFragment = (TextFragment) fm.findFragmentById(R.id.text_fragment);
     }
 
@@ -337,25 +380,23 @@ public class BookSelectionActivity extends BaseAppCompatActivity implements Bibl
     }
 
     @Override
-    public void onChapterSelected(int bookIndex, int chapterIndex) {
-        if (currentBook == bookIndex && currentChapter == chapterIndex)
+    public void onChapterSelected(int chapterIndex) {
+        if (currentChapter == chapterIndex) {
             return;
-        currentBook = bookIndex;
+        }
         currentChapter = chapterIndex;
 
-        drawerLayout.closeDrawers();
-        textFragment.setSelected(bookIndex, chapterIndex, 0);
+        updateBookList();
         updateTitle();
     }
 
-    @Override
-    public void onChapterSelected(int chapterIndex) {
-        if (currentChapter == chapterIndex)
-            return;
-        currentChapter = chapterIndex;
+    private void updateBookList() {
+        bookListAdapter.setSelected(currentBook, currentChapter);
+        bookListAdapter.notifyDataSetChanged();
 
-        chapterSelectionFragment.setSelected(currentBook, currentChapter);
-        updateTitle();
+        lastExpandedGroup = currentBook;
+        bookList.expandGroup(currentBook);
+        bookList.setSelectedGroup(currentBook);
     }
 
     @Override
@@ -388,7 +429,6 @@ public class BookSelectionActivity extends BaseAppCompatActivity implements Bibl
 
     private void loadTexts() {
         bibleReadingPresenter.loadBookNames(currentTranslation);
-        chapterSelectionFragment.setSelected(currentTranslation, currentBook, currentChapter);
         textFragment.setSelected(currentTranslation, currentBook, currentChapter,
                 bibleReadingPresenter.loadCurrentVerse());
     }
@@ -426,6 +466,9 @@ public class BookSelectionActivity extends BaseAppCompatActivity implements Bibl
     public void onBookNamesLoaded(List<String> bookNames) {
         this.bookNames = bookNames;
         updateTitle();
+
+        bookListAdapter.setBookNames(bookNames);
+        updateBookList();
     }
 
     @Override
