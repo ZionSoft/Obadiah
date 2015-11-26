@@ -4,9 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <fragment
-        android:id="@+id/text_fragment"
-        android:name="net.zionsoft.obadiah.ui.fragments.TextFragment"
+    <android.support.v4.view.ViewPager
+        android:id="@+id/verse_pager"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 

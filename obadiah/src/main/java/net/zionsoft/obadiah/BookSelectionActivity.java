@@ -28,9 +28,12 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.view.ActionMode;
+import android.text.ClipboardManager;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -40,10 +43,12 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ExpandableListView;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import net.zionsoft.obadiah.injection.components.fragments.BibleReadingComponentFragment;
 import net.zionsoft.obadiah.injection.scopes.ActivityScope;
 import net.zionsoft.obadiah.model.Settings;
+import net.zionsoft.obadiah.model.Verse;
 import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.appindexing.AppIndexingManager;
 import net.zionsoft.obadiah.model.utils.AppUpdateChecker;
@@ -56,7 +61,7 @@ import net.zionsoft.obadiah.ui.activities.SearchActivity;
 import net.zionsoft.obadiah.ui.activities.SettingsActivity;
 import net.zionsoft.obadiah.ui.activities.TranslationManagementActivity;
 import net.zionsoft.obadiah.ui.adapters.BookExpandableListAdapter;
-import net.zionsoft.obadiah.ui.fragments.TextFragment;
+import net.zionsoft.obadiah.ui.adapters.VersePagerAdapter;
 import net.zionsoft.obadiah.ui.utils.AnimationHelper;
 import net.zionsoft.obadiah.ui.utils.DialogHelper;
 
@@ -68,7 +73,7 @@ import javax.inject.Inject;
 import butterknife.Bind;
 
 public class BookSelectionActivity extends BaseAppCompatActivity implements BibleReadingView,
-        TextFragment.Listener, AdapterView.OnItemSelectedListener {
+        AdapterView.OnItemSelectedListener {
     private static final String KEY_MESSAGE_TYPE = "net.zionsoft.obadiah.BookSelectionActivity.KEY_MESSAGE_TYPE";
     private static final String KEY_BOOK_INDEX = "net.zionsoft.obadiah.BookSelectionActivity.KEY_BOOK_INDEX";
     private static final String KEY_CHAPTER_INDEX = "net.zionsoft.obadiah.BookSelectionActivity.KEY_CHAPTER_INDEX";
@@ -110,6 +115,9 @@ public class BookSelectionActivity extends BaseAppCompatActivity implements Bibl
     @Bind(R.id.book_list)
     ExpandableListView bookList;
 
+    @Bind(R.id.verse_pager)
+    ViewPager versePager;
+
     private AppIndexingManager appIndexingManager;
 
     private String currentTranslation;
@@ -120,7 +128,10 @@ public class BookSelectionActivity extends BaseAppCompatActivity implements Bibl
     private BookExpandableListAdapter bookListAdapter;
     private int lastExpandedGroup;
 
-    private TextFragment textFragment;
+    private VersePagerAdapter versePagerAdapter;
+    private ActionMode actionMode;
+    @SuppressWarnings("deprecation")
+    private ClipboardManager clipboardManager;
 
     private ActionBarDrawerToggle drawerToggle;
     private Spinner translationsSpinner;
@@ -171,7 +182,11 @@ public class BookSelectionActivity extends BaseAppCompatActivity implements Bibl
                         bookListAdapter.notifyDataSetChanged();
 
                         drawerLayout.closeDrawers();
-                        textFragment.setSelected(currentBook, currentChapter, 0);
+
+                        versePagerAdapter.setSelected(currentBook, currentChapter, 0);
+                        versePagerAdapter.notifyDataSetChanged();
+
+                        versePager.setCurrentItem(currentChapter, true);
 
                         updateTitle();
                     }
@@ -194,8 +209,110 @@ public class BookSelectionActivity extends BaseAppCompatActivity implements Bibl
             }
         });
 
-        final FragmentManager fm = getSupportFragmentManager();
-        textFragment = (TextFragment) fm.findFragmentById(R.id.text_fragment);
+        versePagerAdapter = new VersePagerAdapter(this, new VersePagerAdapter.Listener() {
+            @Override
+            public void onVersesSelectionChanged(boolean hasSelected) {
+                if (hasSelected) {
+                    if (actionMode != null) {
+                        return;
+                    }
+
+                    actionMode = startSupportActionMode(new ActionMode.Callback() {
+                        @Override
+                        public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
+                            actionMode.getMenuInflater().inflate(R.menu.menu_text_selection_context, menu);
+                            return true;
+                        }
+
+                        @Override
+                        public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
+                            return false;
+                        }
+
+                        @Override
+                        public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
+                            switch (menuItem.getItemId()) {
+                                case R.id.action_copy:
+                                    Analytics.trackUIEvent("copy");
+
+                                    if (clipboardManager == null) {
+                                        // noinspection deprecation
+                                        clipboardManager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                                    }
+                                    clipboardManager.setText(buildText(versePagerAdapter.getSelectedVerses(versePager.getCurrentItem())));
+                                    Toast.makeText(BookSelectionActivity.this,
+                                            R.string.toast_verses_copied, Toast.LENGTH_SHORT).show();
+                                    actionMode.finish();
+                                    return true;
+                                case R.id.action_share:
+                                    Analytics.trackUIEvent("share");
+
+                                    startActivity(Intent.createChooser(new Intent().setAction(Intent.ACTION_SEND).setType("text/plain")
+                                                    .putExtra(Intent.EXTRA_TEXT,
+                                                            buildText(versePagerAdapter.getSelectedVerses(versePager.getCurrentItem()))),
+                                            getResources().getText(R.string.text_share_with)
+                                    ));
+                                    actionMode.finish();
+                                    return true;
+                                default:
+                                    return false;
+                            }
+                        }
+
+                        @Override
+                        public void onDestroyActionMode(ActionMode actionMode) {
+                            if (actionMode != BookSelectionActivity.this.actionMode) {
+                                return;
+                            }
+                            versePagerAdapter.deselectVerses();
+                            BookSelectionActivity.this.actionMode = null;
+                        }
+                    });
+                } else {
+                    if (actionMode != null) {
+                        actionMode.finish();
+                    }
+                }
+            }
+        });
+        versePager.setAdapter(versePagerAdapter);
+        versePager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            public void onPageScrollStateChanged(int state) {
+                // do nothing
+            }
+
+            public void onPageScrolled(int position, float positionOffset,
+                                       int positionOffsetPixels) {
+                // do nothing
+            }
+
+            public void onPageSelected(int position) {
+                if (currentChapter == position) {
+                    return;
+                }
+                currentChapter = position;
+
+                if (actionMode != null) {
+                    actionMode.finish();
+                }
+
+                updateBookList();
+                updateTitle();
+            }
+        });
+    }
+
+    private static String buildText(List<Verse> verses) {
+        if (verses == null || verses.size() == 0)
+            return null;
+
+        // format: <book name> <chapter index>:<verse index> <verse text>
+        final StringBuilder text = new StringBuilder();
+        for (Verse verse : verses) {
+            text.append(String.format("%S %d:%d %s\n", verse.bookName, verse.chapterIndex + 1,
+                    verse.verseIndex + 1, verse.verseText));
+        }
+        return text.toString();
     }
 
     private void checkDeepLink() {
@@ -296,6 +413,8 @@ public class BookSelectionActivity extends BaseAppCompatActivity implements Bibl
         rootView.setKeepScreenOn(settings.keepScreenOn());
         rootView.setBackgroundColor(settings.getBackgroundColor());
 
+        versePagerAdapter.notifyDataSetChanged();
+
         currentTranslation = bibleReadingPresenter.loadCurrentTranslation();
         if (TextUtils.isEmpty(currentTranslation)) {
             return;
@@ -336,8 +455,13 @@ public class BookSelectionActivity extends BaseAppCompatActivity implements Bibl
 
     @Override
     protected void onStop() {
-        bibleReadingPresenter.storeReadingProgress(currentBook, currentChapter, textFragment.getCurrentVerse());
+        bibleReadingPresenter.storeReadingProgress(currentBook, currentChapter,
+                versePagerAdapter.getCurrentVerse(versePager.getCurrentItem()));
         appIndexingManager.onStop();
+
+        if (actionMode != null) {
+            actionMode.finish();
+        }
 
         super.onStop();
     }
@@ -379,17 +503,6 @@ public class BookSelectionActivity extends BaseAppCompatActivity implements Bibl
         }
     }
 
-    @Override
-    public void onChapterSelected(int chapterIndex) {
-        if (currentChapter == chapterIndex) {
-            return;
-        }
-        currentChapter = chapterIndex;
-
-        updateBookList();
-        updateTitle();
-    }
-
     private void updateBookList() {
         bookListAdapter.setSelected(currentBook, currentChapter);
         bookListAdapter.notifyDataSetChanged();
@@ -429,8 +542,12 @@ public class BookSelectionActivity extends BaseAppCompatActivity implements Bibl
 
     private void loadTexts() {
         bibleReadingPresenter.loadBookNames(currentTranslation);
-        textFragment.setSelected(currentTranslation, currentBook, currentChapter,
+
+        versePagerAdapter.setTranslationShortName(currentTranslation);
+        versePagerAdapter.setSelected(currentBook, currentChapter,
                 bibleReadingPresenter.loadCurrentVerse());
+        versePagerAdapter.notifyDataSetChanged();
+        versePager.setCurrentItem(currentChapter, true);
     }
 
     @Override
@@ -501,7 +618,8 @@ public class BookSelectionActivity extends BaseAppCompatActivity implements Bibl
 
         Analytics.trackTranslationSelection(selected);
         currentTranslation = selected;
-        bibleReadingPresenter.storeReadingProgress(currentBook, currentChapter, textFragment.getCurrentVerse());
+        bibleReadingPresenter.storeReadingProgress(currentBook, currentChapter,
+                versePagerAdapter.getCurrentVerse(versePager.getCurrentItem()));
 
         loadTexts();
     }
