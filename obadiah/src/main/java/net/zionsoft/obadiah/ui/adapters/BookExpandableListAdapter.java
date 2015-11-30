@@ -31,9 +31,9 @@ import net.zionsoft.obadiah.model.Bible;
 
 import java.util.List;
 
-public class BookExpandableListAdapter extends BaseExpandableListAdapter {
-    public static interface OnChapterClickListener {
-        void onChapterClicked(int book, int chapter);
+public class BookExpandableListAdapter extends BaseExpandableListAdapter implements View.OnClickListener {
+    public interface OnChapterSelectedListener {
+        void onChapterSelected(int book, int chapter);
     }
 
     private static class ViewTag {
@@ -47,26 +47,18 @@ public class BookExpandableListAdapter extends BaseExpandableListAdapter {
 
     private static final int ROW_CHILD_COUNT = 5;
 
-    private final OnChapterClickListener mListener;
-    private final View.OnClickListener mViewClickListener;
-    private final LayoutInflater mInflater;
+    private final OnChapterSelectedListener listener;
+    private final LayoutInflater inflater;
 
     private List<String> bookNames;
     private int currentBook;
     private int currentChapter;
 
-    public BookExpandableListAdapter(Context context, OnChapterClickListener listener) {
+    public BookExpandableListAdapter(Context context, OnChapterSelectedListener listener) {
         super();
 
-        mListener = listener;
-        mViewClickListener = new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                final ChapterTag chapterTag = (ChapterTag) view.getTag();
-                mListener.onChapterClicked(chapterTag.book, chapterTag.chapter);
-            }
-        };
-        mInflater = LayoutInflater.from(context);
+        this.listener = listener;
+        inflater = LayoutInflater.from(context);
     }
 
     @Override
@@ -76,8 +68,9 @@ public class BookExpandableListAdapter extends BaseExpandableListAdapter {
 
     @Override
     public int getChildrenCount(int groupPosition) {
-        if (bookNames == null)
+        if (bookNames == null) {
             return 0;
+        }
 
         final int chapterCount = Bible.getChapterCount(groupPosition);
         return chapterCount / ROW_CHILD_COUNT + (chapterCount % ROW_CHILD_COUNT == 0 ? 0 : 1);
@@ -111,7 +104,7 @@ public class BookExpandableListAdapter extends BaseExpandableListAdapter {
     @Override
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
         final TextView textView = (TextView) (convertView == null
-                ? mInflater.inflate(R.layout.item_book_name, parent, false) : convertView);
+                ? inflater.inflate(R.layout.item_book_name, parent, false) : convertView);
         textView.setText(bookNames.get(groupPosition));
         return textView;
     }
@@ -121,13 +114,13 @@ public class BookExpandableListAdapter extends BaseExpandableListAdapter {
         final LinearLayout linearLayout;
         final ViewTag viewTag;
         if (convertView == null) {
-            linearLayout = (LinearLayout) mInflater.inflate(R.layout.item_chapter_row, parent, false);
+            linearLayout = (LinearLayout) inflater.inflate(R.layout.item_chapter_row, parent, false);
 
             viewTag = new ViewTag();
             viewTag.textViews = new TextView[ROW_CHILD_COUNT];
             for (int i = 0; i < ROW_CHILD_COUNT; ++i) {
                 viewTag.textViews[i] = (TextView) linearLayout.getChildAt(i);
-                viewTag.textViews[i].setOnClickListener(mViewClickListener);
+                viewTag.textViews[i].setOnClickListener(this);
             }
             linearLayout.setTag(viewTag);
         } else {
@@ -144,8 +137,7 @@ public class BookExpandableListAdapter extends BaseExpandableListAdapter {
             } else {
                 textView.setVisibility(View.VISIBLE);
                 textView.setBackgroundColor(groupPosition == currentBook && chapter == currentChapter
-                                ? Color.DKGRAY : Color.TRANSPARENT
-                );
+                        ? Color.DKGRAY : Color.TRANSPARENT);
                 textView.setText(Integer.toString(chapter + 1));
 
                 ChapterTag chapterTag = (ChapterTag) textView.getTag();
@@ -173,5 +165,11 @@ public class BookExpandableListAdapter extends BaseExpandableListAdapter {
     public void setSelected(int currentBook, int currentChapter) {
         this.currentBook = currentBook;
         this.currentChapter = currentChapter;
+    }
+
+    @Override
+    public void onClick(View v) {
+        final ChapterTag chapterTag = (ChapterTag) v.getTag();
+        listener.onChapterSelected(chapterTag.book, chapterTag.chapter);
     }
 }

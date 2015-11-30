@@ -71,7 +71,7 @@ import javax.inject.Inject;
 import butterknife.Bind;
 
 public class BookSelectionActivity extends BaseAppCompatActivity implements BibleReadingView,
-        AdapterView.OnItemSelectedListener {
+        AdapterView.OnItemSelectedListener, BookExpandableListAdapter.OnChapterSelectedListener {
     private static final String KEY_MESSAGE_TYPE = "net.zionsoft.obadiah.BookSelectionActivity.KEY_MESSAGE_TYPE";
     private static final String KEY_BOOK_INDEX = "net.zionsoft.obadiah.BookSelectionActivity.KEY_BOOK_INDEX";
     private static final String KEY_CHAPTER_INDEX = "net.zionsoft.obadiah.BookSelectionActivity.KEY_CHAPTER_INDEX";
@@ -165,30 +165,7 @@ public class BookSelectionActivity extends BaseAppCompatActivity implements Bibl
         drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, 0, 0);
         drawerLayout.setDrawerListener(drawerToggle);
 
-        bookListAdapter = new BookExpandableListAdapter(this,
-                new BookExpandableListAdapter.OnChapterClickListener() {
-                    @Override
-                    public void onChapterClicked(int book, int chapter) {
-                        if (currentBook == book && currentChapter == chapter) {
-                            return;
-                        }
-
-                        currentBook = book;
-                        currentChapter = chapter;
-
-                        bookListAdapter.setSelected(currentBook, currentChapter);
-                        bookListAdapter.notifyDataSetChanged();
-
-                        drawerLayout.closeDrawers();
-
-                        versePagerAdapter.setSelected(currentBook, currentChapter, 0);
-                        versePagerAdapter.notifyDataSetChanged();
-
-                        versePager.setCurrentItem(currentChapter, true);
-
-                        updateTitle();
-                    }
-                });
+        bookListAdapter = new BookExpandableListAdapter(this, this);
         bookList.setAdapter(bookListAdapter);
         bookList.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
             @Override
@@ -589,5 +566,27 @@ public class BookSelectionActivity extends BaseAppCompatActivity implements Bibl
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
         // do nothing
+    }
+
+    @Override
+    public void onChapterSelected(int book, int chapter) {
+        if (currentBook == book && currentChapter == chapter) {
+            return;
+        }
+
+        currentBook = book;
+        currentChapter = chapter;
+
+        bookListAdapter.setSelected(currentBook, currentChapter);
+        bookListAdapter.notifyDataSetChanged();
+
+        drawerLayout.closeDrawers();
+
+        versePagerAdapter.setSelected(currentBook, currentChapter, 0);
+        versePagerAdapter.notifyDataSetChanged();
+
+        versePager.setCurrentItem(currentChapter, true);
+
+        updateTitle();
     }
 }
