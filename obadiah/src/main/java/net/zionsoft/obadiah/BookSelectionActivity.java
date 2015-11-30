@@ -17,7 +17,6 @@
 
 package net.zionsoft.obadiah;
 
-import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -51,7 +50,6 @@ import net.zionsoft.obadiah.model.Settings;
 import net.zionsoft.obadiah.model.Verse;
 import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.appindexing.AppIndexingManager;
-import net.zionsoft.obadiah.model.utils.AppUpdateChecker;
 import net.zionsoft.obadiah.model.utils.UriHelper;
 import net.zionsoft.obadiah.mvp.presenters.BibleReadingPresenter;
 import net.zionsoft.obadiah.mvp.views.BibleReadingView;
@@ -370,42 +368,6 @@ public class BookSelectionActivity extends BaseAppCompatActivity implements Bibl
 
         appIndexingManager.onStart();
         populateUi();
-        showUpdateDialog();
-    }
-
-    private void showUpdateDialog() {
-        if (!bibleReadingPresenter.hasDownloadedTranslation()) {
-            // do nothing if there's no translation installed (most likely it's the 1st time use)
-            return;
-        }
-
-        if (AppUpdateChecker.shouldUpdate(this)) {
-            DialogHelper.showDialog(BookSelectionActivity.this, false,
-                    R.string.dialog_new_version_available_message,
-                    new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            try {
-                                startActivity(new Intent(Intent.ACTION_VIEW).setData(Constants.GOOGLE_PLAY_URI));
-                                Analytics.trackUIEvent("upgrade_app");
-                            } catch (ActivityNotFoundException e) {
-                                Analytics.trackException("Failed to open market for updating: "
-                                        + Build.MANUFACTURER + ", " + Build.MODEL);
-
-                                // falls back to open a link in browser
-                                startActivity(new Intent(Intent.ACTION_VIEW).setData(
-                                        Uri.parse("http://www.zionsoft.net/bible-reader/")));
-                            }
-                        }
-                    },
-                    new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            Analytics.trackUIEvent("ignore_upgrade_app");
-                        }
-                    });
-            AppUpdateChecker.markAsUpdateAsked(this);
-        }
     }
 
     private void populateUi() {

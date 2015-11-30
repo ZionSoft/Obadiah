@@ -99,7 +99,6 @@
 
         <service android:name=".model.notification.PushNotificationHandler" />
         <service android:name=".model.notification.PushNotificationRegister" />
-        <service android:name=".model.utils.AppUpdateChecker" />
         <service
             android:name=".model.notification.InstanceIDListener"
             android:exported="false">
