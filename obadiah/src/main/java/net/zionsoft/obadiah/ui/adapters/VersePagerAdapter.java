@@ -42,8 +42,8 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 
 public class VersePagerAdapter extends PagerAdapter {
-    public static interface Listener {
-        public void onVersesSelectionChanged(boolean hasSelected);
+    public interface Listener {
+        void onVersesSelectionChanged(boolean hasSelected);
     }
 
     static class Page {

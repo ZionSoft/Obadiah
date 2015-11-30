@@ -145,20 +145,6 @@ public class Bible {
         return bookNames;
     }
 
-    public void loadBookNames(final String translationShortName, final OnStringsLoadedListener listener) {
-        new SimpleAsyncTask<Void, Void, List<String>>() {
-            @Override
-            protected List<String> doInBackground(Void... params) {
-                return loadBookNames(translationShortName);
-            }
-
-            @Override
-            protected void onPostExecute(List<String> result) {
-                listener.onStringsLoaded(result);
-            }
-        }.start();
-    }
-
     public void loadVerses(final String translationShortName, final int book, final int chapter,
                            final OnVersesLoadedListener listener) {
         final String key = buildVersesCacheKey(translationShortName, book, chapter);

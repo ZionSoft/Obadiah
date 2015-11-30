@@ -71,7 +71,8 @@ import javax.inject.Inject;
 import butterknife.Bind;
 
 public class BookSelectionActivity extends BaseAppCompatActivity implements BibleReadingView,
-        AdapterView.OnItemSelectedListener, BookExpandableListAdapter.OnChapterSelectedListener {
+        AdapterView.OnItemSelectedListener, BookExpandableListAdapter.OnChapterSelectedListener,
+        ExpandableListView.OnGroupClickListener, VersePagerAdapter.Listener, ViewPager.OnPageChangeListener {
     private static final String KEY_MESSAGE_TYPE = "net.zionsoft.obadiah.BookSelectionActivity.KEY_MESSAGE_TYPE";
     private static final String KEY_BOOK_INDEX = "net.zionsoft.obadiah.BookSelectionActivity.KEY_BOOK_INDEX";
     private static final String KEY_CHAPTER_INDEX = "net.zionsoft.obadiah.BookSelectionActivity.KEY_CHAPTER_INDEX";
@@ -167,114 +168,11 @@ public class BookSelectionActivity extends BaseAppCompatActivity implements Bibl
 
         bookListAdapter = new BookExpandableListAdapter(this, this);
         bookList.setAdapter(bookListAdapter);
-        bookList.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
-            @Override
-            public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
-                parent.smoothScrollToPosition(groupPosition);
-                if (parent.isGroupExpanded(groupPosition)) {
-                    parent.collapseGroup(groupPosition);
-                } else {
-                    parent.expandGroup(groupPosition);
-                    if (lastExpandedGroup != groupPosition) {
-                        parent.collapseGroup(lastExpandedGroup);
-                        lastExpandedGroup = groupPosition;
-                    }
-                }
-                return true;
-            }
-        });
+        bookList.setOnGroupClickListener(this);
 
-        versePagerAdapter = new VersePagerAdapter(this, new VersePagerAdapter.Listener() {
-            @Override
-            public void onVersesSelectionChanged(boolean hasSelected) {
-                if (hasSelected) {
-                    if (actionMode != null) {
-                        return;
-                    }
-
-                    actionMode = startSupportActionMode(new ActionMode.Callback() {
-                        @Override
-                        public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
-                            actionMode.getMenuInflater().inflate(R.menu.menu_text_selection_context, menu);
-                            return true;
-                        }
-
-                        @Override
-                        public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
-                            return false;
-                        }
-
-                        @Override
-                        public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
-                            switch (menuItem.getItemId()) {
-                                case R.id.action_copy:
-                                    Analytics.trackUIEvent("copy");
-
-                                    if (clipboardManager == null) {
-                                        // noinspection deprecation
-                                        clipboardManager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-                                    }
-                                    clipboardManager.setText(buildText(versePagerAdapter.getSelectedVerses(versePager.getCurrentItem())));
-                                    Toast.makeText(BookSelectionActivity.this,
-                                            R.string.toast_verses_copied, Toast.LENGTH_SHORT).show();
-                                    actionMode.finish();
-                                    return true;
-                                case R.id.action_share:
-                                    Analytics.trackUIEvent("share");
-
-                                    startActivity(Intent.createChooser(new Intent().setAction(Intent.ACTION_SEND).setType("text/plain")
-                                                    .putExtra(Intent.EXTRA_TEXT,
-                                                            buildText(versePagerAdapter.getSelectedVerses(versePager.getCurrentItem()))),
-                                            getResources().getText(R.string.text_share_with)
-                                    ));
-                                    actionMode.finish();
-                                    return true;
-                                default:
-                                    return false;
-                            }
-                        }
-
-                        @Override
-                        public void onDestroyActionMode(ActionMode actionMode) {
-                            if (actionMode != BookSelectionActivity.this.actionMode) {
-                                return;
-                            }
-                            versePagerAdapter.deselectVerses();
-                            BookSelectionActivity.this.actionMode = null;
-                        }
-                    });
-                } else {
-                    if (actionMode != null) {
-                        actionMode.finish();
-                    }
-                }
-            }
-        });
+        versePagerAdapter = new VersePagerAdapter(this, this);
         versePager.setAdapter(versePagerAdapter);
-        versePager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            public void onPageScrollStateChanged(int state) {
-                // do nothing
-            }
-
-            public void onPageScrolled(int position, float positionOffset,
-                                       int positionOffsetPixels) {
-                // do nothing
-            }
-
-            public void onPageSelected(int position) {
-                if (currentChapter == position) {
-                    return;
-                }
-                currentChapter = position;
-
-                if (actionMode != null) {
-                    actionMode.finish();
-                }
-
-                updateBookList();
-                updateTitle();
-            }
-        });
+        versePager.addOnPageChangeListener(this);
     }
 
     private static String buildText(List<Verse> verses) {
@@ -363,15 +261,6 @@ public class BookSelectionActivity extends BaseAppCompatActivity implements Bibl
         currentChapter = bibleReadingPresenter.loadCurrentChapter();
     }
 
-    private void updateTitle() {
-        final String bookName = bookNames.get(currentBook);
-        setTitle(String.format("%s, %d", bookName, currentChapter + 1));
-        appIndexingManager.onView(currentTranslation, bookName, currentBook, currentChapter);
-
-        // TODO get an improved tracking algorithm, e.g. only consider as "read" if the user stays for a while
-        bibleReadingPresenter.trackReadingProgress(currentBook, currentChapter);
-    }
-
     @Override
     protected void onResumeFragments() {
         super.onResumeFragments();
@@ -440,15 +329,6 @@ public class BookSelectionActivity extends BaseAppCompatActivity implements Bibl
             default:
                 return super.onOptionsItemSelected(item);
         }
-    }
-
-    private void updateBookList() {
-        bookListAdapter.setSelected(currentBook, currentChapter);
-        bookListAdapter.notifyDataSetChanged();
-
-        lastExpandedGroup = currentBook;
-        bookList.expandGroup(currentBook);
-        bookList.setSelectedGroup(currentBook);
     }
 
     @Override
@@ -527,6 +407,24 @@ public class BookSelectionActivity extends BaseAppCompatActivity implements Bibl
         updateBookList();
     }
 
+    private void updateTitle() {
+        final String bookName = bookNames.get(currentBook);
+        setTitle(String.format("%s, %d", bookName, currentChapter + 1));
+        appIndexingManager.onView(currentTranslation, bookName, currentBook, currentChapter);
+
+        // TODO get an improved tracking algorithm, e.g. only consider as "read" if the user stays for a while
+        bibleReadingPresenter.trackReadingProgress(currentBook, currentChapter);
+    }
+
+    private void updateBookList() {
+        bookListAdapter.setSelected(currentBook, currentChapter);
+        bookListAdapter.notifyDataSetChanged();
+
+        lastExpandedGroup = currentBook;
+        bookList.expandGroup(currentBook);
+        bookList.setSelectedGroup(currentBook);
+    }
+
     @Override
     public void onBookNamesLoadFailed() {
         if (currentTranslation != null) {
@@ -587,6 +485,111 @@ public class BookSelectionActivity extends BaseAppCompatActivity implements Bibl
 
         versePager.setCurrentItem(currentChapter, true);
 
+        updateTitle();
+    }
+
+    @Override
+    public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
+        parent.smoothScrollToPosition(groupPosition);
+        if (parent.isGroupExpanded(groupPosition)) {
+            parent.collapseGroup(groupPosition);
+        } else {
+            parent.expandGroup(groupPosition);
+            if (lastExpandedGroup != groupPosition) {
+                parent.collapseGroup(lastExpandedGroup);
+                lastExpandedGroup = groupPosition;
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public void onVersesSelectionChanged(boolean hasSelected) {
+        if (hasSelected) {
+            if (actionMode != null) {
+                return;
+            }
+
+            actionMode = startSupportActionMode(new ActionMode.Callback() {
+                @Override
+                public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
+                    actionMode.getMenuInflater().inflate(R.menu.menu_text_selection_context, menu);
+                    return true;
+                }
+
+                @Override
+                public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
+                    return false;
+                }
+
+                @Override
+                public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
+                    switch (menuItem.getItemId()) {
+                        case R.id.action_copy:
+                            Analytics.trackUIEvent("copy");
+
+                            if (clipboardManager == null) {
+                                // noinspection deprecation
+                                clipboardManager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                            }
+                            clipboardManager.setText(buildText(versePagerAdapter.getSelectedVerses(versePager.getCurrentItem())));
+                            Toast.makeText(BookSelectionActivity.this,
+                                    R.string.toast_verses_copied, Toast.LENGTH_SHORT).show();
+                            actionMode.finish();
+                            return true;
+                        case R.id.action_share:
+                            Analytics.trackUIEvent("share");
+
+                            startActivity(Intent.createChooser(new Intent().setAction(Intent.ACTION_SEND).setType("text/plain")
+                                            .putExtra(Intent.EXTRA_TEXT,
+                                                    buildText(versePagerAdapter.getSelectedVerses(versePager.getCurrentItem()))),
+                                    getResources().getText(R.string.text_share_with)
+                            ));
+                            actionMode.finish();
+                            return true;
+                        default:
+                            return false;
+                    }
+                }
+
+                @Override
+                public void onDestroyActionMode(ActionMode actionMode) {
+                    if (actionMode != BookSelectionActivity.this.actionMode) {
+                        return;
+                    }
+                    versePagerAdapter.deselectVerses();
+                    BookSelectionActivity.this.actionMode = null;
+                }
+            });
+        } else {
+            if (actionMode != null) {
+                actionMode.finish();
+            }
+        }
+    }
+
+    @Override
+    public void onPageScrollStateChanged(int state) {
+        // do nothing
+    }
+
+    @Override
+    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+        // do nothing
+    }
+
+    @Override
+    public void onPageSelected(int position) {
+        if (currentChapter == position) {
+            return;
+        }
+        currentChapter = position;
+
+        if (actionMode != null) {
+            actionMode.finish();
+        }
+
+        updateBookList();
         updateTitle();
     }
 }
