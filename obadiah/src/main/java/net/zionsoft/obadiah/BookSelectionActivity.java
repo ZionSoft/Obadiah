@@ -29,9 +29,9 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.view.ActionMode;
+import android.support.v7.widget.Toolbar;
 import android.text.ClipboardManager;
 import android.text.TextUtils;
 import android.view.Menu;
@@ -111,6 +111,9 @@ public class BookSelectionActivity extends BaseAppCompatActivity implements Bibl
     @Bind(R.id.drawer_layout)
     DrawerLayout drawerLayout;
 
+    @Bind(R.id.toolbar)
+    Toolbar toolbar;
+
     @Bind(R.id.book_list)
     ExpandableListView bookList;
 
@@ -159,11 +162,10 @@ public class BookSelectionActivity extends BaseAppCompatActivity implements Bibl
 
         rootView = getWindow().getDecorView();
 
-        final ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setHomeButtonEnabled(true);
+        toolbar.setTitle(R.string.app_name);
+        setSupportActionBar(toolbar);
 
-        drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, 0, 0);
+        drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, 0, 0);
         drawerLayout.setDrawerListener(drawerToggle);
 
         bookListAdapter = new BookExpandableListAdapter(this, this);
@@ -409,7 +411,7 @@ public class BookSelectionActivity extends BaseAppCompatActivity implements Bibl
 
     private void updateTitle() {
         final String bookName = bookNames.get(currentBook);
-        setTitle(String.format("%s, %d", bookName, currentChapter + 1));
+        toolbar.setTitle(String.format("%s, %d", bookName, currentChapter + 1));
         appIndexingManager.onView(currentTranslation, bookName, currentBook, currentChapter);
 
         // TODO get an improved tracking algorithm, e.g. only consider as "read" if the user stays for a while

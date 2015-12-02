@@ -18,9 +18,7 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
-        <activity
-            android:name=".BookSelectionActivity"
-            android:label="@string/app_name">
+        <activity android:name=".BookSelectionActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -38,16 +36,11 @@
                 <category android:name="android.intent.category.BROWSABLE" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".ui.activities.OpenSourceLicenseActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".ui.activities.ReadingProgressActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".ui.activities.OpenSourceLicenseActivity" />
+        <activity android:name=".ui.activities.ReadingProgressActivity" />
         <activity
             android:name=".ui.activities.SearchActivity"
-            android:launchMode="singleTop"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
@@ -67,12 +60,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".ui.activities.SettingsActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".ui.activities.TranslationManagementActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".ui.activities.SettingsActivity" />
+        <activity android:name=".ui.activities.TranslationManagementActivity" />
 
         <activity
             android:name="com.google.android.gms.ads.AdActivity"
