@@ -20,15 +20,16 @@ package net.zionsoft.obadiah.ui.adapters;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.support.v4.view.PagerAdapter;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ListView;
 
 import net.zionsoft.obadiah.App;
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.Bible;
+import net.zionsoft.obadiah.model.Settings;
 import net.zionsoft.obadiah.model.Verse;
 import net.zionsoft.obadiah.ui.utils.AnimationHelper;
 import net.zionsoft.obadiah.ui.utils.DialogHelper;
@@ -46,9 +47,10 @@ public class VersePagerAdapter extends PagerAdapter {
         void onVersesSelectionChanged(boolean hasSelected);
     }
 
-    static class Page {
+    static class Page implements RecyclerView.OnChildAttachStateChangeListener, View.OnClickListener {
         boolean inUse;
         int position;
+        Listener listener;
         VerseListAdapter verseListAdapter;
 
         View rootView;
@@ -56,17 +58,38 @@ public class VersePagerAdapter extends PagerAdapter {
         @Bind(R.id.loading_spinner)
         View loadingSpinner;
 
-        @Bind(R.id.verse_list_view)
-        ListView verseListView;
+        @Bind(R.id.verse_list)
+        RecyclerView verseList;
 
         Page(View view) {
             ButterKnife.bind(this, view);
             rootView = view;
         }
+
+        @Override
+        public void onChildViewAttachedToWindow(View view) {
+            view.setOnClickListener(this);
+        }
+
+        @Override
+        public void onChildViewDetachedFromWindow(View view) {
+            view.setOnClickListener(null);
+        }
+
+        @Override
+        public void onClick(View v) {
+            verseListAdapter.select(verseList.getChildAdapterPosition(v));
+            verseListAdapter.notifyDataSetChanged();
+
+            listener.onVersesSelectionChanged(verseListAdapter.hasSelectedVerses());
+        }
     }
 
     @Inject
     Bible bible;
+
+    @Inject
+    Settings settings;
 
     private final Context context;
     private final Listener listener;
@@ -105,18 +128,12 @@ public class VersePagerAdapter extends PagerAdapter {
 
         if (page == null) {
             page = new Page(inflater.inflate(R.layout.item_verse_pager, container, false));
-            final VerseListAdapter verseListAdapter = new VerseListAdapter(context);
+            final VerseListAdapter verseListAdapter = new VerseListAdapter(context, settings);
             page.verseListAdapter = verseListAdapter;
-            page.verseListView.setAdapter(verseListAdapter);
-            page.verseListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    verseListAdapter.select(position);
-                    verseListAdapter.notifyDataSetChanged();
-
-                    listener.onVersesSelectionChanged(verseListAdapter.hasSelectedVerses());
-                }
-            });
+            page.listener = listener;
+            page.verseList.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false));
+            page.verseList.setAdapter(verseListAdapter);
+            page.verseList.addOnChildAttachStateChangeListener(page);
             pages.add(page);
         }
 
@@ -125,7 +142,7 @@ public class VersePagerAdapter extends PagerAdapter {
         page.position = position;
 
         page.loadingSpinner.setVisibility(View.VISIBLE);
-        page.verseListView.setVisibility(View.GONE);
+        page.verseList.setVisibility(View.GONE);
         loadVerses(position, page);
 
         return page;
@@ -142,28 +159,27 @@ public class VersePagerAdapter extends PagerAdapter {
                                         public void onClick(DialogInterface dialog, int which) {
                                             loadVerses(position, page);
                                         }
-                                    }, null
-                            );
+                                    }, null);
                             return;
                         }
 
                         if (page.position == position) {
                             AnimationHelper.fadeOut(page.loadingSpinner);
-                            AnimationHelper.fadeIn(page.verseListView);
+                            AnimationHelper.fadeIn(page.verseList);
 
                             page.verseListAdapter.setVerses(verses);
                             page.verseListAdapter.notifyDataSetChanged();
 
                             if (currentVerse > 0 && currentChapter == position) {
-                                page.verseListView.post(new Runnable() {
+                                page.verseList.post(new Runnable() {
                                     @Override
                                     public void run() {
-                                        page.verseListView.setSelection(currentVerse);
+                                        page.verseList.scrollToPosition(currentVerse);
                                         currentVerse = 0;
                                     }
                                 });
                             } else {
-                                page.verseListView.setSelectionAfterHeaderView();
+                                page.verseList.scrollToPosition(0);
                             }
                         }
                     }
@@ -204,8 +220,11 @@ public class VersePagerAdapter extends PagerAdapter {
 
     public int getCurrentVerse(int chapter) {
         for (Page page : pages) {
-            if (page.position == chapter)
-                return page.verseListView.getFirstVisiblePosition();
+            if (page.position == chapter) {
+                final LinearLayoutManager linearLayoutManager
+                        = (LinearLayoutManager) page.verseList.getLayoutManager();
+                return linearLayoutManager.findFirstVisibleItemPosition();
+            }
         }
         return 0;
     }
