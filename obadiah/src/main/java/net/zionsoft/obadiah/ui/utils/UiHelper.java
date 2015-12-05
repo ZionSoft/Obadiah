@@ -33,7 +33,7 @@ public class UiHelper {
                 menuKeyField.setBoolean(config, false);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            // do nothing
         }
     }
 }

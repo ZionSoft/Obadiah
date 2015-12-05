@@ -353,8 +353,7 @@ public class BookSelectionActivity extends BaseAppCompatActivity implements Bibl
         final List<String> names = new ArrayList<>(translationsCount + 1);
         names.addAll(translations);
         names.add(getString(R.string.text_more_translations));
-        translationsSpinner.setAdapter(new ArrayAdapter<>(
-                getSupportActionBar().getThemedContext(), R.layout.item_drop_down, names));
+        translationsSpinner.setAdapter(new ArrayAdapter<>(this, R.layout.item_drop_down, names));
         translationsSpinner.setSelection(selected);
         translationsSpinner.setOnItemSelectedListener(this);
 
