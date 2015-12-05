@@ -14,7 +14,7 @@
 
     <application
         android:name=".App"
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
@@ -106,7 +106,9 @@
         <!-- End Enable background analytics dispatching for non-Google Play devices -->
 
         <!-- Enable Google Play Store Campaign Measurement-->
-        <receiver android:name="com.google.android.gms.analytics.CampaignTrackingReceiver">
+        <receiver
+            android:name="com.google.android.gms.analytics.CampaignTrackingReceiver"
+            android:permission="android.permission.INSTALL_PACKAGES">
             <intent-filter>
                 <action android:name="com.android.vending.INSTALL_REFERRER" />
             </intent-filter>
