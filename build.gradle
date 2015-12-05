@@ -28,7 +28,7 @@ ext {
     javaxAnnotationApiVersion = '1.2'
     butterKnifeVersion = '7.0.1'
     rxAndroidVersion = '1.0.1'
-    rxJavaVersion = '1.0.16'
+    rxJavaVersion = '1.1.0'
     retrofitVersion = '2.0.0-beta2'
 
     stethoVersion = '1.2.0'
