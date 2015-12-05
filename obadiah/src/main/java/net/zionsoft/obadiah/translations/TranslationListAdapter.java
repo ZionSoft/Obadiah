@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.ui.adapters;
+package net.zionsoft.obadiah.translations;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -37,7 +37,7 @@ import net.zionsoft.obadiah.ui.widget.SectionHeader;
 import java.util.ArrayList;
 import java.util.Locale;
 
-public class TranslationListAdapter extends RecyclerView.Adapter {
+class TranslationListAdapter extends RecyclerView.Adapter {
     private static final int VIEW_TYPE_HEADER = 0;
     private static final int VIEW_TYPE_TRANSLATION = 1;
 
@@ -53,7 +53,7 @@ public class TranslationListAdapter extends RecyclerView.Adapter {
         }
     }
 
-    public static class TranslationViewHolder extends RecyclerView.ViewHolder {
+    static class TranslationViewHolder extends RecyclerView.ViewHolder {
         private TranslationInfo translationInfo;
         private boolean downloaded;
 
@@ -83,7 +83,7 @@ public class TranslationListAdapter extends RecyclerView.Adapter {
     private final ArrayList<ArrayList<TranslationInfoHolder>> translationList = new ArrayList<>();
     private int count = 0;
 
-    public TranslationListAdapter(Context context, Settings settings, String currentTranslation) {
+    TranslationListAdapter(Context context, Settings settings, String currentTranslation) {
         this.inflater = LayoutInflater.from(context);
         this.resources = context.getResources();
         this.currentTranslation = currentTranslation;
@@ -176,7 +176,7 @@ public class TranslationListAdapter extends RecyclerView.Adapter {
         return count;
     }
 
-    public void setTranslations(Translations translations) {
+    void setTranslations(Translations translations) {
         sectionHeaders.clear();
         translationList.clear();
         count = 0;

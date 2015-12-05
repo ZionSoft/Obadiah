@@ -15,12 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.mvp.views;
+package net.zionsoft.obadiah.translations;
 
 import net.zionsoft.obadiah.model.translations.TranslationInfo;
 import net.zionsoft.obadiah.model.translations.Translations;
+import net.zionsoft.obadiah.mvp.views.MVPView;
 
-public interface TranslationManagementView extends MVPView {
+interface TranslationManagementView extends MVPView {
     void onTranslationLoaded(Translations translations);
 
     void onTranslationLoadFailed();

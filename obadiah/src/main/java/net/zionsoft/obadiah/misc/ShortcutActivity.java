@@ -15,20 +15,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.injection.components.fragments;
+package net.zionsoft.obadiah.misc;
 
-import net.zionsoft.obadiah.injection.InjectionComponent;
-import net.zionsoft.obadiah.injection.components.SearchComponent;
+import android.app.Activity;
+import android.content.Intent;
+import android.os.Bundle;
 
-public class SearchComponentFragment extends ComponentFragment<SearchComponent> {
-    public static final String FRAGMENT_TAG = "net.zionsoft.obadiah.SearchComponentFragment.FRAGMENT_TAG";
+import net.zionsoft.obadiah.BookSelectionActivity;
+import net.zionsoft.obadiah.R;
 
-    public static SearchComponentFragment newInstance() {
-        return new SearchComponentFragment();
-    }
-
+public class ShortcutActivity extends Activity {
     @Override
-    protected SearchComponent createComponent(InjectionComponent injectionComponent) {
-        return SearchComponent.Initializer.init(injectionComponent);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        setResult(RESULT_OK, new Intent()
+                .putExtra(Intent.EXTRA_SHORTCUT_INTENT, BookSelectionActivity.newStartIntent(this))
+                .putExtra(Intent.EXTRA_SHORTCUT_NAME, getString(R.string.app_name))
+                .putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE,
+                        Intent.ShortcutIconResource.fromContext(this, R.drawable.ic_launcher)));
+        finish();
     }
 }

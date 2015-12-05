@@ -15,26 +15,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.mvp.presenters;
+package net.zionsoft.obadiah.misc.license;
 
-import net.zionsoft.obadiah.model.Verse;
-import net.zionsoft.obadiah.mvp.models.SearchModel;
-import net.zionsoft.obadiah.mvp.views.SearchView;
+import net.zionsoft.obadiah.mvp.presenters.MVPPresenter;
 
 import java.util.List;
 
-import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
-public class SearchPresenter extends MVPPresenter<SearchView> {
-    private final SearchModel searchModel;
+class OpenSourceLicensePresenter extends MVPPresenter<OpenSourceLicenseView> {
+    private final OpenSourceLicenseModel openSourceLicenseModel;
 
     private Subscription subscription;
 
-    public SearchPresenter(SearchModel searchModel) {
-        this.searchModel = searchModel;
+    OpenSourceLicensePresenter(OpenSourceLicenseModel openSourceLicenseModel) {
+        this.openSourceLicenseModel = openSourceLicenseModel;
     }
 
     @Override
@@ -47,37 +45,18 @@ public class SearchPresenter extends MVPPresenter<SearchView> {
         super.onViewDropped();
     }
 
-    public void search(String translation, String query) {
-        subscription = searchModel.search(translation, query)
+    void loadLicense() {
+        subscription = openSourceLicenseModel.loadLicense()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<List<Verse>>() {
+                .subscribe(new Action1<List<String>>() {
                     @Override
-                    public void onCompleted() {
-                        // do nothing
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        SearchView v = getView();
+                    public void call(List<String> licenses) {
+                        OpenSourceLicenseView v = getView();
                         if (v != null) {
-                            v.onVersesSearchFailed();
-                        }
-                    }
-
-                    @Override
-                    public void onNext(List<Verse> verses) {
-                        SearchView v = getView();
-                        if (v != null) {
-                            v.onVersesSearched(verses);
+                            v.onLicensesLoaded(licenses);
                         }
                     }
                 });
-    }
-
-    public void clearSearchHistory() {
-        searchModel.clearSearchHistory()
-                .subscribeOn(Schedulers.io())
-                .subscribe();
     }
 }

@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.ui.activities;
+package net.zionsoft.obadiah.translations;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -42,15 +42,11 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 
 import net.zionsoft.obadiah.R;
-import net.zionsoft.obadiah.injection.components.fragments.TranslationManagementComponentFragment;
-import net.zionsoft.obadiah.injection.scopes.ActivityScope;
 import net.zionsoft.obadiah.model.Settings;
 import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.translations.TranslationInfo;
 import net.zionsoft.obadiah.model.translations.Translations;
-import net.zionsoft.obadiah.mvp.presenters.TranslationManagementPresenter;
-import net.zionsoft.obadiah.mvp.views.TranslationManagementView;
-import net.zionsoft.obadiah.ui.adapters.TranslationListAdapter;
+import net.zionsoft.obadiah.ui.activities.BaseAppCompatActivity;
 import net.zionsoft.obadiah.ui.utils.AnimationHelper;
 import net.zionsoft.obadiah.ui.utils.DialogHelper;
 import net.zionsoft.obadiah.ui.widget.ProgressDialog;
@@ -62,7 +58,7 @@ import butterknife.Bind;
 public class TranslationManagementActivity extends BaseAppCompatActivity
         implements TranslationManagementView, SwipeRefreshLayout.OnRefreshListener,
         RecyclerView.OnChildAttachStateChangeListener, View.OnClickListener, View.OnCreateContextMenuListener {
-    private static final String KEY_MESSAGE_TYPE = "net.zionsoft.obadiah.ui.activities.TranslationManagementActivity.KEY_MESSAGE_TYPE";
+    private static final String KEY_MESSAGE_TYPE = "net.zionsoft.obadiah.translations.TranslationManagementActivity.KEY_MESSAGE_TYPE";
 
     public static Intent newStartReorderToTopIntent(Context context, String messageType) {
         final Intent startIntent = newStartIntent(context).putExtra(KEY_MESSAGE_TYPE, messageType);
@@ -80,7 +76,6 @@ public class TranslationManagementActivity extends BaseAppCompatActivity
 
     private static final int CONTEXT_MENU_ITEM_DELETE = 0;
 
-    @ActivityScope
     @Inject
     TranslationManagementPresenter translationManagementPresenter;
 

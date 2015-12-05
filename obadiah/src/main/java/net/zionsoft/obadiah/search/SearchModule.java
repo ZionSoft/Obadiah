@@ -15,14 +15,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.mvp.views;
+package net.zionsoft.obadiah.search;
 
-import net.zionsoft.obadiah.model.Verse;
+import android.content.Context;
 
-import java.util.List;
+import net.zionsoft.obadiah.injection.scopes.ActivityScope;
+import net.zionsoft.obadiah.model.Bible;
 
-public interface SearchView extends MVPView {
-    void onVersesSearched(List<Verse> verses);
+import dagger.Module;
+import dagger.Provides;
 
-    void onVersesSearchFailed();
+@Module
+public class SearchModule {
+    @Provides
+    SearchModel provideSearchModel(Context context, Bible bible) {
+        return new SearchModel(context, bible);
+    }
+
+    @Provides
+    @ActivityScope
+    SearchPresenter provideSearchPresenter(SearchModel searchModel) {
+        return new SearchPresenter(searchModel);
+    }
 }

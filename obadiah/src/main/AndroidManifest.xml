@@ -36,10 +36,10 @@
                 <category android:name="android.intent.category.BROWSABLE" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.activities.OpenSourceLicenseActivity" />
+        <activity android:name=".misc.license.OpenSourceLicenseActivity" />
         <activity android:name=".ui.activities.ReadingProgressActivity" />
         <activity
-            android:name=".ui.activities.SearchActivity"
+            android:name=".search.SearchActivity"
             android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
@@ -53,7 +53,7 @@
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
         </activity>
-        <activity android:name=".ui.activities.ShortcutActivity">
+        <activity android:name=".misc.ShortcutActivity">
             <intent-filter>
                 <action android:name="android.intent.action.CREATE_SHORTCUT" />
 
@@ -61,7 +61,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".ui.activities.SettingsActivity" />
-        <activity android:name=".ui.activities.TranslationManagementActivity" />
+        <activity android:name=".translations.TranslationManagementActivity" />
 
         <activity
             android:name="com.google.android.gms.ads.AdActivity"

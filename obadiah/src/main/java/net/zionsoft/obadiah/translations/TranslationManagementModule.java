@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.injection.modules;
+package net.zionsoft.obadiah.translations;
 
 import android.content.Context;
 
@@ -26,8 +26,6 @@ import net.zionsoft.obadiah.model.Bible;
 import net.zionsoft.obadiah.model.database.DatabaseHelper;
 import net.zionsoft.obadiah.mvp.models.AdsModel;
 import net.zionsoft.obadiah.mvp.models.BibleReadingModel;
-import net.zionsoft.obadiah.mvp.models.TranslationManagementModel;
-import net.zionsoft.obadiah.mvp.presenters.TranslationManagementPresenter;
 import net.zionsoft.obadiah.network.BackendInterface;
 
 import dagger.Module;
@@ -46,14 +44,14 @@ public class TranslationManagementModule {
     }
 
     @Provides
-    public TranslationManagementModel provideTranslationManagementModel(
+    TranslationManagementModel provideTranslationManagementModel(
             DatabaseHelper databaseHelper, Moshi moshi, BackendInterface backendInterface) {
         return new TranslationManagementModel(databaseHelper, moshi, backendInterface);
     }
 
     @Provides
     @ActivityScope
-    public TranslationManagementPresenter provideTranslationManagementPresenter(
+    TranslationManagementPresenter provideTranslationManagementPresenter(
             AdsModel adsModel, BibleReadingModel bibleReadingModel,
             TranslationManagementModel translationManagementModel) {
         return new TranslationManagementPresenter(adsModel, bibleReadingModel, translationManagementModel);

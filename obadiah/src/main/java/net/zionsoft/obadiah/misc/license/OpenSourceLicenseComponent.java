@@ -15,12 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.injection.components;
+package net.zionsoft.obadiah.misc.license;
 
 import net.zionsoft.obadiah.injection.InjectionComponent;
-import net.zionsoft.obadiah.injection.modules.OpenSourceLicenseModule;
+import net.zionsoft.obadiah.injection.components.Component;
 import net.zionsoft.obadiah.injection.scopes.ActivityScope;
-import net.zionsoft.obadiah.ui.activities.OpenSourceLicenseActivity;
 
 import dagger.Subcomponent;
 
@@ -30,7 +29,7 @@ public interface OpenSourceLicenseComponent extends Component {
     void inject(OpenSourceLicenseActivity openSourceLicenseActivity);
 
     final class Initializer {
-        public static OpenSourceLicenseComponent init(InjectionComponent injectionComponent) {
+        static OpenSourceLicenseComponent init(InjectionComponent injectionComponent) {
             return injectionComponent.plus(new OpenSourceLicenseModule());
         }
     }

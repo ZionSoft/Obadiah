@@ -15,10 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.ui.adapters;
+package net.zionsoft.obadiah.misc.license;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.support.v7.widget.RecyclerView;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -27,51 +26,38 @@ import android.widget.TextView;
 
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.Settings;
-import net.zionsoft.obadiah.model.Verse;
 
 import java.util.List;
 
-public class SearchResultListAdapter extends RecyclerView.Adapter {
+class OpenSourceLicenseListAdapter extends RecyclerView.Adapter {
     private final LayoutInflater inflater;
-    private final Resources resources;
-    private final Settings settings;
+    private final int textColor;
+    private final float textSize;
+    private final List<String> licenses;
 
-    private List<Verse> verses;
-
-    public SearchResultListAdapter(Context context, Settings settings) {
+    OpenSourceLicenseListAdapter(Context context, Settings settings, List<String> licenses) {
         this.inflater = LayoutInflater.from(context);
-        this.resources = context.getResources();
-        this.settings = settings;
+        this.textColor = settings.getTextColor();
+        this.textSize = context.getResources().getDimensionPixelSize(settings.getTextSize().textSize);
+        this.licenses = licenses;
     }
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new RecyclerView.ViewHolder(inflater.inflate(R.layout.item_search_result, parent, false)) {
+        TextView textView = (TextView) inflater.inflate(R.layout.item_open_source_license, parent, false);
+        textView.setTextColor(textColor);
+        textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+        return new RecyclerView.ViewHolder(textView) {
         };
     }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        final TextView textView = (TextView) holder.itemView;
-        textView.setTextColor(settings.getTextColor());
-        textView.setTextSize(TypedValue.COMPLEX_UNIT_PX,
-                resources.getDimension(settings.getTextSize().textSize));
-
-        final Verse verse = getVerse(position);
-        textView.setText(String.format("%s %d:%d\n%s", verse.bookName,
-                verse.chapterIndex + 1, verse.verseIndex + 1, verse.verseText));
+        ((TextView) holder.itemView).setText(licenses.get(position));
     }
 
     @Override
     public int getItemCount() {
-        return verses != null ? verses.size() : 0;
-    }
-
-    public void setVerses(List<Verse> verses) {
-        this.verses = verses;
-    }
-
-    public Verse getVerse(int position) {
-        return verses.get(position);
+        return licenses.size();
     }
 }

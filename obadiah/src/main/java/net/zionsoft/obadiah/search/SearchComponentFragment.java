@@ -15,23 +15,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.injection.components;
+package net.zionsoft.obadiah.search;
 
 import net.zionsoft.obadiah.injection.InjectionComponent;
-import net.zionsoft.obadiah.injection.modules.TranslationManagementModule;
-import net.zionsoft.obadiah.injection.scopes.ActivityScope;
-import net.zionsoft.obadiah.ui.activities.TranslationManagementActivity;
+import net.zionsoft.obadiah.injection.components.fragments.ComponentFragment;
 
-import dagger.Subcomponent;
+public class SearchComponentFragment extends ComponentFragment<SearchComponent> {
+    static final String FRAGMENT_TAG = "net.zionsoft.obadiah.SearchComponentFragment.FRAGMENT_TAG";
 
-@ActivityScope
-@Subcomponent(modules = TranslationManagementModule.class)
-public interface TranslationManagementComponent extends Component {
-    void inject(TranslationManagementActivity translationManagementActivity);
+    static SearchComponentFragment newInstance() {
+        return new SearchComponentFragment();
+    }
 
-    final class Initializer {
-        public static TranslationManagementComponent init(InjectionComponent injectionComponent) {
-            return injectionComponent.plus(new TranslationManagementModule());
-        }
+    @Override
+    protected SearchComponent createComponent(InjectionComponent injectionComponent) {
+        return SearchComponent.Initializer.init(injectionComponent);
     }
 }

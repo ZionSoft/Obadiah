@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.mvp.presenters;
+package net.zionsoft.obadiah.translations;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -25,8 +25,7 @@ import net.zionsoft.obadiah.model.translations.TranslationInfo;
 import net.zionsoft.obadiah.model.translations.Translations;
 import net.zionsoft.obadiah.mvp.models.AdsModel;
 import net.zionsoft.obadiah.mvp.models.BibleReadingModel;
-import net.zionsoft.obadiah.mvp.models.TranslationManagementModel;
-import net.zionsoft.obadiah.mvp.views.TranslationManagementView;
+import net.zionsoft.obadiah.mvp.presenters.MVPPresenter;
 
 import rx.Subscriber;
 import rx.Subscription;
@@ -35,7 +34,7 @@ import rx.functions.Action0;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
-public class TranslationManagementPresenter extends MVPPresenter<TranslationManagementView>
+class TranslationManagementPresenter extends MVPPresenter<TranslationManagementView>
         implements AdsModel.OnAdsRemovalPurchasedListener {
     private final AdsModel adsModel;
     private final BibleReadingModel bibleReadingModel;
@@ -45,8 +44,8 @@ public class TranslationManagementPresenter extends MVPPresenter<TranslationMana
     private Subscription removeTranslationSubscription;
     private Subscription fetchTranslationSubscription;
 
-    public TranslationManagementPresenter(AdsModel adsModel, BibleReadingModel bibleReadingModel,
-                                          TranslationManagementModel translationManagementModel) {
+    TranslationManagementPresenter(AdsModel adsModel, BibleReadingModel bibleReadingModel,
+                                   TranslationManagementModel translationManagementModel) {
         this.adsModel = adsModel;
         this.bibleReadingModel = bibleReadingModel;
         this.translationManagementModel = translationManagementModel;
@@ -70,15 +69,15 @@ public class TranslationManagementPresenter extends MVPPresenter<TranslationMana
         super.onViewDropped();
     }
 
-    public String loadCurrentTranslation() {
+    String loadCurrentTranslation() {
         return bibleReadingModel.loadCurrentTranslation();
     }
 
-    public void saveCurrentTranslation(TranslationInfo translation) {
+    void saveCurrentTranslation(TranslationInfo translation) {
         bibleReadingModel.saveCurrentTranslation(translation);
     }
 
-    public void loadTranslations(boolean forceRefresh) {
+    void loadTranslations(boolean forceRefresh) {
         subscription.add(translationManagementModel.loadTranslations(forceRefresh)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -106,7 +105,7 @@ public class TranslationManagementPresenter extends MVPPresenter<TranslationMana
                 }));
     }
 
-    public void removeTranslation(final TranslationInfo translation) {
+    void removeTranslation(final TranslationInfo translation) {
         if (removeTranslationSubscription != null) {
             return;
         }
@@ -143,14 +142,14 @@ public class TranslationManagementPresenter extends MVPPresenter<TranslationMana
                 });
     }
 
-    public void cancelRemoveTranslation() {
+    void cancelRemoveTranslation() {
         if (removeTranslationSubscription != null) {
             removeTranslationSubscription.unsubscribe();
             removeTranslationSubscription = null;
         }
     }
 
-    public void fetchTranslation(final TranslationInfo translation) {
+    void fetchTranslation(final TranslationInfo translation) {
         if (fetchTranslationSubscription != null) {
             return;
         }
@@ -194,14 +193,14 @@ public class TranslationManagementPresenter extends MVPPresenter<TranslationMana
                 });
     }
 
-    public void cancelFetchTranslation() {
+    void cancelFetchTranslation() {
         if (fetchTranslationSubscription != null) {
             fetchTranslationSubscription.unsubscribe();
             fetchTranslationSubscription = null;
         }
     }
 
-    public void loadAdsStatus() {
+    void loadAdsStatus() {
         subscription.add(adsModel.shouldHideAds()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<Boolean>() {
@@ -232,15 +231,15 @@ public class TranslationManagementPresenter extends MVPPresenter<TranslationMana
                 }));
     }
 
-    public void removeAds(Activity activity) {
+    void removeAds(Activity activity) {
         adsModel.purchaseAdsRemoval(activity, this);
     }
 
-    public boolean handleActivityResult(int requestCode, int resultCode, Intent data) {
+    boolean handleActivityResult(int requestCode, int resultCode, Intent data) {
         return adsModel.handleActivityResult(requestCode, resultCode, data);
     }
 
-    public void cleanup() {
+    void cleanup() {
         adsModel.cleanup();
     }
 

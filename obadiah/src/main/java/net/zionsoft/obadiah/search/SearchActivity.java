@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.ui.activities;
+package net.zionsoft.obadiah.search;
 
 import android.app.SearchManager;
 import android.content.Context;
@@ -42,12 +42,9 @@ import com.google.android.gms.actions.SearchIntents;
 import net.zionsoft.obadiah.BookSelectionActivity;
 import net.zionsoft.obadiah.Constants;
 import net.zionsoft.obadiah.R;
-import net.zionsoft.obadiah.injection.components.fragments.SearchComponentFragment;
-import net.zionsoft.obadiah.injection.scopes.ActivityScope;
 import net.zionsoft.obadiah.model.Settings;
 import net.zionsoft.obadiah.model.Verse;
-import net.zionsoft.obadiah.mvp.presenters.SearchPresenter;
-import net.zionsoft.obadiah.ui.adapters.SearchResultListAdapter;
+import net.zionsoft.obadiah.ui.activities.BaseAppCompatActivity;
 import net.zionsoft.obadiah.ui.utils.AnimationHelper;
 import net.zionsoft.obadiah.ui.utils.DialogHelper;
 
@@ -59,7 +56,7 @@ import javax.inject.Inject;
 import butterknife.Bind;
 
 public class SearchActivity extends BaseAppCompatActivity
-        implements net.zionsoft.obadiah.mvp.views.SearchView,
+        implements net.zionsoft.obadiah.search.SearchView,
         RecyclerView.OnChildAttachStateChangeListener, View.OnClickListener {
     public static Intent newStartReorderToTopIntent(Context context) {
         final Intent startIntent = new Intent(context, SearchActivity.class);
@@ -71,11 +68,10 @@ public class SearchActivity extends BaseAppCompatActivity
         return startIntent;
     }
 
-    private static final String KEY_CURRENT_TRANSLATION = "net.zionsoft.obadiah.ui.activities.SearchActivity.KEY_CURRENT_TRANSLATION";
-    private static final String KEY_QUERY = "net.zionsoft.obadiah.ui.activities.SearchActivity.KEY_QUERY";
-    private static final String KEY_VERSES = "net.zionsoft.obadiah.ui.activities.SearchActivity.KEY_VERSES";
+    private static final String KEY_CURRENT_TRANSLATION = "net.zionsoft.obadiah.search.SearchActivity.KEY_CURRENT_TRANSLATION";
+    private static final String KEY_QUERY = "net.zionsoft.obadiah.search.SearchActivity.KEY_QUERY";
+    private static final String KEY_VERSES = "net.zionsoft.obadiah.search.SearchActivity.KEY_VERSES";
 
-    @ActivityScope
     @Inject
     SearchPresenter searchPresenter;
 

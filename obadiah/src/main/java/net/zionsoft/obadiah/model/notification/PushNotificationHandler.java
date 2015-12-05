@@ -41,7 +41,7 @@ import net.zionsoft.obadiah.model.Verse;
 import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.database.DatabaseHelper;
 import net.zionsoft.obadiah.model.translations.TranslationHelper;
-import net.zionsoft.obadiah.ui.activities.TranslationManagementActivity;
+import net.zionsoft.obadiah.translations.TranslationManagementActivity;
 
 import org.json.JSONException;
 import org.json.JSONObject;

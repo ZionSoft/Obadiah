@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.mvp.models;
+package net.zionsoft.obadiah.translations;
 
 import android.database.sqlite.SQLiteDatabase;
 import android.os.SystemClock;
@@ -48,20 +48,20 @@ import rx.functions.Func1;
 import rx.functions.Func2;
 import rx.schedulers.Schedulers;
 
-public class TranslationManagementModel {
+class TranslationManagementModel {
     private final DatabaseHelper databaseHelper;
     private final BackendInterface backendInterface;
     private final JsonAdapter<BackendTranslationInfo> translationInfoJsonAdapter;
     private final JsonAdapter<BackendChapter> chapterJsonAdapter;
 
-    public TranslationManagementModel(DatabaseHelper databaseHelper, Moshi moshi, BackendInterface backendInterface) {
+    TranslationManagementModel(DatabaseHelper databaseHelper, Moshi moshi, BackendInterface backendInterface) {
         this.databaseHelper = databaseHelper;
         this.backendInterface = backendInterface;
         this.translationInfoJsonAdapter = moshi.adapter(BackendTranslationInfo.class);
         this.chapterJsonAdapter = moshi.adapter(BackendChapter.class);
     }
 
-    public Observable<Translations> loadTranslations(boolean forceRefresh) {
+    Observable<Translations> loadTranslations(boolean forceRefresh) {
         Observable<List<TranslationInfo>> translations;
         if (forceRefresh) {
             translations = loadFromNetwork();
@@ -130,9 +130,9 @@ public class TranslationManagementModel {
                         }
                     }
                 })
-                // workaround for Retrofit / okhttp issue (of sorts)
-                // https://github.com/square/retrofit/issues/1046
-                // https://github.com/square/okhttp/issues/1592
+                        // workaround for Retrofit / okhttp issue (of sorts)
+                        // https://github.com/square/retrofit/issues/1046
+                        // https://github.com/square/okhttp/issues/1592
                 .unsubscribeOn(Schedulers.io());
     }
 
@@ -156,7 +156,7 @@ public class TranslationManagementModel {
         });
     }
 
-    public Observable<Void> removeTranslation(final TranslationInfo translation) {
+    Observable<Void> removeTranslation(final TranslationInfo translation) {
         return Observable.create(new Observable.OnSubscribe<Void>() {
             @Override
             public void call(Subscriber<? super Void> subscriber) {
@@ -183,7 +183,7 @@ public class TranslationManagementModel {
         });
     }
 
-    public Observable<Integer> fetchTranslation(final TranslationInfo translation) {
+    Observable<Integer> fetchTranslation(final TranslationInfo translation) {
         return Observable.create(new Observable.OnSubscribe<Integer>() {
             @Override
             public void call(Subscriber<? super Integer> subscriber) {

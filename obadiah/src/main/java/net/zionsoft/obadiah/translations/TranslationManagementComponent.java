@@ -15,20 +15,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.injection.components.fragments;
+package net.zionsoft.obadiah.translations;
 
 import net.zionsoft.obadiah.injection.InjectionComponent;
-import net.zionsoft.obadiah.injection.components.OpenSourceLicenseComponent;
+import net.zionsoft.obadiah.injection.components.Component;
+import net.zionsoft.obadiah.injection.scopes.ActivityScope;
 
-public class OpenSourceLicenseComponentFragment extends ComponentFragment<OpenSourceLicenseComponent> {
-    public static final String FRAGMENT_TAG = "net.zionsoft.obadiah.OpenSourceLicenseComponentFragment.FRAGMENT_TAG";
+import dagger.Subcomponent;
 
-    public static OpenSourceLicenseComponentFragment newInstance() {
-        return new OpenSourceLicenseComponentFragment();
-    }
+@ActivityScope
+@Subcomponent(modules = TranslationManagementModule.class)
+public interface TranslationManagementComponent extends Component {
+    void inject(TranslationManagementActivity translationManagementActivity);
 
-    @Override
-    protected OpenSourceLicenseComponent createComponent(InjectionComponent injectionComponent) {
-        return OpenSourceLicenseComponent.Initializer.init(injectionComponent);
+    final class Initializer {
+        static TranslationManagementComponent init(InjectionComponent injectionComponent) {
+            return injectionComponent.plus(new TranslationManagementModule());
+        }
     }
 }

@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.ui.activities;
+package net.zionsoft.obadiah.misc.license;
 
 import android.content.Context;
 import android.content.Intent;
@@ -29,12 +29,8 @@ import android.view.View;
 import android.widget.ProgressBar;
 
 import net.zionsoft.obadiah.R;
-import net.zionsoft.obadiah.injection.components.fragments.OpenSourceLicenseComponentFragment;
-import net.zionsoft.obadiah.injection.scopes.ActivityScope;
 import net.zionsoft.obadiah.model.Settings;
-import net.zionsoft.obadiah.mvp.presenters.OpenSourceLicensePresenter;
-import net.zionsoft.obadiah.mvp.views.OpenSourceLicenseView;
-import net.zionsoft.obadiah.ui.adapters.OpenSourceLicenseListAdapter;
+import net.zionsoft.obadiah.ui.activities.BaseAppCompatActivity;
 
 import java.util.List;
 
@@ -47,7 +43,6 @@ public class OpenSourceLicenseActivity extends BaseAppCompatActivity implements 
         return new Intent(context, OpenSourceLicenseActivity.class);
     }
 
-    @ActivityScope
     @Inject
     OpenSourceLicensePresenter openSourceLicensePresenter;
 

@@ -15,13 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.injection.modules;
+package net.zionsoft.obadiah.misc.license;
 
 import android.content.Context;
 
 import net.zionsoft.obadiah.injection.scopes.ActivityScope;
-import net.zionsoft.obadiah.mvp.models.OpenSourceLicenseModel;
-import net.zionsoft.obadiah.mvp.presenters.OpenSourceLicensePresenter;
 
 import dagger.Module;
 import dagger.Provides;
@@ -29,13 +27,13 @@ import dagger.Provides;
 @Module
 public class OpenSourceLicenseModule {
     @Provides
-    public OpenSourceLicenseModel provideOpenSourceLicensesModel(Context context) {
+    OpenSourceLicenseModel provideOpenSourceLicensesModel(Context context) {
         return new OpenSourceLicenseModel(context);
     }
 
     @Provides
     @ActivityScope
-    public OpenSourceLicensePresenter provideOpenSourceLicensePresenter(OpenSourceLicenseModel openSourceLicenseModel) {
+    OpenSourceLicensePresenter provideOpenSourceLicensePresenter(OpenSourceLicenseModel openSourceLicenseModel) {
         return new OpenSourceLicensePresenter(openSourceLicenseModel);
     }
 }

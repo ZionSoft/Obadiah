@@ -15,10 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.mvp.views;
+package net.zionsoft.obadiah.misc.license;
+
+import net.zionsoft.obadiah.mvp.views.MVPView;
 
 import java.util.List;
 
-public interface OpenSourceLicenseView extends MVPView {
+interface OpenSourceLicenseView extends MVPView {
     void onLicensesLoaded(List<String> licenses);
 }

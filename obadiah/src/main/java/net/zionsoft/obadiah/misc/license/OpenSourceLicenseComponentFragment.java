@@ -15,24 +15,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.ui.activities;
+package net.zionsoft.obadiah.misc.license;
 
-import android.app.Activity;
-import android.content.Intent;
-import android.os.Bundle;
+import net.zionsoft.obadiah.injection.InjectionComponent;
+import net.zionsoft.obadiah.injection.components.fragments.ComponentFragment;
 
-import net.zionsoft.obadiah.BookSelectionActivity;
-import net.zionsoft.obadiah.R;
+public class OpenSourceLicenseComponentFragment extends ComponentFragment<OpenSourceLicenseComponent> {
+    static final String FRAGMENT_TAG = "net.zionsoft.obadiah.OpenSourceLicenseComponentFragment.FRAGMENT_TAG";
 
-public class ShortcutActivity extends Activity {
+    static OpenSourceLicenseComponentFragment newInstance() {
+        return new OpenSourceLicenseComponentFragment();
+    }
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        setResult(RESULT_OK, new Intent()
-                .putExtra(Intent.EXTRA_SHORTCUT_INTENT, BookSelectionActivity.newStartIntent(this))
-                .putExtra(Intent.EXTRA_SHORTCUT_NAME, getString(R.string.app_name))
-                .putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE, Intent.ShortcutIconResource.fromContext(this, R.drawable.ic_launcher)));
-        finish();
+    protected OpenSourceLicenseComponent createComponent(InjectionComponent injectionComponent) {
+        return OpenSourceLicenseComponent.Initializer.init(injectionComponent);
     }
 }

@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.mvp.models;
+package net.zionsoft.obadiah.misc.license;
 
 import android.content.Context;
 
@@ -30,14 +30,14 @@ import java.util.List;
 import rx.Observable;
 import rx.Subscriber;
 
-public class OpenSourceLicenseModel {
+class OpenSourceLicenseModel {
     private final Context applicationContext;
 
-    public OpenSourceLicenseModel(Context context) {
+    OpenSourceLicenseModel(Context context) {
         this.applicationContext = context.getApplicationContext();
     }
 
-    public Observable<List<String>> loadLicense() {
+    Observable<List<String>> loadLicense() {
         return Observable.create(new Observable.OnSubscribe<List<String>>() {
             @Override
             public void call(Subscriber<? super List<String>> subscriber) {

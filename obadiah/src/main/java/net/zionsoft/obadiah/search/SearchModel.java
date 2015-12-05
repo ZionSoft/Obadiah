@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.mvp.models;
+package net.zionsoft.obadiah.search;
 
 import android.content.Context;
 import android.provider.SearchRecentSuggestions;
@@ -29,17 +29,17 @@ import java.util.List;
 import rx.Observable;
 import rx.Subscriber;
 
-public class SearchModel {
+class SearchModel {
     private final Bible bible;
     private final SearchRecentSuggestions recentSearches;
 
-    public SearchModel(Context context, Bible bible) {
+    SearchModel(Context context, Bible bible) {
         this.bible = bible;
         this.recentSearches = new SearchRecentSuggestions(context,
                 RecentSearchProvider.AUTHORITY, RecentSearchProvider.MODE);
     }
 
-    public Observable<List<Verse>> search(final String translation, final String query) {
+    Observable<List<Verse>> search(final String translation, final String query) {
         recentSearches.saveRecentQuery(query, null);
         return Observable.create(new Observable.OnSubscribe<List<Verse>>() {
             @Override
@@ -54,7 +54,7 @@ public class SearchModel {
         });
     }
 
-    public Observable<Void> clearSearchHistory() {
+    Observable<Void> clearSearchHistory() {
         return Observable.create(new Observable.OnSubscribe<Void>() {
             @Override
             public void call(Subscriber<? super Void> subscriber) {
