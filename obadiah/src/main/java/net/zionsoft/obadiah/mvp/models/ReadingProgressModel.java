@@ -39,4 +39,14 @@ public class ReadingProgressModel {
             }
         });
     }
+
+    public Observable<Void> trackReadingProgress(final int book, final int chapter) {
+        return Observable.create(new Observable.OnSubscribe<Void>() {
+            @Override
+            public void call(Subscriber<? super Void> subscriber) {
+                readingProgressManager.trackReadingProgress(book, chapter);
+                subscriber.onCompleted();
+            }
+        });
+    }
 }

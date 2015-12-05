@@ -112,30 +112,17 @@ public class Bible {
         verseCache.evictAll();
     }
 
-    public void loadDownloadedTranslations(final OnStringsLoadedListener listener) {
-        new SimpleAsyncTask<Void, Void, List<String>>() {
-            @Override
-            protected List<String> doInBackground(Void... params) {
-                SQLiteDatabase db = null;
-                try {
-                    db = databaseHelper.openDatabase();
-                    if (db == null) {
-                        Analytics.trackException("Failed to open database.");
-                        return null;
-                    }
-                    return TranslationHelper.getDownloadedTranslationShortNames(db);
-                } finally {
-                    if (db != null) {
-                        databaseHelper.closeDatabase();
-                    }
-                }
+    @NonNull
+    public List<String> loadTranslations() {
+        SQLiteDatabase db = null;
+        try {
+            db = databaseHelper.openDatabase();
+            return TranslationHelper.getDownloadedTranslationShortNames(db);
+        } finally {
+            if (db != null) {
+                databaseHelper.closeDatabase();
             }
-
-            @Override
-            protected void onPostExecute(List<String> result) {
-                listener.onStringsLoaded(Collections.unmodifiableList(result));
-            }
-        }.start();
+        }
     }
 
     @NonNull
@@ -156,20 +143,6 @@ public class Bible {
             bookNameCache.put(translationShortName, bookNames);
         }
         return bookNames;
-    }
-
-    public void loadBookNames(final String translationShortName, final OnStringsLoadedListener listener) {
-        new SimpleAsyncTask<Void, Void, List<String>>() {
-            @Override
-            protected List<String> doInBackground(Void... params) {
-                return loadBookNames(translationShortName);
-            }
-
-            @Override
-            protected void onPostExecute(List<String> result) {
-                listener.onStringsLoaded(result);
-            }
-        }.start();
     }
 
     public void loadVerses(final String translationShortName, final int book, final int chapter,

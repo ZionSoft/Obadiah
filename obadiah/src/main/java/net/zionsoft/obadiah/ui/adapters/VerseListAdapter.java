@@ -19,15 +19,13 @@ package net.zionsoft.obadiah.ui.adapters;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.support.v7.widget.RecyclerView;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import net.zionsoft.obadiah.App;
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.Settings;
 import net.zionsoft.obadiah.model.Verse;
@@ -35,17 +33,24 @@ import net.zionsoft.obadiah.model.Verse;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
+import butterknife.Bind;
+import butterknife.ButterKnife;
 
-public class VerseListAdapter extends BaseAdapter {
-    private static class ViewTag {
+public class VerseListAdapter extends RecyclerView.Adapter {
+    static class ViewHolder extends RecyclerView.ViewHolder {
+        @Bind(R.id.index)
         TextView index;
+
+        @Bind(R.id.text)
         TextView text;
+
+        private ViewHolder(View itemView) {
+            super(itemView);
+            ButterKnife.bind(this, itemView);
+        }
     }
 
-    @Inject
-    Settings settings;
-
+    private final Settings settings;
     private final LayoutInflater inflater;
     private final Resources resources;
 
@@ -53,69 +58,48 @@ public class VerseListAdapter extends BaseAdapter {
     private boolean[] selected;
     private int selectedCount;
 
-    public VerseListAdapter(Context context) {
-        App.get(context).getInjectionComponent().inject(this);
-
-        inflater = LayoutInflater.from(context);
-        resources = context.getResources();
+    public VerseListAdapter(Context context, Settings settings) {
+        this.settings = settings;
+        this.inflater = LayoutInflater.from(context);
+        this.resources = context.getResources();
     }
 
     @Override
-    public int getCount() {
-        return verses == null ? 0 : verses.size();
+    public int getItemCount() {
+        return verses != null ? verses.size() : 0;
     }
 
     @Override
-    public Verse getItem(int position) {
-        return verses == null ? null : verses.get(position);
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        return new ViewHolder(inflater.inflate(R.layout.item_text, parent, false));
     }
 
     @Override
-    public long getItemId(int position) {
-        return position;
-    }
-
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        final LinearLayout linearLayout;
-        final ViewTag viewTag;
-        if (convertView == null) {
-            linearLayout = (LinearLayout) inflater.inflate(R.layout.item_text, parent, false);
-
-            viewTag = new ViewTag();
-            viewTag.index = (TextView) linearLayout.getChildAt(0);
-            viewTag.text = (TextView) linearLayout.getChildAt(1);
-            linearLayout.setTag(viewTag);
-        } else {
-            linearLayout = (LinearLayout) convertView;
-            viewTag = (ViewTag) linearLayout.getTag();
-        }
-
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+        final ViewHolder viewHolder = (ViewHolder) holder;
         if (selected[position]) {
-            linearLayout.setBackgroundColor(resources.getColor(R.color.blue_semi_transparent));
+            viewHolder.itemView.setBackgroundColor(resources.getColor(R.color.blue_semi_transparent));
         } else {
-            linearLayout.setBackgroundResource(R.drawable.background_text);
+            viewHolder.itemView.setBackgroundResource(R.drawable.background_text);
         }
 
         final int textColor = settings.getTextColor();
         final float textSize = resources.getDimension(settings.getTextSize().textSize);
-        viewTag.index.setTextColor(textColor);
-        viewTag.index.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+        viewHolder.index.setTextColor(textColor);
+        viewHolder.index.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
 
-        final int count = getCount();
+        final int count = getItemCount();
         if (count < 10) {
-            viewTag.index.setText(Integer.toString(position + 1));
+            viewHolder.index.setText(Integer.toString(position + 1));
         } else if (count < 100) {
-            viewTag.index.setText(String.format("%2d", position + 1));
+            viewHolder.index.setText(String.format("%2d", position + 1));
         } else {
-            viewTag.index.setText(String.format("%3d", position + 1));
+            viewHolder.index.setText(String.format("%3d", position + 1));
         }
 
-        viewTag.text.setTextColor(textColor);
-        viewTag.text.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
-        viewTag.text.setText(verses.get(position).verseText);
-
-        return linearLayout;
+        viewHolder.text.setTextColor(textColor);
+        viewHolder.text.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+        viewHolder.text.setText(verses.get(position).verseText);
     }
 
     void setVerses(List<Verse> verses) {
@@ -140,7 +124,7 @@ public class VerseListAdapter extends BaseAdapter {
     }
 
     List<Verse> getSelectedVerses() {
-        final List<Verse> selectedVerses = new ArrayList<Verse>(selectedCount);
+        final List<Verse> selectedVerses = new ArrayList<>(selectedCount);
         int i = 0;
         for (boolean selected : this.selected) {
             if (selected)

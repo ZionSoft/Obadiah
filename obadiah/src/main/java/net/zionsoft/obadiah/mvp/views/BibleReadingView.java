@@ -15,24 +15,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.ui.fragments;
+package net.zionsoft.obadiah.mvp.views;
 
-import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.view.View;
+import java.util.List;
 
-import butterknife.ButterKnife;
+public interface BibleReadingView extends MVPView {
+    void onTranslationsLoaded(List<String> translations);
 
-public abstract class BaseFragment extends Fragment {
-    @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        ButterKnife.bind(this, view);
-    }
+    void onTranslationsLoadFailed();
 
-    @Override
-    public void onDestroyView() {
-        ButterKnife.unbind(this);
-        super.onDestroyView();
-    }
+    void onNoTranslationAvailable();
+
+    void onBookNamesLoaded(List<String> bookNames);
+
+    void onBookNamesLoadFailed();
 }

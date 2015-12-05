@@ -19,6 +19,8 @@ package net.zionsoft.obadiah.mvp.models;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
 import net.zionsoft.obadiah.Constants;
 import net.zionsoft.obadiah.model.Bible;
@@ -31,15 +33,15 @@ import rx.Observable;
 import rx.Subscriber;
 
 public class BibleReadingModel {
-    private final SharedPreferences preferences;
     private final Bible bible;
+    private final SharedPreferences preferences;
 
     public BibleReadingModel(Context context, Bible bible) {
-        this.preferences = context.getApplicationContext()
-                .getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+        this.preferences = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
         this.bible = bible;
     }
 
+    @Nullable
     public String loadCurrentTranslation() {
         return preferences.getString(Constants.PREF_KEY_LAST_READ_TRANSLATION, null);
     }
@@ -47,6 +49,48 @@ public class BibleReadingModel {
     public void saveCurrentTranslation(TranslationInfo translation) {
         preferences.edit().putString(Constants.PREF_KEY_LAST_READ_TRANSLATION, translation.shortName).apply();
         Analytics.trackTranslationSelection(translation.shortName);
+    }
+
+    public boolean hasDownloadedTranslation() {
+        return !TextUtils.isEmpty(loadCurrentTranslation());
+    }
+
+    public int loadCurrentBook() {
+        return preferences.getInt(Constants.PREF_KEY_LAST_READ_BOOK, 0);
+    }
+
+    public int loadCurrentChapter() {
+        return preferences.getInt(Constants.PREF_KEY_LAST_READ_CHAPTER, 0);
+    }
+
+    public int loadCurrentVerse() {
+        return preferences.getInt(Constants.PREF_KEY_LAST_READ_VERSE, 0);
+    }
+
+    public void setCurrentTranslation(String translation) {
+        preferences.edit().putString(Constants.PREF_KEY_LAST_READ_TRANSLATION, translation).apply();
+    }
+
+    public void storeReadingProgress(int book, int chapter, int verse) {
+        preferences.edit()
+                .putInt(Constants.PREF_KEY_LAST_READ_BOOK, book)
+                .putInt(Constants.PREF_KEY_LAST_READ_CHAPTER, chapter)
+                .putInt(Constants.PREF_KEY_LAST_READ_VERSE, verse)
+                .apply();
+    }
+
+    public Observable<List<String>> loadTranslations() {
+        return Observable.create(new Observable.OnSubscribe<List<String>>() {
+            @Override
+            public void call(Subscriber<? super List<String>> subscriber) {
+                try {
+                    subscriber.onNext(bible.loadTranslations());
+                    subscriber.onCompleted();
+                } catch (Exception e) {
+                    subscriber.onError(e);
+                }
+            }
+        });
     }
 
     public Observable<List<String>> loadBookNames(final String translation) {

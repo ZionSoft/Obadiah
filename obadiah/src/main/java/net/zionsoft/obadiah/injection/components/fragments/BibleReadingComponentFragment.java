@@ -15,25 +15,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.ui.utils;
+package net.zionsoft.obadiah.injection.components.fragments;
 
-import android.content.Context;
-import android.view.ViewConfiguration;
+import net.zionsoft.obadiah.injection.InjectionComponent;
+import net.zionsoft.obadiah.injection.components.BibleReadingComponent;
 
-import java.lang.reflect.Field;
+public class BibleReadingComponentFragment extends ComponentFragment<BibleReadingComponent> {
+    public static final String FRAGMENT_TAG = "net.zionsoft.obadiah.BibleReadingComponentFragment.FRAGMENT_TAG";
 
-public class UiHelper {
-    public static void forceActionBarOverflowMenu(Context context) {
-        // F**K hardware buttons, and credit to http://stackoverflow.com/a/18387935
-        try {
-            ViewConfiguration config = ViewConfiguration.get(context);
-            Field menuKeyField = ViewConfiguration.class.getDeclaredField("sHasPermanentMenuKey");
-            if (menuKeyField != null) {
-                menuKeyField.setAccessible(true);
-                menuKeyField.setBoolean(config, false);
-            }
-        } catch (Exception e) {
-            // do nothing
-        }
+    public static BibleReadingComponentFragment newInstance() {
+        return new BibleReadingComponentFragment();
+    }
+
+    @Override
+    protected BibleReadingComponent createComponent(InjectionComponent injectionComponent) {
+        return BibleReadingComponent.Initializer.init(injectionComponent);
     }
 }

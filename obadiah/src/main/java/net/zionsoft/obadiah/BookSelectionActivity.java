@@ -17,42 +17,49 @@
 
 package net.zionsoft.obadiah;
 
-import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.view.ActionMode;
+import android.support.v7.widget.Toolbar;
+import android.text.ClipboardManager;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ExpandableListView;
 import android.widget.Spinner;
+import android.widget.Toast;
 
-import net.zionsoft.obadiah.model.Bible;
-import net.zionsoft.obadiah.model.ReadingProgressManager;
+import net.zionsoft.obadiah.injection.components.fragments.BibleReadingComponentFragment;
+import net.zionsoft.obadiah.injection.scopes.ActivityScope;
 import net.zionsoft.obadiah.model.Settings;
+import net.zionsoft.obadiah.model.Verse;
 import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.appindexing.AppIndexingManager;
-import net.zionsoft.obadiah.model.utils.AppUpdateChecker;
 import net.zionsoft.obadiah.model.utils.UriHelper;
+import net.zionsoft.obadiah.mvp.presenters.BibleReadingPresenter;
+import net.zionsoft.obadiah.mvp.views.BibleReadingView;
 import net.zionsoft.obadiah.ui.activities.BaseAppCompatActivity;
 import net.zionsoft.obadiah.ui.activities.ReadingProgressActivity;
 import net.zionsoft.obadiah.ui.activities.SearchActivity;
 import net.zionsoft.obadiah.ui.activities.SettingsActivity;
 import net.zionsoft.obadiah.ui.activities.TranslationManagementActivity;
-import net.zionsoft.obadiah.ui.fragments.ChapterSelectionFragment;
-import net.zionsoft.obadiah.ui.fragments.TextFragment;
+import net.zionsoft.obadiah.ui.adapters.BookExpandableListAdapter;
+import net.zionsoft.obadiah.ui.adapters.VersePagerAdapter;
 import net.zionsoft.obadiah.ui.utils.AnimationHelper;
 import net.zionsoft.obadiah.ui.utils.DialogHelper;
 
@@ -63,8 +70,9 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 
-public class BookSelectionActivity extends BaseAppCompatActivity
-        implements ChapterSelectionFragment.Listener, TextFragment.Listener {
+public class BookSelectionActivity extends BaseAppCompatActivity implements BibleReadingView,
+        AdapterView.OnItemSelectedListener, BookExpandableListAdapter.OnChapterSelectedListener,
+        ExpandableListView.OnGroupClickListener, VersePagerAdapter.Listener, ViewPager.OnPageChangeListener {
     private static final String KEY_MESSAGE_TYPE = "net.zionsoft.obadiah.BookSelectionActivity.KEY_MESSAGE_TYPE";
     private static final String KEY_BOOK_INDEX = "net.zionsoft.obadiah.BookSelectionActivity.KEY_BOOK_INDEX";
     private static final String KEY_CHAPTER_INDEX = "net.zionsoft.obadiah.BookSelectionActivity.KEY_CHAPTER_INDEX";
@@ -93,11 +101,9 @@ public class BookSelectionActivity extends BaseAppCompatActivity
         return new Intent(context, BookSelectionActivity.class);
     }
 
+    @ActivityScope
     @Inject
-    Bible bible;
-
-    @Inject
-    ReadingProgressManager readingProgressManager;
+    BibleReadingPresenter bibleReadingPresenter;
 
     @Inject
     Settings settings;
@@ -105,16 +111,29 @@ public class BookSelectionActivity extends BaseAppCompatActivity
     @Bind(R.id.drawer_layout)
     DrawerLayout drawerLayout;
 
+    @Bind(R.id.toolbar)
+    Toolbar toolbar;
+
+    @Bind(R.id.book_list)
+    ExpandableListView bookList;
+
+    @Bind(R.id.verse_pager)
+    ViewPager versePager;
+
     private AppIndexingManager appIndexingManager;
-    private SharedPreferences preferences;
 
     private String currentTranslation;
     private List<String> bookNames;
     private int currentBook;
     private int currentChapter;
 
-    private ChapterSelectionFragment chapterSelectionFragment;
-    private TextFragment textFragment;
+    private BookExpandableListAdapter bookListAdapter;
+    private int lastExpandedGroup;
+
+    private VersePagerAdapter versePagerAdapter;
+    private ActionMode actionMode;
+    @SuppressWarnings("deprecation")
+    private ClipboardManager clipboardManager;
 
     private ActionBarDrawerToggle drawerToggle;
     private Spinner translationsSpinner;
@@ -123,10 +142,16 @@ public class BookSelectionActivity extends BaseAppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        App.get(this).getInjectionComponent().inject(this);
+
+        FragmentManager fm = getSupportFragmentManager();
+        if (fm.findFragmentByTag(BibleReadingComponentFragment.FRAGMENT_TAG) == null) {
+            fm.beginTransaction()
+                    .add(BibleReadingComponentFragment.newInstance(),
+                            BibleReadingComponentFragment.FRAGMENT_TAG)
+                    .commit();
+        }
 
         appIndexingManager = new AppIndexingManager(this);
-        preferences = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE);
 
         initializeUi();
         checkDeepLink();
@@ -137,23 +162,39 @@ public class BookSelectionActivity extends BaseAppCompatActivity
 
         rootView = getWindow().getDecorView();
 
-        final ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setHomeButtonEnabled(true);
+        toolbar.setTitle(R.string.app_name);
+        setSupportActionBar(toolbar);
 
-        drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, 0, 0);
+        drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, 0, 0);
         drawerLayout.setDrawerListener(drawerToggle);
 
-        final FragmentManager fm = getSupportFragmentManager();
-        chapterSelectionFragment = (ChapterSelectionFragment) fm.findFragmentById(R.id.left_drawer);
-        textFragment = (TextFragment) fm.findFragmentById(R.id.text_fragment);
+        bookListAdapter = new BookExpandableListAdapter(this, this);
+        bookList.setAdapter(bookListAdapter);
+        bookList.setOnGroupClickListener(this);
+
+        versePagerAdapter = new VersePagerAdapter(this, this);
+        versePager.setAdapter(versePagerAdapter);
+        versePager.addOnPageChangeListener(this);
+    }
+
+    private static String buildText(List<Verse> verses) {
+        if (verses == null || verses.size() == 0)
+            return null;
+
+        // format: <book name> <chapter index>:<verse index> <verse text>
+        final StringBuilder text = new StringBuilder();
+        for (Verse verse : verses) {
+            text.append(String.format("%S %d:%d %s\n", verse.bookName, verse.chapterIndex + 1,
+                    verse.verseIndex + 1, verse.verseText));
+        }
+        return text.toString();
     }
 
     private void checkDeepLink() {
         final Intent startIntent = getIntent();
         final Uri uri = startIntent.getData();
         if (uri != null) {
-            UriHelper.checkDeepLink(preferences, uri);
+            UriHelper.checkDeepLink(this, uri);
         } else {
             final String messageType = startIntent.getStringExtra(KEY_MESSAGE_TYPE);
             if (TextUtils.isEmpty(messageType)) {
@@ -172,13 +213,22 @@ public class BookSelectionActivity extends BaseAppCompatActivity
                 return;
             }
 
-            preferences.edit()
-                    .putInt(Constants.PREF_KEY_LAST_READ_BOOK, bookIndex)
-                    .putInt(Constants.PREF_KEY_LAST_READ_CHAPTER, chapterIndex)
-                    .putInt(Constants.PREF_KEY_LAST_READ_VERSE, verseIndex)
-                    .apply();
+            bibleReadingPresenter.storeReadingProgress(bookIndex, chapterIndex, verseIndex);
 
             Analytics.trackNotificationEvent("notification_opened", messageType);
+        }
+    }
+
+    @Override
+    public void onAttachFragment(Fragment fragment) {
+        super.onAttachFragment(fragment);
+
+        if (fragment instanceof BibleReadingComponentFragment) {
+            ((BibleReadingComponentFragment) fragment).getComponent().inject(this);
+
+            final View rootView = getWindow().getDecorView();
+            rootView.setKeepScreenOn(settings.keepScreenOn());
+            rootView.setBackgroundColor(settings.getBackgroundColor());
         }
     }
 
@@ -195,42 +245,6 @@ public class BookSelectionActivity extends BaseAppCompatActivity
 
         appIndexingManager.onStart();
         populateUi();
-        showUpdateDialog();
-    }
-
-    private void showUpdateDialog() {
-        if (TextUtils.isEmpty(preferences.getString(Constants.PREF_KEY_LAST_READ_TRANSLATION, null))) {
-            // do nothing if there's no translation installed (most likely it's the 1st time use)
-            return;
-        }
-
-        if (AppUpdateChecker.shouldUpdate(this)) {
-            DialogHelper.showDialog(BookSelectionActivity.this, false,
-                    R.string.dialog_new_version_available_message,
-                    new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            try {
-                                startActivity(new Intent(Intent.ACTION_VIEW).setData(Constants.GOOGLE_PLAY_URI));
-                                Analytics.trackUIEvent("upgrade_app");
-                            } catch (ActivityNotFoundException e) {
-                                Analytics.trackException("Failed to open market for updating: "
-                                        + Build.MANUFACTURER + ", " + Build.MODEL);
-
-                                // falls back to open a link in browser
-                                startActivity(new Intent(Intent.ACTION_VIEW).setData(
-                                        Uri.parse("http://www.zionsoft.net/bible-reader/")));
-                            }
-                        }
-                    },
-                    new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            Analytics.trackUIEvent("ignore_upgrade_app");
-                        }
-                    });
-            AppUpdateChecker.markAsUpdateAsked(this);
-        }
     }
 
     private void populateUi() {
@@ -238,158 +252,46 @@ public class BookSelectionActivity extends BaseAppCompatActivity
         rootView.setKeepScreenOn(settings.keepScreenOn());
         rootView.setBackgroundColor(settings.getBackgroundColor());
 
-        currentTranslation = preferences.getString(Constants.PREF_KEY_LAST_READ_TRANSLATION, null);
-        if (currentTranslation == null) {
-            DialogHelper.showDialog(this, false, R.string.dialog_no_translation,
-                    new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            AnimationHelper.slideIn(BookSelectionActivity.this,
-                                    TranslationManagementActivity.newStartIntent(BookSelectionActivity.this));
-                        }
-                    }, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            finish();
-                        }
-                    }
-            );
+        versePagerAdapter.notifyDataSetChanged();
+
+        currentTranslation = bibleReadingPresenter.loadCurrentTranslation();
+        if (TextUtils.isEmpty(currentTranslation)) {
             return;
         }
 
-        currentBook = preferences.getInt(Constants.PREF_KEY_LAST_READ_BOOK, 0);
-        currentChapter = preferences.getInt(Constants.PREF_KEY_LAST_READ_CHAPTER, 0);
+        currentBook = bibleReadingPresenter.loadCurrentBook();
+        currentChapter = bibleReadingPresenter.loadCurrentChapter();
+    }
 
+    @Override
+    protected void onResumeFragments() {
+        super.onResumeFragments();
+        bibleReadingPresenter.takeView(this);
         loadTranslations();
     }
 
     private void loadTranslations() {
-        if (translationsSpinner == null)
-            return;
-
-        bible.loadDownloadedTranslations(new Bible.OnStringsLoadedListener() {
-            @Override
-            public void onStringsLoaded(List<String> strings) {
-                if (strings == null || strings.size() == 0) {
-                    if (currentTranslation != null) {
-                        DialogHelper.showDialog(BookSelectionActivity.this, false, R.string.dialog_retry,
-                                new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        loadTranslations();
-                                    }
-                                }, null
-                        );
-                    }
-                    return;
-                }
-
-                int selected = 0;
-                boolean hasSelectedTranslation = false;
-                for (String translation : strings) {
-                    if (translation.equals(currentTranslation)) {
-                        hasSelectedTranslation = true;
-                        break;
-                    }
-                    ++selected;
-                }
-                if (!hasSelectedTranslation) {
-                    // the requested translation is not available
-                    currentTranslation = strings.get(0);
-                    selected = 0;
-                    preferences.edit()
-                            .putString(Constants.PREF_KEY_LAST_READ_TRANSLATION, currentTranslation)
-                            .apply();
-                }
-
-                final int translationsCount = strings.size();
-                final List<String> translations = new ArrayList<String>(translationsCount + 1);
-                translations.addAll(strings);
-                translations.add(getResources().getString(R.string.text_more_translations));
-                translationsSpinner.setAdapter(new ArrayAdapter<String>(
-                        getSupportActionBar().getThemedContext(), R.layout.item_drop_down, translations));
-                translationsSpinner.setSelection(selected);
-                translationsSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                    @Override
-                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                        if (position == translationsCount) {
-                            AnimationHelper.slideIn(BookSelectionActivity.this,
-                                    TranslationManagementActivity.newStartIntent(BookSelectionActivity.this));
-                            return;
-                        }
-
-                        final String selected = translations.get(position);
-                        if (selected.equals(currentTranslation))
-                            return;
-
-                        Analytics.trackTranslationSelection(selected);
-                        currentTranslation = selected;
-                        preferences.edit()
-                                .putString(Constants.PREF_KEY_LAST_READ_TRANSLATION, selected)
-                                .putInt(Constants.PREF_KEY_LAST_READ_VERSE, textFragment.getCurrentVerse())
-                                .apply();
-
-                        loadTexts();
-                    }
-
-                    @Override
-                    public void onNothingSelected(AdapterView<?> parent) {
-                        // do nothing
-                    }
-                });
-
-                loadTexts();
-            }
-        });
+        // we should wait until the menu is inflated
+        if (translationsSpinner != null) {
+            bibleReadingPresenter.loadTranslations();
+        }
     }
 
-    private void loadTexts() {
-        bible.loadBookNames(currentTranslation, new Bible.OnStringsLoadedListener() {
-                    @Override
-                    public void onStringsLoaded(List<String> strings) {
-                        if (strings == null || strings.size() == 0) {
-                            if (currentTranslation != null) {
-                                DialogHelper.showDialog(BookSelectionActivity.this, false, R.string.dialog_retry,
-                                        new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialog, int which) {
-                                                loadTexts();
-                                            }
-                                        }, null
-                                );
-                            }
-                            return;
-                        }
-
-                        bookNames = strings;
-                        updateTitle();
-                    }
-                }
-        );
-
-        chapterSelectionFragment.setSelected(currentTranslation, currentBook, currentChapter);
-
-        textFragment.setSelected(currentTranslation, currentBook, currentChapter,
-                preferences.getInt(Constants.PREF_KEY_LAST_READ_VERSE, 0));
-    }
-
-    private void updateTitle() {
-        final String bookName = bookNames.get(currentBook);
-        setTitle(String.format("%s, %d", bookName, currentChapter + 1));
-        appIndexingManager.onView(currentTranslation, bookName, currentBook, currentChapter);
-
-        // TODO get an improved tracking algorithm, e.g. only consider as "read" if the user stays for a while
-        readingProgressManager.trackChapterReading(currentBook, currentChapter);
+    @Override
+    protected void onPause() {
+        bibleReadingPresenter.dropView();
+        super.onPause();
     }
 
     @Override
     protected void onStop() {
-        preferences.edit()
-                .putInt(Constants.PREF_KEY_LAST_READ_BOOK, currentBook)
-                .putInt(Constants.PREF_KEY_LAST_READ_CHAPTER, currentChapter)
-                .putInt(Constants.PREF_KEY_LAST_READ_VERSE, textFragment.getCurrentVerse())
-                .apply();
+        bibleReadingPresenter.storeReadingProgress(currentBook, currentChapter,
+                versePagerAdapter.getCurrentVerse(versePager.getCurrentItem()));
         appIndexingManager.onStop();
+
+        if (actionMode != null) {
+            actionMode.finish();
+        }
 
         super.onStop();
     }
@@ -432,24 +334,263 @@ public class BookSelectionActivity extends BaseAppCompatActivity
     }
 
     @Override
-    public void onChapterSelected(int bookIndex, int chapterIndex) {
-        if (currentBook == bookIndex && currentChapter == chapterIndex)
+    public void onTranslationsLoaded(List<String> translations) {
+        final int translationsCount = translations.size();
+        int selected;
+        for (selected = 0; selected < translationsCount; ++selected) {
+            if (translations.get(selected).equals(currentTranslation)) {
+                break;
+            }
+        }
+        if (selected == translationsCount) {
+            // the requested translation is not available, use the first one in the list
+            selected = 0;
+            currentTranslation = translations.get(0);
+            bibleReadingPresenter.setCurrentTranslation(currentTranslation);
+        }
+
+        // appends "More" to end of list that is to be shown in spinner
+        final List<String> names = new ArrayList<>(translationsCount + 1);
+        names.addAll(translations);
+        names.add(getString(R.string.text_more_translations));
+        translationsSpinner.setAdapter(new ArrayAdapter<>(this, R.layout.item_drop_down, names));
+        translationsSpinner.setSelection(selected);
+        translationsSpinner.setOnItemSelectedListener(this);
+
+        loadTexts();
+    }
+
+    private void loadTexts() {
+        bibleReadingPresenter.loadBookNames(currentTranslation);
+
+        versePagerAdapter.setTranslationShortName(currentTranslation);
+        versePagerAdapter.setSelected(currentBook, currentChapter,
+                bibleReadingPresenter.loadCurrentVerse());
+        versePagerAdapter.notifyDataSetChanged();
+        versePager.setCurrentItem(currentChapter, true);
+    }
+
+    @Override
+    public void onTranslationsLoadFailed() {
+        DialogHelper.showDialog(this, false, R.string.dialog_retry,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        bibleReadingPresenter.loadTranslations();
+                    }
+                }, null);
+    }
+
+    @Override
+    public void onNoTranslationAvailable() {
+        DialogHelper.showDialog(this, false, R.string.dialog_no_translation,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        AnimationHelper.slideIn(BookSelectionActivity.this,
+                                TranslationManagementActivity.newStartIntent(BookSelectionActivity.this));
+                    }
+                }, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        finish();
+                    }
+                }
+        );
+    }
+
+    @Override
+    public void onBookNamesLoaded(List<String> bookNames) {
+        this.bookNames = bookNames;
+        updateTitle();
+
+        bookListAdapter.setBookNames(bookNames);
+        updateBookList();
+    }
+
+    private void updateTitle() {
+        final String bookName = bookNames.get(currentBook);
+        toolbar.setTitle(String.format("%s, %d", bookName, currentChapter + 1));
+        appIndexingManager.onView(currentTranslation, bookName, currentBook, currentChapter);
+
+        // TODO get an improved tracking algorithm, e.g. only consider as "read" if the user stays for a while
+        bibleReadingPresenter.trackReadingProgress(currentBook, currentChapter);
+    }
+
+    private void updateBookList() {
+        bookListAdapter.setSelected(currentBook, currentChapter);
+        bookListAdapter.notifyDataSetChanged();
+
+        lastExpandedGroup = currentBook;
+        bookList.expandGroup(currentBook);
+        bookList.setSelectedGroup(currentBook);
+    }
+
+    @Override
+    public void onBookNamesLoadFailed() {
+        if (currentTranslation != null) {
+            DialogHelper.showDialog(this, false, R.string.dialog_retry,
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            loadTexts();
+                        }
+                    }, null);
+        }
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        final Adapter adapter = parent.getAdapter();
+        if (position == adapter.getCount() - 1) {
+            // last item ("More") selected, opens the translation management activity
+            AnimationHelper.slideIn(BookSelectionActivity.this,
+                    TranslationManagementActivity.newStartIntent(BookSelectionActivity.this));
             return;
-        currentBook = bookIndex;
-        currentChapter = chapterIndex;
+        }
+
+        final String selected = (String) adapter.getItem(position);
+        if (selected == null || selected.equals(currentTranslation)) {
+            return;
+        }
+
+        Analytics.trackTranslationSelection(selected);
+        currentTranslation = selected;
+        bibleReadingPresenter.storeReadingProgress(currentBook, currentChapter,
+                versePagerAdapter.getCurrentVerse(versePager.getCurrentItem()));
+
+        loadTexts();
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+        // do nothing
+    }
+
+    @Override
+    public void onChapterSelected(int book, int chapter) {
+        if (currentBook == book && currentChapter == chapter) {
+            return;
+        }
+
+        currentBook = book;
+        currentChapter = chapter;
+
+        bookListAdapter.setSelected(currentBook, currentChapter);
+        bookListAdapter.notifyDataSetChanged();
 
         drawerLayout.closeDrawers();
-        textFragment.setSelected(bookIndex, chapterIndex, 0);
+
+        versePagerAdapter.setSelected(currentBook, currentChapter, 0);
+        versePagerAdapter.notifyDataSetChanged();
+
+        versePager.setCurrentItem(currentChapter, true);
+
         updateTitle();
     }
 
     @Override
-    public void onChapterSelected(int chapterIndex) {
-        if (currentChapter == chapterIndex)
-            return;
-        currentChapter = chapterIndex;
+    public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
+        parent.smoothScrollToPosition(groupPosition);
+        if (parent.isGroupExpanded(groupPosition)) {
+            parent.collapseGroup(groupPosition);
+        } else {
+            parent.expandGroup(groupPosition);
+            if (lastExpandedGroup != groupPosition) {
+                parent.collapseGroup(lastExpandedGroup);
+                lastExpandedGroup = groupPosition;
+            }
+        }
+        return true;
+    }
 
-        chapterSelectionFragment.setSelected(currentBook, currentChapter);
+    @Override
+    public void onVersesSelectionChanged(boolean hasSelected) {
+        if (hasSelected) {
+            if (actionMode != null) {
+                return;
+            }
+
+            actionMode = startSupportActionMode(new ActionMode.Callback() {
+                @Override
+                public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
+                    actionMode.getMenuInflater().inflate(R.menu.menu_text_selection_context, menu);
+                    return true;
+                }
+
+                @Override
+                public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
+                    return false;
+                }
+
+                @Override
+                public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
+                    switch (menuItem.getItemId()) {
+                        case R.id.action_copy:
+                            Analytics.trackUIEvent("copy");
+
+                            if (clipboardManager == null) {
+                                // noinspection deprecation
+                                clipboardManager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                            }
+                            clipboardManager.setText(buildText(versePagerAdapter.getSelectedVerses(versePager.getCurrentItem())));
+                            Toast.makeText(BookSelectionActivity.this,
+                                    R.string.toast_verses_copied, Toast.LENGTH_SHORT).show();
+                            actionMode.finish();
+                            return true;
+                        case R.id.action_share:
+                            Analytics.trackUIEvent("share");
+
+                            startActivity(Intent.createChooser(new Intent().setAction(Intent.ACTION_SEND).setType("text/plain")
+                                            .putExtra(Intent.EXTRA_TEXT,
+                                                    buildText(versePagerAdapter.getSelectedVerses(versePager.getCurrentItem()))),
+                                    getResources().getText(R.string.text_share_with)
+                            ));
+                            actionMode.finish();
+                            return true;
+                        default:
+                            return false;
+                    }
+                }
+
+                @Override
+                public void onDestroyActionMode(ActionMode actionMode) {
+                    if (actionMode != BookSelectionActivity.this.actionMode) {
+                        return;
+                    }
+                    versePagerAdapter.deselectVerses();
+                    BookSelectionActivity.this.actionMode = null;
+                }
+            });
+        } else {
+            if (actionMode != null) {
+                actionMode.finish();
+            }
+        }
+    }
+
+    @Override
+    public void onPageScrollStateChanged(int state) {
+        // do nothing
+    }
+
+    @Override
+    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+        // do nothing
+    }
+
+    @Override
+    public void onPageSelected(int position) {
+        if (currentChapter == position) {
+            return;
+        }
+        currentChapter = position;
+
+        if (actionMode != null) {
+            actionMode.finish();
+        }
+
+        updateBookList();
         updateTitle();
     }
 }
