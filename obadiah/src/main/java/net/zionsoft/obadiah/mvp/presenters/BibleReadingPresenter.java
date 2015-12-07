@@ -87,7 +87,10 @@ public class BibleReadingPresenter extends MVPPresenter<BibleReadingView> {
     }
 
     public void trackReadingProgress(int book, int chapter) {
-        readingProgressModel.trackReadingProgress(book, chapter);
+        readingProgressModel.trackReadingProgress(book, chapter)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe();
     }
 
     public void loadTranslations() {
