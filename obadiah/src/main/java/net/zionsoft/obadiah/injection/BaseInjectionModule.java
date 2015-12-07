@@ -24,7 +24,6 @@ import com.squareup.okhttp.OkHttpClient;
 
 import net.zionsoft.obadiah.App;
 import net.zionsoft.obadiah.model.Bible;
-import net.zionsoft.obadiah.model.ReadingProgressManager;
 import net.zionsoft.obadiah.model.Settings;
 import net.zionsoft.obadiah.model.database.DatabaseHelper;
 import net.zionsoft.obadiah.network.BackendInterface;
@@ -63,12 +62,6 @@ public class BaseInjectionModule {
     @Singleton
     public DatabaseHelper provideDatabaseHelper() {
         return new DatabaseHelper(application);
-    }
-
-    @Provides
-    @Singleton
-    public ReadingProgressManager provideReadingProgressManager() {
-        return new ReadingProgressManager(application);
     }
 
     @Provides

@@ -26,7 +26,6 @@ import java.util.List;
 
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
@@ -94,16 +93,26 @@ public class ReadingProgressPresenter extends MVPPresenter<ReadingProgressView> 
         subscription.add(readingProgressModel.loadReadingProgress()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Action1<ReadingProgress>() {
+                .subscribe(new Subscriber<ReadingProgress>() {
                     @Override
-                    public void call(ReadingProgress readingProgress) {
+                    public void onCompleted() {
+                        // do nothing
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
                         ReadingProgressView v = getView();
                         if (v != null) {
-                            if (readingProgress != null) {
-                                v.onReadingProgressLoaded(readingProgress);
-                            } else {
-                                v.onReadingProgressLoadFailed();
-                            }
+                            v.onReadingProgressLoadFailed();
+
+                        }
+                    }
+
+                    @Override
+                    public void onNext(ReadingProgress readingProgress) {
+                        ReadingProgressView v = getView();
+                        if (v != null) {
+                            v.onReadingProgressLoaded(readingProgress);
                         }
                     }
                 }));

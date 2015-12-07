@@ -32,7 +32,7 @@ public class ReadingProgress {
     private final List<Integer> chaptersReadPerBook;
     private final List<Pair<Integer, Long>> lastChapterReadPerBook;
 
-    ReadingProgress(List<SparseArray<Long>> chaptersReadPerBook, int continuousReading) {
+    public ReadingProgress(List<SparseArray<Long>> chaptersReadPerBook, int continuousReading) {
         super();
 
         int totalChaptersRead = 0;

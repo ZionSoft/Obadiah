@@ -21,7 +21,7 @@ import android.content.Context;
 
 import net.zionsoft.obadiah.injection.scopes.ActivityScope;
 import net.zionsoft.obadiah.model.Bible;
-import net.zionsoft.obadiah.model.ReadingProgressManager;
+import net.zionsoft.obadiah.model.database.DatabaseHelper;
 import net.zionsoft.obadiah.mvp.models.BibleReadingModel;
 import net.zionsoft.obadiah.mvp.models.ReadingProgressModel;
 import net.zionsoft.obadiah.mvp.presenters.ReadingProgressPresenter;
@@ -37,8 +37,8 @@ public class ReadingProgressModule {
     }
 
     @Provides
-    public ReadingProgressModel provideReadingProgressModel(ReadingProgressManager readingProgressManager) {
-        return new ReadingProgressModel(readingProgressManager);
+    public ReadingProgressModel provideReadingProgressModel(DatabaseHelper databaseHelper) {
+        return new ReadingProgressModel(databaseHelper);
     }
 
     @Provides
