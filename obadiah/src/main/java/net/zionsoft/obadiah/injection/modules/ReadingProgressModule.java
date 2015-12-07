@@ -18,10 +18,10 @@
 package net.zionsoft.obadiah.injection.modules;
 
 import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
 
 import net.zionsoft.obadiah.injection.scopes.ActivityScope;
 import net.zionsoft.obadiah.model.Bible;
-import net.zionsoft.obadiah.model.database.DatabaseHelper;
 import net.zionsoft.obadiah.mvp.models.BibleReadingModel;
 import net.zionsoft.obadiah.mvp.models.ReadingProgressModel;
 import net.zionsoft.obadiah.mvp.presenters.ReadingProgressPresenter;
@@ -37,8 +37,8 @@ public class ReadingProgressModule {
     }
 
     @Provides
-    public ReadingProgressModel provideReadingProgressModel(DatabaseHelper databaseHelper) {
-        return new ReadingProgressModel(databaseHelper);
+    public ReadingProgressModel provideReadingProgressModel(SQLiteDatabase database) {
+        return new ReadingProgressModel(database);
     }
 
     @Provides

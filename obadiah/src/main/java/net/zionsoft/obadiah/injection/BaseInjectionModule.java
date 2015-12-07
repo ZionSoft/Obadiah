@@ -18,6 +18,7 @@
 package net.zionsoft.obadiah.injection;
 
 import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
 
 import com.squareup.moshi.Moshi;
 import com.squareup.okhttp.OkHttpClient;
@@ -60,8 +61,8 @@ public class BaseInjectionModule {
 
     @Provides
     @Singleton
-    public DatabaseHelper provideDatabaseHelper() {
-        return new DatabaseHelper(application);
+    public SQLiteDatabase provideSQLiteDatabase() {
+        return new DatabaseHelper(application).getWritableDatabase();
     }
 
     @Provides

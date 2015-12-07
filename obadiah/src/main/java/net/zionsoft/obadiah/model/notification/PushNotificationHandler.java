@@ -39,7 +39,6 @@ import net.zionsoft.obadiah.Constants;
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.Verse;
 import net.zionsoft.obadiah.model.analytics.Analytics;
-import net.zionsoft.obadiah.model.database.DatabaseHelper;
 import net.zionsoft.obadiah.model.translations.TranslationHelper;
 import net.zionsoft.obadiah.translations.TranslationManagementActivity;
 
@@ -63,7 +62,7 @@ public class PushNotificationHandler extends IntentService {
     private static final String MESSAGE_TYPE_NEW_TRANSLATION = "newTranslation";
 
     @Inject
-    DatabaseHelper databaseHelper;
+    SQLiteDatabase database;
 
     public PushNotificationHandler() {
         super("net.zionsoft.obadiah.model.notification.PushNotificationHandler");
@@ -129,16 +128,14 @@ public class PushNotificationHandler extends IntentService {
             return false;
         }
 
-        SQLiteDatabase db = null;
         try {
             final JSONObject jsonObject = new JSONObject(messageAttrs);
             final int bookIndex = jsonObject.getInt("book");
             final int chapterIndex = jsonObject.getInt("chapter");
             final int verseIndex = jsonObject.getInt("verse");
 
-            db = databaseHelper.openDatabase();
-            final String bookName = TranslationHelper.getBookNames(db, translationShortName).get(bookIndex);
-            final Verse verse = TranslationHelper.getVerse(db, translationShortName, bookName,
+            final String bookName = TranslationHelper.getBookNames(database, translationShortName).get(bookIndex);
+            final Verse verse = TranslationHelper.getVerse(database, translationShortName, bookName,
                     bookIndex, chapterIndex, verseIndex);
             if (verse == null) {
                 throw new IllegalArgumentException("Invalid push message attrs: " + messageAttrs);
@@ -153,10 +150,6 @@ public class PushNotificationHandler extends IntentService {
         } catch (Exception e) {
             Crashlytics.getInstance().core.logException(e);
             return false;
-        } finally {
-            if (db != null) {
-                databaseHelper.closeDatabase();
-            }
         }
         return true;
     }

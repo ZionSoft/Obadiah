@@ -23,8 +23,6 @@ import android.support.annotation.NonNull;
 import android.support.v4.util.LruCache;
 
 import net.zionsoft.obadiah.App;
-import net.zionsoft.obadiah.model.analytics.Analytics;
-import net.zionsoft.obadiah.model.database.DatabaseHelper;
 import net.zionsoft.obadiah.model.translations.TranslationHelper;
 import net.zionsoft.obadiah.utils.SimpleAsyncTask;
 
@@ -53,7 +51,7 @@ public class Bible {
             28, 16, 24, 21, 28, 16, 16, 13, 6, 6, 4, 4, 5, 3, 6, 4, 3, 1, 13, 5, 5, 3, 5, 1, 1, 1, 22};
 
     @Inject
-    DatabaseHelper databaseHelper;
+    SQLiteDatabase database;
 
     private final LruCache<String, List<String>> bookNameCache;
     private final LruCache<String, List<Verse>> verseCache;
@@ -114,32 +112,15 @@ public class Bible {
 
     @NonNull
     public List<String> loadTranslations() {
-        SQLiteDatabase db = null;
-        try {
-            db = databaseHelper.openDatabase();
-            return TranslationHelper.getDownloadedTranslationShortNames(db);
-        } finally {
-            if (db != null) {
-                databaseHelper.closeDatabase();
-            }
-        }
+        return TranslationHelper.getDownloadedTranslationShortNames(database);
     }
 
     @NonNull
     public List<String> loadBookNames(String translationShortName) {
         List<String> bookNames = bookNameCache.get(translationShortName);
         if (bookNames == null) {
-            SQLiteDatabase db = null;
-            try {
-                db = databaseHelper.openDatabase();
-                bookNames = Collections.unmodifiableList(
-                        TranslationHelper.getBookNames(db, translationShortName));
-            } finally {
-                if (db != null) {
-                    databaseHelper.closeDatabase();
-                }
-            }
-
+            bookNames = Collections.unmodifiableList(
+                    TranslationHelper.getBookNames(database, translationShortName));
             bookNameCache.put(translationShortName, bookNames);
         }
         return bookNames;
@@ -157,28 +138,16 @@ public class Bible {
         new SimpleAsyncTask<Void, Void, List<Verse>>() {
             @Override
             protected List<Verse> doInBackground(Void... params) {
-                SQLiteDatabase db = null;
-                try {
-                    db = databaseHelper.openDatabase();
-                    if (db == null) {
-                        Analytics.trackException("Failed to open database.");
-                        return null;
-                    }
-
-                    List<String> bookNames = bookNameCache.get(translationShortName);
-                    if (bookNames == null) {
-                        // this should not happen, but just in case
-                        bookNames = Collections.unmodifiableList(TranslationHelper.getBookNames(db, translationShortName));
-                        bookNameCache.put(translationShortName, bookNames);
-                    }
-
-                    return TranslationHelper.getVerses(db, translationShortName,
-                            bookNames.get(book), book, chapter);
-                } finally {
-                    if (db != null) {
-                        databaseHelper.closeDatabase();
-                    }
+                List<String> bookNames = bookNameCache.get(translationShortName);
+                if (bookNames == null) {
+                    // this should not happen, but just in case
+                    bookNames = Collections.unmodifiableList(
+                            TranslationHelper.getBookNames(database, translationShortName));
+                    bookNameCache.put(translationShortName, bookNames);
                 }
+
+                return TranslationHelper.getVerses(database, translationShortName,
+                        bookNames.get(book), book, chapter);
             }
 
             @Override
@@ -196,20 +165,14 @@ public class Bible {
 
     @NonNull
     public List<Verse> search(String translationShortName, String query) {
-        SQLiteDatabase db = null;
-        try {
-            db = databaseHelper.openDatabase();
-            List<String> bookNames = bookNameCache.get(translationShortName);
-            if (bookNames == null) {
-                // this should not happen, but just in case
-                bookNames = Collections.unmodifiableList(TranslationHelper.getBookNames(db, translationShortName));
-                bookNameCache.put(translationShortName, bookNames);
-            }
-            return TranslationHelper.searchVerses(db, translationShortName, bookNames, query);
-        } finally {
-            if (db != null) {
-                databaseHelper.closeDatabase();
-            }
+        List<String> bookNames = bookNameCache.get(translationShortName);
+        if (bookNames == null) {
+            // this should not happen, but just in case
+            bookNames = Collections.unmodifiableList(
+                    TranslationHelper.getBookNames(database, translationShortName));
+            bookNameCache.put(translationShortName, bookNames);
         }
+        return TranslationHelper.searchVerses(database, translationShortName, bookNames, query);
+
     }
 }

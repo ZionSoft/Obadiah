@@ -25,7 +25,6 @@ import com.squareup.moshi.Moshi;
 import com.squareup.okhttp.ResponseBody;
 
 import net.zionsoft.obadiah.model.analytics.Analytics;
-import net.zionsoft.obadiah.model.database.DatabaseHelper;
 import net.zionsoft.obadiah.model.translations.TranslationHelper;
 import net.zionsoft.obadiah.model.translations.TranslationInfo;
 import net.zionsoft.obadiah.model.translations.Translations;
@@ -49,13 +48,13 @@ import rx.functions.Func2;
 import rx.schedulers.Schedulers;
 
 class TranslationManagementModel {
-    private final DatabaseHelper databaseHelper;
+    private final SQLiteDatabase database;
     private final BackendInterface backendInterface;
     private final JsonAdapter<BackendTranslationInfo> translationInfoJsonAdapter;
     private final JsonAdapter<BackendChapter> chapterJsonAdapter;
 
-    TranslationManagementModel(DatabaseHelper databaseHelper, Moshi moshi, BackendInterface backendInterface) {
-        this.databaseHelper = databaseHelper;
+    TranslationManagementModel(SQLiteDatabase database, Moshi moshi, BackendInterface backendInterface) {
+        this.database = database;
         this.backendInterface = backendInterface;
         this.translationInfoJsonAdapter = moshi.adapter(BackendTranslationInfo.class);
         this.chapterJsonAdapter = moshi.adapter(BackendChapter.class);
@@ -84,17 +83,11 @@ class TranslationManagementModel {
                 new Observable.OnSubscribe<List<String>>() {
                     @Override
                     public void call(Subscriber<? super List<String>> subscriber) {
-                        SQLiteDatabase db = null;
                         try {
-                            db = databaseHelper.openDatabase();
-                            subscriber.onNext(TranslationHelper.getDownloadedTranslationShortNames(db));
+                            subscriber.onNext(TranslationHelper.getDownloadedTranslationShortNames(database));
                             subscriber.onCompleted();
                         } catch (Exception e) {
                             subscriber.onError(e);
-                        } finally {
-                            if (db != null) {
-                                databaseHelper.closeDatabase();
-                            }
                         }
                     }
                 });
@@ -114,25 +107,20 @@ class TranslationManagementModel {
                 .doOnNext(new Action1<List<TranslationInfo>>() {
                     @Override
                     public void call(List<TranslationInfo> translations) {
-                        SQLiteDatabase db = null;
                         try {
-                            db = databaseHelper.openDatabase();
-                            db.beginTransaction();
-                            TranslationHelper.saveTranslations(db, translations);
-                            db.setTransactionSuccessful();
+                            database.beginTransaction();
+                            TranslationHelper.saveTranslations(database, translations);
+                            database.setTransactionSuccessful();
                         } finally {
-                            if (db != null) {
-                                if (db.inTransaction()) {
-                                    db.endTransaction();
-                                }
-                                databaseHelper.closeDatabase();
+                            if (database.inTransaction()) {
+                                database.endTransaction();
                             }
                         }
                     }
                 })
-                        // workaround for Retrofit / okhttp issue (of sorts)
-                        // https://github.com/square/retrofit/issues/1046
-                        // https://github.com/square/okhttp/issues/1592
+                // workaround for Retrofit / okhttp issue (of sorts)
+                // https://github.com/square/retrofit/issues/1046
+                // https://github.com/square/okhttp/issues/1592
                 .unsubscribeOn(Schedulers.io());
     }
 
@@ -140,17 +128,11 @@ class TranslationManagementModel {
         return Observable.create(new Observable.OnSubscribe<List<TranslationInfo>>() {
             @Override
             public void call(Subscriber<? super List<TranslationInfo>> subscriber) {
-                SQLiteDatabase db = null;
                 try {
-                    db = databaseHelper.openDatabase();
-                    subscriber.onNext(TranslationHelper.getTranslations(db));
+                    subscriber.onNext(TranslationHelper.getTranslations(database));
                     subscriber.onCompleted();
                 } catch (Exception e) {
                     subscriber.onError(e);
-                } finally {
-                    if (db != null) {
-                        databaseHelper.closeDatabase();
-                    }
                 }
             }
         });
@@ -161,18 +143,13 @@ class TranslationManagementModel {
             @Override
             public void call(Subscriber<? super Void> subscriber) {
                 try {
-                    SQLiteDatabase db = null;
                     try {
-                        db = databaseHelper.openDatabase();
-                        db.beginTransaction();
-                        TranslationHelper.removeTranslation(db, translation.shortName);
-                        db.setTransactionSuccessful();
+                        database.beginTransaction();
+                        TranslationHelper.removeTranslation(database, translation.shortName);
+                        database.setTransactionSuccessful();
                     } finally {
-                        if (db != null) {
-                            if (db.inTransaction()) {
-                                db.endTransaction();
-                            }
-                            databaseHelper.closeDatabase();
+                        if (database.inTransaction()) {
+                            database.endTransaction();
                         }
                     }
                     subscriber.onCompleted();
@@ -190,7 +167,6 @@ class TranslationManagementModel {
                 final long timestamp = SystemClock.elapsedRealtime();
                 boolean success = false;
 
-                SQLiteDatabase db = null;
                 ZipInputStream is = null;
                 try {
                     final Response<ResponseBody> response
@@ -199,9 +175,8 @@ class TranslationManagementModel {
                         throw new IOException("Unsupported HTTP status code - " + response.code());
                     }
 
-                    db = databaseHelper.openDatabase();
-                    db.beginTransaction();
-                    TranslationHelper.createTranslationTable(db, translation.shortName);
+                    database.beginTransaction();
+                    TranslationHelper.createTranslationTable(database, translation.shortName);
 
                     is = new ZipInputStream(response.body().byteStream());
                     ZipEntry entry;
@@ -211,13 +186,13 @@ class TranslationManagementModel {
                         final String entryName = entry.getName();
                         BufferedSource bufferedSource = Okio.buffer(Okio.source(is));
                         if (entryName.equals("books.json")) {
-                            TranslationHelper.saveBookNames(db,
+                            TranslationHelper.saveBookNames(database,
                                     translationInfoJsonAdapter.fromJson(bufferedSource));
                         } else {
                             final String[] parts = entryName.substring(0, entryName.length() - 5).split("-");
                             final int book = Integer.parseInt(parts[0]);
                             final int chapter = Integer.parseInt(parts[1]);
-                            TranslationHelper.saveVerses(db, translation.shortName, book, chapter,
+                            TranslationHelper.saveVerses(database, translation.shortName, book, chapter,
                                     chapterJsonAdapter.fromJson(bufferedSource).verses);
                         }
 
@@ -232,7 +207,7 @@ class TranslationManagementModel {
                             subscriber.onNext(Integer.valueOf(progress));
                         }
                     }
-                    db.setTransactionSuccessful();
+                    database.setTransactionSuccessful();
                     subscriber.onCompleted();
                     success = true;
                 } catch (Exception e) {
@@ -240,11 +215,8 @@ class TranslationManagementModel {
                 } finally {
                     Analytics.trackTranslationDownload(translation.shortName, success, SystemClock.elapsedRealtime() - timestamp);
 
-                    if (db != null) {
-                        if (db.inTransaction()) {
-                            db.endTransaction();
-                        }
-                        databaseHelper.closeDatabase();
+                    if (database.inTransaction()) {
+                        database.endTransaction();
                     }
 
                     if (is != null) {

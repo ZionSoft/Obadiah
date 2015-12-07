@@ -34,21 +34,19 @@ import rx.Observable;
 import rx.Subscriber;
 
 public class ReadingProgressModel {
-    private final DatabaseHelper databaseHelper;
+    private final SQLiteDatabase database;
 
-    public ReadingProgressModel(DatabaseHelper databaseHelper) {
-        this.databaseHelper = databaseHelper;
+    public ReadingProgressModel(SQLiteDatabase database) {
+        this.database = database;
     }
 
     public Observable<ReadingProgress> loadReadingProgress() {
         return Observable.create(new Observable.OnSubscribe<ReadingProgress>() {
             @Override
             public void call(Subscriber<? super ReadingProgress> subscriber) {
-                SQLiteDatabase db = null;
                 Cursor cursor = null;
                 try {
-                    db = databaseHelper.openDatabase();
-                    cursor = db.query(DatabaseHelper.TABLE_READING_PROGRESS,
+                    cursor = database.query(DatabaseHelper.TABLE_READING_PROGRESS,
                             new String[]{DatabaseHelper.COLUMN_BOOK_INDEX, DatabaseHelper.COLUMN_CHAPTER_INDEX,
                                     DatabaseHelper.COLUMN_LAST_READING_TIMESTAMP},
                             null, null, null, null, null
@@ -67,7 +65,7 @@ public class ReadingProgressModel {
                     }
 
                     final int continuousReadingDays = Integer.parseInt(
-                            DatabaseHelper.getMetadata(db, DatabaseHelper.KEY_CONTINUOUS_READING_DAYS, "1"));
+                            DatabaseHelper.getMetadata(database, DatabaseHelper.KEY_CONTINUOUS_READING_DAYS, "1"));
 
                     subscriber.onNext(new ReadingProgress(chaptersReadPerBook, continuousReadingDays));
                     subscriber.onCompleted();
@@ -76,9 +74,6 @@ public class ReadingProgressModel {
                 } finally {
                     if (cursor != null) {
                         cursor.close();
-                    }
-                    if (db != null) {
-                        databaseHelper.closeDatabase();
                     }
                 }
             }
@@ -89,42 +84,37 @@ public class ReadingProgressModel {
         return Observable.create(new Observable.OnSubscribe<Void>() {
             @Override
             public void call(Subscriber<? super Void> subscriber) {
-                SQLiteDatabase db = null;
                 try {
-                    db = databaseHelper.openDatabase();
-                    db.beginTransaction();
+                    database.beginTransaction();
 
                     final ContentValues values = new ContentValues(3);
                     values.put(DatabaseHelper.COLUMN_BOOK_INDEX, book);
                     values.put(DatabaseHelper.COLUMN_CHAPTER_INDEX, chapter);
                     values.put(DatabaseHelper.COLUMN_LAST_READING_TIMESTAMP, System.currentTimeMillis());
-                    db.insertWithOnConflict(DatabaseHelper.TABLE_READING_PROGRESS,
+                    database.insertWithOnConflict(DatabaseHelper.TABLE_READING_PROGRESS,
                             null, values, SQLiteDatabase.CONFLICT_REPLACE);
 
                     final long lastReadingDay = Long.parseLong(DatabaseHelper.getMetadata(
-                            db, DatabaseHelper.KEY_LAST_READING_TIMESTAMP, "0")) / DateUtils.DAY_IN_MILLIS;
+                            database, DatabaseHelper.KEY_LAST_READING_TIMESTAMP, "0")) / DateUtils.DAY_IN_MILLIS;
                     final long now = System.currentTimeMillis();
                     final long today = now / DateUtils.DAY_IN_MILLIS;
                     final long diff = today - lastReadingDay;
                     if (diff == 1) {
                         final int continuousReadingDays = Integer.parseInt(
-                                DatabaseHelper.getMetadata(db, DatabaseHelper.KEY_CONTINUOUS_READING_DAYS, "0"));
-                        DatabaseHelper.setMetadata(db, DatabaseHelper.KEY_CONTINUOUS_READING_DAYS,
+                                DatabaseHelper.getMetadata(database, DatabaseHelper.KEY_CONTINUOUS_READING_DAYS, "0"));
+                        DatabaseHelper.setMetadata(database, DatabaseHelper.KEY_CONTINUOUS_READING_DAYS,
                                 Integer.toString(continuousReadingDays + 1));
                     } else if (diff > 2) {
-                        DatabaseHelper.setMetadata(db, DatabaseHelper.KEY_CONTINUOUS_READING_DAYS, "1");
+                        DatabaseHelper.setMetadata(database, DatabaseHelper.KEY_CONTINUOUS_READING_DAYS, "1");
                     }
-                    DatabaseHelper.setMetadata(db, DatabaseHelper.KEY_LAST_READING_TIMESTAMP, Long.toString(now));
+                    DatabaseHelper.setMetadata(database, DatabaseHelper.KEY_LAST_READING_TIMESTAMP, Long.toString(now));
 
-                    db.setTransactionSuccessful();
+                    database.setTransactionSuccessful();
                 } catch (Exception e) {
                     // do nothing
                 } finally {
-                    if (db != null) {
-                        if (db.inTransaction()) {
-                            db.endTransaction();
-                        }
-                        databaseHelper.closeDatabase();
+                    if (database.inTransaction()) {
+                        database.endTransaction();
                     }
                 }
 
