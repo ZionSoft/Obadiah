@@ -15,16 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.model.search;
+package net.zionsoft.obadiah.search;
 
 import android.content.SearchRecentSuggestionsProvider;
 
 import net.zionsoft.obadiah.BuildConfig;
 
 public class RecentSearchProvider extends SearchRecentSuggestionsProvider {
-    public final static String AUTHORITY = BuildConfig.DEBUG
-            ? "net.zionsoft.obadiah.debug.model.search.RecentSearchProvider"
-            : "net.zionsoft.obadiah.model.search.RecentSearchProvider";
+    public final static String AUTHORITY
+            = BuildConfig.APPLICATION_ID + ".model.search.RecentSearchProvider";
     public final static int MODE = DATABASE_MODE_QUERIES;
 
     public RecentSearchProvider() {

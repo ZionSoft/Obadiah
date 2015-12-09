@@ -68,7 +68,7 @@
             android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize" />
 
         <provider
-            android:name=".model.search.RecentSearchProvider"
+            android:name=".search.RecentSearchProvider"
             android:authorities="${applicationId}.model.search.RecentSearchProvider"
             android:exported="false" />
 

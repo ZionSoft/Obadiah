@@ -22,7 +22,6 @@ import android.provider.SearchRecentSuggestions;
 
 import net.zionsoft.obadiah.model.Bible;
 import net.zionsoft.obadiah.model.Verse;
-import net.zionsoft.obadiah.model.search.RecentSearchProvider;
 
 import java.util.List;
 
