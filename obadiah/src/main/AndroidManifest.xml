@@ -60,7 +60,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.activities.SettingsActivity" />
+        <activity android:name=".misc.settings.SettingsActivity" />
         <activity android:name=".translations.TranslationManagementActivity" />
 
         <activity

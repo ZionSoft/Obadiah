@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.ui.activities;
+package net.zionsoft.obadiah.misc.settings;
 
 import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
@@ -39,11 +39,10 @@ import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.misc.license.OpenSourceLicenseActivity;
 import net.zionsoft.obadiah.model.Settings;
 import net.zionsoft.obadiah.model.analytics.Analytics;
+import net.zionsoft.obadiah.ui.activities.BaseAppCompatActivity;
 import net.zionsoft.obadiah.ui.utils.AnimationHelper;
 import net.zionsoft.obadiah.ui.utils.DialogHelper;
 import net.zionsoft.obadiah.ui.widget.SectionHeader;
-import net.zionsoft.obadiah.ui.widget.settings.SettingSwitch;
-import net.zionsoft.obadiah.ui.widget.settings.SettingTitleDescriptionButton;
 
 import javax.inject.Inject;
 

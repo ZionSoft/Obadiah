@@ -30,7 +30,7 @@ import net.zionsoft.obadiah.search.SearchComponent;
 import net.zionsoft.obadiah.search.SearchModule;
 import net.zionsoft.obadiah.translations.TranslationManagementComponent;
 import net.zionsoft.obadiah.translations.TranslationManagementModule;
-import net.zionsoft.obadiah.ui.activities.SettingsActivity;
+import net.zionsoft.obadiah.misc.settings.SettingsActivity;
 import net.zionsoft.obadiah.ui.adapters.VersePagerAdapter;
 
 import javax.inject.Singleton;

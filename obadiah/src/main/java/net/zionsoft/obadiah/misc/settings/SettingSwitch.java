@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.ui.widget.settings;
+package net.zionsoft.obadiah.misc.settings;
 
 import android.annotation.TargetApi;
 import android.content.Context;
