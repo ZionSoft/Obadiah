@@ -55,8 +55,8 @@ public class Settings {
         @DimenRes
         public final int smallerTextSize;
 
-        private TextSize(String settingKey, @StringRes int title,
-                         @DimenRes int textSize, @DimenRes int smallerTextSize) {
+        TextSize(String settingKey, @StringRes int title,
+                 @DimenRes int textSize, @DimenRes int smallerTextSize) {
             this.settingKey = settingKey;
             this.title = title;
             this.textSize = textSize;

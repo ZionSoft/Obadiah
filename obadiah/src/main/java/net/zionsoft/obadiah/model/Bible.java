@@ -34,10 +34,6 @@ import javax.inject.Singleton;
 
 @Singleton
 public class Bible {
-    public interface OnStringsLoadedListener {
-        public void onStringsLoaded(List<String> strings);
-    }
-
     public interface OnVersesLoadedListener {
         public void onVersesLoaded(List<Verse> verses);
     }
