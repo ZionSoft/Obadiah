@@ -39,7 +39,7 @@ import net.zionsoft.obadiah.Constants;
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.domain.Verse;
 import net.zionsoft.obadiah.model.analytics.Analytics;
-import net.zionsoft.obadiah.model.translations.TranslationHelper;
+import net.zionsoft.obadiah.model.database.TranslationHelper;
 import net.zionsoft.obadiah.translations.TranslationManagementActivity;
 
 import org.json.JSONException;

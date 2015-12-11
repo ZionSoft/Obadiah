@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.model.translations;
+package net.zionsoft.obadiah.model.database;
 
 import android.content.ContentValues;
 import android.database.Cursor;
@@ -25,48 +25,13 @@ import android.support.annotation.Nullable;
 import net.zionsoft.obadiah.model.Bible;
 import net.zionsoft.obadiah.model.domain.TranslationInfo;
 import net.zionsoft.obadiah.model.domain.Verse;
-import net.zionsoft.obadiah.model.database.DatabaseHelper;
 import net.zionsoft.obadiah.network.BackendTranslationInfo;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Locale;
 
 public class TranslationHelper {
-    public static List<TranslationInfo> sortByLocale(List<TranslationInfo> translations) {
-        Collections.sort(translations, new Comparator<TranslationInfo>() {
-            @Override
-            public int compare(TranslationInfo translation1, TranslationInfo translation2) {
-                // first compares with user's default locale
-                final Locale userLocale = Locale.getDefault();
-                final String userLanguage = userLocale.getLanguage().toLowerCase();
-                final String userCountry = userLocale.getCountry().toLowerCase();
-                final String[] fields1 = translation1.language.split("_");
-                final String[] fields2 = translation2.language.split("_");
-                final int score1 = compareLocale(fields1[0], fields1[1],
-                        userLanguage, userCountry);
-                final int score2 = compareLocale(fields2[0], fields2[1],
-                        userLanguage, userCountry);
-                int r = score2 - score1;
-                if (r != 0)
-                    return r;
-
-                // then sorts by language & name
-                r = translation1.language.compareTo(translation2.language);
-                return r == 0 ? translation1.name.compareTo(translation2.name) : r;
-            }
-        });
-        return translations;
-    }
-
-    private static int compareLocale(String language, String country, String targetLanguage, String targetCountry) {
-        if (language.equals(targetLanguage))
-            return (country.equals(targetCountry)) ? 2 : 1;
-        return 0;
-    }
-
     public static List<String> getDownloadedTranslationShortNames(SQLiteDatabase db) {
         Cursor cursor = null;
         try {

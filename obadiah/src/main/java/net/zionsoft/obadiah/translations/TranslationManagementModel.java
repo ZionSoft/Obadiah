@@ -25,7 +25,7 @@ import com.squareup.moshi.Moshi;
 import com.squareup.okhttp.ResponseBody;
 
 import net.zionsoft.obadiah.model.analytics.Analytics;
-import net.zionsoft.obadiah.model.translations.TranslationHelper;
+import net.zionsoft.obadiah.model.database.TranslationHelper;
 import net.zionsoft.obadiah.model.domain.TranslationInfo;
 import net.zionsoft.obadiah.model.domain.Translations;
 import net.zionsoft.obadiah.network.BackendChapter;
@@ -33,7 +33,10 @@ import net.zionsoft.obadiah.network.BackendInterface;
 import net.zionsoft.obadiah.network.BackendTranslationInfo;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -76,7 +79,7 @@ class TranslationManagementModel {
         translations = translations.map(new Func1<List<TranslationInfo>, List<TranslationInfo>>() {
             @Override
             public List<TranslationInfo> call(List<TranslationInfo> translations) {
-                return TranslationHelper.sortByLocale(translations);
+                return sortByLocale(translations);
             }
         });
         final Observable<List<String>> downloaded = Observable.create(
@@ -118,9 +121,9 @@ class TranslationManagementModel {
                         }
                     }
                 })
-                // workaround for Retrofit / okhttp issue (of sorts)
-                // https://github.com/square/retrofit/issues/1046
-                // https://github.com/square/okhttp/issues/1592
+                        // workaround for Retrofit / okhttp issue (of sorts)
+                        // https://github.com/square/retrofit/issues/1046
+                        // https://github.com/square/okhttp/issues/1592
                 .unsubscribeOn(Schedulers.io());
     }
 
@@ -136,6 +139,40 @@ class TranslationManagementModel {
                 }
             }
         });
+    }
+
+    private static List<TranslationInfo> sortByLocale(List<TranslationInfo> translations) {
+        Collections.sort(translations, new Comparator<TranslationInfo>() {
+            @Override
+            public int compare(TranslationInfo translation1, TranslationInfo translation2) {
+                // first compares with user's default locale
+                final Locale userLocale = Locale.getDefault();
+                final String userLanguage = userLocale.getLanguage().toLowerCase();
+                final String userCountry = userLocale.getCountry().toLowerCase();
+                final String[] fields1 = translation1.language.split("_");
+                final String[] fields2 = translation2.language.split("_");
+                final int score1 = compareLocale(fields1[0], fields1[1],
+                        userLanguage, userCountry);
+                final int score2 = compareLocale(fields2[0], fields2[1],
+                        userLanguage, userCountry);
+                int r = score2 - score1;
+                if (r != 0) {
+                    return r;
+                }
+
+                // then sorts by language & name
+                r = translation1.language.compareTo(translation2.language);
+                return r == 0 ? translation1.name.compareTo(translation2.name) : r;
+            }
+        });
+        return translations;
+    }
+
+    private static int compareLocale(String language, String country, String targetLanguage, String targetCountry) {
+        if (language.equals(targetLanguage)) {
+            return (country.equals(targetCountry)) ? 2 : 1;
+        }
+        return 0;
     }
 
     Observable<Void> removeTranslation(final TranslationInfo translation) {
