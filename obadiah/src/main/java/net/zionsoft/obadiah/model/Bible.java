@@ -23,6 +23,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.util.LruCache;
 
 import net.zionsoft.obadiah.App;
+import net.zionsoft.obadiah.model.domain.Verse;
 import net.zionsoft.obadiah.model.translations.TranslationHelper;
 import net.zionsoft.obadiah.utils.SimpleAsyncTask;
 

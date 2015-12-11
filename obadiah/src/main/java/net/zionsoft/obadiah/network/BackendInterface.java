@@ -19,7 +19,7 @@ package net.zionsoft.obadiah.network;
 
 import com.squareup.okhttp.ResponseBody;
 
-import net.zionsoft.obadiah.model.translations.TranslationInfo;
+import net.zionsoft.obadiah.model.domain.TranslationInfo;
 
 import java.util.List;
 

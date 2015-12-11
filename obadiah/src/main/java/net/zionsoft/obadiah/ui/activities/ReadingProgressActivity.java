@@ -32,7 +32,7 @@ import net.zionsoft.obadiah.Constants;
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.injection.components.fragments.ReadingProgressComponentFragment;
 import net.zionsoft.obadiah.injection.scopes.ActivityScope;
-import net.zionsoft.obadiah.model.ReadingProgress;
+import net.zionsoft.obadiah.model.domain.ReadingProgress;
 import net.zionsoft.obadiah.model.Settings;
 import net.zionsoft.obadiah.mvp.presenters.ReadingProgressPresenter;
 import net.zionsoft.obadiah.mvp.views.ReadingProgressView;

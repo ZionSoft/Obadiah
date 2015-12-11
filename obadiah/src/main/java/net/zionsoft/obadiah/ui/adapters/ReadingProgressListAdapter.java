@@ -28,7 +28,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import net.zionsoft.obadiah.R;
-import net.zionsoft.obadiah.model.ReadingProgress;
+import net.zionsoft.obadiah.model.domain.ReadingProgress;
 import net.zionsoft.obadiah.model.Settings;
 import net.zionsoft.obadiah.ui.utils.DateFormatter;
 import net.zionsoft.obadiah.ui.widget.ProgressBar;

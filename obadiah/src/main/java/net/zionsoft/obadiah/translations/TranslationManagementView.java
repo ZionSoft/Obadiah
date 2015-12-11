@@ -17,8 +17,8 @@
 
 package net.zionsoft.obadiah.translations;
 
-import net.zionsoft.obadiah.model.translations.TranslationInfo;
-import net.zionsoft.obadiah.model.translations.Translations;
+import net.zionsoft.obadiah.model.domain.TranslationInfo;
+import net.zionsoft.obadiah.model.domain.Translations;
 import net.zionsoft.obadiah.mvp.views.MVPView;
 
 interface TranslationManagementView extends MVPView {

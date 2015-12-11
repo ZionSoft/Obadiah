@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.model;
+package net.zionsoft.obadiah.model.domain;
 
 import android.os.Parcel;
 import android.os.Parcelable;

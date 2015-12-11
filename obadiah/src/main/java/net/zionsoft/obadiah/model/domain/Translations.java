@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.model.translations;
+package net.zionsoft.obadiah.model.domain;
 
 import android.support.annotation.NonNull;
 

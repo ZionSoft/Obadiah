@@ -17,7 +17,7 @@
 
 package net.zionsoft.obadiah.mvp.presenters;
 
-import net.zionsoft.obadiah.model.ReadingProgress;
+import net.zionsoft.obadiah.model.domain.ReadingProgress;
 import net.zionsoft.obadiah.mvp.models.BibleReadingModel;
 import net.zionsoft.obadiah.mvp.models.ReadingProgressModel;
 import net.zionsoft.obadiah.mvp.views.ReadingProgressView;

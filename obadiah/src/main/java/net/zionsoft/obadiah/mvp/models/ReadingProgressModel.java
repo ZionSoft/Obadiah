@@ -24,7 +24,7 @@ import android.text.format.DateUtils;
 import android.util.SparseArray;
 
 import net.zionsoft.obadiah.model.Bible;
-import net.zionsoft.obadiah.model.ReadingProgress;
+import net.zionsoft.obadiah.model.domain.ReadingProgress;
 import net.zionsoft.obadiah.model.database.DatabaseHelper;
 
 import java.util.ArrayList;

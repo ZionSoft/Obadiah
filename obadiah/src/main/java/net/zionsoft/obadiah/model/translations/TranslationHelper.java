@@ -23,7 +23,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.Nullable;
 
 import net.zionsoft.obadiah.model.Bible;
-import net.zionsoft.obadiah.model.Verse;
+import net.zionsoft.obadiah.model.domain.TranslationInfo;
+import net.zionsoft.obadiah.model.domain.Verse;
 import net.zionsoft.obadiah.model.database.DatabaseHelper;
 import net.zionsoft.obadiah.network.BackendTranslationInfo;
 

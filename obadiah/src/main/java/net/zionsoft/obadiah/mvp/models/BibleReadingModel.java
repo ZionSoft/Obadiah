@@ -25,7 +25,7 @@ import android.text.TextUtils;
 import net.zionsoft.obadiah.Constants;
 import net.zionsoft.obadiah.model.Bible;
 import net.zionsoft.obadiah.model.analytics.Analytics;
-import net.zionsoft.obadiah.model.translations.TranslationInfo;
+import net.zionsoft.obadiah.model.domain.TranslationInfo;
 
 import java.util.List;
 

@@ -17,7 +17,7 @@
 
 package net.zionsoft.obadiah.search;
 
-import net.zionsoft.obadiah.model.Verse;
+import net.zionsoft.obadiah.model.domain.Verse;
 import net.zionsoft.obadiah.mvp.views.MVPView;
 
 import java.util.List;
