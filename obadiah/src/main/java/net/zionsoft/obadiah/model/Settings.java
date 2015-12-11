@@ -65,7 +65,7 @@ public class Settings {
 
         private static final TextSize DEFAULT = MEDIUM;
 
-        public static TextSize fromSettingKey(@Nullable String settingKey) {
+        private static TextSize fromSettingKey(@Nullable String settingKey) {
             for (TextSize textSize : TextSize.values()) {
                 if (textSize.settingKey.equals(settingKey)) {
                     return textSize;
@@ -91,13 +91,9 @@ public class Settings {
         super();
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        refresh();
-    }
 
-    public void refresh() {
         nightMode = sharedPreferences.getBoolean(SETTING_KEY_NIGHT_MODE, false);
         screenOn = sharedPreferences.getBoolean(SETTING_KEY_SCREEN_ON, false);
-
         textSize = TextSize.fromSettingKey(sharedPreferences.getString(SETTING_KEY_TEXT_SIZE, null));
     }
 

@@ -172,8 +172,6 @@ public class SearchActivity extends BaseAppCompatActivity
     }
 
     private void populateUi() {
-        settings.refresh();
-
         final View rootView = getWindow().getDecorView();
         rootView.setKeepScreenOn(settings.keepScreenOn());
         rootView.setBackgroundColor(settings.getBackgroundColor());

@@ -248,7 +248,6 @@ public class BookSelectionActivity extends BaseAppCompatActivity implements Bibl
     }
 
     private void populateUi() {
-        settings.refresh();
         rootView.setKeepScreenOn(settings.keepScreenOn());
         rootView.setBackgroundColor(settings.getBackgroundColor());
 
