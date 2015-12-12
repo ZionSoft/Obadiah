@@ -23,7 +23,6 @@ import android.database.sqlite.SQLiteDatabase;
 import com.squareup.moshi.Moshi;
 
 import net.zionsoft.obadiah.injection.scopes.ActivityScope;
-import net.zionsoft.obadiah.model.Bible;
 import net.zionsoft.obadiah.mvp.models.AdsModel;
 import net.zionsoft.obadiah.mvp.models.BibleReadingModel;
 import net.zionsoft.obadiah.network.BackendInterface;
@@ -36,11 +35,6 @@ public class TranslationManagementModule {
     @Provides
     AdsModel provideAdsModel(Context context, Moshi moshi) {
         return new AdsModel(context, moshi);
-    }
-
-    @Provides
-    BibleReadingModel provideBibleReadingModel(Context context, Bible bible) {
-        return new BibleReadingModel(context, bible);
     }
 
     @Provides

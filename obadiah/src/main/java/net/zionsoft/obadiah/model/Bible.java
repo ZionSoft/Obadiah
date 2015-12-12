@@ -23,9 +23,8 @@ import android.support.annotation.NonNull;
 import android.support.v4.util.LruCache;
 
 import net.zionsoft.obadiah.App;
-import net.zionsoft.obadiah.model.domain.Verse;
 import net.zionsoft.obadiah.model.database.TranslationHelper;
-import net.zionsoft.obadiah.utils.SimpleAsyncTask;
+import net.zionsoft.obadiah.model.domain.Verse;
 
 import java.util.Collections;
 import java.util.List;
@@ -35,10 +34,6 @@ import javax.inject.Singleton;
 
 @Singleton
 public class Bible {
-    public interface OnVersesLoadedListener {
-        public void onVersesLoaded(List<Verse> verses);
-    }
-
     private static final int BOOK_COUNT = 66;
     private static final int OLD_TESTAMENT_COUNT = 39;
     private static final int NEW_TESTAMENT_COUNT = 27;
@@ -123,37 +118,27 @@ public class Bible {
         return bookNames;
     }
 
-    public void loadVerses(final String translationShortName, final int book, final int chapter,
-                           final OnVersesLoadedListener listener) {
+    @NonNull
+    public List<Verse> loadVerses(String translationShortName, int book, int chapter) {
         final String key = buildVersesCacheKey(translationShortName, book, chapter);
-        final List<Verse> verses = verseCache.get(key);
+        List<Verse> verses = verseCache.get(key);
         if (verses != null) {
-            listener.onVersesLoaded(verses);
-            return;
+            return verses;
         }
 
-        new SimpleAsyncTask<Void, Void, List<Verse>>() {
-            @Override
-            protected List<Verse> doInBackground(Void... params) {
-                List<String> bookNames = bookNameCache.get(translationShortName);
-                if (bookNames == null) {
-                    // this should not happen, but just in case
-                    bookNames = Collections.unmodifiableList(
-                            TranslationHelper.getBookNames(database, translationShortName));
-                    bookNameCache.put(translationShortName, bookNames);
-                }
+        List<String> bookNames = bookNameCache.get(translationShortName);
+        if (bookNames == null) {
+            // this should not happen, but just in case
+            bookNames = Collections.unmodifiableList(
+                    TranslationHelper.getBookNames(database, translationShortName));
+            bookNameCache.put(translationShortName, bookNames);
+        }
 
-                return TranslationHelper.getVerses(database, translationShortName,
-                        bookNames.get(book), book, chapter);
-            }
+        verses = Collections.unmodifiableList(TranslationHelper.getVerses(
+                database, translationShortName, bookNames.get(book), book, chapter));
+        verseCache.put(key, verses);
 
-            @Override
-            protected void onPostExecute(List<Verse> result) {
-                result = Collections.unmodifiableList(result);
-                verseCache.put(key, result);
-                listener.onVersesLoaded(result);
-            }
-        }.start();
+        return verses;
     }
 
     private static String buildVersesCacheKey(String translationShortName, int book, int chapter) {

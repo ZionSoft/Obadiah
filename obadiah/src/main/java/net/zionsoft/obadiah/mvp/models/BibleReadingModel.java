@@ -26,16 +26,22 @@ import net.zionsoft.obadiah.Constants;
 import net.zionsoft.obadiah.model.Bible;
 import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.domain.TranslationInfo;
+import net.zionsoft.obadiah.model.domain.Verse;
 
 import java.util.List;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import rx.Observable;
 import rx.Subscriber;
 
+@Singleton
 public class BibleReadingModel {
     private final Bible bible;
     private final SharedPreferences preferences;
 
+    @Inject
     public BibleReadingModel(Context context, Bible bible) {
         this.preferences = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
         this.bible = bible;
@@ -99,6 +105,20 @@ public class BibleReadingModel {
             public void call(Subscriber<? super List<String>> subscriber) {
                 try {
                     subscriber.onNext(bible.loadBookNames(translation));
+                    subscriber.onCompleted();
+                } catch (Exception e) {
+                    subscriber.onError(e);
+                }
+            }
+        });
+    }
+
+    public Observable<List<Verse>> loadVerses(final String translationShortName, final int book, final int chapter) {
+        return Observable.create(new Observable.OnSubscribe<List<Verse>>() {
+            @Override
+            public void call(Subscriber<? super List<Verse>> subscriber) {
+                try {
+                    subscriber.onNext(bible.loadVerses(translationShortName, book, chapter));
                     subscriber.onCompleted();
                 } catch (Exception e) {
                     subscriber.onError(e);

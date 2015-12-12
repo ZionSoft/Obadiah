@@ -31,6 +31,7 @@ import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.Bible;
 import net.zionsoft.obadiah.model.Settings;
 import net.zionsoft.obadiah.model.domain.Verse;
+import net.zionsoft.obadiah.mvp.models.BibleReadingModel;
 import net.zionsoft.obadiah.ui.utils.AnimationHelper;
 import net.zionsoft.obadiah.ui.utils.DialogHelper;
 
@@ -41,6 +42,9 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 public class VersePagerAdapter extends PagerAdapter {
     public interface Listener {
@@ -86,7 +90,7 @@ public class VersePagerAdapter extends PagerAdapter {
     }
 
     @Inject
-    Bible bible;
+    BibleReadingModel bibleReadingModel;
 
     @Inject
     Settings settings;
@@ -149,20 +153,28 @@ public class VersePagerAdapter extends PagerAdapter {
     }
 
     private void loadVerses(final int position, final Page page) {
-        bible.loadVerses(translationShortName, currentBook, position, new Bible.OnVersesLoadedListener() {
+        bibleReadingModel.loadVerses(translationShortName, currentBook, position)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<List<Verse>>() {
                     @Override
-                    public void onVersesLoaded(List<Verse> verses) {
-                        if (verses == null || verses.size() == 0) {
-                            DialogHelper.showDialog(context, false, R.string.dialog_retry,
-                                    new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            loadVerses(position, page);
-                                        }
-                                    }, null);
-                            return;
-                        }
+                    public void onCompleted() {
+                        // do nothing
+                    }
 
+                    @Override
+                    public void onError(Throwable e) {
+                        DialogHelper.showDialog(context, false, R.string.dialog_retry,
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        loadVerses(position, page);
+                                    }
+                                }, null);
+                    }
+
+                    @Override
+                    public void onNext(List<Verse> verses) {
                         if (page.position == position) {
                             AnimationHelper.fadeOut(page.loadingSpinner);
                             AnimationHelper.fadeIn(page.verseList);
@@ -183,8 +195,7 @@ public class VersePagerAdapter extends PagerAdapter {
                             }
                         }
                     }
-                }
-        );
+                });
     }
 
     @Override
