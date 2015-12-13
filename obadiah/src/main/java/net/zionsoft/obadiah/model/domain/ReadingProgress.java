@@ -20,8 +20,6 @@ package net.zionsoft.obadiah.model.domain;
 import android.util.Pair;
 import android.util.SparseArray;
 
-import net.zionsoft.obadiah.model.Bible;
-
 import java.util.ArrayList;
 import java.util.List;
 

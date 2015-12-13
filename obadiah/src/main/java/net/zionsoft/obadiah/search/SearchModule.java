@@ -20,7 +20,7 @@ package net.zionsoft.obadiah.search;
 import android.content.Context;
 
 import net.zionsoft.obadiah.injection.scopes.ActivityScope;
-import net.zionsoft.obadiah.model.Bible;
+import net.zionsoft.obadiah.mvp.models.BibleReadingModel;
 
 import dagger.Module;
 import dagger.Provides;
@@ -28,8 +28,8 @@ import dagger.Provides;
 @Module
 public class SearchModule {
     @Provides
-    SearchModel provideSearchModel(Context context, Bible bible) {
-        return new SearchModel(context, bible);
+    SearchModel provideSearchModel(Context context, BibleReadingModel bibleReadingModel) {
+        return new SearchModel(context, bibleReadingModel);
     }
 
     @Provides

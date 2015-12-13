@@ -24,7 +24,6 @@ import com.squareup.moshi.Moshi;
 import com.squareup.okhttp.OkHttpClient;
 
 import net.zionsoft.obadiah.App;
-import net.zionsoft.obadiah.model.Bible;
 import net.zionsoft.obadiah.model.Settings;
 import net.zionsoft.obadiah.model.database.DatabaseHelper;
 import net.zionsoft.obadiah.mvp.models.BibleReadingModel;
@@ -56,20 +55,14 @@ public class BaseInjectionModule {
 
     @Provides
     @Singleton
-    public Bible provideBible() {
-        return new Bible(application);
-    }
-
-    @Provides
-    @Singleton
     public SQLiteDatabase provideSQLiteDatabase() {
         return new DatabaseHelper(application).getWritableDatabase();
     }
 
     @Provides
     @Singleton
-    public BibleReadingModel provideBibleReadingModel(Context context, Bible bible) {
-        return new BibleReadingModel(context, bible);
+    public BibleReadingModel provideBibleReadingModel(Context context, SQLiteDatabase database) {
+        return new BibleReadingModel(context, database);
     }
 
     @Provides

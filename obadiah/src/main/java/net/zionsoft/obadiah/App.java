@@ -23,9 +23,9 @@ import com.crashlytics.android.Crashlytics;
 
 import net.zionsoft.obadiah.injection.InjectionComponent;
 import net.zionsoft.obadiah.legacy.Upgrader;
-import net.zionsoft.obadiah.model.Bible;
 import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.notification.PushNotificationRegister;
+import net.zionsoft.obadiah.mvp.models.BibleReadingModel;
 import net.zionsoft.obadiah.ui.utils.UiHelper;
 
 import javax.inject.Inject;
@@ -34,7 +34,7 @@ import io.fabric.sdk.android.Fabric;
 
 public class App extends BaseApp {
     @Inject
-    Bible bible;
+    BibleReadingModel bibleReadingModel;
 
     private InjectionComponent injectionComponent;
 
@@ -64,7 +64,7 @@ public class App extends BaseApp {
 
     @Override
     public void onLowMemory() {
-        bible.clearCache();
+        bibleReadingModel.clearCache();
 
         super.onLowMemory();
     }

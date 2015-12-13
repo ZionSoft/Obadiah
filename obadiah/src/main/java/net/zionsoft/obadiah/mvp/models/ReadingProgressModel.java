@@ -23,7 +23,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.text.format.DateUtils;
 import android.util.SparseArray;
 
-import net.zionsoft.obadiah.model.Bible;
+import net.zionsoft.obadiah.model.domain.Bible;
 import net.zionsoft.obadiah.model.domain.ReadingProgress;
 import net.zionsoft.obadiah.model.database.DatabaseHelper;
 

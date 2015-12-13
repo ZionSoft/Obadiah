@@ -20,8 +20,8 @@ package net.zionsoft.obadiah.search;
 import android.content.Context;
 import android.provider.SearchRecentSuggestions;
 
-import net.zionsoft.obadiah.model.Bible;
 import net.zionsoft.obadiah.model.domain.Verse;
+import net.zionsoft.obadiah.mvp.models.BibleReadingModel;
 
 import java.util.List;
 
@@ -29,28 +29,18 @@ import rx.Observable;
 import rx.Subscriber;
 
 class SearchModel {
-    private final Bible bible;
+    private final BibleReadingModel bibleReadingModel;
     private final SearchRecentSuggestions recentSearches;
 
-    SearchModel(Context context, Bible bible) {
-        this.bible = bible;
+    SearchModel(Context context, BibleReadingModel bibleReadingModel) {
+        this.bibleReadingModel = bibleReadingModel;
         this.recentSearches = new SearchRecentSuggestions(context,
                 RecentSearchProvider.AUTHORITY, RecentSearchProvider.MODE);
     }
 
-    Observable<List<Verse>> search(final String translation, final String query) {
+    Observable<List<Verse>> search(String translation, String query) {
         recentSearches.saveRecentQuery(query, null);
-        return Observable.create(new Observable.OnSubscribe<List<Verse>>() {
-            @Override
-            public void call(Subscriber<? super List<Verse>> subscriber) {
-                try {
-                    subscriber.onNext(bible.search(translation, query));
-                    subscriber.onCompleted();
-                } catch (Exception e) {
-                    subscriber.onError(e);
-                }
-            }
-        });
+        return bibleReadingModel.search(translation, query);
     }
 
     Observable<Void> clearSearchHistory() {

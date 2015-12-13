@@ -26,7 +26,7 @@ import android.text.TextUtils;
 import com.crashlytics.android.Crashlytics;
 
 import net.zionsoft.obadiah.Constants;
-import net.zionsoft.obadiah.model.Bible;
+import net.zionsoft.obadiah.model.domain.Bible;
 import net.zionsoft.obadiah.model.analytics.Analytics;
 
 public class UriHelper {

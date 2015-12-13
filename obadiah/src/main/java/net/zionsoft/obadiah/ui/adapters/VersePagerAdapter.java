@@ -28,7 +28,7 @@ import android.view.ViewGroup;
 
 import net.zionsoft.obadiah.App;
 import net.zionsoft.obadiah.R;
-import net.zionsoft.obadiah.model.Bible;
+import net.zionsoft.obadiah.model.domain.Bible;
 import net.zionsoft.obadiah.model.Settings;
 import net.zionsoft.obadiah.model.domain.Verse;
 import net.zionsoft.obadiah.mvp.models.BibleReadingModel;

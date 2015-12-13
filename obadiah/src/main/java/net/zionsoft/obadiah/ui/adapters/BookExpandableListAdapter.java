@@ -27,7 +27,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import net.zionsoft.obadiah.R;
-import net.zionsoft.obadiah.model.Bible;
+import net.zionsoft.obadiah.model.domain.Bible;
 
 import java.util.List;
 
