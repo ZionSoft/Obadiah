@@ -22,11 +22,7 @@ import net.zionsoft.obadiah.model.domain.ReadingProgress;
 import java.util.List;
 
 public interface ReadingProgressView extends MVPView {
-    void onBookNamesLoaded(List<String> bookNames);
-
-    void onBookNamesLoadFailed();
-
-    void onReadingProgressLoaded(ReadingProgress readingProgress);
+    void onReadingProgressLoaded(ReadingProgress readingProgress, List<String> bookNames);
 
     void onReadingProgressLoadFailed();
 }

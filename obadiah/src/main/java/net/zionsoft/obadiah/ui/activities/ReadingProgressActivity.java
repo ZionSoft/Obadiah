@@ -28,12 +28,11 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
-import net.zionsoft.obadiah.Constants;
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.injection.components.fragments.ReadingProgressComponentFragment;
 import net.zionsoft.obadiah.injection.scopes.ActivityScope;
-import net.zionsoft.obadiah.model.domain.ReadingProgress;
 import net.zionsoft.obadiah.model.Settings;
+import net.zionsoft.obadiah.model.domain.ReadingProgress;
 import net.zionsoft.obadiah.mvp.presenters.ReadingProgressPresenter;
 import net.zionsoft.obadiah.mvp.views.ReadingProgressView;
 import net.zionsoft.obadiah.ui.adapters.ReadingProgressListAdapter;
@@ -66,9 +65,6 @@ public class ReadingProgressActivity extends BaseAppCompatActivity implements Re
 
     @Bind(R.id.loading_spinner)
     View loadingSpinner;
-
-    private List<String> bookNames;
-    private ReadingProgress readingProgress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,13 +102,7 @@ public class ReadingProgressActivity extends BaseAppCompatActivity implements Re
     protected void onResumeFragments() {
         super.onResumeFragments();
         readingProgressPresenter.takeView(this);
-        loadBookNames();
         loadReadingProgress();
-    }
-
-    private void loadBookNames() {
-        readingProgressPresenter.loadBookNames(getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE)
-                .getString(Constants.PREF_KEY_LAST_READ_TRANSLATION, null));
     }
 
     private void loadReadingProgress() {
@@ -126,26 +116,10 @@ public class ReadingProgressActivity extends BaseAppCompatActivity implements Re
     }
 
     @Override
-    public void onBookNamesLoaded(List<String> bookNames) {
-        this.bookNames = bookNames;
-        updateAdapter();
-    }
-
-    @Override
-    public void onBookNamesLoadFailed() {
-        DialogHelper.showDialog(ReadingProgressActivity.this, false, R.string.dialog_retry,
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        loadBookNames();
-                    }
-                }, null);
-    }
-
-    @Override
-    public void onReadingProgressLoaded(ReadingProgress readingProgress) {
-        this.readingProgress = readingProgress;
-        updateAdapter();
+    public void onReadingProgressLoaded(ReadingProgress readingProgress, List<String> bookNames) {
+        AnimationHelper.fadeOut(loadingSpinner);
+        readingProgressList.setAdapter(
+                new ReadingProgressListAdapter(this, settings, bookNames, readingProgress));
     }
 
     @Override
@@ -157,13 +131,5 @@ public class ReadingProgressActivity extends BaseAppCompatActivity implements Re
                         loadReadingProgress();
                     }
                 }, null);
-    }
-
-    private void updateAdapter() {
-        if (bookNames != null && readingProgress != null) {
-            AnimationHelper.fadeOut(loadingSpinner);
-            readingProgressList.setAdapter(
-                    new ReadingProgressListAdapter(this, settings, bookNames, readingProgress));
-        }
     }
 }

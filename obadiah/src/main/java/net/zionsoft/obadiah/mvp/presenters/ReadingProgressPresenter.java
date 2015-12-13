@@ -17,6 +17,8 @@
 
 package net.zionsoft.obadiah.mvp.presenters;
 
+import android.util.Pair;
+
 import net.zionsoft.obadiah.model.domain.ReadingProgress;
 import net.zionsoft.obadiah.mvp.models.BibleReadingModel;
 import net.zionsoft.obadiah.mvp.models.ReadingProgressModel;
@@ -24,8 +26,10 @@ import net.zionsoft.obadiah.mvp.views.ReadingProgressView;
 
 import java.util.List;
 
+import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Func2;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
@@ -57,43 +61,17 @@ public class ReadingProgressPresenter extends MVPPresenter<ReadingProgressView> 
         super.onViewDropped();
     }
 
-    public void loadBookNames(String translation) {
-        subscription.add(bibleReadingModel.loadBookNames(translation)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<List<String>>() {
-                    @Override
-                    public void onCompleted() {
-                        // do nothing
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        ReadingProgressView v = getView();
-                        if (v != null) {
-                            v.onBookNamesLoadFailed();
-                        }
-                    }
-
-                    @Override
-                    public void onNext(List<String> bookNames) {
-                        ReadingProgressView v = getView();
-                        if (v != null) {
-                            if (bookNames.size() > 0) {
-                                v.onBookNamesLoaded(bookNames);
-                            } else {
-                                v.onBookNamesLoadFailed();
-                            }
-                        }
-                    }
-                }));
-    }
-
     public void loadReadingProgress() {
-        subscription.add(readingProgressModel.loadReadingProgress()
-                .subscribeOn(Schedulers.io())
+        subscription.add(Observable.zip(readingProgressModel.loadReadingProgress(),
+                bibleReadingModel.loadBookNames(bibleReadingModel.loadCurrentTranslation()),
+                new Func2<ReadingProgress, List<String>, Pair<ReadingProgress, List<String>>>() {
+                    @Override
+                    public Pair<ReadingProgress, List<String>> call(ReadingProgress readingProgress, List<String> bookNames) {
+                        return new Pair<>(readingProgress, bookNames);
+                    }
+                }).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<ReadingProgress>() {
+                .subscribe(new Subscriber<Pair<ReadingProgress, List<String>>>() {
                     @Override
                     public void onCompleted() {
                         // do nothing
@@ -104,15 +82,14 @@ public class ReadingProgressPresenter extends MVPPresenter<ReadingProgressView> 
                         ReadingProgressView v = getView();
                         if (v != null) {
                             v.onReadingProgressLoadFailed();
-
                         }
                     }
 
                     @Override
-                    public void onNext(ReadingProgress readingProgress) {
+                    public void onNext(Pair<ReadingProgress, List<String>> readingProgress) {
                         ReadingProgressView v = getView();
                         if (v != null) {
-                            v.onReadingProgressLoaded(readingProgress);
+                            v.onReadingProgressLoaded(readingProgress.first, readingProgress.second);
                         }
                     }
                 }));
