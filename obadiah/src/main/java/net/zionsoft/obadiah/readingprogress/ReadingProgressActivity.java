@@ -33,7 +33,6 @@ import net.zionsoft.obadiah.injection.scopes.ActivityScope;
 import net.zionsoft.obadiah.model.Settings;
 import net.zionsoft.obadiah.model.domain.ReadingProgress;
 import net.zionsoft.obadiah.ui.activities.BaseAppCompatActivity;
-import net.zionsoft.obadiah.ui.adapters.ReadingProgressListAdapter;
 import net.zionsoft.obadiah.ui.utils.AnimationHelper;
 import net.zionsoft.obadiah.ui.utils.DialogHelper;
 

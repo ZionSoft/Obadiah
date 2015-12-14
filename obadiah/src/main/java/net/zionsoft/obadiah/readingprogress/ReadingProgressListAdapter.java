@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.ui.adapters;
+package net.zionsoft.obadiah.readingprogress;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -38,7 +38,7 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-public class ReadingProgressListAdapter extends RecyclerView.Adapter {
+class ReadingProgressListAdapter extends RecyclerView.Adapter {
     static class HeaderViewHolder extends RecyclerView.ViewHolder {
         @Bind(R.id.continuous_reading_text_view)
         TextView continuousReading;
@@ -145,8 +145,8 @@ public class ReadingProgressListAdapter extends RecyclerView.Adapter {
     private final List<String> bookNames;
     private final ReadingProgress readingProgress;
 
-    public ReadingProgressListAdapter(Context context, Settings settings,
-                                      List<String> bookNames, ReadingProgress readingProgress) {
+    ReadingProgressListAdapter(Context context, Settings settings,
+                               List<String> bookNames, ReadingProgress readingProgress) {
         this.inflater = LayoutInflater.from(context);
         this.resources = context.getResources();
         this.dateFormatter = new DateFormatter(resources);
