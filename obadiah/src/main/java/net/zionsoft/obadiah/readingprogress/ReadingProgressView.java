@@ -18,7 +18,7 @@
 package net.zionsoft.obadiah.readingprogress;
 
 import net.zionsoft.obadiah.model.domain.ReadingProgress;
-import net.zionsoft.obadiah.mvp.views.MVPView;
+import net.zionsoft.obadiah.mvp.MVPView;
 
 import java.util.List;
 

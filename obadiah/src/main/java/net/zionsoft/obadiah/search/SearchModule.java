@@ -20,7 +20,7 @@ package net.zionsoft.obadiah.search;
 import android.content.Context;
 
 import net.zionsoft.obadiah.injection.scopes.ActivityScope;
-import net.zionsoft.obadiah.mvp.models.BibleReadingModel;
+import net.zionsoft.obadiah.model.datamodel.BibleReadingModel;
 
 import dagger.Module;
 import dagger.Provides;

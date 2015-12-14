@@ -18,7 +18,7 @@
 package net.zionsoft.obadiah.biblereading;
 
 import net.zionsoft.obadiah.injection.InjectionComponent;
-import net.zionsoft.obadiah.injection.components.fragments.ComponentFragment;
+import net.zionsoft.obadiah.injection.components.ComponentFragment;
 
 public class BibleReadingComponentFragment extends ComponentFragment<BibleReadingComponent> {
     static final String FRAGMENT_TAG = "net.zionsoft.obadiah.BibleReadingComponentFragment.FRAGMENT_TAG";

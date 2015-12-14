@@ -25,7 +25,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import net.zionsoft.obadiah.R;
-import net.zionsoft.obadiah.model.Settings;
+import net.zionsoft.obadiah.model.datamodel.Settings;
 
 import java.util.List;
 

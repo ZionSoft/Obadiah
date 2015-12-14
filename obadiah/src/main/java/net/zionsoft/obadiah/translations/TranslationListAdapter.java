@@ -29,7 +29,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import net.zionsoft.obadiah.R;
-import net.zionsoft.obadiah.model.Settings;
+import net.zionsoft.obadiah.model.datamodel.Settings;
 import net.zionsoft.obadiah.model.domain.TranslationInfo;
 import net.zionsoft.obadiah.ui.widget.SectionHeader;
 

@@ -24,10 +24,10 @@ import com.squareup.moshi.Moshi;
 import com.squareup.okhttp.OkHttpClient;
 
 import net.zionsoft.obadiah.App;
-import net.zionsoft.obadiah.model.Settings;
+import net.zionsoft.obadiah.model.datamodel.Settings;
 import net.zionsoft.obadiah.model.database.DatabaseHelper;
-import net.zionsoft.obadiah.mvp.models.BibleReadingModel;
-import net.zionsoft.obadiah.mvp.models.ReadingProgressModel;
+import net.zionsoft.obadiah.model.datamodel.BibleReadingModel;
+import net.zionsoft.obadiah.model.datamodel.ReadingProgressModel;
 import net.zionsoft.obadiah.network.BackendInterface;
 
 import java.util.concurrent.TimeUnit;

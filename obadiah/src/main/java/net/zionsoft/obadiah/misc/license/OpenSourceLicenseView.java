@@ -17,7 +17,7 @@
 
 package net.zionsoft.obadiah.misc.license;
 
-import net.zionsoft.obadiah.mvp.views.MVPView;
+import net.zionsoft.obadiah.mvp.MVPView;
 
 import java.util.List;
 

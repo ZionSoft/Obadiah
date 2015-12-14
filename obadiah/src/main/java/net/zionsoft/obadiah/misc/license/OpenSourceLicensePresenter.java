@@ -17,7 +17,7 @@
 
 package net.zionsoft.obadiah.misc.license;
 
-import net.zionsoft.obadiah.mvp.presenters.MVPPresenter;
+import net.zionsoft.obadiah.mvp.MVPPresenter;
 
 import java.util.List;
 

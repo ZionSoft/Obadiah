@@ -18,7 +18,7 @@
 package net.zionsoft.obadiah.search;
 
 import net.zionsoft.obadiah.model.domain.Verse;
-import net.zionsoft.obadiah.mvp.presenters.MVPPresenter;
+import net.zionsoft.obadiah.mvp.MVPPresenter;
 
 import java.util.List;
 

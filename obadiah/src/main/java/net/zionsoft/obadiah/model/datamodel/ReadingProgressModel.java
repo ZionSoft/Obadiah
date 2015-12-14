@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.mvp.models;
+package net.zionsoft.obadiah.model.datamodel;
 
 import android.content.ContentValues;
 import android.database.Cursor;

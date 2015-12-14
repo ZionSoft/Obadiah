@@ -21,7 +21,7 @@ import android.content.Context;
 import android.provider.SearchRecentSuggestions;
 
 import net.zionsoft.obadiah.model.domain.Verse;
-import net.zionsoft.obadiah.mvp.models.BibleReadingModel;
+import net.zionsoft.obadiah.model.datamodel.BibleReadingModel;
 
 import java.util.List;
 

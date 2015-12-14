@@ -18,8 +18,8 @@
 package net.zionsoft.obadiah.readingprogress;
 
 import net.zionsoft.obadiah.injection.scopes.ActivityScope;
-import net.zionsoft.obadiah.mvp.models.BibleReadingModel;
-import net.zionsoft.obadiah.mvp.models.ReadingProgressModel;
+import net.zionsoft.obadiah.model.datamodel.BibleReadingModel;
+import net.zionsoft.obadiah.model.datamodel.ReadingProgressModel;
 
 import dagger.Module;
 import dagger.Provides;

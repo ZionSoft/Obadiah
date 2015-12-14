@@ -18,7 +18,7 @@
 package net.zionsoft.obadiah.readingprogress;
 
 import net.zionsoft.obadiah.injection.InjectionComponent;
-import net.zionsoft.obadiah.injection.components.fragments.ComponentFragment;
+import net.zionsoft.obadiah.injection.components.ComponentFragment;
 
 public class ReadingProgressComponentFragment extends ComponentFragment<ReadingProgressComponent> {
     static final String FRAGMENT_TAG = "net.zionsoft.obadiah.ReadingProgressComponentFragment.FRAGMENT_TAG";

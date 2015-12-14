@@ -20,9 +20,9 @@ package net.zionsoft.obadiah.readingprogress;
 import android.util.Pair;
 
 import net.zionsoft.obadiah.model.domain.ReadingProgress;
-import net.zionsoft.obadiah.mvp.models.BibleReadingModel;
-import net.zionsoft.obadiah.mvp.models.ReadingProgressModel;
-import net.zionsoft.obadiah.mvp.presenters.MVPPresenter;
+import net.zionsoft.obadiah.model.datamodel.BibleReadingModel;
+import net.zionsoft.obadiah.model.datamodel.ReadingProgressModel;
+import net.zionsoft.obadiah.mvp.MVPPresenter;
 
 import java.util.List;
 

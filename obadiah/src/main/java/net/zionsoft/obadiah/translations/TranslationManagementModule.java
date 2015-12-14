@@ -23,8 +23,7 @@ import android.database.sqlite.SQLiteDatabase;
 import com.squareup.moshi.Moshi;
 
 import net.zionsoft.obadiah.injection.scopes.ActivityScope;
-import net.zionsoft.obadiah.mvp.models.AdsModel;
-import net.zionsoft.obadiah.mvp.models.BibleReadingModel;
+import net.zionsoft.obadiah.model.datamodel.BibleReadingModel;
 import net.zionsoft.obadiah.network.BackendInterface;
 
 import dagger.Module;

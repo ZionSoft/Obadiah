@@ -22,9 +22,8 @@ import android.content.Intent;
 import android.text.TextUtils;
 
 import net.zionsoft.obadiah.model.domain.TranslationInfo;
-import net.zionsoft.obadiah.mvp.models.AdsModel;
-import net.zionsoft.obadiah.mvp.models.BibleReadingModel;
-import net.zionsoft.obadiah.mvp.presenters.MVPPresenter;
+import net.zionsoft.obadiah.model.datamodel.BibleReadingModel;
+import net.zionsoft.obadiah.mvp.MVPPresenter;
 
 import rx.Subscriber;
 import rx.Subscription;

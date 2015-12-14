@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.mvp.models;
+package net.zionsoft.obadiah.translations;
 
 import android.app.Activity;
 import android.content.Context;
@@ -31,19 +31,19 @@ import rx.Observable;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
-public class AdsModel implements InAppBilling.OnAdsRemovalPurchasedListener {
-    public interface OnAdsRemovalPurchasedListener {
+class AdsModel implements InAppBilling.OnAdsRemovalPurchasedListener {
+    interface OnAdsRemovalPurchasedListener {
         void onAdsRemovalPurchased(boolean purchased);
     }
 
     private final InAppBilling inAppBilling;
     private OnAdsRemovalPurchasedListener onAdsRemovalPurchasedListener;
 
-    public AdsModel(Context context, Moshi moshi) {
+    AdsModel(Context context, Moshi moshi) {
         inAppBilling = new InAppBilling(context, moshi);
     }
 
-    public Observable<Boolean> shouldHideAds() {
+    Observable<Boolean> shouldHideAds() {
         return Observable.interval(500L, TimeUnit.MILLISECONDS, Schedulers.io())
                 .filter(new Func1<Long, Boolean>() {
                     @Override
@@ -60,16 +60,16 @@ public class AdsModel implements InAppBilling.OnAdsRemovalPurchasedListener {
                 });
     }
 
-    public void purchaseAdsRemoval(Activity activity, OnAdsRemovalPurchasedListener listener) {
+    void purchaseAdsRemoval(Activity activity, OnAdsRemovalPurchasedListener listener) {
         onAdsRemovalPurchasedListener = listener;
         inAppBilling.purchaseAdsRemoval(activity, this);
     }
 
-    public boolean handleActivityResult(int requestCode, int resultCode, Intent data) {
+    boolean handleActivityResult(int requestCode, int resultCode, Intent data) {
         return inAppBilling.handleActivityResult(requestCode, resultCode, data);
     }
 
-    public void cleanup() {
+    void cleanup() {
         inAppBilling.cleanup();
         onAdsRemovalPurchasedListener = null;
     }

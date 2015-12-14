@@ -18,7 +18,7 @@
 package net.zionsoft.obadiah.misc.license;
 
 import net.zionsoft.obadiah.injection.InjectionComponent;
-import net.zionsoft.obadiah.injection.components.fragments.ComponentFragment;
+import net.zionsoft.obadiah.injection.components.ComponentFragment;
 
 public class OpenSourceLicenseComponentFragment extends ComponentFragment<OpenSourceLicenseComponent> {
     static final String FRAGMENT_TAG = "net.zionsoft.obadiah.OpenSourceLicenseComponentFragment.FRAGMENT_TAG";

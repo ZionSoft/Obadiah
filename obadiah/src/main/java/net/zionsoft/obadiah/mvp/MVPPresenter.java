@@ -15,7 +15,34 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.mvp.views;
+package net.zionsoft.obadiah.mvp;
 
-public interface MVPView {
+import android.support.annotation.CallSuper;
+import android.support.annotation.Nullable;
+
+public abstract class MVPPresenter<V extends MVPView> {
+    private V view;
+
+    public final void takeView(V view) {
+        this.view = view;
+        onViewTaken();
+    }
+
+    @CallSuper
+    protected void onViewTaken() {
+    }
+
+    public final void dropView() {
+        this.view = null;
+        onViewDropped();
+    }
+
+    @CallSuper
+    protected void onViewDropped() {
+    }
+
+    @Nullable
+    protected final V getView() {
+        return view;
+    }
 }

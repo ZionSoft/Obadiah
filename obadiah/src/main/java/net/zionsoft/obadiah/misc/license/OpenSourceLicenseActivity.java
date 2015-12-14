@@ -29,7 +29,7 @@ import android.view.View;
 import android.widget.ProgressBar;
 
 import net.zionsoft.obadiah.R;
-import net.zionsoft.obadiah.model.Settings;
+import net.zionsoft.obadiah.model.datamodel.Settings;
 import net.zionsoft.obadiah.ui.utils.BaseAppCompatActivity;
 
 import java.util.List;
