@@ -27,6 +27,7 @@ import net.zionsoft.obadiah.App;
 import net.zionsoft.obadiah.model.Settings;
 import net.zionsoft.obadiah.model.database.DatabaseHelper;
 import net.zionsoft.obadiah.mvp.models.BibleReadingModel;
+import net.zionsoft.obadiah.mvp.models.ReadingProgressModel;
 import net.zionsoft.obadiah.network.BackendInterface;
 
 import java.util.concurrent.TimeUnit;
@@ -63,6 +64,12 @@ public class BaseInjectionModule {
     @Singleton
     public BibleReadingModel provideBibleReadingModel(Context context, SQLiteDatabase database) {
         return new BibleReadingModel(context, database);
+    }
+
+    @Provides
+    @Singleton
+    public ReadingProgressModel provideReadingProgressModel(SQLiteDatabase database) {
+        return new ReadingProgressModel(database);
     }
 
     @Provides

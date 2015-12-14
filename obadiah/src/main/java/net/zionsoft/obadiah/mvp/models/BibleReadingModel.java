@@ -44,7 +44,6 @@ import rx.functions.Func1;
 @Singleton
 public class BibleReadingModel {
     private final SQLiteDatabase database;
-    ;
     private final SharedPreferences preferences;
 
     private final LruCache<String, List<String>> bookNameCache

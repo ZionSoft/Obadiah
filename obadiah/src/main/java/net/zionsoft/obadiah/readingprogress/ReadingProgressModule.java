@@ -17,8 +17,6 @@
 
 package net.zionsoft.obadiah.readingprogress;
 
-import android.database.sqlite.SQLiteDatabase;
-
 import net.zionsoft.obadiah.injection.scopes.ActivityScope;
 import net.zionsoft.obadiah.mvp.models.BibleReadingModel;
 import net.zionsoft.obadiah.mvp.models.ReadingProgressModel;
@@ -28,11 +26,6 @@ import dagger.Provides;
 
 @Module
 public class ReadingProgressModule {
-    @Provides
-    ReadingProgressModel provideReadingProgressModel(SQLiteDatabase database) {
-        return new ReadingProgressModel(database);
-    }
-
     @Provides
     @ActivityScope
     ReadingProgressPresenter progressPresenter(BibleReadingModel bibleReadingModel,

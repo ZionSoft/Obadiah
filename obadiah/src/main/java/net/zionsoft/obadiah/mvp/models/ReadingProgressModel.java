@@ -30,12 +30,17 @@ import net.zionsoft.obadiah.model.database.DatabaseHelper;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import rx.Observable;
 import rx.Subscriber;
 
+@Singleton
 public class ReadingProgressModel {
     private final SQLiteDatabase database;
 
+    @Inject
     public ReadingProgressModel(SQLiteDatabase database) {
         this.database = database;
     }
