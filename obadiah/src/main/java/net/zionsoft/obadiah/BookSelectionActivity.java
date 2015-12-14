@@ -54,7 +54,7 @@ import net.zionsoft.obadiah.utils.UriHelper;
 import net.zionsoft.obadiah.mvp.presenters.BibleReadingPresenter;
 import net.zionsoft.obadiah.mvp.views.BibleReadingView;
 import net.zionsoft.obadiah.ui.activities.BaseAppCompatActivity;
-import net.zionsoft.obadiah.ui.activities.ReadingProgressActivity;
+import net.zionsoft.obadiah.readingprogress.ReadingProgressActivity;
 import net.zionsoft.obadiah.search.SearchActivity;
 import net.zionsoft.obadiah.misc.settings.SettingsActivity;
 import net.zionsoft.obadiah.translations.TranslationManagementActivity;

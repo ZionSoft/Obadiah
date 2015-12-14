@@ -15,14 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.injection.modules;
+package net.zionsoft.obadiah.readingprogress;
 
 import android.database.sqlite.SQLiteDatabase;
 
 import net.zionsoft.obadiah.injection.scopes.ActivityScope;
 import net.zionsoft.obadiah.mvp.models.BibleReadingModel;
 import net.zionsoft.obadiah.mvp.models.ReadingProgressModel;
-import net.zionsoft.obadiah.mvp.presenters.ReadingProgressPresenter;
 
 import dagger.Module;
 import dagger.Provides;
@@ -30,14 +29,14 @@ import dagger.Provides;
 @Module
 public class ReadingProgressModule {
     @Provides
-    public ReadingProgressModel provideReadingProgressModel(SQLiteDatabase database) {
+    ReadingProgressModel provideReadingProgressModel(SQLiteDatabase database) {
         return new ReadingProgressModel(database);
     }
 
     @Provides
     @ActivityScope
-    public ReadingProgressPresenter progressPresenter(BibleReadingModel bibleReadingModel,
-                                                      ReadingProgressModel readingProgressModel) {
+    ReadingProgressPresenter progressPresenter(BibleReadingModel bibleReadingModel,
+                                               ReadingProgressModel readingProgressModel) {
         return new ReadingProgressPresenter(bibleReadingModel, readingProgressModel);
     }
 }

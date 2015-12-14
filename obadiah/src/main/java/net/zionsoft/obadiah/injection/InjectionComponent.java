@@ -19,9 +19,9 @@ package net.zionsoft.obadiah.injection;
 
 import net.zionsoft.obadiah.App;
 import net.zionsoft.obadiah.injection.components.BibleReadingComponent;
-import net.zionsoft.obadiah.injection.components.ReadingProgressComponent;
+import net.zionsoft.obadiah.readingprogress.ReadingProgressComponent;
 import net.zionsoft.obadiah.injection.modules.BibleReadingModule;
-import net.zionsoft.obadiah.injection.modules.ReadingProgressModule;
+import net.zionsoft.obadiah.readingprogress.ReadingProgressModule;
 import net.zionsoft.obadiah.misc.license.OpenSourceLicenseComponent;
 import net.zionsoft.obadiah.misc.license.OpenSourceLicenseModule;
 import net.zionsoft.obadiah.misc.settings.SettingsActivity;

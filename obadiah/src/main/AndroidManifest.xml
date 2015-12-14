@@ -37,7 +37,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".misc.license.OpenSourceLicenseActivity" />
-        <activity android:name=".ui.activities.ReadingProgressActivity" />
+        <activity android:name=".readingprogress.ReadingProgressActivity" />
         <activity
             android:name=".search.SearchActivity"
             android:launchMode="singleTop">

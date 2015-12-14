@@ -15,12 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.injection.components;
+package net.zionsoft.obadiah.readingprogress;
 
 import net.zionsoft.obadiah.injection.InjectionComponent;
-import net.zionsoft.obadiah.injection.modules.ReadingProgressModule;
+import net.zionsoft.obadiah.injection.components.Component;
 import net.zionsoft.obadiah.injection.scopes.ActivityScope;
-import net.zionsoft.obadiah.ui.activities.ReadingProgressActivity;
 
 import dagger.Subcomponent;
 

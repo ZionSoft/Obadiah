@@ -15,20 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.injection.components.fragments;
+package net.zionsoft.obadiah.readingprogress;
 
-import net.zionsoft.obadiah.injection.InjectionComponent;
-import net.zionsoft.obadiah.injection.components.ReadingProgressComponent;
+import net.zionsoft.obadiah.model.domain.ReadingProgress;
+import net.zionsoft.obadiah.mvp.views.MVPView;
 
-public class ReadingProgressComponentFragment extends ComponentFragment<ReadingProgressComponent> {
-    public static final String FRAGMENT_TAG = "net.zionsoft.obadiah.ReadingProgressComponentFragment.FRAGMENT_TAG";
+import java.util.List;
 
-    public static ReadingProgressComponentFragment newInstance() {
-        return new ReadingProgressComponentFragment();
-    }
+interface ReadingProgressView extends MVPView {
+    void onReadingProgressLoaded(ReadingProgress readingProgress, List<String> bookNames);
 
-    @Override
-    protected ReadingProgressComponent createComponent(InjectionComponent injectionComponent) {
-        return ReadingProgressComponent.Initializer.init(injectionComponent);
-    }
+    void onReadingProgressLoadFailed();
 }

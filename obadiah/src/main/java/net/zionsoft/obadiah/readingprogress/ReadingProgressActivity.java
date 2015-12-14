@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.ui.activities;
+package net.zionsoft.obadiah.readingprogress;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -29,12 +29,10 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 
 import net.zionsoft.obadiah.R;
-import net.zionsoft.obadiah.injection.components.fragments.ReadingProgressComponentFragment;
 import net.zionsoft.obadiah.injection.scopes.ActivityScope;
 import net.zionsoft.obadiah.model.Settings;
 import net.zionsoft.obadiah.model.domain.ReadingProgress;
-import net.zionsoft.obadiah.mvp.presenters.ReadingProgressPresenter;
-import net.zionsoft.obadiah.mvp.views.ReadingProgressView;
+import net.zionsoft.obadiah.ui.activities.BaseAppCompatActivity;
 import net.zionsoft.obadiah.ui.adapters.ReadingProgressListAdapter;
 import net.zionsoft.obadiah.ui.utils.AnimationHelper;
 import net.zionsoft.obadiah.ui.utils.DialogHelper;

@@ -15,14 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.mvp.presenters;
+package net.zionsoft.obadiah.readingprogress;
 
 import android.util.Pair;
 
 import net.zionsoft.obadiah.model.domain.ReadingProgress;
 import net.zionsoft.obadiah.mvp.models.BibleReadingModel;
 import net.zionsoft.obadiah.mvp.models.ReadingProgressModel;
-import net.zionsoft.obadiah.mvp.views.ReadingProgressView;
+import net.zionsoft.obadiah.mvp.presenters.MVPPresenter;
 
 import java.util.List;
 
@@ -33,14 +33,14 @@ import rx.functions.Func2;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
-public class ReadingProgressPresenter extends MVPPresenter<ReadingProgressView> {
+class ReadingProgressPresenter extends MVPPresenter<ReadingProgressView> {
     private final BibleReadingModel bibleReadingModel;
     private final ReadingProgressModel readingProgressModel;
 
     private CompositeSubscription subscription;
 
-    public ReadingProgressPresenter(BibleReadingModel bibleReadingModel,
-                                    ReadingProgressModel readingProgressModel) {
+    ReadingProgressPresenter(BibleReadingModel bibleReadingModel,
+                             ReadingProgressModel readingProgressModel) {
         this.bibleReadingModel = bibleReadingModel;
         this.readingProgressModel = readingProgressModel;
     }
@@ -61,7 +61,7 @@ public class ReadingProgressPresenter extends MVPPresenter<ReadingProgressView> 
         super.onViewDropped();
     }
 
-    public void loadReadingProgress() {
+    void loadReadingProgress() {
         subscription.add(Observable.zip(readingProgressModel.loadReadingProgress(),
                 bibleReadingModel.loadBookNames(bibleReadingModel.loadCurrentTranslation()),
                 new Func2<ReadingProgress, List<String>, Pair<ReadingProgress, List<String>>>() {
