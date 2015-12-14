@@ -45,7 +45,6 @@ import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.Settings;
 import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.domain.TranslationInfo;
-import net.zionsoft.obadiah.model.domain.Translations;
 import net.zionsoft.obadiah.ui.activities.BaseAppCompatActivity;
 import net.zionsoft.obadiah.ui.utils.AnimationHelper;
 import net.zionsoft.obadiah.ui.utils.DialogHelper;

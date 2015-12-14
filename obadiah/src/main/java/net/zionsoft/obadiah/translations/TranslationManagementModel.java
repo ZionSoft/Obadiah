@@ -27,7 +27,6 @@ import com.squareup.okhttp.ResponseBody;
 import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.database.TranslationHelper;
 import net.zionsoft.obadiah.model.domain.TranslationInfo;
-import net.zionsoft.obadiah.model.domain.Translations;
 import net.zionsoft.obadiah.network.BackendChapter;
 import net.zionsoft.obadiah.network.BackendInterface;
 import net.zionsoft.obadiah.network.BackendTranslationInfo;

@@ -15,41 +15,43 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.model.domain;
+package net.zionsoft.obadiah.translations;
 
 import android.support.annotation.NonNull;
+
+import net.zionsoft.obadiah.model.domain.TranslationInfo;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class Translations {
+class Translations {
     @NonNull
-    public final List<TranslationInfo> downloaded;
+    final List<TranslationInfo> downloaded;
 
     @NonNull
-    public final List<TranslationInfo> available;
+    final List<TranslationInfo> available;
 
     private Translations(@NonNull List<TranslationInfo> downloaded, @NonNull List<TranslationInfo> available) {
         this.downloaded = downloaded;
         this.available = available;
     }
 
-    public static class Builder {
+    static class Builder {
         private List<TranslationInfo> translations;
         private List<String> downloaded;
 
-        public Builder translations(List<TranslationInfo> translations) {
+        Builder translations(List<TranslationInfo> translations) {
             this.translations = translations;
             return this;
         }
 
-        public Builder downloaded(List<String> downloaded) {
+        Builder downloaded(List<String> downloaded) {
             this.downloaded = downloaded;
             return this;
         }
 
-        public Translations build() {
+        Translations build() {
             final int translationCount = translations.size();
             final int downloadedCount = downloaded.size();
             final List<TranslationInfo> downloadedTranslations = new ArrayList<>(downloadedCount);
