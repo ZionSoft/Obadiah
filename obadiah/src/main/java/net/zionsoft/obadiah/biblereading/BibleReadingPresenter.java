@@ -66,10 +66,6 @@ class BibleReadingPresenter extends MVPPresenter<BibleReadingView> {
         bibleReadingModel.setCurrentTranslation(translation);
     }
 
-    boolean hasDownloadedTranslation() {
-        return bibleReadingModel.hasDownloadedTranslation();
-    }
-
     int loadCurrentBook() {
         return bibleReadingModel.loadCurrentBook();
     }

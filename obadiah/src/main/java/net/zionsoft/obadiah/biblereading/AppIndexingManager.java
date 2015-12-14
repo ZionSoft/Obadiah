@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.model.appindexing;
+package net.zionsoft.obadiah.biblereading;
 
 import android.app.Activity;
 import android.net.Uri;
@@ -27,7 +27,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 
 import net.zionsoft.obadiah.BuildConfig;
 
-public class AppIndexingManager {
+class AppIndexingManager {
     private final Activity activity;
     private final GoogleApiClient googleApiClient;
 
@@ -38,7 +38,7 @@ public class AppIndexingManager {
     private static final String WEB_URI_TEMPLATE = "http://bible.zionsoft.net/bible/%s/%d/%d";
     private Uri mAppIndexingUri;
 
-    public AppIndexingManager(Activity activity) {
+    AppIndexingManager(Activity activity) {
         super();
 
         if (ConnectionResult.SUCCESS != GooglePlayServicesUtil.isGooglePlayServicesAvailable(activity)) {
@@ -52,12 +52,12 @@ public class AppIndexingManager {
         googleApiClient = new GoogleApiClient.Builder(activity).addApi(AppIndex.APP_INDEX_API).build();
     }
 
-    public void onStart() {
+    void onStart() {
         if (googleApiClient != null)
             googleApiClient.connect();
     }
 
-    public void onView(String translationShortName, String bookName, int bookIndex, int chapterIndex) {
+    void onView(String translationShortName, String bookName, int bookIndex, int chapterIndex) {
         if (googleApiClient != null) {
             onViewEnd();
 
