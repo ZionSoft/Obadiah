@@ -38,12 +38,8 @@ public class App extends BaseApp {
 
     private InjectionComponent injectionComponent;
 
-    public static App get(Context context) {
-        return (App) context.getApplicationContext();
-    }
-
-    public InjectionComponent getInjectionComponent() {
-        return injectionComponent;
+    public static InjectionComponent getInjectionComponent(Context context) {
+        return ((App) context.getApplicationContext()).injectionComponent;
     }
 
     @Override

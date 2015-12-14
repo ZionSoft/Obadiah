@@ -107,7 +107,7 @@ public class VersePagerAdapter extends PagerAdapter {
 
     VersePagerAdapter(Context context, Listener listener) {
         super();
-        App.get(context).getInjectionComponent().inject(this);
+        App.getInjectionComponent(context).inject(this);
 
         this.context = context;
         this.listener = listener;

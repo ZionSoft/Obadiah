@@ -23,8 +23,6 @@ import android.support.v4.app.Fragment;
 
 import net.zionsoft.obadiah.App;
 import net.zionsoft.obadiah.injection.InjectionComponent;
-import net.zionsoft.obadiah.injection.components.Component;
-import net.zionsoft.obadiah.injection.components.HasComponent;
 
 public abstract class ComponentFragment<C extends Component> extends Fragment implements HasComponent<C> {
     private C component;
@@ -34,7 +32,7 @@ public abstract class ComponentFragment<C extends Component> extends Fragment im
         super.onAttach(context);
 
         if (component == null) {
-            component = createComponent(App.get(context).getInjectionComponent());
+            component = createComponent(App.getInjectionComponent(context));
         }
     }
 
