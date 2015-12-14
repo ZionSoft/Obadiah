@@ -18,9 +18,9 @@
 package net.zionsoft.obadiah.injection;
 
 import net.zionsoft.obadiah.App;
-import net.zionsoft.obadiah.injection.components.BibleReadingComponent;
+import net.zionsoft.obadiah.biblereading.BibleReadingComponent;
 import net.zionsoft.obadiah.readingprogress.ReadingProgressComponent;
-import net.zionsoft.obadiah.injection.modules.BibleReadingModule;
+import net.zionsoft.obadiah.biblereading.BibleReadingModule;
 import net.zionsoft.obadiah.readingprogress.ReadingProgressModule;
 import net.zionsoft.obadiah.misc.license.OpenSourceLicenseComponent;
 import net.zionsoft.obadiah.misc.license.OpenSourceLicenseModule;
@@ -30,7 +30,7 @@ import net.zionsoft.obadiah.search.SearchComponent;
 import net.zionsoft.obadiah.search.SearchModule;
 import net.zionsoft.obadiah.translations.TranslationManagementComponent;
 import net.zionsoft.obadiah.translations.TranslationManagementModule;
-import net.zionsoft.obadiah.ui.adapters.VersePagerAdapter;
+import net.zionsoft.obadiah.biblereading.VersePagerAdapter;
 
 import javax.inject.Singleton;
 

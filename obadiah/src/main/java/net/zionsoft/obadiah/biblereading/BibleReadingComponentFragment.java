@@ -15,23 +15,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.injection.components;
+package net.zionsoft.obadiah.biblereading;
 
-import net.zionsoft.obadiah.BookSelectionActivity;
 import net.zionsoft.obadiah.injection.InjectionComponent;
-import net.zionsoft.obadiah.injection.modules.BibleReadingModule;
-import net.zionsoft.obadiah.injection.scopes.ActivityScope;
+import net.zionsoft.obadiah.injection.components.fragments.ComponentFragment;
 
-import dagger.Subcomponent;
+public class BibleReadingComponentFragment extends ComponentFragment<BibleReadingComponent> {
+    static final String FRAGMENT_TAG = "net.zionsoft.obadiah.BibleReadingComponentFragment.FRAGMENT_TAG";
 
-@ActivityScope
-@Subcomponent(modules = BibleReadingModule.class)
-public interface BibleReadingComponent extends Component {
-    void inject(BookSelectionActivity bookSelectionActivity);
+    static BibleReadingComponentFragment newInstance() {
+        return new BibleReadingComponentFragment();
+    }
 
-    final class Initializer {
-        public static BibleReadingComponent init(InjectionComponent injectionComponent) {
-            return injectionComponent.plus(new BibleReadingModule());
-        }
+    @Override
+    protected BibleReadingComponent createComponent(InjectionComponent injectionComponent) {
+        return BibleReadingComponent.Initializer.init(injectionComponent);
     }
 }

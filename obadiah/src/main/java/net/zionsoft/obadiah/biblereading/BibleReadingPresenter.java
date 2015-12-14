@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.mvp.presenters;
+package net.zionsoft.obadiah.biblereading;
 
 import android.support.annotation.Nullable;
 
 import net.zionsoft.obadiah.mvp.models.BibleReadingModel;
 import net.zionsoft.obadiah.mvp.models.ReadingProgressModel;
-import net.zionsoft.obadiah.mvp.views.BibleReadingView;
+import net.zionsoft.obadiah.mvp.presenters.MVPPresenter;
 
 import java.util.List;
 
@@ -30,13 +30,13 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
-public class BibleReadingPresenter extends MVPPresenter<BibleReadingView> {
+class BibleReadingPresenter extends MVPPresenter<BibleReadingView> {
     private final BibleReadingModel bibleReadingModel;
     private final ReadingProgressModel readingProgressModel;
 
     private CompositeSubscription subscription;
 
-    public BibleReadingPresenter(BibleReadingModel bibleReadingModel, ReadingProgressModel readingProgressModel) {
+    BibleReadingPresenter(BibleReadingModel bibleReadingModel, ReadingProgressModel readingProgressModel) {
         this.bibleReadingModel = bibleReadingModel;
         this.readingProgressModel = readingProgressModel;
     }
@@ -58,42 +58,42 @@ public class BibleReadingPresenter extends MVPPresenter<BibleReadingView> {
     }
 
     @Nullable
-    public String loadCurrentTranslation() {
+    String loadCurrentTranslation() {
         return bibleReadingModel.loadCurrentTranslation();
     }
 
-    public void setCurrentTranslation(String translation) {
+    void setCurrentTranslation(String translation) {
         bibleReadingModel.setCurrentTranslation(translation);
     }
 
-    public boolean hasDownloadedTranslation() {
+    boolean hasDownloadedTranslation() {
         return bibleReadingModel.hasDownloadedTranslation();
     }
 
-    public int loadCurrentBook() {
+    int loadCurrentBook() {
         return bibleReadingModel.loadCurrentBook();
     }
 
-    public int loadCurrentChapter() {
+    int loadCurrentChapter() {
         return bibleReadingModel.loadCurrentChapter();
     }
 
-    public int loadCurrentVerse() {
+    int loadCurrentVerse() {
         return bibleReadingModel.loadCurrentVerse();
     }
 
-    public void storeReadingProgress(int book, int chapter, int verse) {
+    void storeReadingProgress(int book, int chapter, int verse) {
         bibleReadingModel.storeReadingProgress(book, chapter, verse);
     }
 
-    public void trackReadingProgress(int book, int chapter) {
+    void trackReadingProgress(int book, int chapter) {
         readingProgressModel.trackReadingProgress(book, chapter)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe();
     }
 
-    public void loadTranslations() {
+    void loadTranslations() {
         if (bibleReadingModel.hasDownloadedTranslation()) {
             subscription.add(bibleReadingModel.loadTranslations()
                     .subscribeOn(Schedulers.io())
@@ -133,7 +133,7 @@ public class BibleReadingPresenter extends MVPPresenter<BibleReadingView> {
         }
     }
 
-    public void loadBookNames(String translation) {
+    void loadBookNames(String translation) {
         subscription.add(bibleReadingModel.loadBookNames(translation)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

@@ -34,7 +34,7 @@ import android.text.TextUtils;
 import com.crashlytics.android.Crashlytics;
 
 import net.zionsoft.obadiah.App;
-import net.zionsoft.obadiah.BookSelectionActivity;
+import net.zionsoft.obadiah.biblereading.BibleReadingActivity;
 import net.zionsoft.obadiah.Constants;
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.domain.Verse;
@@ -142,7 +142,7 @@ public class PushNotificationHandler extends IntentService {
             }
 
             builder.setContentIntent(PendingIntent.getActivity(this, 0,
-                    BookSelectionActivity.newStartReorderToTopIntent(this, messageType, bookIndex, chapterIndex, verseIndex),
+                    BibleReadingActivity.newStartReorderToTopIntent(this, messageType, bookIndex, chapterIndex, verseIndex),
                     PendingIntent.FLAG_UPDATE_CURRENT))
                     .setContentTitle(String.format("%s, %d:%d", bookName, chapterIndex + 1, verseIndex + 1))
                     .setContentText(verse.verseText)

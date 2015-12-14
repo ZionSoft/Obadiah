@@ -15,22 +15,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.injection.modules;
+package net.zionsoft.obadiah.biblereading;
 
-import net.zionsoft.obadiah.injection.scopes.ActivityScope;
-import net.zionsoft.obadiah.mvp.models.BibleReadingModel;
-import net.zionsoft.obadiah.mvp.models.ReadingProgressModel;
-import net.zionsoft.obadiah.mvp.presenters.BibleReadingPresenter;
+import net.zionsoft.obadiah.mvp.views.MVPView;
 
-import dagger.Module;
-import dagger.Provides;
+import java.util.List;
 
-@Module
-public class BibleReadingModule {
-    @Provides
-    @ActivityScope
-    public BibleReadingPresenter provideBibleReadingPresenter(BibleReadingModel bibleReadingModel,
-                                                              ReadingProgressModel readingProgressModel) {
-        return new BibleReadingPresenter(bibleReadingModel, readingProgressModel);
-    }
+interface BibleReadingView extends MVPView {
+    void onTranslationsLoaded(List<String> translations);
+
+    void onTranslationsLoadFailed();
+
+    void onNoTranslationAvailable();
+
+    void onBookNamesLoaded(List<String> bookNames);
+
+    void onBookNamesLoadFailed();
 }

@@ -39,12 +39,12 @@ import android.widget.Toast;
 
 import com.google.android.gms.actions.SearchIntents;
 
-import net.zionsoft.obadiah.BookSelectionActivity;
+import net.zionsoft.obadiah.biblereading.BibleReadingActivity;
 import net.zionsoft.obadiah.Constants;
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.Settings;
 import net.zionsoft.obadiah.model.domain.Verse;
-import net.zionsoft.obadiah.ui.activities.BaseAppCompatActivity;
+import net.zionsoft.obadiah.ui.utils.BaseAppCompatActivity;
 import net.zionsoft.obadiah.ui.utils.AnimationHelper;
 import net.zionsoft.obadiah.ui.utils.DialogHelper;
 
@@ -313,6 +313,6 @@ public class SearchActivity extends BaseAppCompatActivity
                 .putInt(Constants.PREF_KEY_LAST_READ_VERSE, verse.verseIndex)
                 .apply();
 
-        AnimationHelper.slideIn(this, BookSelectionActivity.newStartReorderToTopIntent(this));
+        AnimationHelper.slideIn(this, BibleReadingActivity.newStartReorderToTopIntent(this));
     }
 }

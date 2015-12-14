@@ -21,7 +21,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 
-import net.zionsoft.obadiah.BookSelectionActivity;
+import net.zionsoft.obadiah.biblereading.BibleReadingActivity;
 import net.zionsoft.obadiah.R;
 
 public class ShortcutActivity extends Activity {
@@ -30,7 +30,7 @@ public class ShortcutActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         setResult(RESULT_OK, new Intent()
-                .putExtra(Intent.EXTRA_SHORTCUT_INTENT, BookSelectionActivity.newStartIntent(this))
+                .putExtra(Intent.EXTRA_SHORTCUT_INTENT, BibleReadingActivity.newStartIntent(this))
                 .putExtra(Intent.EXTRA_SHORTCUT_NAME, getString(R.string.app_name))
                 .putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE,
                         Intent.ShortcutIconResource.fromContext(this, R.drawable.ic_launcher)));

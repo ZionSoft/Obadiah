@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.ui.adapters;
+package net.zionsoft.obadiah.biblereading;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -47,7 +47,7 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
 public class VersePagerAdapter extends PagerAdapter {
-    public interface Listener {
+    interface Listener {
         void onVersesSelectionChanged(boolean hasSelected);
     }
 
@@ -105,7 +105,7 @@ public class VersePagerAdapter extends PagerAdapter {
     private int currentChapter;
     private int currentVerse;
 
-    public VersePagerAdapter(Context context, Listener listener) {
+    VersePagerAdapter(Context context, Listener listener) {
         super();
         App.get(context).getInjectionComponent().inject(this);
 
@@ -219,17 +219,17 @@ public class VersePagerAdapter extends PagerAdapter {
         return POSITION_NONE;
     }
 
-    public void setTranslationShortName(String translationShortName) {
+    void setTranslationShortName(String translationShortName) {
         this.translationShortName = translationShortName;
     }
 
-    public void setSelected(int currentBook, int currentChapter, int currentVerse) {
+    void setSelected(int currentBook, int currentChapter, int currentVerse) {
         this.currentBook = currentBook;
         this.currentChapter = currentChapter;
         this.currentVerse = currentVerse;
     }
 
-    public int getCurrentVerse(int chapter) {
+    int getCurrentVerse(int chapter) {
         for (Page page : pages) {
             if (page.position == chapter) {
                 final LinearLayoutManager linearLayoutManager
@@ -240,7 +240,7 @@ public class VersePagerAdapter extends PagerAdapter {
         return 0;
     }
 
-    public List<Verse> getSelectedVerses(int chapter) {
+    List<Verse> getSelectedVerses(int chapter) {
         for (Page page : pages) {
             if (page.position == chapter)
                 return page.verseListAdapter.getSelectedVerses();
@@ -248,7 +248,7 @@ public class VersePagerAdapter extends PagerAdapter {
         return null;
     }
 
-    public void deselectVerses() {
+    void deselectVerses() {
         for (Page page : pages) {
             page.verseListAdapter.deselectVerses();
             page.verseListAdapter.notifyDataSetChanged();

@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.ui.adapters;
+package net.zionsoft.obadiah.biblereading;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -36,7 +36,7 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-public class VerseListAdapter extends RecyclerView.Adapter {
+class VerseListAdapter extends RecyclerView.Adapter {
     static class ViewHolder extends RecyclerView.ViewHolder {
         @Bind(R.id.index)
         TextView index;
@@ -58,7 +58,7 @@ public class VerseListAdapter extends RecyclerView.Adapter {
     private boolean[] selected;
     private int selectedCount;
 
-    public VerseListAdapter(Context context, Settings settings) {
+    VerseListAdapter(Context context, Settings settings) {
         this.settings = settings;
         this.inflater = LayoutInflater.from(context);
         this.resources = context.getResources();

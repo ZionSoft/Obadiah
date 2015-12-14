@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.ui.adapters;
+package net.zionsoft.obadiah.biblereading;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -31,8 +31,8 @@ import net.zionsoft.obadiah.model.domain.Bible;
 
 import java.util.List;
 
-public class BookExpandableListAdapter extends BaseExpandableListAdapter implements View.OnClickListener {
-    public interface OnChapterSelectedListener {
+class BookExpandableListAdapter extends BaseExpandableListAdapter implements View.OnClickListener {
+    interface OnChapterSelectedListener {
         void onChapterSelected(int book, int chapter);
     }
 
@@ -54,7 +54,7 @@ public class BookExpandableListAdapter extends BaseExpandableListAdapter impleme
     private int currentBook;
     private int currentChapter;
 
-    public BookExpandableListAdapter(Context context, OnChapterSelectedListener listener) {
+    BookExpandableListAdapter(Context context, OnChapterSelectedListener listener) {
         super();
 
         this.listener = listener;

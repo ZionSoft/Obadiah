@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah;
+package net.zionsoft.obadiah.biblereading;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -44,22 +44,18 @@ import android.widget.ExpandableListView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import net.zionsoft.obadiah.injection.components.fragments.BibleReadingComponentFragment;
+import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.injection.scopes.ActivityScope;
 import net.zionsoft.obadiah.model.Settings;
 import net.zionsoft.obadiah.model.domain.Verse;
 import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.appindexing.AppIndexingManager;
 import net.zionsoft.obadiah.utils.UriHelper;
-import net.zionsoft.obadiah.mvp.presenters.BibleReadingPresenter;
-import net.zionsoft.obadiah.mvp.views.BibleReadingView;
-import net.zionsoft.obadiah.ui.activities.BaseAppCompatActivity;
+import net.zionsoft.obadiah.ui.utils.BaseAppCompatActivity;
 import net.zionsoft.obadiah.readingprogress.ReadingProgressActivity;
 import net.zionsoft.obadiah.search.SearchActivity;
 import net.zionsoft.obadiah.misc.settings.SettingsActivity;
 import net.zionsoft.obadiah.translations.TranslationManagementActivity;
-import net.zionsoft.obadiah.ui.adapters.BookExpandableListAdapter;
-import net.zionsoft.obadiah.ui.adapters.VersePagerAdapter;
 import net.zionsoft.obadiah.ui.utils.AnimationHelper;
 import net.zionsoft.obadiah.ui.utils.DialogHelper;
 
@@ -70,13 +66,13 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 
-public class BookSelectionActivity extends BaseAppCompatActivity implements BibleReadingView,
+public class BibleReadingActivity extends BaseAppCompatActivity implements BibleReadingView,
         AdapterView.OnItemSelectedListener, BookExpandableListAdapter.OnChapterSelectedListener,
         ExpandableListView.OnGroupClickListener, VersePagerAdapter.Listener, ViewPager.OnPageChangeListener {
-    private static final String KEY_MESSAGE_TYPE = "net.zionsoft.obadiah.BookSelectionActivity.KEY_MESSAGE_TYPE";
-    private static final String KEY_BOOK_INDEX = "net.zionsoft.obadiah.BookSelectionActivity.KEY_BOOK_INDEX";
-    private static final String KEY_CHAPTER_INDEX = "net.zionsoft.obadiah.BookSelectionActivity.KEY_CHAPTER_INDEX";
-    private static final String KEY_VERSE_INDEX = "net.zionsoft.obadiah.BookSelectionActivity.KEY_VERSE_INDEX";
+    private static final String KEY_MESSAGE_TYPE = "net.zionsoft.obadiah.biblereading.BibleReadingActivity.KEY_MESSAGE_TYPE";
+    private static final String KEY_BOOK_INDEX = "net.zionsoft.obadiah.biblereading.BibleReadingActivity.KEY_BOOK_INDEX";
+    private static final String KEY_CHAPTER_INDEX = "net.zionsoft.obadiah.biblereading.BibleReadingActivity.KEY_CHAPTER_INDEX";
+    private static final String KEY_VERSE_INDEX = "net.zionsoft.obadiah.biblereading.BibleReadingActivity.KEY_VERSE_INDEX";
 
     public static Intent newStartReorderToTopIntent(Context context, String messageType,
                                                     int book, int chapter, int verse) {
@@ -98,7 +94,7 @@ public class BookSelectionActivity extends BaseAppCompatActivity implements Bibl
     }
 
     public static Intent newStartIntent(Context context) {
-        return new Intent(context, BookSelectionActivity.class);
+        return new Intent(context, BibleReadingActivity.class);
     }
 
     @ActivityScope
@@ -386,8 +382,8 @@ public class BookSelectionActivity extends BaseAppCompatActivity implements Bibl
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        AnimationHelper.slideIn(BookSelectionActivity.this,
-                                TranslationManagementActivity.newStartIntent(BookSelectionActivity.this));
+                        AnimationHelper.slideIn(BibleReadingActivity.this,
+                                TranslationManagementActivity.newStartIntent(BibleReadingActivity.this));
                     }
                 }, new DialogInterface.OnClickListener() {
                     @Override
@@ -443,8 +439,8 @@ public class BookSelectionActivity extends BaseAppCompatActivity implements Bibl
         final Adapter adapter = parent.getAdapter();
         if (position == adapter.getCount() - 1) {
             // last item ("More") selected, opens the translation management activity
-            AnimationHelper.slideIn(BookSelectionActivity.this,
-                    TranslationManagementActivity.newStartIntent(BookSelectionActivity.this));
+            AnimationHelper.slideIn(BibleReadingActivity.this,
+                    TranslationManagementActivity.newStartIntent(BibleReadingActivity.this));
             return;
         }
 
@@ -533,7 +529,7 @@ public class BookSelectionActivity extends BaseAppCompatActivity implements Bibl
                                 clipboardManager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
                             }
                             clipboardManager.setText(buildText(versePagerAdapter.getSelectedVerses(versePager.getCurrentItem())));
-                            Toast.makeText(BookSelectionActivity.this,
+                            Toast.makeText(BibleReadingActivity.this,
                                     R.string.toast_verses_copied, Toast.LENGTH_SHORT).show();
                             actionMode.finish();
                             return true;
@@ -554,11 +550,11 @@ public class BookSelectionActivity extends BaseAppCompatActivity implements Bibl
 
                 @Override
                 public void onDestroyActionMode(ActionMode actionMode) {
-                    if (actionMode != BookSelectionActivity.this.actionMode) {
+                    if (actionMode != BibleReadingActivity.this.actionMode) {
                         return;
                     }
                     versePagerAdapter.deselectVerses();
-                    BookSelectionActivity.this.actionMode = null;
+                    BibleReadingActivity.this.actionMode = null;
                 }
             });
         } else {
