@@ -17,17 +17,14 @@
 
 package net.zionsoft.obadiah.model.datamodel;
 
-import android.content.ContentValues;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.text.format.DateUtils;
 import android.util.SparseArray;
 
-import net.zionsoft.obadiah.model.domain.Bible;
+import net.zionsoft.obadiah.model.database.MetadataTableHelper;
+import net.zionsoft.obadiah.model.database.ReadingProgressTableHelper;
 import net.zionsoft.obadiah.model.domain.ReadingProgress;
-import net.zionsoft.obadiah.model.database.DatabaseHelper;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -49,36 +46,21 @@ public class ReadingProgressModel {
         return Observable.create(new Observable.OnSubscribe<ReadingProgress>() {
             @Override
             public void call(Subscriber<? super ReadingProgress> subscriber) {
-                Cursor cursor = null;
                 try {
-                    cursor = database.query(DatabaseHelper.TABLE_READING_PROGRESS,
-                            new String[]{DatabaseHelper.COLUMN_BOOK_INDEX, DatabaseHelper.COLUMN_CHAPTER_INDEX,
-                                    DatabaseHelper.COLUMN_LAST_READING_TIMESTAMP},
-                            null, null, null, null, null
-                    );
-                    final int bookIndex = cursor.getColumnIndex(DatabaseHelper.COLUMN_BOOK_INDEX);
-                    final int chapterIndex = cursor.getColumnIndex(DatabaseHelper.COLUMN_CHAPTER_INDEX);
-                    final int lastReadingTimestamp = cursor.getColumnIndex(DatabaseHelper.COLUMN_LAST_READING_TIMESTAMP);
-
-                    final int bookCount = Bible.getBookCount();
-                    final List<SparseArray<Long>> chaptersReadPerBook = new ArrayList<>(bookCount);
-                    for (int i = 0; i < bookCount; ++i)
-                        chaptersReadPerBook.add(new SparseArray<Long>(Bible.getChapterCount(i)));
-                    while (cursor.moveToNext()) {
-                        chaptersReadPerBook.get(cursor.getInt(bookIndex))
-                                .append(cursor.getInt(chapterIndex), cursor.getLong(lastReadingTimestamp));
-                    }
-
-                    final int continuousReadingDays = Integer.parseInt(
-                            DatabaseHelper.getMetadata(database, DatabaseHelper.KEY_CONTINUOUS_READING_DAYS, "1"));
+                    database.beginTransaction();
+                    final List<SparseArray<Long>> chaptersReadPerBook
+                            = ReadingProgressTableHelper.getChaptersReadPerBook(database);
+                    final int continuousReadingDays = Integer.parseInt(MetadataTableHelper.getMetadata(
+                            database, MetadataTableHelper.KEY_CONTINUOUS_READING_DAYS, "1"));
+                    database.setTransactionSuccessful();
 
                     subscriber.onNext(new ReadingProgress(chaptersReadPerBook, continuousReadingDays));
                     subscriber.onCompleted();
                 } catch (Exception e) {
                     subscriber.onError(e);
                 } finally {
-                    if (cursor != null) {
-                        cursor.close();
+                    if (database.inTransaction()) {
+                        database.endTransaction();
                     }
                 }
             }
@@ -92,27 +74,24 @@ public class ReadingProgressModel {
                 try {
                     database.beginTransaction();
 
-                    final ContentValues values = new ContentValues(3);
-                    values.put(DatabaseHelper.COLUMN_BOOK_INDEX, book);
-                    values.put(DatabaseHelper.COLUMN_CHAPTER_INDEX, chapter);
-                    values.put(DatabaseHelper.COLUMN_LAST_READING_TIMESTAMP, System.currentTimeMillis());
-                    database.insertWithOnConflict(DatabaseHelper.TABLE_READING_PROGRESS,
-                            null, values, SQLiteDatabase.CONFLICT_REPLACE);
-
-                    final long lastReadingDay = Long.parseLong(DatabaseHelper.getMetadata(
-                            database, DatabaseHelper.KEY_LAST_READING_TIMESTAMP, "0")) / DateUtils.DAY_IN_MILLIS;
                     final long now = System.currentTimeMillis();
+                    ReadingProgressTableHelper.saveChapterReading(database, book, chapter, now);
+                    MetadataTableHelper.saveMetadata(database,
+                            MetadataTableHelper.KEY_LAST_READING_TIMESTAMP, Long.toString(now));
+
+                    final long lastReadingDay = Long.parseLong(MetadataTableHelper.getMetadata(
+                            database, MetadataTableHelper.KEY_LAST_READING_TIMESTAMP, "0")) / DateUtils.DAY_IN_MILLIS;
                     final long today = now / DateUtils.DAY_IN_MILLIS;
                     final long diff = today - lastReadingDay;
+                    int continuousReadingDays = 1;
                     if (diff == 1) {
-                        final int continuousReadingDays = Integer.parseInt(
-                                DatabaseHelper.getMetadata(database, DatabaseHelper.KEY_CONTINUOUS_READING_DAYS, "0"));
-                        DatabaseHelper.setMetadata(database, DatabaseHelper.KEY_CONTINUOUS_READING_DAYS,
-                                Integer.toString(continuousReadingDays + 1));
-                    } else if (diff > 2) {
-                        DatabaseHelper.setMetadata(database, DatabaseHelper.KEY_CONTINUOUS_READING_DAYS, "1");
+                        continuousReadingDays = 1 + Integer.parseInt(
+                                MetadataTableHelper.getMetadata(database,
+                                        MetadataTableHelper.KEY_CONTINUOUS_READING_DAYS, "0"));
                     }
-                    DatabaseHelper.setMetadata(database, DatabaseHelper.KEY_LAST_READING_TIMESTAMP, Long.toString(now));
+                    MetadataTableHelper.saveMetadata(database,
+                            MetadataTableHelper.KEY_CONTINUOUS_READING_DAYS,
+                            Integer.toString(continuousReadingDays));
 
                     database.setTransactionSuccessful();
                 } catch (Exception e) {

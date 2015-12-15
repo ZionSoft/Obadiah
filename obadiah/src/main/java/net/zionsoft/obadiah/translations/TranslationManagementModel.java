@@ -25,7 +25,9 @@ import com.squareup.moshi.Moshi;
 import com.squareup.okhttp.ResponseBody;
 
 import net.zionsoft.obadiah.model.analytics.Analytics;
+import net.zionsoft.obadiah.model.database.BookNamesTableHelper;
 import net.zionsoft.obadiah.model.database.TranslationHelper;
+import net.zionsoft.obadiah.model.database.TranslationsTableHelper;
 import net.zionsoft.obadiah.model.domain.TranslationInfo;
 import net.zionsoft.obadiah.network.BackendChapter;
 import net.zionsoft.obadiah.network.BackendInterface;
@@ -86,7 +88,7 @@ class TranslationManagementModel {
                     @Override
                     public void call(Subscriber<? super List<String>> subscriber) {
                         try {
-                            subscriber.onNext(TranslationHelper.getDownloadedTranslationShortNames(database));
+                            subscriber.onNext(TranslationsTableHelper.getDownloadedTranslations(database));
                             subscriber.onCompleted();
                         } catch (Exception e) {
                             subscriber.onError(e);
@@ -111,7 +113,7 @@ class TranslationManagementModel {
                     public void call(List<TranslationInfo> translations) {
                         try {
                             database.beginTransaction();
-                            TranslationHelper.saveTranslations(database, translations);
+                            TranslationsTableHelper.saveTranslations(database, translations);
                             database.setTransactionSuccessful();
                         } finally {
                             if (database.inTransaction()) {
@@ -131,7 +133,7 @@ class TranslationManagementModel {
             @Override
             public void call(Subscriber<? super List<TranslationInfo>> subscriber) {
                 try {
-                    subscriber.onNext(TranslationHelper.getTranslations(database));
+                    subscriber.onNext(TranslationsTableHelper.getTranslations(database));
                     subscriber.onCompleted();
                 } catch (Exception e) {
                     subscriber.onError(e);
@@ -182,6 +184,7 @@ class TranslationManagementModel {
                     try {
                         database.beginTransaction();
                         TranslationHelper.removeTranslation(database, translation.shortName);
+                        BookNamesTableHelper.removeBookNames(database, translation.shortName);
                         database.setTransactionSuccessful();
                     } finally {
                         if (database.inTransaction()) {
@@ -222,7 +225,7 @@ class TranslationManagementModel {
                         final String entryName = entry.getName();
                         BufferedSource bufferedSource = Okio.buffer(Okio.source(is));
                         if (entryName.equals("books.json")) {
-                            TranslationHelper.saveBookNames(database,
+                            BookNamesTableHelper.saveBookNames(database,
                                     translationInfoJsonAdapter.fromJson(bufferedSource));
                         } else {
                             final String[] parts = entryName.substring(0, entryName.length() - 5).split("-");

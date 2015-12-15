@@ -37,6 +37,7 @@ import net.zionsoft.obadiah.App;
 import net.zionsoft.obadiah.biblereading.BibleReadingActivity;
 import net.zionsoft.obadiah.Constants;
 import net.zionsoft.obadiah.R;
+import net.zionsoft.obadiah.model.database.BookNamesTableHelper;
 import net.zionsoft.obadiah.model.domain.Verse;
 import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.database.TranslationHelper;
@@ -134,7 +135,7 @@ public class PushNotificationHandler extends IntentService {
             final int chapterIndex = jsonObject.getInt("chapter");
             final int verseIndex = jsonObject.getInt("verse");
 
-            final String bookName = TranslationHelper.getBookNames(database, translationShortName).get(bookIndex);
+            final String bookName = BookNamesTableHelper.getBookNames(database, translationShortName).get(bookIndex);
             final Verse verse = TranslationHelper.getVerse(database, translationShortName, bookName,
                     bookIndex, chapterIndex, verseIndex);
             if (verse == null) {

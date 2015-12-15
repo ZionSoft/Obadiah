@@ -26,7 +26,9 @@ import android.text.TextUtils;
 
 import net.zionsoft.obadiah.Constants;
 import net.zionsoft.obadiah.model.analytics.Analytics;
+import net.zionsoft.obadiah.model.database.BookNamesTableHelper;
 import net.zionsoft.obadiah.model.database.TranslationHelper;
+import net.zionsoft.obadiah.model.database.TranslationsTableHelper;
 import net.zionsoft.obadiah.model.domain.TranslationInfo;
 import net.zionsoft.obadiah.model.domain.Verse;
 
@@ -119,7 +121,7 @@ public class BibleReadingModel {
             @Override
             public void call(Subscriber<? super List<String>> subscriber) {
                 try {
-                    subscriber.onNext(TranslationHelper.getDownloadedTranslationShortNames(database));
+                    subscriber.onNext(TranslationsTableHelper.getDownloadedTranslations(database));
                     subscriber.onCompleted();
                 } catch (Exception e) {
                     subscriber.onError(e);
@@ -149,7 +151,7 @@ public class BibleReadingModel {
             public void call(Subscriber<? super List<String>> subscriber) {
                 try {
                     subscriber.onNext(Collections.unmodifiableList(
-                            TranslationHelper.getBookNames(database, translation)));
+                            BookNamesTableHelper.getBookNames(database, translation)));
                     subscriber.onCompleted();
                 } catch (Exception e) {
                     subscriber.onError(e);

@@ -61,10 +61,11 @@ public class ReadingProgress {
 
             if (chaptersReadCount == Bible.getChapterCount(i)) {
                 ++finishedBooks;
-                if (i < Bible.getOldTestamentBookCount())
+                if (i < Bible.getOldTestamentBookCount()) {
                     ++finishedOldTestament;
-                else
+                } else {
                     ++finishedNewTestament;
+                }
             }
             ++i;
         }
