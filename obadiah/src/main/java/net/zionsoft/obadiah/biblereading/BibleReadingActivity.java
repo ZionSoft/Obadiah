@@ -153,7 +153,7 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
     }
 
     private void initializeUi() {
-        setContentView(R.layout.activity_book_selection);
+        setContentView(R.layout.activity_bible_reading);
 
         rootView = getWindow().getDecorView();
 
