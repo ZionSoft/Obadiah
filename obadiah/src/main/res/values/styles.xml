@@ -15,14 +15,14 @@
     </style>
 
     <style name="AppSpinnerStyle" parent="android:style/Widget.ListView.DropDown">
-        <item name="android:divider">@android:color/darker_gray</item>
-        <item name="android:dividerHeight">1dp</item>
+        <item name="android:divider">@color/dark_gray</item>
+        <item name="android:dividerHeight">1px</item>
     </style>
 
     <style name="Divider" />
 
     <style name="Divider.Horizontal" parent="Divider">
         <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">1dp</item>
+        <item name="android:layout_height">1px</item>
     </style>
 </resources>
