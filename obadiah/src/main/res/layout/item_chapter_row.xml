@@ -7,6 +7,7 @@
     <TextView
         android:layout_width="@dimen/chapter_grid_width"
         android:layout_height="@dimen/chapter_grid_height"
+        android:background="@drawable/background_chapter"
         android:gravity="center"
         android:textColor="@android:color/white"
         android:textSize="@dimen/text_size_medium" />
@@ -14,6 +15,7 @@
     <TextView
         android:layout_width="@dimen/chapter_grid_width"
         android:layout_height="@dimen/chapter_grid_height"
+        android:background="@drawable/background_chapter"
         android:gravity="center"
         android:textColor="@android:color/white"
         android:textSize="@dimen/text_size_medium" />
@@ -21,6 +23,7 @@
     <TextView
         android:layout_width="@dimen/chapter_grid_width"
         android:layout_height="@dimen/chapter_grid_height"
+        android:background="@drawable/background_chapter"
         android:gravity="center"
         android:textColor="@android:color/white"
         android:textSize="@dimen/text_size_medium" />
@@ -28,6 +31,7 @@
     <TextView
         android:layout_width="@dimen/chapter_grid_width"
         android:layout_height="@dimen/chapter_grid_height"
+        android:background="@drawable/background_chapter"
         android:gravity="center"
         android:textColor="@android:color/white"
         android:textSize="@dimen/text_size_medium" />
@@ -35,6 +39,7 @@
     <TextView
         android:layout_width="@dimen/chapter_grid_width"
         android:layout_height="@dimen/chapter_grid_height"
+        android:background="@drawable/background_chapter"
         android:gravity="center"
         android:textColor="@android:color/white"
         android:textSize="@dimen/text_size_medium" />

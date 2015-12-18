@@ -18,7 +18,6 @@
 package net.zionsoft.obadiah.biblereading;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -136,8 +135,7 @@ class BookExpandableListAdapter extends BaseExpandableListAdapter implements Vie
                 textView.setVisibility(View.GONE);
             } else {
                 textView.setVisibility(View.VISIBLE);
-                textView.setBackgroundColor(groupPosition == currentBook && chapter == currentChapter
-                        ? Color.DKGRAY : Color.TRANSPARENT);
+                textView.setSelected(groupPosition == currentBook && chapter == currentChapter);
                 textView.setText(Integer.toString(chapter + 1));
 
                 ChapterTag chapterTag = (ChapterTag) textView.getTag();
