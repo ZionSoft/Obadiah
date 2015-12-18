@@ -102,17 +102,19 @@ class VerseListAdapter extends RecyclerView.Adapter {
         this.verses = verses;
 
         final int size = this.verses.size();
-        if (selected == null || selected.length < size)
+        if (selected == null || selected.length < size) {
             selected = new boolean[size];
+        }
         deselectVerses();
     }
 
     void select(int position) {
         selected[position] ^= true;
-        if (selected[position])
+        if (selected[position]) {
             ++selectedCount;
-        else
+        } else {
             --selectedCount;
+        }
     }
 
     boolean hasSelectedVerses() {
@@ -121,18 +123,18 @@ class VerseListAdapter extends RecyclerView.Adapter {
 
     List<Verse> getSelectedVerses() {
         final List<Verse> selectedVerses = new ArrayList<>(selectedCount);
-        int i = 0;
-        for (boolean selected : this.selected) {
-            if (selected)
+        for (int i = 0; i < selected.length; ++i) {
+            if (selected[i]) {
                 selectedVerses.add(verses.get(i));
-            ++i;
+            }
         }
         return selectedVerses;
     }
 
     void deselectVerses() {
-        for (int i = 0; i < selected.length; ++i)
+        for (int i = 0; i < selected.length; ++i) {
             selected[i] = false;
+        }
         selectedCount = 0;
     }
 }

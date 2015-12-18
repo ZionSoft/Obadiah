@@ -29,11 +29,10 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 
 import net.zionsoft.obadiah.R;
-import net.zionsoft.obadiah.injection.scopes.ActivityScope;
 import net.zionsoft.obadiah.model.datamodel.Settings;
 import net.zionsoft.obadiah.model.domain.ReadingProgress;
-import net.zionsoft.obadiah.ui.utils.BaseAppCompatActivity;
 import net.zionsoft.obadiah.ui.utils.AnimationHelper;
+import net.zionsoft.obadiah.ui.utils.BaseAppCompatActivity;
 import net.zionsoft.obadiah.ui.utils.DialogHelper;
 
 import java.util.List;
@@ -47,7 +46,6 @@ public class ReadingProgressActivity extends BaseAppCompatActivity implements Re
         return new Intent(context, ReadingProgressActivity.class);
     }
 
-    @ActivityScope
     @Inject
     ReadingProgressPresenter readingProgressPresenter;
 

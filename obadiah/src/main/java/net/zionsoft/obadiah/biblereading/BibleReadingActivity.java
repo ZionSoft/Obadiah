@@ -45,18 +45,17 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import net.zionsoft.obadiah.R;
-import net.zionsoft.obadiah.injection.scopes.ActivityScope;
+import net.zionsoft.obadiah.misc.settings.SettingsActivity;
+import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.datamodel.Settings;
 import net.zionsoft.obadiah.model.domain.Verse;
-import net.zionsoft.obadiah.model.analytics.Analytics;
-import net.zionsoft.obadiah.utils.UriHelper;
-import net.zionsoft.obadiah.ui.utils.BaseAppCompatActivity;
 import net.zionsoft.obadiah.readingprogress.ReadingProgressActivity;
 import net.zionsoft.obadiah.search.SearchActivity;
-import net.zionsoft.obadiah.misc.settings.SettingsActivity;
 import net.zionsoft.obadiah.translations.TranslationManagementActivity;
 import net.zionsoft.obadiah.ui.utils.AnimationHelper;
+import net.zionsoft.obadiah.ui.utils.BaseAppCompatActivity;
 import net.zionsoft.obadiah.ui.utils.DialogHelper;
+import net.zionsoft.obadiah.utils.UriHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -96,7 +95,6 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
         return new Intent(context, BibleReadingActivity.class);
     }
 
-    @ActivityScope
     @Inject
     BibleReadingPresenter bibleReadingPresenter;
 
