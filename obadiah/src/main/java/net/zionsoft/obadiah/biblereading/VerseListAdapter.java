@@ -77,11 +77,7 @@ class VerseListAdapter extends RecyclerView.Adapter {
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         final ViewHolder viewHolder = (ViewHolder) holder;
-        if (selected[position]) {
-            viewHolder.itemView.setBackgroundColor(resources.getColor(R.color.blue_semi_transparent));
-        } else {
-            viewHolder.itemView.setBackgroundResource(R.drawable.background_text);
-        }
+        viewHolder.itemView.setSelected(selected[position]);
 
         final int textColor = settings.getTextColor();
         final float textSize = resources.getDimension(settings.getTextSize().textSize);
