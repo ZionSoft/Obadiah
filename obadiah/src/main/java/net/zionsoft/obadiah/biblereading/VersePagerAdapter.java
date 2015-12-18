@@ -82,8 +82,9 @@ public class VersePagerAdapter extends PagerAdapter {
 
         @Override
         public void onClick(View v) {
-            verseListAdapter.select(verseList.getChildAdapterPosition(v));
-            verseListAdapter.notifyDataSetChanged();
+            final int position = verseList.getChildAdapterPosition(v);
+            verseListAdapter.select(position);
+            verseListAdapter.notifyItemChanged(position);
 
             listener.onVersesSelectionChanged(verseListAdapter.hasSelectedVerses());
         }
