@@ -39,13 +39,12 @@ import android.widget.Toast;
 
 import com.google.android.gms.actions.SearchIntents;
 
-import net.zionsoft.obadiah.biblereading.BibleReadingActivity;
 import net.zionsoft.obadiah.Constants;
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.datamodel.Settings;
 import net.zionsoft.obadiah.model.domain.Verse;
-import net.zionsoft.obadiah.ui.utils.BaseAppCompatActivity;
 import net.zionsoft.obadiah.ui.utils.AnimationHelper;
+import net.zionsoft.obadiah.ui.utils.BaseAppCompatActivity;
 import net.zionsoft.obadiah.ui.utils.DialogHelper;
 
 import java.util.ArrayList;
@@ -56,8 +55,7 @@ import javax.inject.Inject;
 import butterknife.Bind;
 
 public class SearchActivity extends BaseAppCompatActivity
-        implements net.zionsoft.obadiah.search.SearchView,
-        RecyclerView.OnChildAttachStateChangeListener, View.OnClickListener {
+        implements net.zionsoft.obadiah.search.SearchView {
     public static Intent newStartReorderToTopIntent(Context context) {
         final Intent startIntent = new Intent(context, SearchActivity.class);
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
@@ -115,7 +113,6 @@ public class SearchActivity extends BaseAppCompatActivity
         setContentView(R.layout.activity_search);
         toolbar.setLogo(R.drawable.ic_action_bar);
         setSupportActionBar(toolbar);
-        searchResultList.addOnChildAttachStateChangeListener(this);
         searchResultList.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         initializeAdapter();
 
@@ -292,27 +289,5 @@ public class SearchActivity extends BaseAppCompatActivity
                         search();
                     }
                 }, null);
-    }
-
-    @Override
-    public void onChildViewAttachedToWindow(View view) {
-        view.setOnClickListener(this);
-    }
-
-    @Override
-    public void onChildViewDetachedFromWindow(View view) {
-        view.setOnClickListener(null);
-    }
-
-    @Override
-    public void onClick(View v) {
-        final Verse verse = verses.get(searchResultList.getChildAdapterPosition(v));
-        getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE).edit()
-                .putInt(Constants.PREF_KEY_LAST_READ_BOOK, verse.bookIndex)
-                .putInt(Constants.PREF_KEY_LAST_READ_CHAPTER, verse.chapterIndex)
-                .putInt(Constants.PREF_KEY_LAST_READ_VERSE, verse.verseIndex)
-                .apply();
-
-        AnimationHelper.slideIn(this, BibleReadingActivity.newStartReorderToTopIntent(this));
     }
 }
