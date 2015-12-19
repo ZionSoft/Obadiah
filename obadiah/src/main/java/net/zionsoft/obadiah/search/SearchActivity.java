@@ -31,7 +31,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -55,7 +54,8 @@ import javax.inject.Inject;
 import butterknife.Bind;
 
 public class SearchActivity extends BaseAppCompatActivity
-        implements net.zionsoft.obadiah.search.SearchView {
+        implements SearchView.OnQueryTextListener, Toolbar.OnMenuItemClickListener,
+        net.zionsoft.obadiah.search.SearchView {
     public static Intent newStartReorderToTopIntent(Context context) {
         final Intent startIntent = new Intent(context, SearchActivity.class);
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
@@ -111,12 +111,32 @@ public class SearchActivity extends BaseAppCompatActivity
         }
 
         setContentView(R.layout.activity_search);
-        toolbar.setLogo(R.drawable.ic_action_bar);
-        setSupportActionBar(toolbar);
+        initializeToolbar();
         searchResultList.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         initializeAdapter();
 
         handleStartIntent(getIntent());
+    }
+
+    private void initializeToolbar() {
+        toolbar.setLogo(R.drawable.ic_action_bar);
+
+        toolbar.setOnMenuItemClickListener(this);
+        toolbar.inflateMenu(R.menu.menu_search);
+        final MenuItem searchMenuItem = toolbar.getMenu().findItem(R.id.action_search);
+        MenuItemCompat.expandActionView(searchMenuItem);
+        searchView = (SearchView) MenuItemCompat.getActionView(searchMenuItem);
+        searchView.setSearchableInfo(((SearchManager) getSystemService(SEARCH_SERVICE))
+                .getSearchableInfo(getComponentName()));
+        searchView.setQueryRefinementEnabled(true);
+        searchView.setIconified(false);
+        searchView.setOnQueryTextListener(this);
+
+        if (TextUtils.isEmpty(query)) {
+            handleStartIntent(getIntent());
+        } else {
+            searchView.setQuery(query, false);
+        }
     }
 
     private void initializeAdapter() {
@@ -204,36 +224,14 @@ public class SearchActivity extends BaseAppCompatActivity
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_search, menu);
+    public boolean onQueryTextChange(String newText) {
+        return false;
+    }
 
-        final MenuItem searchMenuItem = menu.findItem(R.id.action_search);
-        MenuItemCompat.expandActionView(searchMenuItem);
-        searchView = (SearchView) MenuItemCompat.getActionView(searchMenuItem);
-        searchView.setSearchableInfo(((SearchManager) getSystemService(SEARCH_SERVICE))
-                .getSearchableInfo(getComponentName()));
-        searchView.setQueryRefinementEnabled(true);
-        searchView.setIconified(false);
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                SearchActivity.this.query = query;
-                search();
-                return true;
-            }
-        });
-
-        if (TextUtils.isEmpty(query)) {
-            handleStartIntent(getIntent());
-        } else {
-            searchView.setQuery(query, false);
-        }
-
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        this.query = query;
+        search();
         return true;
     }
 
@@ -255,13 +253,13 @@ public class SearchActivity extends BaseAppCompatActivity
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onMenuItemClick(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_clear_search_history:
                 searchPresenter.clearSearchHistory();
                 return true;
             default:
-                return super.onOptionsItemSelected(item);
+                return false;
         }
     }
 

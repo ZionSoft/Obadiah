@@ -56,7 +56,8 @@ import butterknife.Bind;
 
 public class TranslationManagementActivity extends BaseAppCompatActivity
         implements TranslationManagementView, SwipeRefreshLayout.OnRefreshListener,
-        RecyclerView.OnChildAttachStateChangeListener, View.OnClickListener, View.OnCreateContextMenuListener {
+        RecyclerView.OnChildAttachStateChangeListener, View.OnClickListener,
+        View.OnCreateContextMenuListener, Toolbar.OnMenuItemClickListener {
     private static final String KEY_MESSAGE_TYPE = "net.zionsoft.obadiah.translations.TranslationManagementActivity.KEY_MESSAGE_TYPE";
 
     public static Intent newStartReorderToTopIntent(Context context, String messageType) {
@@ -121,7 +122,10 @@ public class TranslationManagementActivity extends BaseAppCompatActivity
 
         toolbar.setLogo(R.drawable.ic_action_bar);
         toolbar.setTitle(R.string.activity_manage_translation);
-        setSupportActionBar(toolbar);
+
+        toolbar.setOnMenuItemClickListener(this);
+        toolbar.inflateMenu(R.menu.menu_translation_management);
+        removeAdsMenuItem = toolbar.getMenu().findItem(R.id.action_remove_ads);
 
         swipeContainer.setColorSchemeResources(R.color.dark_cyan, R.color.dark_lime, R.color.blue, R.color.dark_blue);
         swipeContainer.setOnRefreshListener(this);
@@ -228,26 +232,6 @@ public class TranslationManagementActivity extends BaseAppCompatActivity
         if (downloadTranslationProgressDialog != null) {
             downloadTranslationProgressDialog.dismiss();
             downloadTranslationProgressDialog = null;
-        }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_translation_management, menu);
-        removeAdsMenuItem = menu.findItem(R.id.action_remove_ads);
-
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_remove_ads:
-                Analytics.trackUIEvent("remove_ads");
-                translationManagementPresenter.removeAds(this);
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
         }
     }
 
@@ -445,5 +429,17 @@ public class TranslationManagementActivity extends BaseAppCompatActivity
         }
 
         adView.setVisibility(View.GONE);
+    }
+
+    @Override
+    public boolean onMenuItemClick(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_remove_ads:
+                Analytics.trackUIEvent("remove_ads");
+                translationManagementPresenter.removeAds(this);
+                return true;
+            default:
+                return false;
+        }
     }
 }
