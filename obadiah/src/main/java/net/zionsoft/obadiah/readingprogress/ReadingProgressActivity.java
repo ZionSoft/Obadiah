@@ -76,7 +76,6 @@ public class ReadingProgressActivity extends BaseAppCompatActivity implements Re
         setContentView(R.layout.activity_reading_progress);
         toolbar.setLogo(R.drawable.ic_action_bar);
         toolbar.setTitle(R.string.activity_reading_progress);
-        setSupportActionBar(toolbar);
         readingProgressList.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
     }
 

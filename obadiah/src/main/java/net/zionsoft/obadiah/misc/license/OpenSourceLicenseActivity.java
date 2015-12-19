@@ -73,7 +73,6 @@ public class OpenSourceLicenseActivity extends BaseAppCompatActivity implements 
         setContentView(R.layout.activity_open_source_license);
         toolbar.setLogo(R.drawable.ic_action_bar);
         toolbar.setTitle(R.string.activity_open_source_license);
-        setSupportActionBar(toolbar);
         licenseList.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
     }
 

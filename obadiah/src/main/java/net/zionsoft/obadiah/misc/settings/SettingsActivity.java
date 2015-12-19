@@ -102,7 +102,6 @@ public class SettingsActivity extends BaseAppCompatActivity {
 
         toolbar.setLogo(R.drawable.ic_action_bar);
         toolbar.setTitle(R.string.activity_settings);
-        setSupportActionBar(toolbar);
 
         rootView.setKeepScreenOn(settings.keepScreenOn());
         updateColor();
