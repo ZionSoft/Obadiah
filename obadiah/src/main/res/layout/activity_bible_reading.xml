@@ -21,7 +21,7 @@
             android:layout_height="match_parent" />
 
         <ExpandableListView
-            android:id="@+id/book_list"
+            android:id="@+id/chapter_list"
             android:layout_width="@dimen/left_drawer_width"
             android:layout_height="match_parent"
             android:layout_gravity="start"

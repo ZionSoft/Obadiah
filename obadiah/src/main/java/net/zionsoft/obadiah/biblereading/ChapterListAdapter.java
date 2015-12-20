@@ -30,7 +30,7 @@ import net.zionsoft.obadiah.model.domain.Bible;
 
 import java.util.List;
 
-class BookExpandableListAdapter extends BaseExpandableListAdapter implements View.OnClickListener {
+class ChapterListAdapter extends BaseExpandableListAdapter implements View.OnClickListener {
     interface OnChapterSelectedListener {
         void onChapterSelected(int book, int chapter);
     }
@@ -53,7 +53,7 @@ class BookExpandableListAdapter extends BaseExpandableListAdapter implements Vie
     private int currentBook;
     private int currentChapter;
 
-    BookExpandableListAdapter(Context context, OnChapterSelectedListener listener) {
+    ChapterListAdapter(Context context, OnChapterSelectedListener listener) {
         super();
 
         this.listener = listener;

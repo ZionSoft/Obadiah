@@ -65,7 +65,7 @@ import javax.inject.Inject;
 import butterknife.Bind;
 
 public class BibleReadingActivity extends BaseAppCompatActivity implements BibleReadingView,
-        AdapterView.OnItemSelectedListener, BookExpandableListAdapter.OnChapterSelectedListener,
+        AdapterView.OnItemSelectedListener, ChapterListAdapter.OnChapterSelectedListener,
         ExpandableListView.OnGroupClickListener, VersePagerAdapter.Listener, ViewPager.OnPageChangeListener {
     private static final String KEY_MESSAGE_TYPE = "net.zionsoft.obadiah.biblereading.BibleReadingActivity.KEY_MESSAGE_TYPE";
     private static final String KEY_BOOK_INDEX = "net.zionsoft.obadiah.biblereading.BibleReadingActivity.KEY_BOOK_INDEX";
@@ -107,8 +107,8 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
     @Bind(R.id.toolbar)
     Toolbar toolbar;
 
-    @Bind(R.id.book_list)
-    ExpandableListView bookList;
+    @Bind(R.id.chapter_list)
+    ExpandableListView chapterList;
 
     @Bind(R.id.verse_pager)
     ViewPager versePager;
@@ -120,7 +120,7 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
     private int currentBook;
     private int currentChapter;
 
-    private BookExpandableListAdapter bookListAdapter;
+    private ChapterListAdapter chapterListAdapter;
     private int lastExpandedGroup;
 
     private VersePagerAdapter versePagerAdapter;
@@ -161,26 +161,13 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
         drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, 0, 0);
         drawerLayout.setDrawerListener(drawerToggle);
 
-        bookListAdapter = new BookExpandableListAdapter(this, this);
-        bookList.setAdapter(bookListAdapter);
-        bookList.setOnGroupClickListener(this);
+        chapterListAdapter = new ChapterListAdapter(this, this);
+        chapterList.setAdapter(chapterListAdapter);
+        chapterList.setOnGroupClickListener(this);
 
         versePagerAdapter = new VersePagerAdapter(this, this);
         versePager.setAdapter(versePagerAdapter);
         versePager.addOnPageChangeListener(this);
-    }
-
-    private static String buildText(List<Verse> verses) {
-        if (verses == null || verses.size() == 0)
-            return null;
-
-        // format: <book name> <chapter index>:<verse index> <verse text>
-        final StringBuilder text = new StringBuilder();
-        for (Verse verse : verses) {
-            text.append(String.format("%S %d:%d %s\n", verse.bookName, verse.chapterIndex + 1,
-                    verse.verseIndex + 1, verse.verseText));
-        }
-        return text.toString();
     }
 
     private void checkDeepLink() {
@@ -297,7 +284,7 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_bookselection, menu);
+        getMenuInflater().inflate(R.menu.menu_bible_reading, menu);
 
         translationsSpinner = (Spinner) MenuItemCompat.getActionView(menu.findItem(R.id.action_translations));
         loadTranslations();
@@ -396,7 +383,7 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
         this.bookNames = bookNames;
         updateTitle();
 
-        bookListAdapter.setBookNames(bookNames);
+        chapterListAdapter.setBookNames(bookNames);
         updateBookList();
     }
 
@@ -410,12 +397,12 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
     }
 
     private void updateBookList() {
-        bookListAdapter.setSelected(currentBook, currentChapter);
-        bookListAdapter.notifyDataSetChanged();
+        chapterListAdapter.setSelected(currentBook, currentChapter);
+        chapterListAdapter.notifyDataSetChanged();
 
         lastExpandedGroup = currentBook;
-        bookList.expandGroup(currentBook);
-        bookList.setSelectedGroup(currentBook);
+        chapterList.expandGroup(currentBook);
+        chapterList.setSelectedGroup(currentBook);
     }
 
     @Override
@@ -468,8 +455,8 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
         currentBook = book;
         currentChapter = chapter;
 
-        bookListAdapter.setSelected(currentBook, currentChapter);
-        bookListAdapter.notifyDataSetChanged();
+        chapterListAdapter.setSelected(currentBook, currentChapter);
+        chapterListAdapter.notifyDataSetChanged();
 
         drawerLayout.closeDrawers();
 
@@ -559,6 +546,19 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
                 actionMode.finish();
             }
         }
+    }
+
+    private static String buildText(List<Verse> verses) {
+        if (verses == null || verses.size() == 0)
+            return null;
+
+        // format: <book name> <chapter index>:<verse index> <verse text>
+        final StringBuilder text = new StringBuilder();
+        for (Verse verse : verses) {
+            text.append(String.format("%S %d:%d %s\n", verse.bookName, verse.chapterIndex + 1,
+                    verse.verseIndex + 1, verse.verseText));
+        }
+        return text.toString();
     }
 
     @Override
