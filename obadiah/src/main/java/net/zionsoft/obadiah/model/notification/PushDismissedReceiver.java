@@ -33,6 +33,7 @@ public class PushDismissedReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Analytics.trackNotificationEvent("notification_dismissed", intent.getStringExtra(KEY_MESSAGE_TYPE));
+        Analytics.trackEvent(Analytics.CATEGORY_NOTIFICATION, Analytics.NOTIFICATION_ACTION_DISMISSED,
+                intent.getStringExtra(KEY_MESSAGE_TYPE));
     }
 }

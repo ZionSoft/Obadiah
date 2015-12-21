@@ -34,6 +34,17 @@ public class Analytics {
     public static final String BILLING_ACTION_PURCHASED = "purchased";
     public static final String BILLING_ACTION_ERROR = "error";
 
+    public static final String CATEGORY_DEEP_LINK = "deep_link";
+    public static final String DEEP_LINK_ACTION_OPENED = "opened";
+
+    public static final String CATEGORY_NOTIFICATION = "notification";
+    public static final String NOTIFICATION_ACTION_ERROR = "error";
+    public static final String NOTIFICATION_ACTION_DEVICE_REGISTERED = "device_registered";
+    public static final String NOTIFICATION_ACTION_RECEIVED = "received";
+    public static final String NOTIFICATION_ACTION_SHOWN = "shown";
+    public static final String NOTIFICATION_ACTION_OPENED = "opened";
+    public static final String NOTIFICATION_ACTION_DISMISSED = "dismissed";
+
     private static Tracker tracker;
 
     public static void initialize(Context context) {
@@ -97,19 +108,8 @@ public class Analytics {
                 .build());
     }
 
-    public static void trackDeepLink() {
-        tracker.send(new HitBuilders.EventBuilder("deep_link", "open")
-                .build());
-    }
-
     public static void trackUIEvent(String label) {
         tracker.send(new HitBuilders.EventBuilder("ui", "button_click")
-                .setLabel(label)
-                .build());
-    }
-
-    public static void trackNotificationEvent(String action, String label) {
-        tracker.send(new HitBuilders.EventBuilder("notification", action)
                 .setLabel(label)
                 .build());
     }

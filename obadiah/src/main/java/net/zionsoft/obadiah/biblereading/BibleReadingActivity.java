@@ -195,7 +195,7 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
 
             bibleReadingPresenter.storeReadingProgress(bookIndex, chapterIndex, verseIndex);
 
-            Analytics.trackNotificationEvent("notification_opened", messageType);
+            Analytics.trackEvent(Analytics.CATEGORY_NOTIFICATION, Analytics.NOTIFICATION_ACTION_OPENED, messageType);
         }
     }
 

@@ -29,8 +29,9 @@ public class PushNotificationReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         // should just use GcmReceiver, but it requires the WAKE_LOCK permission
         final String messageType = intent.getStringExtra("message_type");
-        if (TextUtils.isEmpty(messageType) || messageType.equals("gcm")) {
-            Analytics.trackNotificationEvent("notification_received", messageType);
+        Analytics.trackEvent(Analytics.CATEGORY_NOTIFICATION, Analytics.NOTIFICATION_ACTION_RECEIVED,
+                TextUtils.isEmpty(messageType) ? "empty message type" : messageType);
+        if ("gcm".equals(messageType)) {
             context.startService(PushNotificationHandler.newStartIntent(context, intent.getExtras()));
         }
     }

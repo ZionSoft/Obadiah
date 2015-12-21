@@ -90,14 +90,15 @@ public class PushNotificationHandler extends IntentService {
                 return;
             }
         } else {
-            Analytics.trackNotificationEvent("unknown_message_type", messageType);
+            Analytics.trackEvent(Analytics.CATEGORY_NOTIFICATION, Analytics.NOTIFICATION_ACTION_ERROR,
+                    "Unknown message type: " + messageType);
             return;
         }
 
         final NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         nm.notify(notificationId, builder.build());
 
-        Analytics.trackNotificationEvent("notification_shown", messageType);
+        Analytics.trackEvent(Analytics.CATEGORY_NOTIFICATION, Analytics.NOTIFICATION_ACTION_SHOWN, messageType);
     }
 
     @NonNull

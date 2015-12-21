@@ -146,7 +146,7 @@ public class TranslationManagementActivity extends BaseAppCompatActivity
         if (TextUtils.isEmpty(messageType)) {
             return;
         }
-        Analytics.trackNotificationEvent("notification_opened", messageType);
+        Analytics.trackEvent(Analytics.CATEGORY_NOTIFICATION, Analytics.NOTIFICATION_ACTION_OPENED, messageType);
     }
 
     @Override
