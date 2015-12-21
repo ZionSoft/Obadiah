@@ -136,9 +136,6 @@ public class SettingsActivity extends BaseAppCompatActivity {
                     startActivity(new Intent(Intent.ACTION_VIEW).setData(Constants.GOOGLE_PLAY_URI));
                     Analytics.trackUIEvent("rate_app");
                 } catch (ActivityNotFoundException e) {
-                    Analytics.trackException("Failed to open market for rating: "
-                            + Build.MANUFACTURER + ", " + Build.MODEL);
-
                     DialogHelper.showDialog(SettingsActivity.this, R.string.dialog_unknown_error, null);
                 }
             }

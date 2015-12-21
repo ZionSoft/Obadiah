@@ -18,7 +18,9 @@
 package net.zionsoft.obadiah.model.analytics;
 
 import android.content.Context;
-import android.os.Build;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
@@ -27,34 +29,40 @@ import com.google.android.gms.analytics.Tracker;
 import net.zionsoft.obadiah.R;
 
 public class Analytics {
+    public static final String CATEGORY_BILLING = "billing";
+    public static final String BILLING_ACTION_NOT_SUPPORTED = "not_supported";
+    public static final String BILLING_ACTION_PURCHASED = "purchased";
+    public static final String BILLING_ACTION_ERROR = "error";
+
     private static Tracker tracker;
 
     public static void initialize(Context context) {
         if (tracker == null) {
             synchronized (Analytics.class) {
-                if (tracker == null)
-                    tracker = GoogleAnalytics.getInstance(context.getApplicationContext()).newTracker(R.xml.analytics);
+                if (tracker == null) {
+                    tracker = GoogleAnalytics.getInstance(context).newTracker(R.xml.analytics);
+                }
             }
         }
     }
 
-    public static void trackException(String description) {
-        tracker.send(new HitBuilders.ExceptionBuilder()
-                .setDescription(description).setFatal(false)
-                .build());
+    public static void trackEvent(@NonNull String category, @NonNull String action) {
+        trackEvent(category, action, null, 1L);
     }
 
-    public static void trackBillingNotSupported(int reason) {
-        tracker.send(new HitBuilders.EventBuilder("billing", "not_supported")
-                .setLabel(String.format("Manufacturer: %s, Model: %s, Reason: %d",
-                        Build.MANUFACTURER, Build.MODEL, reason))
-                .build());
+    public static void trackEvent(@NonNull String category, @NonNull String action, @NonNull String label) {
+        trackEvent(category, action, label, 1L);
     }
 
-    public static void trackBillingPurchase(String productName) {
-        tracker.send(new HitBuilders.EventBuilder("billing", "purchased")
-                .setLabel(productName)
-                .build());
+    public static void trackEvent(@NonNull String category, @NonNull String action, @Nullable String label, long value) {
+        final HitBuilders.EventBuilder eventBuilder = new HitBuilders.EventBuilder(category, action);
+        if (!TextUtils.isEmpty(label)) {
+            eventBuilder.setLabel(label);
+        }
+        if (value >= 0L) {
+            eventBuilder.setValue(value);
+        }
+        tracker.send(eventBuilder.build());
     }
 
     public static void trackScreen(String name) {
