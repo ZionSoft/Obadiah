@@ -45,6 +45,9 @@ public class Analytics {
     public static final String NOTIFICATION_ACTION_OPENED = "opened";
     public static final String NOTIFICATION_ACTION_DISMISSED = "dismissed";
 
+    public static final String CATEGORY_UI = "ui";
+    public static final String UI_ACTION_BUTTON_CLICK = "button_click";
+
     private static Tracker tracker;
 
     public static void initialize(Context context) {
@@ -105,12 +108,6 @@ public class Analytics {
 
     public static void trackTranslationSelection(String translation) {
         tracker.send(new HitBuilders.EventBuilder("select_translation", translation)
-                .build());
-    }
-
-    public static void trackUIEvent(String label) {
-        tracker.send(new HitBuilders.EventBuilder("ui", "button_click")
-                .setLabel(label)
                 .build());
     }
 }

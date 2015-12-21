@@ -134,7 +134,7 @@ public class SettingsActivity extends BaseAppCompatActivity {
             public void onClick(View v) {
                 try {
                     startActivity(new Intent(Intent.ACTION_VIEW).setData(Constants.GOOGLE_PLAY_URI));
-                    Analytics.trackUIEvent("rate_app");
+                    Analytics.trackEvent(Analytics.CATEGORY_UI, Analytics.UI_ACTION_BUTTON_CLICK, "rate_app");
                 } catch (ActivityNotFoundException e) {
                     DialogHelper.showDialog(SettingsActivity.this, R.string.dialog_unknown_error, null);
                 }
