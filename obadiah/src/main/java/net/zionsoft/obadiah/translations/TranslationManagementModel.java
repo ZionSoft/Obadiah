@@ -20,6 +20,7 @@ package net.zionsoft.obadiah.translations;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.SystemClock;
 
+import com.crashlytics.android.Crashlytics;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
 import com.squareup.okhttp.ResponseBody;
@@ -91,6 +92,7 @@ class TranslationManagementModel {
                             subscriber.onNext(TranslationsTableHelper.getDownloadedTranslations(database));
                             subscriber.onCompleted();
                         } catch (Exception e) {
+                            Crashlytics.getInstance().core.logException(e);
                             subscriber.onError(e);
                         }
                     }
@@ -141,6 +143,7 @@ class TranslationManagementModel {
                     subscriber.onNext(TranslationsTableHelper.getTranslations(database));
                     subscriber.onCompleted();
                 } catch (Exception e) {
+                    Crashlytics.getInstance().core.logException(e);
                     subscriber.onError(e);
                 }
             }
@@ -200,6 +203,7 @@ class TranslationManagementModel {
                             Analytics.TRANSLATION_ACTION_REMOVED, translation.shortName);
                     subscriber.onCompleted();
                 } catch (Exception e) {
+                    Crashlytics.getInstance().core.logException(e);
                     subscriber.onError(e);
                 }
             }
@@ -258,6 +262,7 @@ class TranslationManagementModel {
                             SystemClock.elapsedRealtime() - timestamp);
                     subscriber.onCompleted();
                 } catch (Exception e) {
+                    Crashlytics.getInstance().core.logException(e);
                     subscriber.onError(e);
                 } finally {
                     if (database.inTransaction()) {

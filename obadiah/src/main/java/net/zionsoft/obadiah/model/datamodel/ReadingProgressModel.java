@@ -21,6 +21,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.text.format.DateUtils;
 import android.util.SparseArray;
 
+import com.crashlytics.android.Crashlytics;
+
 import net.zionsoft.obadiah.model.database.MetadataTableHelper;
 import net.zionsoft.obadiah.model.database.ReadingProgressTableHelper;
 import net.zionsoft.obadiah.model.domain.ReadingProgress;
@@ -57,6 +59,7 @@ public class ReadingProgressModel {
                     subscriber.onNext(new ReadingProgress(chaptersReadPerBook, continuousReadingDays));
                     subscriber.onCompleted();
                 } catch (Exception e) {
+                    Crashlytics.getInstance().core.logException(e);
                     subscriber.onError(e);
                 } finally {
                     if (database.inTransaction()) {
@@ -95,7 +98,7 @@ public class ReadingProgressModel {
 
                     database.setTransactionSuccessful();
                 } catch (Exception e) {
-                    // do nothing
+                    Crashlytics.getInstance().core.logException(e);
                 } finally {
                     if (database.inTransaction()) {
                         database.endTransaction();
