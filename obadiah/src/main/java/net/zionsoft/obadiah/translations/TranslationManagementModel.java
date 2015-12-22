@@ -20,6 +20,7 @@ package net.zionsoft.obadiah.translations;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.SystemClock;
 
+import com.crashlytics.android.Crashlytics;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
 import com.squareup.okhttp.ResponseBody;
@@ -91,6 +92,7 @@ class TranslationManagementModel {
                             subscriber.onNext(TranslationsTableHelper.getDownloadedTranslations(database));
                             subscriber.onCompleted();
                         } catch (Exception e) {
+                            Crashlytics.getInstance().core.logException(e);
                             subscriber.onError(e);
                         }
                     }
@@ -107,6 +109,7 @@ class TranslationManagementModel {
     }
 
     private Observable<List<TranslationInfo>> loadFromNetwork() {
+        final long timestamp = SystemClock.elapsedRealtime();
         return backendInterface.fetchTranslations()
                 .doOnNext(new Action1<List<TranslationInfo>>() {
                     @Override
@@ -120,6 +123,10 @@ class TranslationManagementModel {
                                 database.endTransaction();
                             }
                         }
+
+                        Analytics.trackEvent(Analytics.CATEGORY_TRANSLATION,
+                                Analytics.TRANSLATION_ACTION_LIST_DOWNLOADED, null,
+                                SystemClock.elapsedRealtime() - timestamp);
                     }
                 })
                         // workaround for Retrofit / okhttp issue (of sorts)
@@ -136,6 +143,7 @@ class TranslationManagementModel {
                     subscriber.onNext(TranslationsTableHelper.getTranslations(database));
                     subscriber.onCompleted();
                 } catch (Exception e) {
+                    Crashlytics.getInstance().core.logException(e);
                     subscriber.onError(e);
                 }
             }
@@ -191,8 +199,11 @@ class TranslationManagementModel {
                             database.endTransaction();
                         }
                     }
+                    Analytics.trackEvent(Analytics.CATEGORY_TRANSLATION,
+                            Analytics.TRANSLATION_ACTION_REMOVED, translation.shortName);
                     subscriber.onCompleted();
                 } catch (Exception e) {
+                    Crashlytics.getInstance().core.logException(e);
                     subscriber.onError(e);
                 }
             }
@@ -204,8 +215,6 @@ class TranslationManagementModel {
             @Override
             public void call(Subscriber<? super Integer> subscriber) {
                 final long timestamp = SystemClock.elapsedRealtime();
-                boolean success = false;
-
                 ZipInputStream is = null;
                 try {
                     final Response<ResponseBody> response
@@ -247,13 +256,15 @@ class TranslationManagementModel {
                         }
                     }
                     database.setTransactionSuccessful();
+
+                    Analytics.trackEvent(Analytics.CATEGORY_TRANSLATION,
+                            Analytics.TRANSLATION_ACTION_DOWNLOADED, translation.shortName,
+                            SystemClock.elapsedRealtime() - timestamp);
                     subscriber.onCompleted();
-                    success = true;
                 } catch (Exception e) {
+                    Crashlytics.getInstance().core.logException(e);
                     subscriber.onError(e);
                 } finally {
-                    Analytics.trackTranslationDownload(translation.shortName, success, SystemClock.elapsedRealtime() - timestamp);
-
                     if (database.inTransaction()) {
                         database.endTransaction();
                     }

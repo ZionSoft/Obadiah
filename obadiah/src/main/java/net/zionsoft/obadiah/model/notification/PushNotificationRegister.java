@@ -54,7 +54,7 @@ public class PushNotificationRegister extends IntentService {
             gcmPubSub.subscribe(token, "/topics/verses", null);
             gcmPubSub.subscribe(token, "/topics/newTranslation", null);
 
-            Analytics.trackNotificationEvent("device_registered", null);
+            Analytics.trackEvent(Analytics.CATEGORY_NOTIFICATION, Analytics.NOTIFICATION_ACTION_DEVICE_REGISTERED);
         } catch (Exception e) {
             Crashlytics.getInstance().core.logException(e);
         }

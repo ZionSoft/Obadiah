@@ -69,7 +69,8 @@ public class UriHelper {
             }
 
             editor.putInt(Constants.PREF_KEY_LAST_READ_VERSE, 0).apply();
-            Analytics.trackDeepLink();
+
+            Analytics.trackEvent(Analytics.CATEGORY_DEEP_LINK, Analytics.DEEP_LINK_ACTION_OPENED);
         } catch (Exception e) {
             Crashlytics.getInstance().core.logException(e);
         }

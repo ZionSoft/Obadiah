@@ -146,7 +146,7 @@ public class TranslationManagementActivity extends BaseAppCompatActivity
         if (TextUtils.isEmpty(messageType)) {
             return;
         }
-        Analytics.trackNotificationEvent("notification_opened", messageType);
+        Analytics.trackEvent(Analytics.CATEGORY_NOTIFICATION, Analytics.NOTIFICATION_ACTION_OPENED, messageType);
     }
 
     @Override
@@ -435,7 +435,7 @@ public class TranslationManagementActivity extends BaseAppCompatActivity
     public boolean onMenuItemClick(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_remove_ads:
-                Analytics.trackUIEvent("remove_ads");
+                Analytics.trackEvent(Analytics.CATEGORY_UI, Analytics.UI_ACTION_BUTTON_CLICK, "remove_ads");
                 translationManagementPresenter.removeAds(this);
                 return true;
             default:

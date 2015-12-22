@@ -18,7 +18,9 @@
 package net.zionsoft.obadiah.model.analytics;
 
 import android.content.Context;
-import android.os.Build;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
@@ -27,82 +29,64 @@ import com.google.android.gms.analytics.Tracker;
 import net.zionsoft.obadiah.R;
 
 public class Analytics {
+    public static final String CATEGORY_BILLING = "billing";
+    public static final String BILLING_ACTION_NOT_SUPPORTED = "not_supported";
+    public static final String BILLING_ACTION_PURCHASED = "purchased";
+    public static final String BILLING_ACTION_ERROR = "error";
+
+    public static final String CATEGORY_DEEP_LINK = "deep_link";
+    public static final String DEEP_LINK_ACTION_OPENED = "opened";
+
+    public static final String CATEGORY_NOTIFICATION = "notification";
+    public static final String NOTIFICATION_ACTION_ERROR = "error";
+    public static final String NOTIFICATION_ACTION_DEVICE_REGISTERED = "device_registered";
+    public static final String NOTIFICATION_ACTION_RECEIVED = "received";
+    public static final String NOTIFICATION_ACTION_SHOWN = "shown";
+    public static final String NOTIFICATION_ACTION_OPENED = "opened";
+    public static final String NOTIFICATION_ACTION_DISMISSED = "dismissed";
+
+    public static final String CATEGORY_UI = "ui";
+    public static final String UI_ACTION_BUTTON_CLICK = "button_click";
+
+    public static final String CATEGORY_TRANSLATION = "translation";
+    public static final String TRANSLATION_ACTION_LIST_DOWNLOADED = "list_downloaded";
+    public static final String TRANSLATION_ACTION_DOWNLOADED = "downloaded";
+    public static final String TRANSLATION_ACTION_SELECTED = "selected";
+    public static final String TRANSLATION_ACTION_REMOVED = "removed";
+
     private static Tracker tracker;
 
     public static void initialize(Context context) {
         if (tracker == null) {
             synchronized (Analytics.class) {
-                if (tracker == null)
-                    tracker = GoogleAnalytics.getInstance(context.getApplicationContext()).newTracker(R.xml.analytics);
+                if (tracker == null) {
+                    tracker = GoogleAnalytics.getInstance(context).newTracker(R.xml.analytics);
+                }
             }
         }
     }
 
-    public static void trackException(String description) {
-        tracker.send(new HitBuilders.ExceptionBuilder()
-                .setDescription(description).setFatal(false)
-                .build());
+    public static void trackEvent(@NonNull String category, @NonNull String action) {
+        trackEvent(category, action, null, 1L);
     }
 
-    public static void trackBillingNotSupported(int reason) {
-        tracker.send(new HitBuilders.EventBuilder("billing", "not_supported")
-                .setLabel(String.format("Manufacturer: %s, Model: %s, Reason: %d",
-                        Build.MANUFACTURER, Build.MODEL, reason))
-                .build());
+    public static void trackEvent(@NonNull String category, @NonNull String action, @NonNull String label) {
+        trackEvent(category, action, label, 1L);
     }
 
-    public static void trackBillingPurchase(String productName) {
-        tracker.send(new HitBuilders.EventBuilder("billing", "purchased")
-                .setLabel(productName)
-                .build());
+    public static void trackEvent(@NonNull String category, @NonNull String action, @Nullable String label, long value) {
+        final HitBuilders.EventBuilder eventBuilder = new HitBuilders.EventBuilder(category, action);
+        if (!TextUtils.isEmpty(label)) {
+            eventBuilder.setLabel(label);
+        }
+        if (value >= 0L) {
+            eventBuilder.setValue(value);
+        }
+        tracker.send(eventBuilder.build());
     }
 
     public static void trackScreen(String name) {
         tracker.setScreenName(name);
         tracker.send(new HitBuilders.ScreenViewBuilder().build());
-    }
-
-    public static void trackTranslationListDownloading(boolean isSuccessful, long elapsedTime) {
-        tracker.send(new HitBuilders.EventBuilder("download_translation_list", "")
-                .setLabel(Boolean.toString(isSuccessful))
-                .build());
-        if (isSuccessful)
-            tracker.send(new HitBuilders.TimingBuilder("download_translation_list", "", elapsedTime).build());
-    }
-
-    public static void trackTranslationDownload(String translation, boolean isSuccessful, long elapsedTime) {
-        tracker.send(new HitBuilders.EventBuilder("download_translation", translation)
-                .setLabel(Boolean.toString(isSuccessful))
-                .build());
-        if (isSuccessful)
-            tracker.send(new HitBuilders.TimingBuilder("download_translation", translation, elapsedTime).build());
-    }
-
-    public static void trackTranslationRemoval(String translation, boolean isSuccessful) {
-        tracker.send(new HitBuilders.EventBuilder("remove_translation", translation)
-                .setLabel(Boolean.toString(isSuccessful))
-                .build());
-    }
-
-    public static void trackTranslationSelection(String translation) {
-        tracker.send(new HitBuilders.EventBuilder("select_translation", translation)
-                .build());
-    }
-
-    public static void trackDeepLink() {
-        tracker.send(new HitBuilders.EventBuilder("deep_link", "open")
-                .build());
-    }
-
-    public static void trackUIEvent(String label) {
-        tracker.send(new HitBuilders.EventBuilder("ui", "button_click")
-                .setLabel(label)
-                .build());
-    }
-
-    public static void trackNotificationEvent(String action, String label) {
-        tracker.send(new HitBuilders.EventBuilder("notification", action)
-                .setLabel(label)
-                .build());
     }
 }

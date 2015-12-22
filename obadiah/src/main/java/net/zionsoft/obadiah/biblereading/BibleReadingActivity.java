@@ -195,7 +195,7 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
 
             bibleReadingPresenter.storeReadingProgress(bookIndex, chapterIndex, verseIndex);
 
-            Analytics.trackNotificationEvent("notification_opened", messageType);
+            Analytics.trackEvent(Analytics.CATEGORY_NOTIFICATION, Analytics.NOTIFICATION_ACTION_OPENED, messageType);
         }
     }
 
@@ -433,7 +433,7 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
             return;
         }
 
-        Analytics.trackTranslationSelection(selected);
+        Analytics.trackEvent(Analytics.CATEGORY_TRANSLATION, Analytics.TRANSLATION_ACTION_SELECTED, selected);
         currentTranslation = selected;
         bibleReadingPresenter.storeReadingProgress(currentBook, currentChapter,
                 versePagerAdapter.getCurrentVerse(versePager.getCurrentItem()));
@@ -506,7 +506,7 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
                 public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
                     switch (menuItem.getItemId()) {
                         case R.id.action_copy:
-                            Analytics.trackUIEvent("copy");
+                            Analytics.trackEvent(Analytics.CATEGORY_UI, Analytics.UI_ACTION_BUTTON_CLICK, "copy");
 
                             if (clipboardManager == null) {
                                 // noinspection deprecation
@@ -518,7 +518,7 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
                             actionMode.finish();
                             return true;
                         case R.id.action_share:
-                            Analytics.trackUIEvent("share");
+                            Analytics.trackEvent(Analytics.CATEGORY_UI, Analytics.UI_ACTION_BUTTON_CLICK, "share");
 
                             startActivity(Intent.createChooser(new Intent().setAction(Intent.ACTION_SEND).setType("text/plain")
                                             .putExtra(Intent.EXTRA_TEXT,

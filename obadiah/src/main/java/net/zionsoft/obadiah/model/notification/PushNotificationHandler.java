@@ -29,6 +29,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 
 import com.crashlytics.android.Crashlytics;
@@ -90,14 +91,15 @@ public class PushNotificationHandler extends IntentService {
                 return;
             }
         } else {
-            Analytics.trackNotificationEvent("unknown_message_type", messageType);
+            Analytics.trackEvent(Analytics.CATEGORY_NOTIFICATION, Analytics.NOTIFICATION_ACTION_ERROR,
+                    "Unknown message type: " + messageType);
             return;
         }
 
         final NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         nm.notify(notificationId, builder.build());
 
-        Analytics.trackNotificationEvent("notification_shown", messageType);
+        Analytics.trackEvent(Analytics.CATEGORY_NOTIFICATION, Analytics.NOTIFICATION_ACTION_SHOWN, messageType);
     }
 
     @NonNull
@@ -111,7 +113,7 @@ public class PushNotificationHandler extends IntentService {
                         PendingIntent.FLAG_UPDATE_CURRENT));
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             builder.setSmallIcon(R.drawable.ic_notification)
-                    .setColor(context.getResources().getColor(R.color.blue));
+                    .setColor(ContextCompat.getColor(context, R.color.blue));
         } else {
             builder.setSmallIcon(R.drawable.ic_launcher);
         }

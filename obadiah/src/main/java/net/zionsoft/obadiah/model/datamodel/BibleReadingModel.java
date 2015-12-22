@@ -24,6 +24,8 @@ import android.support.annotation.Nullable;
 import android.support.v4.util.LruCache;
 import android.text.TextUtils;
 
+import com.crashlytics.android.Crashlytics;
+
 import net.zionsoft.obadiah.Constants;
 import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.database.BookNamesTableHelper;
@@ -85,7 +87,7 @@ public class BibleReadingModel {
 
     public void saveCurrentTranslation(TranslationInfo translation) {
         preferences.edit().putString(Constants.PREF_KEY_LAST_READ_TRANSLATION, translation.shortName).apply();
-        Analytics.trackTranslationSelection(translation.shortName);
+        Analytics.trackEvent(Analytics.CATEGORY_TRANSLATION, Analytics.TRANSLATION_ACTION_SELECTED, translation.shortName);
     }
 
     public boolean hasDownloadedTranslation() {
@@ -124,6 +126,7 @@ public class BibleReadingModel {
                     subscriber.onNext(TranslationsTableHelper.getDownloadedTranslations(database));
                     subscriber.onCompleted();
                 } catch (Exception e) {
+                    Crashlytics.getInstance().core.logException(e);
                     subscriber.onError(e);
                 }
             }
@@ -154,6 +157,7 @@ public class BibleReadingModel {
                             BookNamesTableHelper.getBookNames(database, translation)));
                     subscriber.onCompleted();
                 } catch (Exception e) {
+                    Crashlytics.getInstance().core.logException(e);
                     subscriber.onError(e);
                 }
             }
