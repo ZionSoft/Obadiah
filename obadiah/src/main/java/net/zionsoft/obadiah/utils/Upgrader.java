@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.legacy;
+package net.zionsoft.obadiah.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -23,8 +23,8 @@ import android.content.pm.PackageManager;
 
 import net.zionsoft.obadiah.Constants;
 
-public class Upgrader {
-    public static void upgrade(Context context) {
+class Upgrader {
+    static void upgrade(Context context) {
         final SharedPreferences preferences = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
         final int version = preferences.getInt(Constants.PREF_KEY_CURRENT_APPLICATION_VERSION, 0);
         final int applicationVersion;

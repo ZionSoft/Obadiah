@@ -22,10 +22,9 @@ import android.content.Context;
 import com.crashlytics.android.Crashlytics;
 
 import net.zionsoft.obadiah.injection.InjectionComponent;
-import net.zionsoft.obadiah.legacy.Upgrader;
 import net.zionsoft.obadiah.model.analytics.Analytics;
-import net.zionsoft.obadiah.model.notification.PushNotificationRegister;
 import net.zionsoft.obadiah.model.datamodel.BibleReadingModel;
+import net.zionsoft.obadiah.model.notification.PushNotificationRegister;
 import net.zionsoft.obadiah.ui.utils.UiHelper;
 
 import javax.inject.Inject;
@@ -52,8 +51,6 @@ public class App extends BaseApp {
 
         Analytics.initialize(this);
         PushNotificationRegister.register(this);
-
-        Upgrader.upgrade(this);
 
         UiHelper.forceActionBarOverflowMenu(this);
     }

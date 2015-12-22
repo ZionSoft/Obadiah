@@ -21,15 +21,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
-
 public class PackageUpdateReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-        final int availability = GooglePlayServicesUtil.isGooglePlayServicesAvailable(context);
-        if (availability != ConnectionResult.SUCCESS) {
-            GooglePlayServicesUtil.showErrorNotification(availability, context);
-        }
+        Upgrader.upgrade(context);
     }
 }
