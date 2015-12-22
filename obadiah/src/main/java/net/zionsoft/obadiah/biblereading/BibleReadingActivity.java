@@ -433,7 +433,7 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
             return;
         }
 
-        Analytics.trackTranslationSelection(selected);
+        Analytics.trackEvent(Analytics.CATEGORY_TRANSLATION, Analytics.TRANSLATION_ACTION_SELECTED, selected);
         currentTranslation = selected;
         bibleReadingPresenter.storeReadingProgress(currentBook, currentChapter,
                 versePagerAdapter.getCurrentVerse(versePager.getCurrentItem()));

@@ -48,6 +48,12 @@ public class Analytics {
     public static final String CATEGORY_UI = "ui";
     public static final String UI_ACTION_BUTTON_CLICK = "button_click";
 
+    public static final String CATEGORY_TRANSLATION = "translation";
+    public static final String TRANSLATION_ACTION_LIST_DOWNLOADED = "list_downloaded";
+    public static final String TRANSLATION_ACTION_DOWNLOADED = "downloaded";
+    public static final String TRANSLATION_ACTION_SELECTED = "selected";
+    public static final String TRANSLATION_ACTION_REMOVED = "removed";
+
     private static Tracker tracker;
 
     public static void initialize(Context context) {
@@ -82,32 +88,5 @@ public class Analytics {
     public static void trackScreen(String name) {
         tracker.setScreenName(name);
         tracker.send(new HitBuilders.ScreenViewBuilder().build());
-    }
-
-    public static void trackTranslationListDownloading(boolean isSuccessful, long elapsedTime) {
-        tracker.send(new HitBuilders.EventBuilder("download_translation_list", "")
-                .setLabel(Boolean.toString(isSuccessful))
-                .build());
-        if (isSuccessful)
-            tracker.send(new HitBuilders.TimingBuilder("download_translation_list", "", elapsedTime).build());
-    }
-
-    public static void trackTranslationDownload(String translation, boolean isSuccessful, long elapsedTime) {
-        tracker.send(new HitBuilders.EventBuilder("download_translation", translation)
-                .setLabel(Boolean.toString(isSuccessful))
-                .build());
-        if (isSuccessful)
-            tracker.send(new HitBuilders.TimingBuilder("download_translation", translation, elapsedTime).build());
-    }
-
-    public static void trackTranslationRemoval(String translation, boolean isSuccessful) {
-        tracker.send(new HitBuilders.EventBuilder("remove_translation", translation)
-                .setLabel(Boolean.toString(isSuccessful))
-                .build());
-    }
-
-    public static void trackTranslationSelection(String translation) {
-        tracker.send(new HitBuilders.EventBuilder("select_translation", translation)
-                .build());
     }
 }

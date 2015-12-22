@@ -85,7 +85,7 @@ public class BibleReadingModel {
 
     public void saveCurrentTranslation(TranslationInfo translation) {
         preferences.edit().putString(Constants.PREF_KEY_LAST_READ_TRANSLATION, translation.shortName).apply();
-        Analytics.trackTranslationSelection(translation.shortName);
+        Analytics.trackEvent(Analytics.CATEGORY_TRANSLATION, Analytics.TRANSLATION_ACTION_SELECTED, translation.shortName);
     }
 
     public boolean hasDownloadedTranslation() {
