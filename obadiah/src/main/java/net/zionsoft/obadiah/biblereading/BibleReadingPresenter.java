@@ -17,6 +17,7 @@
 
 package net.zionsoft.obadiah.biblereading;
 
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import net.zionsoft.obadiah.model.datamodel.BibleReadingModel;
@@ -39,12 +40,6 @@ class BibleReadingPresenter extends MVPPresenter<BibleReadingView> {
     BibleReadingPresenter(BibleReadingModel bibleReadingModel, ReadingProgressModel readingProgressModel) {
         this.bibleReadingModel = bibleReadingModel;
         this.readingProgressModel = readingProgressModel;
-    }
-
-    @Override
-    protected void onViewTaken() {
-        super.onViewTaken();
-        subscription = new CompositeSubscription();
     }
 
     @Override
@@ -91,7 +86,7 @@ class BibleReadingPresenter extends MVPPresenter<BibleReadingView> {
 
     void loadTranslations() {
         if (bibleReadingModel.hasDownloadedTranslation()) {
-            subscription.add(bibleReadingModel.loadTranslations()
+            getSubscription().add(bibleReadingModel.loadTranslations()
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(new Subscriber<List<String>>() {
@@ -129,8 +124,16 @@ class BibleReadingPresenter extends MVPPresenter<BibleReadingView> {
         }
     }
 
+    @NonNull
+    private CompositeSubscription getSubscription() {
+        if (subscription == null) {
+            subscription = new CompositeSubscription();
+        }
+        return subscription;
+    }
+
     void loadBookNames(String translation) {
-        subscription.add(bibleReadingModel.loadBookNames(translation)
+        getSubscription().add(bibleReadingModel.loadBookNames(translation)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<List<String>>() {
