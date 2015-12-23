@@ -17,18 +17,18 @@
 
 package net.zionsoft.obadiah.biblereading;
 
-import android.app.Activity;
+import android.content.Context;
 import android.net.Uri;
 
+import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
 
 import net.zionsoft.obadiah.BuildConfig;
 
 class AppIndexingManager {
-    private final Activity activity;
     private final GoogleApiClient googleApiClient;
 
     private static final String TITLE_TEMPLATE = "%s, %d (%s)";
@@ -36,20 +36,19 @@ class AppIndexingManager {
             ? "android-app://net.zionsoft.obadiah.debug/http/bible.zionsoft.net/bible/%s/%d/%d"
             : "android-app://net.zionsoft.obadiah/http/bible.zionsoft.net/bible/%s/%d/%d";
     private static final String WEB_URI_TEMPLATE = "http://bible.zionsoft.net/bible/%s/%d/%d";
-    private Uri mAppIndexingUri;
+    private Action action;
 
-    AppIndexingManager(Activity activity) {
+    AppIndexingManager(Context context) {
         super();
 
-        if (ConnectionResult.SUCCESS != GooglePlayServicesUtil.isGooglePlayServicesAvailable(activity)) {
+        if (ConnectionResult.SUCCESS != GoogleApiAvailability.getInstance()
+                .isGooglePlayServicesAvailable(context)) {
             // no need to bother the user to install latest Google Play services
-            this.activity = null;
             googleApiClient = null;
             return;
         }
 
-        this.activity = activity;
-        googleApiClient = new GoogleApiClient.Builder(activity).addApi(AppIndex.APP_INDEX_API).build();
+        googleApiClient = new GoogleApiClient.Builder(context).addApi(AppIndex.API).build();
     }
 
     void onStart() {
@@ -61,18 +60,19 @@ class AppIndexingManager {
         if (googleApiClient != null) {
             onViewEnd();
 
-            // TODO add out links
-
-            mAppIndexingUri = Uri.parse(String.format(APP_URI_TEMPLATE, translationShortName, bookIndex, chapterIndex));
-            AppIndex.AppIndexApi.view(googleApiClient, activity, mAppIndexingUri,
+            action = Action.newAction(Action.TYPE_VIEW,
                     String.format(TITLE_TEMPLATE, bookName, chapterIndex + 1, translationShortName),
-                    Uri.parse(String.format(WEB_URI_TEMPLATE, translationShortName, bookIndex, chapterIndex)), null);
+                    Uri.parse(String.format(WEB_URI_TEMPLATE, translationShortName, bookIndex, chapterIndex)),
+                    Uri.parse(String.format(APP_URI_TEMPLATE, translationShortName, bookIndex, chapterIndex)));
+            AppIndex.AppIndexApi.start(googleApiClient, action);
         }
     }
 
     private void onViewEnd() {
-        if (mAppIndexingUri != null)
-            AppIndex.AppIndexApi.viewEnd(googleApiClient, activity, mAppIndexingUri);
+        if (action != null) {
+            AppIndex.AppIndexApi.end(googleApiClient, action);
+            action = null;
+        }
     }
 
     public void onStop() {
