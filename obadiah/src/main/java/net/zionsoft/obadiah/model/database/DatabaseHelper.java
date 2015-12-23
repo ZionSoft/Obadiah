@@ -20,6 +20,7 @@ package net.zionsoft.obadiah.model.database;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.support.annotation.NonNull;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -82,5 +83,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         } finally {
             db.endTransaction();
         }
+    }
+
+    @NonNull
+    public SQLiteDatabase getDatabase() {
+        return getWritableDatabase();
     }
 }

@@ -18,11 +18,11 @@
 package net.zionsoft.obadiah.translations;
 
 import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
 
 import com.squareup.moshi.Moshi;
 
 import net.zionsoft.obadiah.injection.scopes.ActivityScope;
+import net.zionsoft.obadiah.model.database.DatabaseHelper;
 import net.zionsoft.obadiah.model.datamodel.BibleReadingModel;
 import net.zionsoft.obadiah.network.BackendInterface;
 
@@ -38,8 +38,8 @@ public class TranslationManagementModule {
 
     @Provides
     TranslationManagementModel provideTranslationManagementModel(
-            SQLiteDatabase database, Moshi moshi, BackendInterface backendInterface) {
-        return new TranslationManagementModel(database, moshi, backendInterface);
+            DatabaseHelper databaseHelper, Moshi moshi, BackendInterface backendInterface) {
+        return new TranslationManagementModel(databaseHelper, moshi, backendInterface);
     }
 
     @Provides

@@ -27,6 +27,7 @@ import com.squareup.okhttp.ResponseBody;
 
 import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.database.BookNamesTableHelper;
+import net.zionsoft.obadiah.model.database.DatabaseHelper;
 import net.zionsoft.obadiah.model.database.TranslationHelper;
 import net.zionsoft.obadiah.model.database.TranslationsTableHelper;
 import net.zionsoft.obadiah.model.domain.TranslationInfo;
@@ -53,13 +54,13 @@ import rx.functions.Func2;
 import rx.schedulers.Schedulers;
 
 class TranslationManagementModel {
-    private final SQLiteDatabase database;
+    private final DatabaseHelper databaseHelper;
     private final BackendInterface backendInterface;
     private final JsonAdapter<BackendTranslationInfo> translationInfoJsonAdapter;
     private final JsonAdapter<BackendChapter> chapterJsonAdapter;
 
-    TranslationManagementModel(SQLiteDatabase database, Moshi moshi, BackendInterface backendInterface) {
-        this.database = database;
+    TranslationManagementModel(DatabaseHelper databaseHelper, Moshi moshi, BackendInterface backendInterface) {
+        this.databaseHelper = databaseHelper;
         this.backendInterface = backendInterface;
         this.translationInfoJsonAdapter = moshi.adapter(BackendTranslationInfo.class);
         this.chapterJsonAdapter = moshi.adapter(BackendChapter.class);
@@ -89,7 +90,8 @@ class TranslationManagementModel {
                     @Override
                     public void call(Subscriber<? super List<String>> subscriber) {
                         try {
-                            subscriber.onNext(TranslationsTableHelper.getDownloadedTranslations(database));
+                            subscriber.onNext(TranslationsTableHelper
+                                    .getDownloadedTranslations(databaseHelper.getDatabase()));
                             subscriber.onCompleted();
                         } catch (Exception e) {
                             Crashlytics.getInstance().core.logException(e);
@@ -114,6 +116,7 @@ class TranslationManagementModel {
                 .doOnNext(new Action1<List<TranslationInfo>>() {
                     @Override
                     public void call(List<TranslationInfo> translations) {
+                        final SQLiteDatabase database = databaseHelper.getDatabase();
                         try {
                             database.beginTransaction();
                             TranslationsTableHelper.saveTranslations(database, translations);
@@ -140,7 +143,8 @@ class TranslationManagementModel {
             @Override
             public void call(Subscriber<? super List<TranslationInfo>> subscriber) {
                 try {
-                    subscriber.onNext(TranslationsTableHelper.getTranslations(database));
+                    subscriber.onNext(TranslationsTableHelper
+                            .getTranslations(databaseHelper.getDatabase()));
                     subscriber.onCompleted();
                 } catch (Exception e) {
                     Crashlytics.getInstance().core.logException(e);
@@ -189,6 +193,7 @@ class TranslationManagementModel {
             @Override
             public void call(Subscriber<? super Void> subscriber) {
                 try {
+                    final SQLiteDatabase database = databaseHelper.getDatabase();
                     try {
                         database.beginTransaction();
                         TranslationHelper.removeTranslation(database, translation.shortName);
@@ -215,6 +220,7 @@ class TranslationManagementModel {
             @Override
             public void call(Subscriber<? super Integer> subscriber) {
                 final long timestamp = SystemClock.elapsedRealtime();
+                final SQLiteDatabase database = databaseHelper.getDatabase();
                 ZipInputStream is = null;
                 try {
                     final Response<ResponseBody> response

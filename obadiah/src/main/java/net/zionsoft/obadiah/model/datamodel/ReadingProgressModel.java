@@ -23,6 +23,7 @@ import android.util.SparseArray;
 
 import com.crashlytics.android.Crashlytics;
 
+import net.zionsoft.obadiah.model.database.DatabaseHelper;
 import net.zionsoft.obadiah.model.database.MetadataTableHelper;
 import net.zionsoft.obadiah.model.database.ReadingProgressTableHelper;
 import net.zionsoft.obadiah.model.domain.ReadingProgress;
@@ -37,17 +38,18 @@ import rx.Subscriber;
 
 @Singleton
 public class ReadingProgressModel {
-    private final SQLiteDatabase database;
+    private final DatabaseHelper databaseHelper;
 
     @Inject
-    public ReadingProgressModel(SQLiteDatabase database) {
-        this.database = database;
+    public ReadingProgressModel(DatabaseHelper databaseHelper) {
+        this.databaseHelper = databaseHelper;
     }
 
     public Observable<ReadingProgress> loadReadingProgress() {
         return Observable.create(new Observable.OnSubscribe<ReadingProgress>() {
             @Override
             public void call(Subscriber<? super ReadingProgress> subscriber) {
+                final SQLiteDatabase database = databaseHelper.getDatabase();
                 try {
                     database.beginTransaction();
                     final List<SparseArray<Long>> chaptersReadPerBook
@@ -74,6 +76,7 @@ public class ReadingProgressModel {
         return Observable.create(new Observable.OnSubscribe<Void>() {
             @Override
             public void call(Subscriber<? super Void> subscriber) {
+                final SQLiteDatabase database = databaseHelper.getDatabase();
                 try {
                     database.beginTransaction();
 

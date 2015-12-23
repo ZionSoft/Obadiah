@@ -19,7 +19,6 @@ package net.zionsoft.obadiah.model.datamodel;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.Nullable;
 import android.support.v4.util.LruCache;
 import android.text.TextUtils;
@@ -29,6 +28,7 @@ import com.crashlytics.android.Crashlytics;
 import net.zionsoft.obadiah.Constants;
 import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.database.BookNamesTableHelper;
+import net.zionsoft.obadiah.model.database.DatabaseHelper;
 import net.zionsoft.obadiah.model.database.TranslationHelper;
 import net.zionsoft.obadiah.model.database.TranslationsTableHelper;
 import net.zionsoft.obadiah.model.domain.TranslationInfo;
@@ -47,7 +47,7 @@ import rx.functions.Func1;
 
 @Singleton
 public class BibleReadingModel {
-    private final SQLiteDatabase database;
+    private final DatabaseHelper databaseHelper;
     private final SharedPreferences preferences;
 
     private final LruCache<String, List<String>> bookNameCache
@@ -75,9 +75,9 @@ public class BibleReadingModel {
     };
 
     @Inject
-    public BibleReadingModel(Context context, SQLiteDatabase database) {
+    public BibleReadingModel(Context context, DatabaseHelper databaseHelper) {
         this.preferences = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-        this.database = database;
+        this.databaseHelper = databaseHelper;
     }
 
     @Nullable
@@ -123,7 +123,8 @@ public class BibleReadingModel {
             @Override
             public void call(Subscriber<? super List<String>> subscriber) {
                 try {
-                    subscriber.onNext(TranslationsTableHelper.getDownloadedTranslations(database));
+                    subscriber.onNext(TranslationsTableHelper
+                            .getDownloadedTranslations(databaseHelper.getDatabase()));
                     subscriber.onCompleted();
                 } catch (Exception e) {
                     Crashlytics.getInstance().core.logException(e);
@@ -154,7 +155,7 @@ public class BibleReadingModel {
             public void call(Subscriber<? super List<String>> subscriber) {
                 try {
                     subscriber.onNext(Collections.unmodifiableList(
-                            BookNamesTableHelper.getBookNames(database, translation)));
+                            BookNamesTableHelper.getBookNames(databaseHelper.getDatabase(), translation)));
                     subscriber.onCompleted();
                 } catch (Exception e) {
                     Crashlytics.getInstance().core.logException(e);
@@ -201,7 +202,7 @@ public class BibleReadingModel {
                     @Override
                     public List<Verse> call(List<String> bookNames) {
                         return Collections.unmodifiableList(TranslationHelper.getVerses(
-                                database, translation, bookNames.get(book), book, chapter));
+                                databaseHelper.getDatabase(), translation, bookNames.get(book), book, chapter));
                     }
                 }).doOnNext(new Action1<List<Verse>>() {
                     @Override
@@ -216,7 +217,8 @@ public class BibleReadingModel {
                 .map(new Func1<List<String>, List<Verse>>() {
                     @Override
                     public List<Verse> call(List<String> bookNames) {
-                        return TranslationHelper.searchVerses(database, translation, bookNames, query);
+                        return TranslationHelper.searchVerses(
+                                databaseHelper.getDatabase(), translation, bookNames, query);
                     }
                 });
     }

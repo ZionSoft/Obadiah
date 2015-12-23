@@ -18,16 +18,15 @@
 package net.zionsoft.obadiah.injection;
 
 import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
 
 import com.squareup.moshi.Moshi;
 import com.squareup.okhttp.OkHttpClient;
 
 import net.zionsoft.obadiah.App;
-import net.zionsoft.obadiah.model.datamodel.Settings;
 import net.zionsoft.obadiah.model.database.DatabaseHelper;
 import net.zionsoft.obadiah.model.datamodel.BibleReadingModel;
 import net.zionsoft.obadiah.model.datamodel.ReadingProgressModel;
+import net.zionsoft.obadiah.model.datamodel.Settings;
 import net.zionsoft.obadiah.network.BackendInterface;
 
 import java.util.concurrent.TimeUnit;
@@ -56,20 +55,20 @@ public class BaseInjectionModule {
 
     @Provides
     @Singleton
-    public SQLiteDatabase provideSQLiteDatabase() {
-        return new DatabaseHelper(application).getWritableDatabase();
+    public DatabaseHelper provideDatabaseHelper() {
+        return new DatabaseHelper(application);
     }
 
     @Provides
     @Singleton
-    public BibleReadingModel provideBibleReadingModel(Context context, SQLiteDatabase database) {
-        return new BibleReadingModel(context, database);
+    public BibleReadingModel provideBibleReadingModel(Context context, DatabaseHelper databaseHelper) {
+        return new BibleReadingModel(context, databaseHelper);
     }
 
     @Provides
     @Singleton
-    public ReadingProgressModel provideReadingProgressModel(SQLiteDatabase database) {
-        return new ReadingProgressModel(database);
+    public ReadingProgressModel provideReadingProgressModel(DatabaseHelper databaseHelper) {
+        return new ReadingProgressModel(databaseHelper);
     }
 
     @Provides
