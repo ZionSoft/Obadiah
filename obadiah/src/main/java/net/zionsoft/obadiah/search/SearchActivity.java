@@ -38,8 +38,8 @@ import android.widget.Toast;
 
 import com.google.android.gms.actions.SearchIntents;
 
-import net.zionsoft.obadiah.Constants;
 import net.zionsoft.obadiah.R;
+import net.zionsoft.obadiah.biblereading.BibleReadingActivity;
 import net.zionsoft.obadiah.model.datamodel.Settings;
 import net.zionsoft.obadiah.model.domain.Verse;
 import net.zionsoft.obadiah.ui.utils.AnimationHelper;
@@ -140,14 +140,14 @@ public class SearchActivity extends BaseAppCompatActivity
     }
 
     private void initializeAdapter() {
-        if (searchResultList == null || settings == null || searchResultAdapter != null) {
+        if (searchResultList == null || settings == null || searchPresenter == null || searchResultAdapter != null) {
             // if the activity is recreated due to screen orientation change, the component fragment
             // is called before the UI is initialized, i.e. onAttachFragment() is called inside
             // super.onCreate()
             // therefore, we try to do the initialization in both places
             return;
         }
-        searchResultAdapter = new SearchResultListAdapter(this, settings);
+        searchResultAdapter = new SearchResultListAdapter(this, searchPresenter, settings);
         searchResultAdapter.setVerses(verses);
         searchResultList.setAdapter(searchResultAdapter);
     }
@@ -193,8 +193,10 @@ public class SearchActivity extends BaseAppCompatActivity
         rootView.setKeepScreenOn(settings.keepScreenOn());
         rootView.setBackgroundColor(settings.getBackgroundColor());
 
-        final String selected = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE)
-                .getString(Constants.PREF_KEY_LAST_READ_TRANSLATION, null);
+        final String selected = searchPresenter.loadCurrentTranslation();
+        if (TextUtils.isEmpty(selected)) {
+            throw new IllegalStateException("No translation selected.");
+        }
         setTitle(selected);
         if (!selected.equals(currentTranslation)) {
             currentTranslation = selected;
@@ -287,5 +289,10 @@ public class SearchActivity extends BaseAppCompatActivity
                         search();
                     }
                 }, null);
+    }
+
+    @Override
+    public void openBibleReadingActivity() {
+        AnimationHelper.slideIn(this, BibleReadingActivity.newStartReorderToTopIntent(this));
     }
 }

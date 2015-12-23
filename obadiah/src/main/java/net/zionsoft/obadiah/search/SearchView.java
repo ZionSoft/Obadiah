@@ -26,4 +26,6 @@ interface SearchView extends MVPView {
     void onVersesSearched(List<Verse> verses);
 
     void onVersesSearchFailed();
+
+    void openBibleReadingActivity();
 }

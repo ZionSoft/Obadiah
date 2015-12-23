@@ -110,7 +110,7 @@ public class BibleReadingModel {
         preferences.edit().putString(Constants.PREF_KEY_LAST_READ_TRANSLATION, translation).apply();
     }
 
-    public void storeReadingProgress(int book, int chapter, int verse) {
+    public void setReadingProgress(int book, int chapter, int verse) {
         preferences.edit()
                 .putInt(Constants.PREF_KEY_LAST_READ_BOOK, book)
                 .putInt(Constants.PREF_KEY_LAST_READ_CHAPTER, chapter)

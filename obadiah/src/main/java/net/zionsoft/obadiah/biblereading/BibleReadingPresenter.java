@@ -78,8 +78,8 @@ class BibleReadingPresenter extends MVPPresenter<BibleReadingView> {
         return bibleReadingModel.loadCurrentVerse();
     }
 
-    void storeReadingProgress(int book, int chapter, int verse) {
-        bibleReadingModel.storeReadingProgress(book, chapter, verse);
+    void setReadingProgress(int book, int chapter, int verse) {
+        bibleReadingModel.setReadingProgress(book, chapter, verse);
     }
 
     void trackReadingProgress(int book, int chapter) {

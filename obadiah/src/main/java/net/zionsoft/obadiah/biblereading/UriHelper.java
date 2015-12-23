@@ -15,22 +15,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.utils;
+package net.zionsoft.obadiah.biblereading;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.crashlytics.android.Crashlytics;
 
-import net.zionsoft.obadiah.Constants;
-import net.zionsoft.obadiah.model.domain.Bible;
 import net.zionsoft.obadiah.model.analytics.Analytics;
+import net.zionsoft.obadiah.model.domain.Bible;
 
-public class UriHelper {
-    public static void checkDeepLink(@NonNull Context context, @NonNull Uri uri) {
+class UriHelper {
+    static void checkDeepLink(@NonNull BibleReadingPresenter bibleReadingPresenter, @NonNull Uri uri) {
         final String path = uri.getPath();
         if (TextUtils.isEmpty(path)) {
             return;
@@ -43,33 +40,24 @@ public class UriHelper {
         }
 
         try {
-            final SharedPreferences.Editor editor = context
-                    .getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE).edit();
-
             // validity of translation short name will be checked later
             final String translationShortName = parts[2];
-            if (!TextUtils.isEmpty(translationShortName)) {
-                editor.putString(Constants.PREF_KEY_LAST_READ_TRANSLATION, translationShortName);
-            } else {
+            if (TextUtils.isEmpty(translationShortName)) {
                 return;
             }
 
             final int bookIndex = Integer.parseInt(parts[3]);
-            if (bookIndex >= 0 && bookIndex < Bible.getBookCount()) {
-                editor.putInt(Constants.PREF_KEY_LAST_READ_BOOK, bookIndex);
-            } else {
+            if (bookIndex < 0 || bookIndex >= Bible.getBookCount()) {
                 return;
             }
 
             final int chapterIndex = Integer.parseInt(parts[4]);
-            if (chapterIndex >= 0 && chapterIndex < Bible.getChapterCount(bookIndex)) {
-                editor.putInt(Constants.PREF_KEY_LAST_READ_CHAPTER, chapterIndex);
-            } else {
+            if (chapterIndex < 0 || chapterIndex >= Bible.getChapterCount(bookIndex)) {
                 return;
             }
 
-            editor.putInt(Constants.PREF_KEY_LAST_READ_VERSE, 0).apply();
-
+            bibleReadingPresenter.setCurrentTranslation(translationShortName);
+            bibleReadingPresenter.setReadingProgress(bookIndex, chapterIndex, 0);
             Analytics.trackEvent(Analytics.CATEGORY_DEEP_LINK, Analytics.DEEP_LINK_ACTION_OPENED);
         } catch (Exception e) {
             Crashlytics.getInstance().core.logException(e);

@@ -34,7 +34,7 @@ public class SearchModule {
 
     @Provides
     @ActivityScope
-    SearchPresenter provideSearchPresenter(SearchModel searchModel) {
-        return new SearchPresenter(searchModel);
+    SearchPresenter provideSearchPresenter(BibleReadingModel bibleReadingModel, SearchModel searchModel) {
+        return new SearchPresenter(bibleReadingModel, searchModel);
     }
 }

@@ -23,8 +23,6 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -35,17 +33,17 @@ import android.text.TextUtils;
 import com.crashlytics.android.Crashlytics;
 
 import net.zionsoft.obadiah.App;
-import net.zionsoft.obadiah.biblereading.BibleReadingActivity;
-import net.zionsoft.obadiah.Constants;
 import net.zionsoft.obadiah.R;
-import net.zionsoft.obadiah.model.database.BookNamesTableHelper;
-import net.zionsoft.obadiah.model.domain.Verse;
+import net.zionsoft.obadiah.biblereading.BibleReadingActivity;
 import net.zionsoft.obadiah.model.analytics.Analytics;
-import net.zionsoft.obadiah.model.database.TranslationHelper;
+import net.zionsoft.obadiah.model.datamodel.BibleReadingModel;
+import net.zionsoft.obadiah.model.domain.Verse;
 import net.zionsoft.obadiah.translations.TranslationManagementActivity;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -64,7 +62,7 @@ public class PushNotificationHandler extends IntentService {
     private static final String MESSAGE_TYPE_NEW_TRANSLATION = "newTranslation";
 
     @Inject
-    SQLiteDatabase database;
+    BibleReadingModel bibleReadingModel;
 
     public PushNotificationHandler() {
         super("net.zionsoft.obadiah.model.notification.PushNotificationHandler");
@@ -122,12 +120,8 @@ public class PushNotificationHandler extends IntentService {
 
     private boolean prepareForVerse(NotificationCompat.Builder builder,
                                     String messageType, String messageAttrs) {
-        final SharedPreferences preferences
-                = getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-
-        final String translationShortName
-                = preferences.getString(Constants.PREF_KEY_LAST_READ_TRANSLATION, null);
-        if (translationShortName == null) {
+        final String translationShortName = bibleReadingModel.loadCurrentTranslation();
+        if (TextUtils.isEmpty(translationShortName)) {
             return false;
         }
 
@@ -137,17 +131,14 @@ public class PushNotificationHandler extends IntentService {
             final int chapterIndex = jsonObject.getInt("chapter");
             final int verseIndex = jsonObject.getInt("verse");
 
-            final String bookName = BookNamesTableHelper.getBookNames(database, translationShortName).get(bookIndex);
-            final Verse verse = TranslationHelper.getVerse(database, translationShortName, bookName,
-                    bookIndex, chapterIndex, verseIndex);
-            if (verse == null) {
-                throw new IllegalArgumentException("Invalid push message attrs: " + messageAttrs);
-            }
-
+            final List<Verse> verses = bibleReadingModel
+                    .loadVerses(translationShortName, bookIndex, chapterIndex)
+                    .toBlocking().first();
+            final Verse verse = verses.get(verseIndex);
             builder.setContentIntent(PendingIntent.getActivity(this, 0,
                     BibleReadingActivity.newStartReorderToTopIntent(this, messageType, bookIndex, chapterIndex, verseIndex),
                     PendingIntent.FLAG_UPDATE_CURRENT))
-                    .setContentTitle(String.format("%s, %d:%d", bookName, chapterIndex + 1, verseIndex + 1))
+                    .setContentTitle(String.format("%s, %d:%d", verse.bookName, chapterIndex + 1, verseIndex + 1))
                     .setContentText(verse.verseText)
                     .setStyle(new NotificationCompat.BigTextStyle().bigText(verse.verseText));
         } catch (Exception e) {

@@ -55,7 +55,6 @@ import net.zionsoft.obadiah.translations.TranslationManagementActivity;
 import net.zionsoft.obadiah.ui.utils.AnimationHelper;
 import net.zionsoft.obadiah.ui.utils.BaseAppCompatActivity;
 import net.zionsoft.obadiah.ui.utils.DialogHelper;
-import net.zionsoft.obadiah.utils.UriHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -147,7 +146,6 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
         appIndexingManager = new AppIndexingManager(this);
 
         initializeUi();
-        checkDeepLink();
     }
 
     private void initializeUi() {
@@ -170,11 +168,26 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
         versePager.addOnPageChangeListener(this);
     }
 
+    @Override
+    public void onAttachFragment(Fragment fragment) {
+        super.onAttachFragment(fragment);
+
+        if (fragment instanceof BibleReadingComponentFragment) {
+            ((BibleReadingComponentFragment) fragment).getComponent().inject(this);
+
+            final View rootView = getWindow().getDecorView();
+            rootView.setKeepScreenOn(settings.keepScreenOn());
+            rootView.setBackgroundColor(settings.getBackgroundColor());
+
+            checkDeepLink();
+        }
+    }
+
     private void checkDeepLink() {
         final Intent startIntent = getIntent();
         final Uri uri = startIntent.getData();
         if (uri != null) {
-            UriHelper.checkDeepLink(this, uri);
+            UriHelper.checkDeepLink(bibleReadingPresenter, uri);
         } else {
             final String messageType = startIntent.getStringExtra(KEY_MESSAGE_TYPE);
             if (TextUtils.isEmpty(messageType)) {
@@ -193,22 +206,9 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
                 return;
             }
 
-            bibleReadingPresenter.storeReadingProgress(bookIndex, chapterIndex, verseIndex);
+            bibleReadingPresenter.setReadingProgress(bookIndex, chapterIndex, verseIndex);
 
             Analytics.trackEvent(Analytics.CATEGORY_NOTIFICATION, Analytics.NOTIFICATION_ACTION_OPENED, messageType);
-        }
-    }
-
-    @Override
-    public void onAttachFragment(Fragment fragment) {
-        super.onAttachFragment(fragment);
-
-        if (fragment instanceof BibleReadingComponentFragment) {
-            ((BibleReadingComponentFragment) fragment).getComponent().inject(this);
-
-            final View rootView = getWindow().getDecorView();
-            rootView.setKeepScreenOn(settings.keepScreenOn());
-            rootView.setBackgroundColor(settings.getBackgroundColor());
         }
     }
 
@@ -264,7 +264,7 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
 
     @Override
     protected void onStop() {
-        bibleReadingPresenter.storeReadingProgress(currentBook, currentChapter,
+        bibleReadingPresenter.setReadingProgress(currentBook, currentChapter,
                 versePagerAdapter.getCurrentVerse(versePager.getCurrentItem()));
         appIndexingManager.onStop();
 
@@ -435,7 +435,7 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
 
         Analytics.trackEvent(Analytics.CATEGORY_TRANSLATION, Analytics.TRANSLATION_ACTION_SELECTED, selected);
         currentTranslation = selected;
-        bibleReadingPresenter.storeReadingProgress(currentBook, currentChapter,
+        bibleReadingPresenter.setReadingProgress(currentBook, currentChapter,
                 versePagerAdapter.getCurrentVerse(versePager.getCurrentItem()));
 
         loadTexts();

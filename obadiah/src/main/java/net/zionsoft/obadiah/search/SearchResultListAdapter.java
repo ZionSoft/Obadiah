@@ -17,7 +17,6 @@
 
 package net.zionsoft.obadiah.search;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
 import android.support.v7.widget.RecyclerView;
@@ -27,57 +26,49 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import net.zionsoft.obadiah.Constants;
 import net.zionsoft.obadiah.R;
-import net.zionsoft.obadiah.biblereading.BibleReadingActivity;
 import net.zionsoft.obadiah.model.datamodel.Settings;
 import net.zionsoft.obadiah.model.domain.Verse;
-import net.zionsoft.obadiah.ui.utils.AnimationHelper;
 
 import java.util.List;
 
 class SearchResultListAdapter extends RecyclerView.Adapter {
     private static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        private final Activity activity;
+        private final SearchPresenter searchPresenter;
         private Verse verse;
 
-        private ViewHolder(Activity activity, View itemView) {
+        private ViewHolder(SearchPresenter searchPresenter, View itemView) {
             super(itemView);
-            this.activity = activity;
+            this.searchPresenter = searchPresenter;
             itemView.setOnClickListener(this);
         }
 
         @Override
         public void onClick(View v) {
             if (verse != null) {
-                activity.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE).edit()
-                        .putInt(Constants.PREF_KEY_LAST_READ_BOOK, verse.bookIndex)
-                        .putInt(Constants.PREF_KEY_LAST_READ_CHAPTER, verse.chapterIndex)
-                        .putInt(Constants.PREF_KEY_LAST_READ_VERSE, verse.verseIndex)
-                        .apply();
-
-                AnimationHelper.slideIn(activity, BibleReadingActivity.newStartReorderToTopIntent(activity));
+                searchPresenter.setReadingProgress(verse.bookIndex, verse.chapterIndex, verse.verseIndex);
+                searchPresenter.openBibleReadingActivity();
             }
         }
     }
 
-    private final Activity activity;
+    private final SearchPresenter searchPresenter;
     private final LayoutInflater inflater;
     private final Resources resources;
     private final Settings settings;
 
     private List<Verse> verses;
 
-    SearchResultListAdapter(Activity activity, Settings settings) {
-        this.activity = activity;
-        this.inflater = LayoutInflater.from(activity);
-        this.resources = activity.getResources();
+    SearchResultListAdapter(Context context, SearchPresenter searchPresenter, Settings settings) {
+        this.searchPresenter = searchPresenter;
+        this.inflater = LayoutInflater.from(context);
+        this.resources = context.getResources();
         this.settings = settings;
     }
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new ViewHolder(activity, inflater.inflate(R.layout.item_search_result, parent, false));
+        return new ViewHolder(searchPresenter, inflater.inflate(R.layout.item_search_result, parent, false));
     }
 
     @Override

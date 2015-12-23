@@ -17,6 +17,9 @@
 
 package net.zionsoft.obadiah.search;
 
+import android.support.annotation.Nullable;
+
+import net.zionsoft.obadiah.model.datamodel.BibleReadingModel;
 import net.zionsoft.obadiah.model.domain.Verse;
 import net.zionsoft.obadiah.mvp.MVPPresenter;
 
@@ -28,11 +31,13 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
 class SearchPresenter extends MVPPresenter<SearchView> {
+    private final BibleReadingModel bibleReadingModel;
     private final SearchModel searchModel;
 
     private Subscription subscription;
 
-    SearchPresenter(SearchModel searchModel) {
+    SearchPresenter(BibleReadingModel bibleReadingModel, SearchModel searchModel) {
+        this.bibleReadingModel = bibleReadingModel;
         this.searchModel = searchModel;
     }
 
@@ -78,5 +83,21 @@ class SearchPresenter extends MVPPresenter<SearchView> {
         searchModel.clearSearchHistory()
                 .subscribeOn(Schedulers.io())
                 .subscribe();
+    }
+
+    @Nullable
+    String loadCurrentTranslation() {
+        return bibleReadingModel.loadCurrentTranslation();
+    }
+
+    void setReadingProgress(int book, int chapter, int verse) {
+        bibleReadingModel.setReadingProgress(book, chapter, verse);
+    }
+
+    void openBibleReadingActivity() {
+        SearchView v = getView();
+        if (v != null) {
+            v.openBibleReadingActivity();
+        }
     }
 }
