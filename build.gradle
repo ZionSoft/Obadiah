@@ -8,7 +8,7 @@ buildscript {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.9'
+    gradleVersion = '2.10'
 }
 
 ext {
@@ -22,12 +22,12 @@ ext {
     targetJavaVersion = JavaVersion.VERSION_1_7
 
     supportLibVersion = '23.1.1'
-    playServicesVersion = '8.3.0'
+    playServicesVersion = '8.4.0'
 
     daggerVersion = '2.0.2'
     javaxAnnotationApiVersion = '1.2'
     butterKnifeVersion = '7.0.1'
-    rxAndroidVersion = '1.0.1'
+    rxAndroidVersion = '1.1.0'
     rxJavaVersion = '1.1.0'
     retrofitVersion = '2.0.0-beta2'
 
