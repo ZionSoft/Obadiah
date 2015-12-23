@@ -39,9 +39,12 @@
     <string name="pref_license">开源软件协议</string>
     <string name="pref_display">显示</string>
     <string name="pref_about">关于</string>
+    <string name="pref_invite_friends">邀请好友</string>
 
     <string name="progress_dialog_translation_deleting">删除中&#8230;</string>
     <string name="progress_dialog_translation_downloading">下载中&#8230;</string>
+
+    <string name="text_invite_friends_message">推荐很好用的圣经阅读软件</string>
 
     <string name="text_available_translation_info">%1$s\n体积%2$d KB</string>
 

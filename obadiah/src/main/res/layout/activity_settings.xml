@@ -58,6 +58,14 @@
                 obadiah:settingTitleDescriptionButtonTitle="@string/pref_rate_me" />
 
             <net.zionsoft.obadiah.misc.settings.SettingTitleDescriptionButton
+                android:id="@+id/invite_friends_setting_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/background_text"
+                obadiah:settingTitleDescriptionButtonDividerVisible="true"
+                obadiah:settingTitleDescriptionButtonTitle="@string/pref_invite_friends" />
+
+            <net.zionsoft.obadiah.misc.settings.SettingTitleDescriptionButton
                 android:id="@+id/version_setting_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

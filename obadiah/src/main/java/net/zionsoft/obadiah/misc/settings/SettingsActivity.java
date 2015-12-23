@@ -33,14 +33,16 @@ import android.util.TypedValue;
 import android.view.View;
 import android.widget.CompoundButton;
 
+import com.google.android.gms.appinvite.AppInviteInvitation;
+
 import net.zionsoft.obadiah.App;
 import net.zionsoft.obadiah.Constants;
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.misc.license.OpenSourceLicenseActivity;
-import net.zionsoft.obadiah.model.datamodel.Settings;
 import net.zionsoft.obadiah.model.analytics.Analytics;
-import net.zionsoft.obadiah.ui.utils.BaseAppCompatActivity;
+import net.zionsoft.obadiah.model.datamodel.Settings;
 import net.zionsoft.obadiah.ui.utils.AnimationHelper;
+import net.zionsoft.obadiah.ui.utils.BaseAppCompatActivity;
 import net.zionsoft.obadiah.ui.utils.DialogHelper;
 import net.zionsoft.obadiah.ui.widget.SectionHeader;
 
@@ -54,6 +56,7 @@ public class SettingsActivity extends BaseAppCompatActivity {
     }
 
     private static final long ANIMATION_DURATION = 300L;
+    private static final int REQUEST_CODE_INVITE_FRIENDS = 8964;
 
     @Inject
     Settings settings;
@@ -78,6 +81,9 @@ public class SettingsActivity extends BaseAppCompatActivity {
 
     @Bind(R.id.rate_me_setting_button)
     SettingTitleDescriptionButton rateMeSettingButton;
+
+    @Bind(R.id.invite_friends_setting_button)
+    SettingTitleDescriptionButton inviteFriendsSettingButton;
 
     @Bind(R.id.version_setting_button)
     SettingTitleDescriptionButton versionSettingButton;
@@ -138,6 +144,18 @@ public class SettingsActivity extends BaseAppCompatActivity {
                 } catch (ActivityNotFoundException e) {
                     DialogHelper.showDialog(SettingsActivity.this, R.string.dialog_unknown_error, null);
                 }
+            }
+        });
+
+        inviteFriendsSettingButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final Resources resources = getResources();
+                final Intent intent = new AppInviteInvitation.IntentBuilder(resources.getString(R.string.pref_invite_friends))
+                        .setAndroidMinimumVersionCode(Build.VERSION_CODES.GINGERBREAD)
+                        .setMessage(resources.getString(R.string.text_invite_friends_message))
+                        .build();
+                startActivityForResult(intent, REQUEST_CODE_INVITE_FRIENDS);
             }
         });
 
@@ -216,6 +234,7 @@ public class SettingsActivity extends BaseAppCompatActivity {
         nightModeSwitch.setTitleTextColor(titleTextColor);
         textSizeSettingButton.setTitleTextColor(titleTextColor);
         rateMeSettingButton.setTitleTextColor(titleTextColor);
+        inviteFriendsSettingButton.setTitleTextColor(titleTextColor);
         versionSettingButton.setTitleTextColor(titleTextColor);
         licenseSettingButton.setTitleTextColor(titleTextColor);
     }
@@ -257,8 +276,20 @@ public class SettingsActivity extends BaseAppCompatActivity {
         textSizeSettingButton.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize, smallerTextSize);
 
         rateMeSettingButton.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize, smallerTextSize);
+        inviteFriendsSettingButton.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize, smallerTextSize);
         aboutSectionHeader.setHeaderTextSize(TypedValue.COMPLEX_UNIT_PX, smallerTextSize);
         versionSettingButton.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize, smallerTextSize);
         licenseSettingButton.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize, smallerTextSize);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_CODE_INVITE_FRIENDS) {
+            if (resultCode == RESULT_OK) {
+                Analytics.trackEvent(Analytics.CATEGORY_SOCIAL, Analytics.SOCIAL_ACTION_INVITE_FRIENDS);
+            }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
     }
 }

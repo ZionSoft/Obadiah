@@ -63,6 +63,7 @@ dependencies {
     compile 'com.google.android.gms:play-services-ads:' + rootProject.ext.playServicesVersion
     compile 'com.google.android.gms:play-services-analytics:' + rootProject.ext.playServicesVersion
     compile 'com.google.android.gms:play-services-appindexing:' + rootProject.ext.playServicesVersion
+    compile 'com.google.android.gms:play-services-appinvite:' + rootProject.ext.playServicesVersion
     compile 'com.google.android.gms:play-services-gcm:' + rootProject.ext.playServicesVersion
 
     compile 'com.google.dagger:dagger:' + rootProject.ext.daggerVersion

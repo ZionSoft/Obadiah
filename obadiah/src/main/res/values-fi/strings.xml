@@ -39,9 +39,12 @@
     <string name="pref_license">Avoimen Lähdekoodin Käyttöluv.</string>
     <string name="pref_display">Näyttö</string>
     <string name="pref_about">Lue Lisää</string>
+    <string name="pref_invite_friends">Kutsua Ystäviä</string>
 
     <string name="progress_dialog_translation_deleting">Poistaminen&#8230;</string>
     <string name="progress_dialog_translation_downloading">Lataaminen&#8230;</string>
+
+    <string name="text_invite_friends_message">Raamatun lukeminen</string>
 
     <string name="text_available_translation_info">%1$s\nKoko: %2$d kt</string>
 

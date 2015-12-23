@@ -39,9 +39,12 @@
     <string name="pref_license">Open Source Licenses</string>
     <string name="pref_display">Display</string>
     <string name="pref_about">About</string>
+    <string name="pref_invite_friends">Invite Friends</string>
 
     <string name="progress_dialog_translation_deleting">Deleting&#8230;</string>
     <string name="progress_dialog_translation_downloading">Downloading&#8230;</string>
+
+    <string name="text_invite_friends_message">Great Bible reading app.</string>
 
     <string name="text_available_translation_info">%1$s\nSize: %2$d KB</string>
 

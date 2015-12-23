@@ -54,6 +54,9 @@ public class Analytics {
     public static final String TRANSLATION_ACTION_SELECTED = "selected";
     public static final String TRANSLATION_ACTION_REMOVED = "removed";
 
+    public static final String CATEGORY_SOCIAL = "social";
+    public static final String SOCIAL_ACTION_INVITE_FRIENDS = "invite_friends";
+
     private static Tracker tracker;
 
     public static void initialize(Context context) {
