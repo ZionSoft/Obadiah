@@ -27,9 +27,5 @@ public class Constants {
     public static final String PREF_KEY_LAST_READ_CHAPTER = "currentChapter";
     public static final String PREF_KEY_LAST_READ_VERSE = "currentVerse";
 
-    public static final String PREF_KEY_CHECKED_APPLICATION_VERSION = "checkedApplicationVersion";
-    public static final String PREF_KEY_CHECKED_APPLICATION_VERSION_TIMESTAMP = "checkedApplicationVersionTimestamp";
-    public static final String PREF_KEY_ASKED_APPLICATION_UPDATE = "askedApplicationUpdate";
-
     public static final Uri GOOGLE_PLAY_URI = Uri.parse("market://details?id=net.zionsoft.obadiah");
 }

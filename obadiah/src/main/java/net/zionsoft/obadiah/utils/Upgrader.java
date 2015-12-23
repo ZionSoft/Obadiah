@@ -35,8 +35,6 @@ class Upgrader {
             // should never reach here
             return;
         }
-        if (version >= applicationVersion)
-            return;
 
         final SharedPreferences.Editor editor = preferences.edit();
         if (version < 10500) {
@@ -56,6 +54,12 @@ class Upgrader {
         if (version < 10802) {
             editor.remove("screenOn")
                     .putInt(Constants.PREF_KEY_CURRENT_APPLICATION_VERSION, 10802);
+        }
+        if (version < 11300) {
+            editor.remove("checkedApplicationVersion")
+                    .remove("checkedApplicationVersionTimestamp")
+                    .remove("askedApplicationUpdate")
+                    .putInt(Constants.PREF_KEY_CURRENT_APPLICATION_VERSION, 11300);
         }
         editor.putInt(Constants.PREF_KEY_CURRENT_APPLICATION_VERSION, applicationVersion)
                 .apply();
