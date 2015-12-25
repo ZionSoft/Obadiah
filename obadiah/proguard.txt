@@ -51,10 +51,6 @@
 -keep interface com.squareup.okhttp.** { *; }
 -keepattributes Signature
 -keepattributes Exceptions
--keepattributes *Annotation*
 
--keepclasseswithmembers class * {
-    @retrofit.http.* <methods>;
-}
-
+-keep class net.zionsoft.obadiah.model.domain.TranslationInfo { *; }
 -keep class net.zionsoft.obadiah.network.** { *; }
