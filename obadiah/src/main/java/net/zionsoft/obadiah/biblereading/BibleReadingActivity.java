@@ -435,6 +435,7 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
 
         Analytics.trackEvent(Analytics.CATEGORY_TRANSLATION, Analytics.TRANSLATION_ACTION_SELECTED, selected);
         currentTranslation = selected;
+        bibleReadingPresenter.setCurrentTranslation(currentTranslation);
         bibleReadingPresenter.setReadingProgress(currentBook, currentChapter,
                 versePagerAdapter.getCurrentVerse(versePager.getCurrentItem()));
 
