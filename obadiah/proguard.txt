@@ -23,8 +23,10 @@
 -keep class android.support.v7.** { *; }
 -keep interface android.support.v7.** { *; }
 
-# Crashlytics
-# http://support.crashlytics.com/knowledgebase/articles/202926-android-studio-and-intellij-with-proguard
+# Fabric
+# https://docs.fabric.io/android/crashlytics/dex-and-proguard.html
+-keep class com.crashlytics.** { *; }
+-keep class com.crashlytics.android.**
 -keepattributes SourceFile,LineNumberTable
 
 # Butter Knife
@@ -40,5 +42,19 @@
     @butterknife.* <methods>;
 }
 
-# RxJava
--dontwarn rx.internal.util.unsafe.**
+# Retrofit
+-dontwarn okio.**
+-dontwarn retrofit.**
+-keep class retrofit.** { *; }
+-keep class com.squareup.moshi.** { *; }
+-keep class com.squareup.okhttp.** { *; }
+-keep interface com.squareup.okhttp.** { *; }
+-keepattributes Signature
+-keepattributes Exceptions
+-keepattributes *Annotation*
+
+-keepclasseswithmembers class * {
+    @retrofit.http.* <methods>;
+}
+
+-keep class net.zionsoft.obadiah.network.** { *; }

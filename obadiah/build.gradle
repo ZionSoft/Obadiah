@@ -24,8 +24,8 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
 
     defaultConfig {
-        versionName '1.12.5'
-        versionCode 11205
+        versionName rootProject.ext.versionName
+        versionCode rootProject.ext.versionCode
 
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
@@ -46,7 +46,7 @@ android {
             versionNameSuffix " debug"
         }
         release {
-            minifyEnabled true
+            minifyEnabled false
             shrinkResources true
             proguardFile getDefaultProguardFile('proguard-android-optimize.txt')
             proguardFile 'proguard.txt'
@@ -72,6 +72,7 @@ dependencies {
 
     compile 'io.reactivex:rxandroid:' + rootProject.ext.rxAndroidVersion
     compile 'io.reactivex:rxjava:' + rootProject.ext.rxJavaVersion
+    compile 'com.artemzin.rxjava:proguard-rules:' + rootProject.ext.rxJavaProguardRulesVersion
 
     compile 'com.jakewharton:butterknife:' + rootProject.ext.butterKnifeVersion
 
