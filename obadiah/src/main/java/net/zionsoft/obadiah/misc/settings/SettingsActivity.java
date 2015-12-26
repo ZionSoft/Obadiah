@@ -207,24 +207,18 @@ public class SettingsActivity extends BaseAppCompatActivity {
 
     private void animateColor(final int fromBackgroundColor, final int toBackgroundColor,
                               final int fromTitleTextColor, final int toTitleTextColor) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            final ArgbEvaluator argbEvaluator = new ArgbEvaluator();
-            final ValueAnimator colorAnimator = ValueAnimator.ofFloat(0.0F, 1.0F);
-            colorAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-                @Override
-                public void onAnimationUpdate(ValueAnimator animator) {
-                    final float fraction = (Float) animator.getAnimatedValue();
-                    final int backgroundColor = (Integer) argbEvaluator.evaluate(fraction, fromBackgroundColor, toBackgroundColor);
-                    final int titleTextColor = (Integer) argbEvaluator.evaluate(fraction, fromTitleTextColor, toTitleTextColor);
-                    updateColor(backgroundColor, titleTextColor);
-                }
-            });
-            colorAnimator.setDuration(ANIMATION_DURATION).start();
-        } else {
-            // TODO adds animation for old devices
-            updateColor(toBackgroundColor, toTitleTextColor);
-        }
+        final ArgbEvaluator argbEvaluator = new ArgbEvaluator();
+        final ValueAnimator colorAnimator = ValueAnimator.ofFloat(0.0F, 1.0F);
+        colorAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animator) {
+                final float fraction = (Float) animator.getAnimatedValue();
+                final int backgroundColor = (Integer) argbEvaluator.evaluate(fraction, fromBackgroundColor, toBackgroundColor);
+                final int titleTextColor = (Integer) argbEvaluator.evaluate(fraction, fromTitleTextColor, toTitleTextColor);
+                updateColor(backgroundColor, titleTextColor);
+            }
+        });
+        colorAnimator.setDuration(ANIMATION_DURATION).start();
     }
 
     private void updateColor() {
@@ -245,23 +239,17 @@ public class SettingsActivity extends BaseAppCompatActivity {
 
     private void animateTextSize(final float fromTextSize, final float toTextSize,
                                  final float fromSmallerTextSize, final float toSmallerTextSize) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            final ValueAnimator textSizeAnimator = ValueAnimator.ofFloat(0.0F, 1.0F);
-            textSizeAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-                @Override
-                public void onAnimationUpdate(ValueAnimator animator) {
-                    final float fraction = (Float) animator.getAnimatedValue();
-                    final float textSize = fromTextSize + fraction * (toTextSize - fromTextSize);
-                    final float smallerTextSize = fromSmallerTextSize + fraction * (toSmallerTextSize - fromSmallerTextSize);
-                    updateTextSize(textSize, smallerTextSize);
-                }
-            });
-            textSizeAnimator.setDuration(ANIMATION_DURATION).start();
-        } else {
-            // TODO adds animation for old devices
-            updateTextSize(toTextSize, toSmallerTextSize);
-        }
+        final ValueAnimator textSizeAnimator = ValueAnimator.ofFloat(0.0F, 1.0F);
+        textSizeAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animator) {
+                final float fraction = (Float) animator.getAnimatedValue();
+                final float textSize = fromTextSize + fraction * (toTextSize - fromTextSize);
+                final float smallerTextSize = fromSmallerTextSize + fraction * (toSmallerTextSize - fromSmallerTextSize);
+                updateTextSize(textSize, smallerTextSize);
+            }
+        });
+        textSizeAnimator.setDuration(ANIMATION_DURATION).start();
     }
 
     private void updateTextSize() {
