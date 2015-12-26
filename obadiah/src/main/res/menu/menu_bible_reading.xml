@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:obadiah="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/action_translations"
         android:title="@null"
-        obadiah:showAsAction="always"
-        obadiah:actionViewClass="android.widget.Spinner" />
+        app:actionViewClass="android.support.v7.widget.AppCompatSpinner"
+        app:showAsAction="always" />
     <item
         android:id="@+id/action_search"
         android:title="@string/action_search"
-        obadiah:showAsAction="never" />
+        app:showAsAction="never" />
     <item
         android:id="@+id/action_reading_progress"
         android:title="@string/action_reading_progress"
-        obadiah:showAsAction="never" />
+        app:showAsAction="never" />
     <item
         android:id="@+id/action_settings"
         android:title="@string/action_settings"
-        obadiah:showAsAction="never" />
+        app:showAsAction="never" />
 </menu>
