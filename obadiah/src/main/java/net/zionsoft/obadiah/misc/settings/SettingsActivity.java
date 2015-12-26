@@ -155,7 +155,11 @@ public class SettingsActivity extends BaseAppCompatActivity {
                         .setAndroidMinimumVersionCode(Build.VERSION_CODES.GINGERBREAD)
                         .setMessage(resources.getString(R.string.text_invite_friends_message))
                         .build();
-                startActivityForResult(intent, REQUEST_CODE_INVITE_FRIENDS);
+                try {
+                    startActivityForResult(intent, REQUEST_CODE_INVITE_FRIENDS);
+                } catch (ActivityNotFoundException e) {
+                    DialogHelper.showDialog(SettingsActivity.this, R.string.dialog_unknown_error, null);
+                }
             }
         });
 
