@@ -145,7 +145,7 @@ public class BibleReadingModel {
                 });
     }
 
-    private Observable<List<String>> loadBookNamesFromCache(final String translation) {
+    private Observable<List<String>> loadBookNamesFromCache(String translation) {
         return Observable.just(bookNameCache.get(translation));
     }
 
