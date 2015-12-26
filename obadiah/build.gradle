@@ -77,7 +77,7 @@ dependencies {
     compile 'com.jakewharton:butterknife:' + rootProject.ext.butterKnifeVersion
 
     compile 'com.squareup.retrofit:retrofit:' + rootProject.ext.retrofitVersion
-    compile 'com.squareup.retrofit:converter-moshi:' + rootProject.ext.retrofitVersion
+    compile 'com.squareup.retrofit:converter-gson:' + rootProject.ext.retrofitVersion
     compile 'com.squareup.retrofit:adapter-rxjava:' + rootProject.ext.retrofitVersion
 
     compile('com.crashlytics.sdk.android:crashlytics:2.3.2@aar') {

@@ -19,7 +19,7 @@ package net.zionsoft.obadiah.translations;
 
 import android.content.Context;
 
-import com.squareup.moshi.Moshi;
+import com.google.gson.Gson;
 
 import net.zionsoft.obadiah.injection.scopes.ActivityScope;
 import net.zionsoft.obadiah.model.database.DatabaseHelper;
@@ -32,14 +32,14 @@ import dagger.Provides;
 @Module
 public class TranslationManagementModule {
     @Provides
-    AdsModel provideAdsModel(Context context, Moshi moshi) {
-        return new AdsModel(context, moshi);
+    AdsModel provideAdsModel(Context context, Gson gson) {
+        return new AdsModel(context, gson);
     }
 
     @Provides
     TranslationManagementModel provideTranslationManagementModel(
-            DatabaseHelper databaseHelper, Moshi moshi, BackendInterface backendInterface) {
-        return new TranslationManagementModel(databaseHelper, moshi, backendInterface);
+            DatabaseHelper databaseHelper, Gson gson, BackendInterface backendInterface) {
+        return new TranslationManagementModel(databaseHelper, gson, backendInterface);
     }
 
     @Provides

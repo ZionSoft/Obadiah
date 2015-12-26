@@ -21,8 +21,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.SystemClock;
 
 import com.crashlytics.android.Crashlytics;
-import com.squareup.moshi.JsonAdapter;
-import com.squareup.moshi.Moshi;
+import com.google.gson.Gson;
 import com.squareup.okhttp.ResponseBody;
 
 import net.zionsoft.obadiah.model.analytics.Analytics;
@@ -43,7 +42,6 @@ import java.util.Locale;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import okio.BufferedSource;
 import okio.Okio;
 import retrofit.Response;
 import rx.Observable;
@@ -55,15 +53,13 @@ import rx.schedulers.Schedulers;
 
 class TranslationManagementModel {
     private final DatabaseHelper databaseHelper;
+    private final Gson gson;
     private final BackendInterface backendInterface;
-    private final JsonAdapter<BackendTranslationInfo> translationInfoJsonAdapter;
-    private final JsonAdapter<BackendChapter> chapterJsonAdapter;
 
-    TranslationManagementModel(DatabaseHelper databaseHelper, Moshi moshi, BackendInterface backendInterface) {
+    TranslationManagementModel(DatabaseHelper databaseHelper, Gson gson, BackendInterface backendInterface) {
         this.databaseHelper = databaseHelper;
+        this.gson = gson;
         this.backendInterface = backendInterface;
-        this.translationInfoJsonAdapter = moshi.adapter(BackendTranslationInfo.class);
-        this.chapterJsonAdapter = moshi.adapter(BackendChapter.class);
     }
 
     Observable<Translations> loadTranslations(boolean forceRefresh) {
@@ -238,16 +234,16 @@ class TranslationManagementModel {
                     int progress = -1;
                     while ((entry = is.getNextEntry()) != null) {
                         final String entryName = entry.getName();
-                        BufferedSource bufferedSource = Okio.buffer(Okio.source(is));
+                        final String content = Okio.buffer(Okio.source(is)).readUtf8();
                         if (entryName.equals("books.json")) {
                             BookNamesTableHelper.saveBookNames(database,
-                                    translationInfoJsonAdapter.fromJson(bufferedSource));
+                                    gson.fromJson(content, BackendTranslationInfo.class));
                         } else {
                             final String[] parts = entryName.substring(0, entryName.length() - 5).split("-");
                             final int book = Integer.parseInt(parts[0]);
                             final int chapter = Integer.parseInt(parts[1]);
                             TranslationHelper.saveVerses(database, translation.shortName, book, chapter,
-                                    chapterJsonAdapter.fromJson(bufferedSource).verses);
+                                    gson.fromJson(content, BackendChapter.class).verses);
                         }
 
                         // only emits if the progress is actually changed

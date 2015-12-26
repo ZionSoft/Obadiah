@@ -21,7 +21,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 
-import com.squareup.moshi.Moshi;
+import com.google.gson.Gson;
 
 import net.zionsoft.obadiah.billing.InAppBilling;
 
@@ -39,8 +39,8 @@ class AdsModel implements InAppBilling.OnAdsRemovalPurchasedListener {
     private final InAppBilling inAppBilling;
     private OnAdsRemovalPurchasedListener onAdsRemovalPurchasedListener;
 
-    AdsModel(Context context, Moshi moshi) {
-        inAppBilling = new InAppBilling(context, moshi);
+    AdsModel(Context context, Gson gson) {
+        inAppBilling = new InAppBilling(context, gson);
     }
 
     Observable<Boolean> shouldHideAds() {

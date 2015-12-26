@@ -51,6 +51,9 @@
 -keep interface com.squareup.okhttp.** { *; }
 -keepattributes Signature
 -keepattributes Exceptions
+-keepattributes *Annotation*
+
+-keep class sun.misc.Unsafe { *; }
 
 -keep class net.zionsoft.obadiah.billing.InAppPurchaseData { *; }
 -keep class net.zionsoft.obadiah.model.domain.TranslationInfo { *; }

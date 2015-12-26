@@ -19,7 +19,8 @@ package net.zionsoft.obadiah.injection;
 
 import android.content.Context;
 
-import com.squareup.moshi.Moshi;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.squareup.okhttp.OkHttpClient;
 
 import net.zionsoft.obadiah.App;
@@ -35,7 +36,7 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
-import retrofit.MoshiConverterFactory;
+import retrofit.GsonConverterFactory;
 import retrofit.Retrofit;
 import retrofit.RxJavaCallAdapterFactory;
 
@@ -79,8 +80,8 @@ public class BaseInjectionModule {
 
     @Provides
     @Singleton
-    public Moshi provideMoshi() {
-        return new Moshi.Builder().build();
+    Gson provideGson() {
+        return new GsonBuilder().create();
     }
 
     @Provides
@@ -95,11 +96,11 @@ public class BaseInjectionModule {
 
     @Provides
     @Singleton
-    public Retrofit provideRetrofit(Moshi moshi, OkHttpClient okHttpClient) {
+    public Retrofit provideRetrofit(Gson gson, OkHttpClient okHttpClient) {
         return new Retrofit.Builder()
                 .baseUrl(BackendInterface.BASE_URL)
                 .client(okHttpClient)
-                .addConverterFactory(MoshiConverterFactory.create(moshi))
+                .addConverterFactory(GsonConverterFactory.create(gson))
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .build();
     }
