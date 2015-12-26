@@ -27,6 +27,7 @@ android {
         versionName rootProject.ext.versionName
         versionCode rootProject.ext.versionCode
 
+        maxSdkVersion rootProject.ext.maxSdkVersion
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
     }

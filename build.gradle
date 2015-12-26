@@ -15,14 +15,15 @@ ext {
     compileSdkVersion = 23
     buildToolsVersion = '23.0.2'
 
+    maxSdkVersion = 14
     minSdkVersion = 9
     targetSdkVersion = 23
 
     sourceJavaVersion = JavaVersion.VERSION_1_7
     targetJavaVersion = JavaVersion.VERSION_1_7
 
-    versionName = '1.13.0'
-    versionCode = 11300
+    versionName = '1.13.1'
+    versionCode = 11301
 
     supportLibVersion = '23.1.1'
     playServicesVersion = '8.4.0'
