@@ -1,4 +1,7 @@
-A simple and easy-to-use Bible reader.
+Bible reader
+------------
+
+A simple and easy-to-use Bible reader with offline reading, multi-versions support, and full text search.
 
 [![Get it on Google Play](https://developer.android.com/images/brand/en_generic_rgb_wo_45.png)](https://play.google.com/store/apps/details?id=net.zionsoft.obadiah)
 
