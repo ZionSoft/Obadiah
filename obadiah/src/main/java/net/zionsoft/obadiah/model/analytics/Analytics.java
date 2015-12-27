@@ -57,6 +57,9 @@ public class Analytics {
     public static final String CATEGORY_SOCIAL = "social";
     public static final String SOCIAL_ACTION_INVITE_FRIENDS = "invite_friends";
 
+    public static final String CATEGORY_NFC = "nfc";
+    public static final String NFC_ACTION_VERSE = "verse";
+
     private static Tracker tracker;
 
     public static void initialize(Context context) {

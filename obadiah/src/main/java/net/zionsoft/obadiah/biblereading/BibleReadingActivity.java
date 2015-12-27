@@ -22,6 +22,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.net.Uri;
+import android.nfc.NdefMessage;
+import android.nfc.NfcAdapter;
+import android.nfc.NfcEvent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -65,7 +68,8 @@ import butterknife.Bind;
 
 public class BibleReadingActivity extends BaseAppCompatActivity implements BibleReadingView,
         AdapterView.OnItemSelectedListener, ChapterListAdapter.OnChapterSelectedListener,
-        ExpandableListView.OnGroupClickListener, VersePagerAdapter.Listener, ViewPager.OnPageChangeListener {
+        ExpandableListView.OnGroupClickListener, VersePagerAdapter.Listener, ViewPager.OnPageChangeListener,
+        NfcAdapter.CreateNdefMessageCallback {
     private static final String KEY_MESSAGE_TYPE = "net.zionsoft.obadiah.biblereading.BibleReadingActivity.KEY_MESSAGE_TYPE";
     private static final String KEY_BOOK_INDEX = "net.zionsoft.obadiah.biblereading.BibleReadingActivity.KEY_BOOK_INDEX";
     private static final String KEY_CHAPTER_INDEX = "net.zionsoft.obadiah.biblereading.BibleReadingActivity.KEY_CHAPTER_INDEX";
@@ -143,6 +147,7 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
                     .commit();
         }
 
+        NfcHelper.registerNdefMessageCallback(this, this);
         appIndexingManager = new AppIndexingManager(this);
 
         initializeUi();
@@ -585,5 +590,11 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
 
         updateBookList();
         updateTitle();
+    }
+
+    @Override
+    public NdefMessage createNdefMessage(NfcEvent event) {
+        return NfcHelper.createNdefMessage(this, currentTranslation, currentBook, currentChapter,
+                versePagerAdapter.getCurrentVerse(versePager.getCurrentItem()));
     }
 }

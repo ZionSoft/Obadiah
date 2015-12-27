@@ -27,13 +27,15 @@ import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.domain.Bible;
 
 class UriHelper {
+    // format: /bible/<translation-short-name>/<book-index>/<chapter-index>/<verse-index>
+    private static final String VERSE_URI_TEMPLATE = "https://bible.zionsoft.net/bible/%s/%d/%d/%d";
+
     static void checkDeepLink(@NonNull BibleReadingPresenter bibleReadingPresenter, @NonNull Uri uri) {
         final String path = uri.getPath();
         if (TextUtils.isEmpty(path)) {
             return;
         }
 
-        // format: /bible/<translation-short-name>/<book-index>/<chapter-index>
         final String[] parts = path.split("/");
         if (parts.length < 5) {
             return;
@@ -62,5 +64,10 @@ class UriHelper {
         } catch (Exception e) {
             Crashlytics.getInstance().core.logException(e);
         }
+    }
+
+    @NonNull
+    static String createUri(String translation, int book, int chapter, int verse) {
+        return String.format(VERSE_URI_TEMPLATE, translation, book, chapter, verse);
     }
 }
