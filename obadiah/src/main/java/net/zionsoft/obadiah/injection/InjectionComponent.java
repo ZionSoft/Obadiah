@@ -30,7 +30,6 @@ import net.zionsoft.obadiah.search.SearchComponent;
 import net.zionsoft.obadiah.search.SearchModule;
 import net.zionsoft.obadiah.translations.TranslationManagementComponent;
 import net.zionsoft.obadiah.translations.TranslationManagementModule;
-import net.zionsoft.obadiah.biblereading.VersePagerAdapter;
 
 import javax.inject.Singleton;
 
@@ -39,11 +38,11 @@ import dagger.Component;
 @Singleton
 @Component(modules = BaseInjectionModule.class)
 public interface InjectionComponent {
-    public void inject(App app);
+    void inject(App app);
 
-    public void inject(SettingsActivity settingsActivity);
+    void inject(SettingsActivity settingsActivity);
 
-    public void inject(PushNotificationHandler pushNotificationHandler);
+    void inject(PushNotificationHandler pushNotificationHandler);
 
     BibleReadingComponent plus(BibleReadingModule bibleReadingModule);
 

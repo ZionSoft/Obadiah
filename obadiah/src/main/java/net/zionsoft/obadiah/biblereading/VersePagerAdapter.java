@@ -39,7 +39,7 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-public class VersePagerAdapter extends PagerAdapter implements VerseView {
+class VersePagerAdapter extends PagerAdapter implements VerseView {
     interface Listener {
         void onVersesSelectionChanged(boolean hasSelected);
     }
