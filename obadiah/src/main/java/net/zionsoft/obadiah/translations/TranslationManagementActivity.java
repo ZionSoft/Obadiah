@@ -358,7 +358,8 @@ public class TranslationManagementActivity extends BaseAppCompatActivity
             return;
         }
         if (translationViewHolder.isDownloaded()) {
-            translationManagementPresenter.saveCurrentTranslation(translationViewHolder.getTranslationInfo());
+            translationManagementPresenter.saveCurrentTranslation(
+                    translationViewHolder.getTranslationInfo().shortName);
 
             finish();
             overridePendingTransition(R.anim.fade_in, R.anim.slide_out_left_to_right);

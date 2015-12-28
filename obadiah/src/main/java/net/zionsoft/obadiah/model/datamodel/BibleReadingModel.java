@@ -31,7 +31,6 @@ import net.zionsoft.obadiah.model.database.BookNamesTableHelper;
 import net.zionsoft.obadiah.model.database.DatabaseHelper;
 import net.zionsoft.obadiah.model.database.TranslationHelper;
 import net.zionsoft.obadiah.model.database.TranslationsTableHelper;
-import net.zionsoft.obadiah.model.domain.TranslationInfo;
 import net.zionsoft.obadiah.model.domain.Verse;
 
 import java.util.Collections;
@@ -85,9 +84,9 @@ public class BibleReadingModel {
         return preferences.getString(Constants.PREF_KEY_LAST_READ_TRANSLATION, null);
     }
 
-    public void saveCurrentTranslation(TranslationInfo translation) {
-        preferences.edit().putString(Constants.PREF_KEY_LAST_READ_TRANSLATION, translation.shortName).apply();
-        Analytics.trackEvent(Analytics.CATEGORY_TRANSLATION, Analytics.TRANSLATION_ACTION_SELECTED, translation.shortName);
+    public void saveCurrentTranslation(String translation) {
+        preferences.edit().putString(Constants.PREF_KEY_LAST_READ_TRANSLATION, translation).apply();
+        Analytics.trackEvent(Analytics.CATEGORY_TRANSLATION, Analytics.TRANSLATION_ACTION_SELECTED, translation);
     }
 
     public boolean hasDownloadedTranslation() {
@@ -104,10 +103,6 @@ public class BibleReadingModel {
 
     public int loadCurrentVerse() {
         return preferences.getInt(Constants.PREF_KEY_LAST_READ_VERSE, 0);
-    }
-
-    public void setCurrentTranslation(String translation) {
-        preferences.edit().putString(Constants.PREF_KEY_LAST_READ_TRANSLATION, translation).apply();
     }
 
     public void setReadingProgress(int book, int chapter, int verse) {

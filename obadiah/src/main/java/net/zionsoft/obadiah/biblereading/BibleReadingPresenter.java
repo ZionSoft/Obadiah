@@ -57,8 +57,8 @@ class BibleReadingPresenter extends MVPPresenter<BibleReadingView> {
         return bibleReadingModel.loadCurrentTranslation();
     }
 
-    void setCurrentTranslation(String translation) {
-        bibleReadingModel.setCurrentTranslation(translation);
+    void saveCurrentTranslation(String translation) {
+        bibleReadingModel.saveCurrentTranslation(translation);
     }
 
     int loadCurrentBook() {

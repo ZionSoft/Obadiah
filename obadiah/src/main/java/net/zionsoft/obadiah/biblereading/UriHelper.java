@@ -58,7 +58,7 @@ class UriHelper {
                 return;
             }
 
-            bibleReadingPresenter.setCurrentTranslation(translationShortName);
+            bibleReadingPresenter.saveCurrentTranslation(translationShortName);
             bibleReadingPresenter.setReadingProgress(bookIndex, chapterIndex, 0);
             Analytics.trackEvent(Analytics.CATEGORY_DEEP_LINK, Analytics.DEEP_LINK_ACTION_OPENED);
         } catch (Exception e) {

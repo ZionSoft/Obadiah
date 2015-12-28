@@ -347,7 +347,7 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
             // the requested translation is not available, use the first one in the list
             selected = 0;
             currentTranslation = translations.get(0);
-            bibleReadingPresenter.setCurrentTranslation(currentTranslation);
+            bibleReadingPresenter.saveCurrentTranslation(currentTranslation);
         }
 
         // appends "More" to end of list that is to be shown in spinner
@@ -457,7 +457,7 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
 
         Analytics.trackEvent(Analytics.CATEGORY_TRANSLATION, Analytics.TRANSLATION_ACTION_SELECTED, selected);
         currentTranslation = selected;
-        bibleReadingPresenter.setCurrentTranslation(currentTranslation);
+        bibleReadingPresenter.saveCurrentTranslation(currentTranslation);
         bibleReadingPresenter.setReadingProgress(currentBook, currentChapter,
                 versePagerAdapter.getCurrentVerse(versePager.getCurrentItem()));
 

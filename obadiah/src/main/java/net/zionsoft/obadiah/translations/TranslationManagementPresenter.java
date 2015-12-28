@@ -71,7 +71,7 @@ class TranslationManagementPresenter extends MVPPresenter<TranslationManagementV
         return bibleReadingModel.loadCurrentTranslation();
     }
 
-    void saveCurrentTranslation(TranslationInfo translation) {
+    void saveCurrentTranslation(String translation) {
         bibleReadingModel.saveCurrentTranslation(translation);
     }
 
@@ -164,7 +164,7 @@ class TranslationManagementPresenter extends MVPPresenter<TranslationManagementV
                     @Override
                     public void onCompleted() {
                         if (TextUtils.isEmpty(bibleReadingModel.loadCurrentTranslation())) {
-                            bibleReadingModel.saveCurrentTranslation(translation);
+                            bibleReadingModel.saveCurrentTranslation(translation.shortName);
                         }
 
                         final TranslationManagementView v = getView();
