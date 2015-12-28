@@ -150,7 +150,9 @@ public class VersePagerAdapter extends PagerAdapter implements VerseView {
 
     @Override
     public void destroyItem(ViewGroup container, int position, Object object) {
-        for (Page page : pages) {
+        final int pageCount = pages.size();
+        for (int i = 0; i < pageCount; ++i) {
+            final Page page = pages.get(i);
             if (page.position == position) {
                 page.inUse = false;
                 container.removeView(page.rootView);
@@ -220,7 +222,9 @@ public class VersePagerAdapter extends PagerAdapter implements VerseView {
     }
 
     int getCurrentVerse(int chapter) {
-        for (Page page : pages) {
+        final int pageCount = pages.size();
+        for (int i = 0; i < pageCount; ++i) {
+            final Page page = pages.get(i);
             if (page.position == chapter) {
                 final LinearLayoutManager linearLayoutManager
                         = (LinearLayoutManager) page.verseList.getLayoutManager();
@@ -231,7 +235,9 @@ public class VersePagerAdapter extends PagerAdapter implements VerseView {
     }
 
     List<Verse> getSelectedVerses(int chapter) {
-        for (Page page : pages) {
+        final int pageCount = pages.size();
+        for (int i = 0; i < pageCount; ++i) {
+            final Page page = pages.get(i);
             if (page.position == chapter)
                 return page.verseListAdapter.getSelectedVerses();
         }
@@ -239,7 +245,9 @@ public class VersePagerAdapter extends PagerAdapter implements VerseView {
     }
 
     void deselectVerses() {
-        for (Page page : pages) {
+        final int pageCount = pages.size();
+        for (int i = 0; i < pageCount; ++i) {
+            final Page page = pages.get(i);
             page.verseListAdapter.deselectVerses();
             page.verseListAdapter.notifyDataSetChanged();
         }
