@@ -105,11 +105,11 @@ public class BibleReadingModel {
         return preferences.getInt(Constants.PREF_KEY_LAST_READ_VERSE, 0);
     }
 
-    public void setReadingProgress(int book, int chapter, int verse) {
+    public void setReadingProgress(Verse.Index index) {
         preferences.edit()
-                .putInt(Constants.PREF_KEY_LAST_READ_BOOK, book)
-                .putInt(Constants.PREF_KEY_LAST_READ_CHAPTER, chapter)
-                .putInt(Constants.PREF_KEY_LAST_READ_VERSE, verse)
+                .putInt(Constants.PREF_KEY_LAST_READ_BOOK, index.book)
+                .putInt(Constants.PREF_KEY_LAST_READ_CHAPTER, index.chapter)
+                .putInt(Constants.PREF_KEY_LAST_READ_VERSE, index.verse)
                 .apply();
     }
 

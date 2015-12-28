@@ -578,8 +578,8 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
         // format: <book name> <chapter index>:<verse index> <verse text>
         final StringBuilder text = new StringBuilder();
         for (Verse verse : verses) {
-            text.append(String.format("%S %d:%d %s\n", verse.bookName, verse.chapterIndex + 1,
-                    verse.verseIndex + 1, verse.verseText));
+            text.append(String.format("%S %d:%d %s\n", verse.bookName, verse.index.chapter + 1,
+                    verse.index.verse + 1, verse.verseText));
         }
         return text.toString();
     }

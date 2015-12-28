@@ -46,7 +46,7 @@ class SearchResultListAdapter extends RecyclerView.Adapter {
         @Override
         public void onClick(View v) {
             if (verse != null) {
-                searchPresenter.setReadingProgress(verse.bookIndex, verse.chapterIndex, verse.verseIndex);
+                searchPresenter.setReadingProgress(verse.index);
                 searchPresenter.openBibleReadingActivity();
             }
         }
@@ -80,7 +80,7 @@ class SearchResultListAdapter extends RecyclerView.Adapter {
 
         final Verse verse = getVerse(position);
         textView.setText(String.format("%s %d:%d\n%s", verse.bookName,
-                verse.chapterIndex + 1, verse.verseIndex + 1, verse.verseText));
+                verse.index.chapter + 1, verse.index.verse + 1, verse.verseText));
         ((ViewHolder) holder).verse = verse;
     }
 

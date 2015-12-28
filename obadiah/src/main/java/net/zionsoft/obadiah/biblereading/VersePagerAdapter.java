@@ -175,7 +175,7 @@ class VersePagerAdapter extends PagerAdapter implements VerseView {
 
     @Override
     public void onVersesLoaded(List<Verse> verses) {
-        final int chapter = verses.get(0).chapterIndex;
+        final int chapter = verses.get(0).index.chapter;
         final int pageCount = pages.size();
         for (int i = 0; i < pageCount; ++i) {
             final Page page = pages.get(i);

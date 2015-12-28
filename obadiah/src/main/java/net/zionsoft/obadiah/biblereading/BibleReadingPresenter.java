@@ -22,6 +22,7 @@ import android.support.annotation.Nullable;
 
 import net.zionsoft.obadiah.model.datamodel.BibleReadingModel;
 import net.zionsoft.obadiah.model.datamodel.ReadingProgressModel;
+import net.zionsoft.obadiah.model.domain.Verse;
 import net.zionsoft.obadiah.mvp.MVPPresenter;
 
 import java.util.List;
@@ -74,7 +75,7 @@ class BibleReadingPresenter extends MVPPresenter<BibleReadingView> {
     }
 
     void setReadingProgress(int book, int chapter, int verse) {
-        bibleReadingModel.setReadingProgress(book, chapter, verse);
+        bibleReadingModel.setReadingProgress(new Verse.Index(book, chapter, verse));
     }
 
     void trackReadingProgress(int book, int chapter) {
