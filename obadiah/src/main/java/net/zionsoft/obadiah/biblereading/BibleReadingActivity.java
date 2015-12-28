@@ -102,6 +102,9 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
     BibleReadingPresenter bibleReadingPresenter;
 
     @Inject
+    VersePresenter versePresenter;
+
+    @Inject
     Settings settings;
 
     @Bind(R.id.drawer_layout)
@@ -168,7 +171,18 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
         chapterList.setAdapter(chapterListAdapter);
         chapterList.setOnGroupClickListener(this);
 
-        versePagerAdapter = new VersePagerAdapter(this, this);
+        initializeAdapter();
+    }
+
+    private void initializeAdapter() {
+        if (versePager == null || versePresenter == null || settings == null || versePagerAdapter != null) {
+            // if the activity is recreated due to screen orientation change, the component fragment
+            // is called before the UI is initialized, i.e. onAttachFragment() is called inside
+            // super.onCreate()
+            // therefore, we try to do the initialization in both places
+            return;
+        }
+        versePagerAdapter = new VersePagerAdapter(this, versePresenter, settings, this, versePager.getOffscreenPageLimit());
         versePager.setAdapter(versePagerAdapter);
         versePager.addOnPageChangeListener(this);
     }
@@ -184,6 +198,7 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
             rootView.setKeepScreenOn(settings.keepScreenOn());
             rootView.setBackgroundColor(settings.getBackgroundColor());
 
+            initializeAdapter();
             checkDeepLink();
         }
     }
@@ -251,6 +266,7 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
     protected void onResumeFragments() {
         super.onResumeFragments();
         bibleReadingPresenter.takeView(this);
+        versePresenter.takeView(versePagerAdapter);
         loadTranslations();
     }
 
@@ -264,6 +280,7 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
     @Override
     protected void onPause() {
         bibleReadingPresenter.dropView();
+        versePresenter.dropView();
         super.onPause();
     }
 

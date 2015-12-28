@@ -17,25 +17,13 @@
 
 package net.zionsoft.obadiah.biblereading;
 
-import net.zionsoft.obadiah.injection.scopes.ActivityScope;
-import net.zionsoft.obadiah.model.datamodel.BibleReadingModel;
-import net.zionsoft.obadiah.model.datamodel.ReadingProgressModel;
+import net.zionsoft.obadiah.model.domain.Verse;
+import net.zionsoft.obadiah.mvp.MVPView;
 
-import dagger.Module;
-import dagger.Provides;
+import java.util.List;
 
-@Module
-public class BibleReadingModule {
-    @Provides
-    @ActivityScope
-    BibleReadingPresenter provideBibleReadingPresenter(BibleReadingModel bibleReadingModel,
-                                                       ReadingProgressModel readingProgressModel) {
-        return new BibleReadingPresenter(bibleReadingModel, readingProgressModel);
-    }
+interface VerseView extends MVPView {
+    void onVersesLoaded(List<Verse> verses);
 
-    @Provides
-    @ActivityScope
-    VersePresenter provideVersePresenter(BibleReadingModel bibleReadingModel) {
-        return new VersePresenter(bibleReadingModel);
-    }
+    void onVersesLoadFailed(String translation, int book, int chapter);
 }

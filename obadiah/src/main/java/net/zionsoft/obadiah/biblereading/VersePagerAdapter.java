@@ -26,27 +26,20 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import net.zionsoft.obadiah.App;
 import net.zionsoft.obadiah.R;
-import net.zionsoft.obadiah.model.domain.Bible;
 import net.zionsoft.obadiah.model.datamodel.Settings;
+import net.zionsoft.obadiah.model.domain.Bible;
 import net.zionsoft.obadiah.model.domain.Verse;
-import net.zionsoft.obadiah.model.datamodel.BibleReadingModel;
 import net.zionsoft.obadiah.ui.utils.AnimationHelper;
 import net.zionsoft.obadiah.ui.utils.DialogHelper;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
-
-import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 
-public class VersePagerAdapter extends PagerAdapter {
+public class VersePagerAdapter extends PagerAdapter implements VerseView {
     interface Listener {
         void onVersesSelectionChanged(boolean hasSelected);
     }
@@ -90,13 +83,9 @@ public class VersePagerAdapter extends PagerAdapter {
         }
     }
 
-    @Inject
-    BibleReadingModel bibleReadingModel;
-
-    @Inject
-    Settings settings;
-
     private final Context context;
+    private final VersePresenter versePresenter;
+    private final Settings settings;
     private final Listener listener;
     private final LayoutInflater inflater;
     private final List<Page> pages;
@@ -106,14 +95,16 @@ public class VersePagerAdapter extends PagerAdapter {
     private int currentChapter;
     private int currentVerse;
 
-    VersePagerAdapter(Context context, Listener listener) {
+    VersePagerAdapter(Context context, VersePresenter versePresenter, Settings settings,
+                      Listener listener, int offScreenPageLimit) {
         super();
-        App.getInjectionComponent(context).inject(this);
 
         this.context = context;
+        this.versePresenter = versePresenter;
+        this.settings = settings;
         this.listener = listener;
-        inflater = LayoutInflater.from(context);
-        pages = new LinkedList<>();
+        this.inflater = LayoutInflater.from(context);
+        this.pages = new ArrayList<>(1 + 2 * offScreenPageLimit);
     }
 
     @Override
@@ -148,55 +139,13 @@ public class VersePagerAdapter extends PagerAdapter {
 
         page.loadingSpinner.setVisibility(View.VISIBLE);
         page.verseList.setVisibility(View.GONE);
-        loadVerses(position, page);
+        loadVerses(position);
 
         return page;
     }
 
-    private void loadVerses(final int position, final Page page) {
-        bibleReadingModel.loadVerses(translationShortName, currentBook, position)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<List<Verse>>() {
-                    @Override
-                    public void onCompleted() {
-                        // do nothing
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        DialogHelper.showDialog(context, false, R.string.dialog_retry,
-                                new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        loadVerses(position, page);
-                                    }
-                                }, null);
-                    }
-
-                    @Override
-                    public void onNext(List<Verse> verses) {
-                        if (page.position == position) {
-                            AnimationHelper.fadeOut(page.loadingSpinner);
-                            AnimationHelper.fadeIn(page.verseList);
-
-                            page.verseListAdapter.setVerses(verses);
-                            page.verseListAdapter.notifyDataSetChanged();
-
-                            if (currentVerse > 0 && currentChapter == position) {
-                                page.verseList.post(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        page.verseList.scrollToPosition(currentVerse);
-                                        currentVerse = 0;
-                                    }
-                                });
-                            } else {
-                                page.verseList.scrollToPosition(0);
-                            }
-                        }
-                    }
-                });
+    private void loadVerses(int position) {
+        versePresenter.loadVerses(translationShortName, currentBook, position);
     }
 
     @Override
@@ -218,6 +167,46 @@ public class VersePagerAdapter extends PagerAdapter {
     @Override
     public int getItemPosition(Object object) {
         return POSITION_NONE;
+    }
+
+    @Override
+    public void onVersesLoaded(List<Verse> verses) {
+        final int chapter = verses.get(0).chapterIndex;
+        final int pageCount = pages.size();
+        for (int i = 0; i < pageCount; ++i) {
+            final Page page = pages.get(i);
+            if (page.position == chapter) {
+                AnimationHelper.fadeOut(page.loadingSpinner);
+                AnimationHelper.fadeIn(page.verseList);
+
+                page.verseListAdapter.setVerses(verses);
+                page.verseListAdapter.notifyDataSetChanged();
+
+                if (currentVerse > 0 && currentChapter == chapter) {
+                    page.verseList.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            page.verseList.scrollToPosition(currentVerse);
+                            currentVerse = 0;
+                        }
+                    });
+                } else {
+                    page.verseList.scrollToPosition(0);
+                }
+                break;
+            }
+        }
+    }
+
+    @Override
+    public void onVersesLoadFailed(String translation, int book, final int chapter) {
+        DialogHelper.showDialog(context, false, R.string.dialog_retry,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        loadVerses(chapter);
+                    }
+                }, null);
     }
 
     void setTranslationShortName(String translationShortName) {

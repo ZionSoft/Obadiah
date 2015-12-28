@@ -43,8 +43,6 @@ public interface InjectionComponent {
 
     public void inject(SettingsActivity settingsActivity);
 
-    public void inject(VersePagerAdapter versePagerAdapter);
-
     public void inject(PushNotificationHandler pushNotificationHandler);
 
     BibleReadingComponent plus(BibleReadingModule bibleReadingModule);
