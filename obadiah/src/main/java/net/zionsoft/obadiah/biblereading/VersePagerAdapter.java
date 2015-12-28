@@ -115,7 +115,9 @@ class VersePagerAdapter extends PagerAdapter implements VerseView {
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
         Page page = null;
-        for (Page p : pages) {
+        final int pageCount = pages.size();
+        for (int i = 0; i < pageCount; ++i) {
+            final Page p = pages.get(i);
             if (!p.inUse) {
                 page = p;
                 break;
