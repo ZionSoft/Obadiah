@@ -44,6 +44,37 @@ class BibleReadingPresenter extends MVPPresenter<BibleReadingView> {
     }
 
     @Override
+    protected void onViewTaken() {
+        super.onViewTaken();
+
+        getSubscription().add(bibleReadingModel.observeCurrentTranslation()
+                .subscribe(new Subscriber<String>() {
+                    @Override
+                    public void onCompleted() {
+                        // do nothing
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        // do nothing
+                    }
+
+                    @Override
+                    public void onNext(String translation) {
+                        loadBookNames(translation);
+                    }
+                }));
+    }
+
+    @NonNull
+    private CompositeSubscription getSubscription() {
+        if (subscription == null) {
+            subscription = new CompositeSubscription();
+        }
+        return subscription;
+    }
+
+    @Override
     protected void onViewDropped() {
         if (subscription != null) {
             subscription.unsubscribe();
@@ -86,54 +117,42 @@ class BibleReadingPresenter extends MVPPresenter<BibleReadingView> {
     }
 
     void loadTranslations() {
-        if (bibleReadingModel.hasDownloadedTranslation()) {
-            getSubscription().add(bibleReadingModel.loadTranslations()
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new Subscriber<List<String>>() {
-                        @Override
-                        public void onCompleted() {
-                            // do nothing
-                        }
+        getSubscription().add(bibleReadingModel.loadTranslations()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<List<String>>() {
+                    @Override
+                    public void onCompleted() {
+                        // do nothing
+                    }
 
-                        @Override
-                        public void onError(Throwable e) {
-                            final BibleReadingView v = getView();
-                            if (v != null) {
-                                v.onTranslationsLoadFailed();
+                    @Override
+                    public void onError(Throwable e) {
+                        final BibleReadingView v = getView();
+                        if (v != null) {
+                            v.onTranslationsLoadFailed();
+                        }
+                    }
+
+                    @Override
+                    public void onNext(List<String> translations) {
+                        final BibleReadingView v = getView();
+                        if (v != null) {
+                            if (translations.size() > 0) {
+                                v.onTranslationsLoaded(translations);
+                            } else {
+                                v.onNoTranslationAvailable();
                             }
                         }
-
-                        @Override
-                        public void onNext(List<String> translations) {
-                            final BibleReadingView v = getView();
-                            if (v != null) {
-                                if (translations.size() > 0) {
-                                    v.onTranslationsLoaded(translations);
-                                } else {
-                                    // Would it ever reach here?
-                                    v.onNoTranslationAvailable();
-                                }
-                            }
-                        }
-                    }));
-        } else {
-            final BibleReadingView v = getView();
-            if (v != null) {
-                v.onNoTranslationAvailable();
-            }
-        }
+                    }
+                }));
     }
 
-    @NonNull
-    private CompositeSubscription getSubscription() {
-        if (subscription == null) {
-            subscription = new CompositeSubscription();
-        }
-        return subscription;
+    void loadBookNamesForCurrentTranslation() {
+        loadBookNames(bibleReadingModel.loadCurrentTranslation());
     }
 
-    void loadBookNames(String translation) {
+    private void loadBookNames(String translation) {
         getSubscription().add(bibleReadingModel.loadBookNames(translation)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -155,10 +174,10 @@ class BibleReadingPresenter extends MVPPresenter<BibleReadingView> {
                     public void onNext(List<String> bookNames) {
                         final BibleReadingView v = getView();
                         if (v != null) {
+                            // if the list is empty, it means the requested translation is not
+                            // installed yet, do nothing
                             if (bookNames.size() > 0) {
                                 v.onBookNamesLoaded(bookNames);
-                            } else {
-                                v.onBookNamesLoadFailed();
                             }
                         }
                     }

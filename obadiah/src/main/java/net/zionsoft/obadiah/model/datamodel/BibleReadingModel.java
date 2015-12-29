@@ -21,7 +21,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.Nullable;
 import android.support.v4.util.LruCache;
-import android.text.TextUtils;
 
 import com.crashlytics.android.Crashlytics;
 
@@ -99,10 +98,6 @@ public class BibleReadingModel {
 
     public Observable<String> observeCurrentTranslation() {
         return currentTranslationUpdatesSubject.asObservable();
-    }
-
-    public boolean hasDownloadedTranslation() {
-        return !TextUtils.isEmpty(loadCurrentTranslation());
     }
 
     public int loadCurrentBook() {

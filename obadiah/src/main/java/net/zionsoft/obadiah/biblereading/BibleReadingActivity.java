@@ -265,13 +265,20 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
     @Override
     protected void onResumeFragments() {
         super.onResumeFragments();
+
         bibleReadingPresenter.takeView(this);
         versePresenter.takeView(versePagerAdapter);
+
         loadTranslations();
+        loadBookNames();
     }
 
     private void loadTranslations() {
         bibleReadingPresenter.loadTranslations();
+    }
+
+    private void loadBookNames() {
+        bibleReadingPresenter.loadBookNamesForCurrentTranslation();
     }
 
     @Override
@@ -326,12 +333,7 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
         translationsSpinner.setSelection(selected);
         translationsSpinner.setOnItemSelectedListener(this);
 
-        loadBookNames();
         loadVerses();
-    }
-
-    private void loadBookNames() {
-        bibleReadingPresenter.loadBookNames(currentTranslation);
     }
 
     private void loadVerses() {
@@ -414,8 +416,7 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
         final Adapter adapter = parent.getAdapter();
         if (position == adapter.getCount() - 1) {
             // last item ("More") selected, opens the translation management activity
-            AnimationHelper.slideIn(BibleReadingActivity.this,
-                    TranslationManagementActivity.newStartIntent(BibleReadingActivity.this));
+            AnimationHelper.slideIn(this, TranslationManagementActivity.newStartIntent(this));
             return;
         }
 
@@ -429,7 +430,6 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
         bibleReadingPresenter.saveReadingProgress(currentBook, currentChapter,
                 versePagerAdapter.getCurrentVerse(versePager.getCurrentItem()));
 
-        loadBookNames();
         loadVerses();
     }
 
