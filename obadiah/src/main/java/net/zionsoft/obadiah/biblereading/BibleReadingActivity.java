@@ -329,12 +329,15 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
         translationsSpinner.setSelection(selected);
         translationsSpinner.setOnItemSelectedListener(this);
 
-        loadTexts();
+        loadBookNames();
+        loadVerses();
     }
 
-    private void loadTexts() {
+    private void loadBookNames() {
         bibleReadingPresenter.loadBookNames(currentTranslation);
+    }
 
+    private void loadVerses() {
         versePagerAdapter.setTranslationShortName(currentTranslation);
         versePagerAdapter.setSelected(currentBook, currentChapter,
                 bibleReadingPresenter.loadCurrentVerse());
@@ -400,15 +403,13 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
 
     @Override
     public void onBookNamesLoadFailed() {
-        if (currentTranslation != null) {
-            DialogHelper.showDialog(this, false, R.string.dialog_retry,
-                    new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            loadTexts();
-                        }
-                    }, null);
-        }
+        DialogHelper.showDialog(this, false, R.string.dialog_retry,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        loadBookNames();
+                    }
+                }, null);
     }
 
     @Override
@@ -431,7 +432,8 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
         bibleReadingPresenter.saveReadingProgress(currentBook, currentChapter,
                 versePagerAdapter.getCurrentVerse(versePager.getCurrentItem()));
 
-        loadTexts();
+        loadBookNames();
+        loadVerses();
     }
 
     @Override
