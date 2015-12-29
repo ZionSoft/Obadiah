@@ -177,7 +177,7 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
     private void initializeAdapter() {
         if (versePager == null || versePresenter == null || settings == null || versePagerAdapter != null) {
             // if the activity is recreated due to screen orientation change, the component fragment
-            // is called before the UI is initialized, i.e. onAttachFragment() is called inside
+            // is attached before the UI is initialized, i.e. onAttachFragment() is called inside
             // super.onCreate()
             // therefore, we try to do the initialization in both places
             return;

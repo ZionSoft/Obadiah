@@ -142,7 +142,7 @@ public class SearchActivity extends BaseAppCompatActivity
     private void initializeAdapter() {
         if (searchResultList == null || settings == null || searchPresenter == null || searchResultAdapter != null) {
             // if the activity is recreated due to screen orientation change, the component fragment
-            // is called before the UI is initialized, i.e. onAttachFragment() is called inside
+            // is attached before the UI is initialized, i.e. onAttachFragment() is called inside
             // super.onCreate()
             // therefore, we try to do the initialization in both places
             return;
