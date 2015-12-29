@@ -211,24 +211,24 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
         final Intent startIntent = getIntent();
         final Uri uri = startIntent.getData();
         if (uri != null) {
-            UriHelper.checkDeepLink(bibleReadingPresenter, uri);
+            UriHelper.checkUri(bibleReadingPresenter, uri);
+            startIntent.setData(null);
         } else {
             final String messageType = startIntent.getStringExtra(KEY_MESSAGE_TYPE);
             if (TextUtils.isEmpty(messageType)) {
                 return;
             }
             final int bookIndex = startIntent.getIntExtra(KEY_BOOK_INDEX, -1);
-            if (bookIndex < 0) {
-                return;
-            }
             final int chapterIndex = startIntent.getIntExtra(KEY_CHAPTER_INDEX, -1);
-            if (chapterIndex < 0) {
-                return;
-            }
             final int verseIndex = startIntent.getIntExtra(KEY_VERSE_INDEX, -1);
-            if (verseIndex < 0) {
+            if (bookIndex < 0 || chapterIndex < 0 || verseIndex < 0) {
+                // should not happen, but just in case
                 return;
             }
+            startIntent.putExtra(KEY_MESSAGE_TYPE, (String) null)
+                    .putExtra(KEY_BOOK_INDEX, -1)
+                    .putExtra(KEY_CHAPTER_INDEX, -1)
+                    .putExtra(KEY_VERSE_INDEX, -1);
 
             bibleReadingPresenter.saveReadingProgress(bookIndex, chapterIndex, verseIndex);
 
@@ -312,6 +312,7 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
         }
         if (selected == translationsCount) {
             // the requested translation is not available, use the first one in the list
+            // this might happen if the user opens a URL for a translation that hasn't been installed yet
             selected = 0;
             currentTranslation = translations.get(0);
             bibleReadingPresenter.saveCurrentTranslation(currentTranslation);
