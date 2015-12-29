@@ -455,7 +455,6 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
             return;
         }
 
-        Analytics.trackEvent(Analytics.CATEGORY_TRANSLATION, Analytics.TRANSLATION_ACTION_SELECTED, selected);
         currentTranslation = selected;
         bibleReadingPresenter.saveCurrentTranslation(currentTranslation);
         bibleReadingPresenter.saveReadingProgress(currentBook, currentChapter,
