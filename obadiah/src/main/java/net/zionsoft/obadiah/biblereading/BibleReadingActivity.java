@@ -69,7 +69,7 @@ import butterknife.Bind;
 public class BibleReadingActivity extends BaseAppCompatActivity implements BibleReadingView,
         AdapterView.OnItemSelectedListener, ChapterListAdapter.OnChapterSelectedListener,
         ExpandableListView.OnGroupClickListener, VersePagerAdapter.Listener, ViewPager.OnPageChangeListener,
-        NfcAdapter.CreateNdefMessageCallback {
+        NfcAdapter.CreateNdefMessageCallback, Toolbar.OnMenuItemClickListener {
     private static final String KEY_MESSAGE_TYPE = "net.zionsoft.obadiah.biblereading.BibleReadingActivity.KEY_MESSAGE_TYPE";
     private static final String KEY_BOOK_INDEX = "net.zionsoft.obadiah.biblereading.BibleReadingActivity.KEY_BOOK_INDEX";
     private static final String KEY_CHAPTER_INDEX = "net.zionsoft.obadiah.biblereading.BibleReadingActivity.KEY_CHAPTER_INDEX";
@@ -162,7 +162,11 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
         rootView = getWindow().getDecorView();
 
         toolbar.setTitle(R.string.app_name);
-        setSupportActionBar(toolbar);
+        toolbar.setOnMenuItemClickListener(this);
+        toolbar.inflateMenu(R.menu.menu_bible_reading);
+
+        translationsSpinner = (Spinner) MenuItemCompat.getActionView(
+                toolbar.getMenu().findItem(R.id.action_translations));
 
         drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, 0, 0);
         drawerLayout.setDrawerListener(drawerToggle);
@@ -271,10 +275,7 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
     }
 
     private void loadTranslations() {
-        // we should wait until the menu is inflated
-        if (translationsSpinner != null) {
-            bibleReadingPresenter.loadTranslations();
-        }
+        bibleReadingPresenter.loadTranslations();
     }
 
     @Override
@@ -302,36 +303,6 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
         super.onConfigurationChanged(newConfig);
 
         drawerToggle.onConfigurationChanged(newConfig);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_bible_reading, menu);
-
-        translationsSpinner = (Spinner) MenuItemCompat.getActionView(menu.findItem(R.id.action_translations));
-        loadTranslations();
-
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (drawerToggle.onOptionsItemSelected(item))
-            return true;
-
-        switch (item.getItemId()) {
-            case R.id.action_search:
-                AnimationHelper.slideIn(this, SearchActivity.newStartReorderToTopIntent(this));
-                return true;
-            case R.id.action_reading_progress:
-                AnimationHelper.slideIn(this, ReadingProgressActivity.newStartIntent(this));
-                return true;
-            case R.id.action_settings:
-                AnimationHelper.slideIn(this, SettingsActivity.newStartIntent(this));
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
     }
 
     @Override
@@ -377,7 +348,7 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        bibleReadingPresenter.loadTranslations();
+                        loadTranslations();
                     }
                 }, null);
     }
@@ -614,5 +585,25 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
     public NdefMessage createNdefMessage(NfcEvent event) {
         return NfcHelper.createNdefMessage(this, currentTranslation, currentBook, currentChapter,
                 versePagerAdapter.getCurrentVerse(versePager.getCurrentItem()));
+    }
+
+    @Override
+    public boolean onMenuItemClick(MenuItem item) {
+        if (drawerToggle.onOptionsItemSelected(item))
+            return true;
+
+        switch (item.getItemId()) {
+            case R.id.action_search:
+                AnimationHelper.slideIn(this, SearchActivity.newStartReorderToTopIntent(this));
+                return true;
+            case R.id.action_reading_progress:
+                AnimationHelper.slideIn(this, ReadingProgressActivity.newStartIntent(this));
+                return true;
+            case R.id.action_settings:
+                AnimationHelper.slideIn(this, SettingsActivity.newStartIntent(this));
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 }
