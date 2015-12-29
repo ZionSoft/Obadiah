@@ -58,7 +58,7 @@ public class TranslationManagementActivity extends BaseAppCompatActivity
         implements TranslationManagementView, SwipeRefreshLayout.OnRefreshListener,
         RecyclerView.OnChildAttachStateChangeListener, View.OnClickListener,
         View.OnCreateContextMenuListener, Toolbar.OnMenuItemClickListener {
-    private static final String KEY_MESSAGE_TYPE = "net.zionsoft.obadiah.translations.TranslationManagementActivity.KEY_MESSAGE_TYPE";
+    private static final String KEY_MESSAGE_TYPE = "net.zionsoft.obadiah.KEY_MESSAGE_TYPE";
 
     public static Intent newStartReorderToTopIntent(Context context, String messageType) {
         final Intent startIntent = newStartIntent(context).putExtra(KEY_MESSAGE_TYPE, messageType);

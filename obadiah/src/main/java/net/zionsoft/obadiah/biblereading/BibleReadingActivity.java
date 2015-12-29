@@ -70,10 +70,10 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
         AdapterView.OnItemSelectedListener, ChapterListAdapter.OnChapterSelectedListener,
         ExpandableListView.OnGroupClickListener, VersePagerAdapter.Listener, ViewPager.OnPageChangeListener,
         NfcAdapter.CreateNdefMessageCallback, Toolbar.OnMenuItemClickListener {
-    private static final String KEY_MESSAGE_TYPE = "net.zionsoft.obadiah.biblereading.BibleReadingActivity.KEY_MESSAGE_TYPE";
-    private static final String KEY_BOOK_INDEX = "net.zionsoft.obadiah.biblereading.BibleReadingActivity.KEY_BOOK_INDEX";
-    private static final String KEY_CHAPTER_INDEX = "net.zionsoft.obadiah.biblereading.BibleReadingActivity.KEY_CHAPTER_INDEX";
-    private static final String KEY_VERSE_INDEX = "net.zionsoft.obadiah.biblereading.BibleReadingActivity.KEY_VERSE_INDEX";
+    private static final String KEY_MESSAGE_TYPE = "net.zionsoft.obadiah.KEY_MESSAGE_TYPE";
+    private static final String KEY_BOOK_INDEX = "net.zionsoft.obadiah.KEY_BOOK_INDEX";
+    private static final String KEY_CHAPTER_INDEX = "net.zionsoft.obadiah.KEY_CHAPTER_INDEX";
+    private static final String KEY_VERSE_INDEX = "net.zionsoft.obadiah.KEY_VERSE_INDEX";
 
     public static Intent newStartReorderToTopIntent(Context context, String messageType,
                                                     int book, int chapter, int verse) {
@@ -131,12 +131,8 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
 
     private VersePagerAdapter versePagerAdapter;
     private ActionMode actionMode;
-    @SuppressWarnings("deprecation")
-    private ClipboardManager clipboardManager;
 
     private ActionBarDrawerToggle drawerToggle;
-    private Spinner translationsSpinner;
-    private View rootView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -159,14 +155,9 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
     private void initializeUi() {
         setContentView(R.layout.activity_bible_reading);
 
-        rootView = getWindow().getDecorView();
-
         toolbar.setTitle(R.string.app_name);
         toolbar.setOnMenuItemClickListener(this);
         toolbar.inflateMenu(R.menu.menu_bible_reading);
-
-        translationsSpinner = (Spinner) MenuItemCompat.getActionView(
-                toolbar.getMenu().findItem(R.id.action_translations));
 
         drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, 0, 0);
         drawerLayout.setDrawerListener(drawerToggle);
@@ -252,6 +243,7 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
     }
 
     private void populateUi() {
+        final View rootView = getWindow().getDecorView();
         rootView.setKeepScreenOn(settings.keepScreenOn());
         rootView.setBackgroundColor(settings.getBackgroundColor());
 
@@ -329,6 +321,9 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
         final List<String> names = new ArrayList<>(translationsCount + 1);
         names.addAll(translations);
         names.add(getString(R.string.text_more_translations));
+
+        final Spinner translationsSpinner = (Spinner) MenuItemCompat.getActionView(
+                toolbar.getMenu().findItem(R.id.action_translations));
         translationsSpinner.setAdapter(new ArrayAdapter<>(this, R.layout.item_drop_down, names));
         translationsSpinner.setSelection(selected);
         translationsSpinner.setOnItemSelectedListener(this);
@@ -501,10 +496,8 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
                         case R.id.action_copy:
                             Analytics.trackEvent(Analytics.CATEGORY_UI, Analytics.UI_ACTION_BUTTON_CLICK, "copy");
 
-                            if (clipboardManager == null) {
-                                // noinspection deprecation
-                                clipboardManager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-                            }
+                            // noinspection deprecation
+                            final ClipboardManager clipboardManager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
                             clipboardManager.setText(buildText(versePagerAdapter.getSelectedVerses(versePager.getCurrentItem())));
                             Toast.makeText(BibleReadingActivity.this,
                                     R.string.toast_verses_copied, Toast.LENGTH_SHORT).show();

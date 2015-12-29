@@ -66,9 +66,9 @@ public class SearchActivity extends BaseAppCompatActivity
         return startIntent;
     }
 
-    private static final String KEY_CURRENT_TRANSLATION = "net.zionsoft.obadiah.search.SearchActivity.KEY_CURRENT_TRANSLATION";
-    private static final String KEY_QUERY = "net.zionsoft.obadiah.search.SearchActivity.KEY_QUERY";
-    private static final String KEY_VERSES = "net.zionsoft.obadiah.search.SearchActivity.KEY_VERSES";
+    private static final String KEY_CURRENT_TRANSLATION = "net.zionsoft.obadiah.KEY_CURRENT_TRANSLATION";
+    private static final String KEY_QUERY = "net.zionsoft.obadiah.KEY_QUERY";
+    private static final String KEY_VERSES = "net.zionsoft.obadiah.KEY_VERSES";
 
     @Inject
     SearchPresenter searchPresenter;
