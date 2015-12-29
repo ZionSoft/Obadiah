@@ -258,10 +258,6 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
         versePagerAdapter.notifyDataSetChanged();
 
         currentTranslation = bibleReadingPresenter.loadCurrentTranslation();
-        if (TextUtils.isEmpty(currentTranslation)) {
-            return;
-        }
-
         currentBook = bibleReadingPresenter.loadCurrentBook();
         currentChapter = bibleReadingPresenter.loadCurrentChapter();
     }
