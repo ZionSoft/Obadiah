@@ -46,7 +46,7 @@ class SearchResultListAdapter extends RecyclerView.Adapter {
         @Override
         public void onClick(View v) {
             if (verse != null) {
-                searchPresenter.setReadingProgress(verse.index);
+                searchPresenter.saveReadingProgress(verse.index);
                 searchPresenter.openBibleReadingActivity();
             }
         }

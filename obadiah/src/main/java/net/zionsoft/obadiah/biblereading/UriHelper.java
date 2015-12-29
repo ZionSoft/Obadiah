@@ -59,7 +59,7 @@ class UriHelper {
             }
 
             bibleReadingPresenter.saveCurrentTranslation(translationShortName);
-            bibleReadingPresenter.setReadingProgress(bookIndex, chapterIndex, 0);
+            bibleReadingPresenter.saveReadingProgress(bookIndex, chapterIndex, 0);
             Analytics.trackEvent(Analytics.CATEGORY_DEEP_LINK, Analytics.DEEP_LINK_ACTION_OPENED);
         } catch (Exception e) {
             Crashlytics.getInstance().core.logException(e);

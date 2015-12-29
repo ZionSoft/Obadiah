@@ -226,7 +226,7 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
                 return;
             }
 
-            bibleReadingPresenter.setReadingProgress(bookIndex, chapterIndex, verseIndex);
+            bibleReadingPresenter.saveReadingProgress(bookIndex, chapterIndex, verseIndex);
 
             Analytics.trackEvent(Analytics.CATEGORY_NOTIFICATION, Analytics.NOTIFICATION_ACTION_OPENED, messageType);
         }
@@ -286,7 +286,7 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
 
     @Override
     protected void onStop() {
-        bibleReadingPresenter.setReadingProgress(currentBook, currentChapter,
+        bibleReadingPresenter.saveReadingProgress(currentBook, currentChapter,
                 versePagerAdapter.getCurrentVerse(versePager.getCurrentItem()));
         appIndexingManager.onStop();
 
@@ -458,7 +458,7 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
         Analytics.trackEvent(Analytics.CATEGORY_TRANSLATION, Analytics.TRANSLATION_ACTION_SELECTED, selected);
         currentTranslation = selected;
         bibleReadingPresenter.saveCurrentTranslation(currentTranslation);
-        bibleReadingPresenter.setReadingProgress(currentBook, currentChapter,
+        bibleReadingPresenter.saveReadingProgress(currentBook, currentChapter,
                 versePagerAdapter.getCurrentVerse(versePager.getCurrentItem()));
 
         loadTexts();
@@ -477,6 +477,7 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
 
         currentBook = book;
         currentChapter = chapter;
+        bibleReadingPresenter.saveReadingProgress(currentBook, currentChapter, 0);
 
         chapterListAdapter.setSelected(currentBook, currentChapter);
         chapterListAdapter.notifyDataSetChanged();
@@ -600,6 +601,7 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
             return;
         }
         currentChapter = position;
+        bibleReadingPresenter.saveReadingProgress(currentBook, currentChapter, 0);
 
         if (actionMode != null) {
             actionMode.finish();

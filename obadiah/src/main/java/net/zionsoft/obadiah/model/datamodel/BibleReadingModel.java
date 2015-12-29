@@ -43,6 +43,8 @@ import rx.Observable;
 import rx.Subscriber;
 import rx.functions.Action1;
 import rx.functions.Func1;
+import rx.subjects.PublishSubject;
+import rx.subjects.SerializedSubject;
 
 @Singleton
 public class BibleReadingModel {
@@ -73,6 +75,11 @@ public class BibleReadingModel {
         }
     };
 
+    private final SerializedSubject<String, String> currentTranslationUpdatesSubject
+            = PublishSubject.<String>create().toSerialized();
+    private final SerializedSubject<Verse.Index, Verse.Index> currentReadingProgressUpdatesSubject
+            = PublishSubject.<Verse.Index>create().toSerialized();
+
     @Inject
     public BibleReadingModel(Context context, DatabaseHelper databaseHelper) {
         this.preferences = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
@@ -86,7 +93,12 @@ public class BibleReadingModel {
 
     public void saveCurrentTranslation(String translation) {
         preferences.edit().putString(Constants.PREF_KEY_LAST_READ_TRANSLATION, translation).apply();
+        currentTranslationUpdatesSubject.onNext(translation);
         Analytics.trackEvent(Analytics.CATEGORY_TRANSLATION, Analytics.TRANSLATION_ACTION_SELECTED, translation);
+    }
+
+    public Observable<String> observeCurrentTranslation() {
+        return currentTranslationUpdatesSubject.asObservable();
     }
 
     public boolean hasDownloadedTranslation() {
@@ -105,12 +117,17 @@ public class BibleReadingModel {
         return preferences.getInt(Constants.PREF_KEY_LAST_READ_VERSE, 0);
     }
 
-    public void setReadingProgress(Verse.Index index) {
+    public void saveReadingProgress(Verse.Index index) {
         preferences.edit()
                 .putInt(Constants.PREF_KEY_LAST_READ_BOOK, index.book)
                 .putInt(Constants.PREF_KEY_LAST_READ_CHAPTER, index.chapter)
                 .putInt(Constants.PREF_KEY_LAST_READ_VERSE, index.verse)
                 .apply();
+        currentReadingProgressUpdatesSubject.onNext(index);
+    }
+
+    public Observable<Verse.Index> observeCurrentReadingProgress() {
+        return currentReadingProgressUpdatesSubject.asObservable();
     }
 
     public Observable<List<String>> loadTranslations() {
