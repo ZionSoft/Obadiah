@@ -68,7 +68,7 @@ public class ChapterListView extends ExpandableListView implements ChapterView,
     }
 
     private void initialize(Context context) {
-        ChapterComponent.Initializer.init(App.getInjectionComponent(context)).inject(this);
+        BibleReadingChapterComponent.Initializer.init(App.getInjectionComponent(context)).inject(this);
 
         setBackgroundColor(Color.BLACK);
         setDivider(new ColorDrawable(ContextCompat.getColor(context, R.color.dark_gray)));

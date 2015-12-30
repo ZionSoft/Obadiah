@@ -29,7 +29,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -40,25 +39,17 @@ import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Adapter;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Spinner;
 import android.widget.Toast;
 
 import net.zionsoft.obadiah.R;
-import net.zionsoft.obadiah.misc.settings.SettingsActivity;
 import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.datamodel.Settings;
 import net.zionsoft.obadiah.model.domain.Verse;
-import net.zionsoft.obadiah.readingprogress.ReadingProgressActivity;
-import net.zionsoft.obadiah.search.SearchActivity;
 import net.zionsoft.obadiah.translations.TranslationManagementActivity;
 import net.zionsoft.obadiah.ui.utils.AnimationHelper;
 import net.zionsoft.obadiah.ui.utils.BaseAppCompatActivity;
 import net.zionsoft.obadiah.ui.utils.DialogHelper;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -66,8 +57,8 @@ import javax.inject.Inject;
 import butterknife.Bind;
 
 public class BibleReadingActivity extends BaseAppCompatActivity implements BibleReadingView,
-        AdapterView.OnItemSelectedListener, VersePagerAdapter.Listener, ViewPager.OnPageChangeListener,
-        NfcAdapter.CreateNdefMessageCallback, Toolbar.OnMenuItemClickListener {
+        VersePagerAdapter.Listener, ViewPager.OnPageChangeListener,
+        NfcAdapter.CreateNdefMessageCallback {
     private static final String KEY_MESSAGE_TYPE = "net.zionsoft.obadiah.KEY_MESSAGE_TYPE";
     private static final String KEY_BOOK_INDEX = "net.zionsoft.obadiah.KEY_BOOK_INDEX";
     private static final String KEY_CHAPTER_INDEX = "net.zionsoft.obadiah.KEY_CHAPTER_INDEX";
@@ -146,10 +137,6 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
 
     private void initializeUi() {
         setContentView(R.layout.activity_bible_reading);
-
-        toolbar.setTitle(R.string.app_name);
-        toolbar.setOnMenuItemClickListener(this);
-        toolbar.inflateMenu(R.menu.menu_bible_reading);
 
         drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, 0, 0);
         drawerLayout.setDrawerListener(drawerToggle);
@@ -290,32 +277,6 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
 
     @Override
     public void onTranslationsLoaded(List<String> translations) {
-        final int translationsCount = translations.size();
-        int selected;
-        for (selected = 0; selected < translationsCount; ++selected) {
-            if (translations.get(selected).equals(currentTranslation)) {
-                break;
-            }
-        }
-        if (selected == translationsCount) {
-            // the requested translation is not available, use the first one in the list
-            // this might happen if the user opens a URL for a translation that hasn't been installed yet
-            selected = 0;
-            currentTranslation = translations.get(0);
-            bibleReadingPresenter.saveCurrentTranslation(currentTranslation);
-        }
-
-        // appends "More" to end of list that is to be shown in spinner
-        final List<String> names = new ArrayList<>(translationsCount + 1);
-        names.addAll(translations);
-        names.add(getString(R.string.text_more_translations));
-
-        final Spinner translationsSpinner = (Spinner) MenuItemCompat.getActionView(
-                toolbar.getMenu().findItem(R.id.action_translations));
-        translationsSpinner.setAdapter(new ArrayAdapter<>(this, R.layout.item_drop_down, names));
-        translationsSpinner.setSelection(selected);
-        translationsSpinner.setOnItemSelectedListener(this);
-
         loadVerses();
     }
 
@@ -364,7 +325,6 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
 
     private void updateTitle() {
         final String bookName = bookNames.get(currentBook);
-        toolbar.setTitle(String.format("%s, %d", bookName, currentChapter + 1));
         appIndexingManager.onView(currentTranslation, bookName, currentBook, currentChapter);
 
         // TODO get an improved tracking algorithm, e.g. only consider as "read" if the user stays for a while
@@ -382,34 +342,15 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
                 }, null);
     }
 
-    @Override
-    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        final Adapter adapter = parent.getAdapter();
-        if (position == adapter.getCount() - 1) {
-            // last item ("More") selected, opens the translation management activity
-            AnimationHelper.slideIn(this, TranslationManagementActivity.newStartIntent(this));
-            return;
-        }
-
-        final String selected = (String) adapter.getItem(position);
-        if (selected == null || selected.equals(currentTranslation)) {
-            return;
-        }
-
-        currentTranslation = selected;
-        bibleReadingPresenter.saveCurrentTranslation(currentTranslation);
-        bibleReadingPresenter.saveReadingProgress(currentBook, currentChapter,
-                versePagerAdapter.getCurrentVerse(versePager.getCurrentItem()));
-
-        loadVerses();
-    }
-
-    @Override
-    public void onNothingSelected(AdapterView<?> parent) {
-        // do nothing
-    }
-
     // TODO
+//    @Override
+//    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+//        bibleReadingPresenter.saveReadingProgress(currentBook, currentChapter,
+//                versePagerAdapter.getCurrentVerse(versePager.getCurrentItem()));
+//
+//        loadVerses();
+//    }
+
 //    @Override
 //    public void onChapterSelected(int book, int chapter) {
 //        if (currentBook == book && currentChapter == chapter) {
@@ -531,25 +472,5 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
     public NdefMessage createNdefMessage(NfcEvent event) {
         return NfcHelper.createNdefMessage(this, currentTranslation, currentBook, currentChapter,
                 versePagerAdapter.getCurrentVerse(versePager.getCurrentItem()));
-    }
-
-    @Override
-    public boolean onMenuItemClick(MenuItem item) {
-        if (drawerToggle.onOptionsItemSelected(item))
-            return true;
-
-        switch (item.getItemId()) {
-            case R.id.action_search:
-                AnimationHelper.slideIn(this, SearchActivity.newStartReorderToTopIntent(this));
-                return true;
-            case R.id.action_reading_progress:
-                AnimationHelper.slideIn(this, ReadingProgressActivity.newStartIntent(this));
-                return true;
-            case R.id.action_settings:
-                AnimationHelper.slideIn(this, SettingsActivity.newStartIntent(this));
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
     }
 }

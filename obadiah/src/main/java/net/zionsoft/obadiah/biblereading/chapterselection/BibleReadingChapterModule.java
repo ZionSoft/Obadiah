@@ -24,7 +24,7 @@ import dagger.Module;
 import dagger.Provides;
 
 @Module
-public class ChapterModule {
+public class BibleReadingChapterModule {
     @Provides
     @ActivityScope
     ChapterPresenter provideChapterPresenter(BibleReadingModel bibleReadingModel) {

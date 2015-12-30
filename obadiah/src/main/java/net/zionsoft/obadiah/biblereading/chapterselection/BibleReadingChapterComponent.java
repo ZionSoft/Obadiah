@@ -24,13 +24,13 @@ import net.zionsoft.obadiah.injection.scopes.ActivityScope;
 import dagger.Subcomponent;
 
 @ActivityScope
-@Subcomponent(modules = ChapterModule.class)
-public interface ChapterComponent extends Component {
+@Subcomponent(modules = BibleReadingChapterModule.class)
+public interface BibleReadingChapterComponent extends Component {
     void inject(ChapterListView chapterListView);
 
     final class Initializer {
-        public static ChapterComponent init(InjectionComponent injectionComponent) {
-            return injectionComponent.plus(new ChapterModule());
+        public static BibleReadingChapterComponent init(InjectionComponent injectionComponent) {
+            return injectionComponent.plus(new BibleReadingChapterModule());
         }
     }
 }
