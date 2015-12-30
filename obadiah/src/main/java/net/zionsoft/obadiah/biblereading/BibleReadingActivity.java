@@ -46,7 +46,6 @@ import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.datamodel.Settings;
 import net.zionsoft.obadiah.model.domain.Verse;
 import net.zionsoft.obadiah.translations.TranslationManagementActivity;
-import net.zionsoft.obadiah.ui.utils.AnimationHelper;
 import net.zionsoft.obadiah.ui.utils.BaseAppCompatActivity;
 import net.zionsoft.obadiah.ui.utils.DialogHelper;
 
@@ -305,8 +304,7 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        AnimationHelper.slideIn(BibleReadingActivity.this,
-                                TranslationManagementActivity.newStartIntent(BibleReadingActivity.this));
+                        startActivity(TranslationManagementActivity.newStartIntent(BibleReadingActivity.this));
                     }
                 }, new DialogInterface.OnClickListener() {
                     @Override

@@ -18,19 +18,10 @@
 package net.zionsoft.obadiah.ui.utils;
 
 import android.animation.Animator;
-import android.app.Activity;
-import android.content.Intent;
 import android.view.View;
-
-import net.zionsoft.obadiah.R;
 
 public class AnimationHelper {
     private static final long ANIMATION_DURATION = 300L;
-
-    public static void slideIn(Activity activity, Intent startIntent) {
-        activity.startActivity(startIntent);
-        activity.overridePendingTransition(R.anim.slide_in_right_to_left, R.anim.fade_out);
-    }
 
     public static void fadeIn(View view) {
         view.setAlpha(0.0F);

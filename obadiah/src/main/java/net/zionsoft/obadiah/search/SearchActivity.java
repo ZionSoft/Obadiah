@@ -293,6 +293,6 @@ public class SearchActivity extends BaseAppCompatActivity
 
     @Override
     public void openBibleReadingActivity() {
-        AnimationHelper.slideIn(this, BibleReadingActivity.newStartReorderToTopIntent(this));
+        startActivity(BibleReadingActivity.newStartReorderToTopIntent(this));
     }
 }
