@@ -43,7 +43,6 @@ import android.view.View;
 import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.ExpandableListView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -67,8 +66,7 @@ import javax.inject.Inject;
 import butterknife.Bind;
 
 public class BibleReadingActivity extends BaseAppCompatActivity implements BibleReadingView,
-        AdapterView.OnItemSelectedListener, ChapterListAdapter.OnChapterSelectedListener,
-        ExpandableListView.OnGroupClickListener, VersePagerAdapter.Listener, ViewPager.OnPageChangeListener,
+        AdapterView.OnItemSelectedListener, VersePagerAdapter.Listener, ViewPager.OnPageChangeListener,
         NfcAdapter.CreateNdefMessageCallback, Toolbar.OnMenuItemClickListener {
     private static final String KEY_MESSAGE_TYPE = "net.zionsoft.obadiah.KEY_MESSAGE_TYPE";
     private static final String KEY_BOOK_INDEX = "net.zionsoft.obadiah.KEY_BOOK_INDEX";
@@ -113,9 +111,6 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
     @Bind(R.id.toolbar)
     Toolbar toolbar;
 
-    @Bind(R.id.chapter_list)
-    ExpandableListView chapterList;
-
     @Bind(R.id.verse_pager)
     ViewPager versePager;
 
@@ -125,9 +120,6 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
     private List<String> bookNames;
     private int currentBook;
     private int currentChapter;
-
-    private ChapterListAdapter chapterListAdapter;
-    private int lastExpandedGroup;
 
     private VersePagerAdapter versePagerAdapter;
     private ActionMode actionMode;
@@ -161,10 +153,6 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
 
         drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, 0, 0);
         drawerLayout.setDrawerListener(drawerToggle);
-
-        chapterListAdapter = new ChapterListAdapter(this, this);
-        chapterList.setAdapter(chapterListAdapter);
-        chapterList.setOnGroupClickListener(this);
 
         initializeAdapter();
     }
@@ -372,9 +360,6 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
     public void onBookNamesLoaded(List<String> bookNames) {
         this.bookNames = bookNames;
         updateTitle();
-
-        chapterListAdapter.setBookNames(bookNames);
-        updateBookList();
     }
 
     private void updateTitle() {
@@ -384,15 +369,6 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
 
         // TODO get an improved tracking algorithm, e.g. only consider as "read" if the user stays for a while
         bibleReadingPresenter.trackReadingProgress(currentBook, currentChapter);
-    }
-
-    private void updateBookList() {
-        chapterListAdapter.setSelected(currentBook, currentChapter);
-        chapterListAdapter.notifyDataSetChanged();
-
-        lastExpandedGroup = currentBook;
-        chapterList.expandGroup(currentBook);
-        chapterList.setSelectedGroup(currentBook);
     }
 
     @Override
@@ -433,43 +409,22 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
         // do nothing
     }
 
-    @Override
-    public void onChapterSelected(int book, int chapter) {
-        if (currentBook == book && currentChapter == chapter) {
-            return;
-        }
-
-        currentBook = book;
-        currentChapter = chapter;
-        bibleReadingPresenter.saveReadingProgress(currentBook, currentChapter, 0);
-
-        chapterListAdapter.setSelected(currentBook, currentChapter);
-        chapterListAdapter.notifyDataSetChanged();
-
-        drawerLayout.closeDrawers();
-
-        versePagerAdapter.setSelected(currentBook, currentChapter, 0);
-        versePagerAdapter.notifyDataSetChanged();
-
-        versePager.setCurrentItem(currentChapter, true);
-
-        updateTitle();
-    }
-
-    @Override
-    public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
-        parent.smoothScrollToPosition(groupPosition);
-        if (parent.isGroupExpanded(groupPosition)) {
-            parent.collapseGroup(groupPosition);
-        } else {
-            parent.expandGroup(groupPosition);
-            if (lastExpandedGroup != groupPosition) {
-                parent.collapseGroup(lastExpandedGroup);
-                lastExpandedGroup = groupPosition;
-            }
-        }
-        return true;
-    }
+    // TODO
+//    @Override
+//    public void onChapterSelected(int book, int chapter) {
+//        if (currentBook == book && currentChapter == chapter) {
+//            return;
+//        }
+//
+//        drawerLayout.closeDrawers();
+//
+//        versePagerAdapter.setSelected(currentBook, currentChapter, 0);
+//        versePagerAdapter.notifyDataSetChanged();
+//
+//        versePager.setCurrentItem(currentChapter, true);
+//
+//        updateTitle();
+//    }
 
     @Override
     public void onVersesSelectionChanged(boolean hasSelected) {
@@ -569,7 +524,6 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
             actionMode.finish();
         }
 
-        updateBookList();
         updateTitle();
     }
 

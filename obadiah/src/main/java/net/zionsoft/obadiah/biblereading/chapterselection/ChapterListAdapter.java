@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.biblereading;
+package net.zionsoft.obadiah.biblereading.chapterselection;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -31,7 +31,7 @@ import net.zionsoft.obadiah.model.domain.Bible;
 import java.util.List;
 
 class ChapterListAdapter extends BaseExpandableListAdapter implements View.OnClickListener {
-    interface OnChapterSelectedListener {
+    interface Listener {
         void onChapterSelected(int book, int chapter);
     }
 
@@ -46,18 +46,18 @@ class ChapterListAdapter extends BaseExpandableListAdapter implements View.OnCli
 
     private static final int ROW_CHILD_COUNT = 5;
 
-    private final OnChapterSelectedListener listener;
     private final LayoutInflater inflater;
+    private final Listener listener;
 
     private List<String> bookNames;
     private int currentBook;
     private int currentChapter;
 
-    ChapterListAdapter(Context context, OnChapterSelectedListener listener) {
+    ChapterListAdapter(Context context, Listener listener) {
         super();
 
+        this.inflater = LayoutInflater.from(context);
         this.listener = listener;
-        inflater = LayoutInflater.from(context);
     }
 
     @Override
@@ -156,11 +156,11 @@ class ChapterListAdapter extends BaseExpandableListAdapter implements View.OnCli
         return true;
     }
 
-    public void setBookNames(List<String> bookNames) {
+    void setBookNames(List<String> bookNames) {
         this.bookNames = bookNames;
     }
 
-    public void setSelected(int currentBook, int currentChapter) {
+    void setCurrentChapter(int currentBook, int currentChapter) {
         this.currentBook = currentBook;
         this.currentChapter = currentChapter;
     }
@@ -168,6 +168,8 @@ class ChapterListAdapter extends BaseExpandableListAdapter implements View.OnCli
     @Override
     public void onClick(View v) {
         final ChapterTag chapterTag = (ChapterTag) v.getTag();
-        listener.onChapterSelected(chapterTag.book, chapterTag.chapter);
+        if (currentBook != chapterTag.book || currentChapter != chapterTag.chapter) {
+            listener.onChapterSelected(chapterTag.book, chapterTag.chapter);
+        }
     }
 }

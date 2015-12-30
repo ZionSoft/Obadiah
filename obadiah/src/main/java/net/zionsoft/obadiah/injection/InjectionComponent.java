@@ -19,6 +19,8 @@ package net.zionsoft.obadiah.injection;
 
 import net.zionsoft.obadiah.App;
 import net.zionsoft.obadiah.biblereading.BibleReadingComponent;
+import net.zionsoft.obadiah.biblereading.chapterselection.ChapterComponent;
+import net.zionsoft.obadiah.biblereading.chapterselection.ChapterModule;
 import net.zionsoft.obadiah.readingprogress.ReadingProgressComponent;
 import net.zionsoft.obadiah.biblereading.BibleReadingModule;
 import net.zionsoft.obadiah.readingprogress.ReadingProgressModule;
@@ -45,6 +47,8 @@ public interface InjectionComponent {
     void inject(PushNotificationHandler pushNotificationHandler);
 
     BibleReadingComponent plus(BibleReadingModule bibleReadingModule);
+
+    ChapterComponent plus(ChapterModule chapterModule);
 
     OpenSourceLicenseComponent plus(OpenSourceLicenseModule openSourceLicenseModule);
 
