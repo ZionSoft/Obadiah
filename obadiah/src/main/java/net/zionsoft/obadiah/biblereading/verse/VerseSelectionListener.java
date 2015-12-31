@@ -15,21 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.biblereading;
+package net.zionsoft.obadiah.biblereading.verse;
 
-import net.zionsoft.obadiah.injection.scopes.ActivityScope;
-import net.zionsoft.obadiah.model.datamodel.BibleReadingModel;
-import net.zionsoft.obadiah.model.datamodel.ReadingProgressModel;
-
-import dagger.Module;
-import dagger.Provides;
-
-@Module
-public class BibleReadingModule {
-    @Provides
-    @ActivityScope
-    BibleReadingPresenter provideBibleReadingPresenter(BibleReadingModel bibleReadingModel,
-                                                       ReadingProgressModel readingProgressModel) {
-        return new BibleReadingPresenter(bibleReadingModel, readingProgressModel);
-    }
+public interface VerseSelectionListener {
+    void onVersesSelectionChanged(boolean hasSelected);
 }

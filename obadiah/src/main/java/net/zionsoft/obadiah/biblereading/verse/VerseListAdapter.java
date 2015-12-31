@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.biblereading;
+package net.zionsoft.obadiah.biblereading.verse;
 
 import android.content.Context;
 import android.content.res.Resources;

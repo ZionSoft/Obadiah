@@ -27,9 +27,10 @@ import android.nfc.NfcAdapter;
 import android.nfc.NfcEvent;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.view.ViewPager;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.view.ActionMode;
@@ -42,6 +43,8 @@ import android.view.View;
 import android.widget.Toast;
 
 import net.zionsoft.obadiah.R;
+import net.zionsoft.obadiah.biblereading.verse.VerseSelectionListener;
+import net.zionsoft.obadiah.biblereading.verse.VerseViewPager;
 import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.datamodel.Settings;
 import net.zionsoft.obadiah.model.domain.Verse;
@@ -56,8 +59,7 @@ import javax.inject.Inject;
 import butterknife.Bind;
 
 public class BibleReadingActivity extends BaseAppCompatActivity implements BibleReadingView,
-        VersePagerAdapter.Listener, ViewPager.OnPageChangeListener,
-        NfcAdapter.CreateNdefMessageCallback {
+        VerseSelectionListener, ActionMode.Callback, NfcAdapter.CreateNdefMessageCallback {
     private static final String KEY_MESSAGE_TYPE = "net.zionsoft.obadiah.KEY_MESSAGE_TYPE";
     private static final String KEY_BOOK_INDEX = "net.zionsoft.obadiah.KEY_BOOK_INDEX";
     private static final String KEY_CHAPTER_INDEX = "net.zionsoft.obadiah.KEY_CHAPTER_INDEX";
@@ -90,9 +92,6 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
     BibleReadingPresenter bibleReadingPresenter;
 
     @Inject
-    VersePresenter versePresenter;
-
-    @Inject
     Settings settings;
 
     @Bind(R.id.drawer_layout)
@@ -102,7 +101,7 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
     Toolbar toolbar;
 
     @Bind(R.id.verse_pager)
-    ViewPager versePager;
+    VerseViewPager versePager;
 
     private AppIndexingManager appIndexingManager;
 
@@ -110,8 +109,8 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
     private List<String> bookNames;
     private int currentBook;
     private int currentChapter;
+    private int currentVerse;
 
-    private VersePagerAdapter versePagerAdapter;
     private ActionMode actionMode;
 
     private ActionBarDrawerToggle drawerToggle;
@@ -140,20 +139,7 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
         drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, 0, 0);
         drawerLayout.setDrawerListener(drawerToggle);
 
-        initializeAdapter();
-    }
-
-    private void initializeAdapter() {
-        if (versePager == null || versePresenter == null || settings == null || versePagerAdapter != null) {
-            // if the activity is recreated due to screen orientation change, the component fragment
-            // is attached before the UI is initialized, i.e. onAttachFragment() is called inside
-            // super.onCreate()
-            // therefore, we try to do the initialization in both places
-            return;
-        }
-        versePagerAdapter = new VersePagerAdapter(this, versePresenter, settings, this, versePager.getOffscreenPageLimit());
-        versePager.setAdapter(versePagerAdapter);
-        versePager.addOnPageChangeListener(this);
+        versePager.setVerseSelectionListener(this);
     }
 
     @Override
@@ -167,7 +153,6 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
             rootView.setKeepScreenOn(settings.keepScreenOn());
             rootView.setBackgroundColor(settings.getBackgroundColor());
 
-            initializeAdapter();
             checkDeepLink();
         }
     }
@@ -221,7 +206,7 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
         rootView.setKeepScreenOn(settings.keepScreenOn());
         rootView.setBackgroundColor(settings.getBackgroundColor());
 
-        versePagerAdapter.notifyDataSetChanged();
+        versePager.getAdapter().notifyDataSetChanged();
 
         currentTranslation = bibleReadingPresenter.loadCurrentTranslation();
         currentBook = bibleReadingPresenter.loadCurrentBook();
@@ -233,14 +218,24 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
         super.onResumeFragments();
 
         bibleReadingPresenter.takeView(this);
-        versePresenter.takeView(versePagerAdapter);
+        if (TextUtils.isEmpty(bibleReadingPresenter.loadCurrentTranslation())) {
+            DialogHelper.showDialog(this, false, R.string.dialog_no_translation,
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            startActivity(TranslationManagementActivity.newStartIntent(BibleReadingActivity.this));
+                        }
+                    }, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            finish();
+                        }
+                    }
+            );
+            return;
+        }
 
-        loadTranslations();
         loadBookNames();
-    }
-
-    private void loadTranslations() {
-        bibleReadingPresenter.loadTranslations();
     }
 
     private void loadBookNames() {
@@ -250,14 +245,11 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
     @Override
     protected void onPause() {
         bibleReadingPresenter.dropView();
-        versePresenter.dropView();
         super.onPause();
     }
 
     @Override
     protected void onStop() {
-        bibleReadingPresenter.saveReadingProgress(currentBook, currentChapter,
-                versePagerAdapter.getCurrentVerse(versePager.getCurrentItem()));
         appIndexingManager.onStop();
 
         if (actionMode != null) {
@@ -270,60 +262,22 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-
         drawerToggle.onConfigurationChanged(newConfig);
-    }
-
-    @Override
-    public void onTranslationsLoaded(List<String> translations) {
-        loadVerses();
-    }
-
-    private void loadVerses() {
-        versePagerAdapter.setTranslationShortName(currentTranslation);
-        versePagerAdapter.setSelected(currentBook, currentChapter,
-                bibleReadingPresenter.loadCurrentVerse());
-        versePagerAdapter.notifyDataSetChanged();
-        versePager.setCurrentItem(currentChapter, true);
-    }
-
-    @Override
-    public void onTranslationsLoadFailed() {
-        DialogHelper.showDialog(this, false, R.string.dialog_retry,
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        loadTranslations();
-                    }
-                }, null);
-    }
-
-    @Override
-    public void onNoTranslationAvailable() {
-        DialogHelper.showDialog(this, false, R.string.dialog_no_translation,
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        startActivity(TranslationManagementActivity.newStartIntent(BibleReadingActivity.this));
-                    }
-                }, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        finish();
-                    }
-                }
-        );
     }
 
     @Override
     public void onBookNamesLoaded(List<String> bookNames) {
         this.bookNames = bookNames;
-        updateTitle();
+        trackingReadingProgress();
     }
 
-    private void updateTitle() {
-        final String bookName = bookNames.get(currentBook);
-        appIndexingManager.onView(currentTranslation, bookName, currentBook, currentChapter);
+    private void trackingReadingProgress() {
+        if (bookNames == null) {
+            // book names haven't been loaded yet, do nothing
+            return;
+        }
+
+        appIndexingManager.onView(currentTranslation, bookNames.get(currentBook), currentBook, currentChapter);
 
         // TODO get an improved tracking algorithm, e.g. only consider as "read" if the user stays for a while
         bibleReadingPresenter.trackReadingProgress(currentBook, currentChapter);
@@ -340,30 +294,28 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
                 }, null);
     }
 
-    // TODO
-//    @Override
-//    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-//        bibleReadingPresenter.saveReadingProgress(currentBook, currentChapter,
-//                versePagerAdapter.getCurrentVerse(versePager.getCurrentItem()));
-//
-//        loadVerses();
-//    }
+    @Override
+    public void onTranslationUpdated(String translation) {
+        currentTranslation = translation;
+    }
 
-//    @Override
-//    public void onChapterSelected(int book, int chapter) {
-//        if (currentBook == book && currentChapter == chapter) {
-//            return;
-//        }
-//
-//        drawerLayout.closeDrawers();
-//
-//        versePagerAdapter.setSelected(currentBook, currentChapter, 0);
-//        versePagerAdapter.notifyDataSetChanged();
-//
-//        versePager.setCurrentItem(currentChapter, true);
-//
-//        updateTitle();
-//    }
+    @Override
+    public void onReadingProgressUpdated(Verse.Index index) {
+        if (currentBook == index.book && currentChapter == index.chapter) {
+            return;
+        }
+        currentBook = index.book;
+        currentChapter = index.chapter;
+        currentVerse = index.verse;
+
+        trackingReadingProgress();
+
+        drawerLayout.closeDrawer(GravityCompat.START);
+
+        if (actionMode != null) {
+            actionMode.finish();
+        }
+    }
 
     @Override
     public void onVersesSelectionChanged(boolean hasSelected) {
@@ -371,56 +323,7 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
             if (actionMode != null) {
                 return;
             }
-
-            actionMode = startSupportActionMode(new ActionMode.Callback() {
-                @Override
-                public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
-                    actionMode.getMenuInflater().inflate(R.menu.menu_text_selection_context, menu);
-                    return true;
-                }
-
-                @Override
-                public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
-                    return false;
-                }
-
-                @Override
-                public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
-                    switch (menuItem.getItemId()) {
-                        case R.id.action_copy:
-                            Analytics.trackEvent(Analytics.CATEGORY_UI, Analytics.UI_ACTION_BUTTON_CLICK, "copy");
-
-                            // noinspection deprecation
-                            final ClipboardManager clipboardManager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-                            clipboardManager.setText(buildText(versePagerAdapter.getSelectedVerses(versePager.getCurrentItem())));
-                            Toast.makeText(BibleReadingActivity.this,
-                                    R.string.toast_verses_copied, Toast.LENGTH_SHORT).show();
-                            actionMode.finish();
-                            return true;
-                        case R.id.action_share:
-                            Analytics.trackEvent(Analytics.CATEGORY_UI, Analytics.UI_ACTION_BUTTON_CLICK, "share");
-
-                            startActivity(Intent.createChooser(new Intent().setAction(Intent.ACTION_SEND).setType("text/plain")
-                                            .putExtra(Intent.EXTRA_TEXT,
-                                                    buildText(versePagerAdapter.getSelectedVerses(versePager.getCurrentItem()))),
-                                    getResources().getText(R.string.text_share_with)
-                            ));
-                            actionMode.finish();
-                            return true;
-                        default:
-                            return false;
-                    }
-                }
-
-                @Override
-                public void onDestroyActionMode(ActionMode actionMode) {
-                    if (actionMode != BibleReadingActivity.this.actionMode) {
-                        return;
-                    }
-                    versePagerAdapter.deselectVerses();
-                    BibleReadingActivity.this.actionMode = null;
-                }
-            });
+            actionMode = startSupportActionMode(this);
         } else {
             if (actionMode != null) {
                 actionMode.finish();
@@ -428,9 +331,47 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
         }
     }
 
-    private static String buildText(List<Verse> verses) {
-        if (verses == null || verses.size() == 0)
+    @Override
+    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+        mode.getMenuInflater().inflate(R.menu.menu_text_selection_context, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+        return false;
+    }
+
+    @Override
+    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_copy:
+                Analytics.trackEvent(Analytics.CATEGORY_UI, Analytics.UI_ACTION_BUTTON_CLICK, "copy");
+
+                // noinspection deprecation
+                final ClipboardManager clipboardManager = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+                clipboardManager.setText(buildText(versePager.getSelectedVerses()));
+                Toast.makeText(this, R.string.toast_verses_copied, Toast.LENGTH_SHORT).show();
+                mode.finish();
+                return true;
+            case R.id.action_share:
+                Analytics.trackEvent(Analytics.CATEGORY_UI, Analytics.UI_ACTION_BUTTON_CLICK, "share");
+
+                startActivity(Intent.createChooser(new Intent()
+                                .setAction(Intent.ACTION_SEND).setType("text/plain")
+                                .putExtra(Intent.EXTRA_TEXT, buildText(versePager.getSelectedVerses())),
+                        getResources().getText(R.string.text_share_with)));
+                mode.finish();
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    private static String buildText(@Nullable List<Verse> verses) {
+        if (verses == null || verses.size() == 0) {
             return null;
+        }
 
         // format: <book name> <chapter index>:<verse index> <verse text>
         final StringBuilder text = new StringBuilder();
@@ -442,33 +383,13 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
     }
 
     @Override
-    public void onPageScrollStateChanged(int state) {
-        // do nothing
-    }
-
-    @Override
-    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-        // do nothing
-    }
-
-    @Override
-    public void onPageSelected(int position) {
-        if (currentChapter == position) {
-            return;
-        }
-        currentChapter = position;
-        bibleReadingPresenter.saveReadingProgress(currentBook, currentChapter, 0);
-
-        if (actionMode != null) {
-            actionMode.finish();
-        }
-
-        updateTitle();
+    public void onDestroyActionMode(ActionMode mode) {
+        versePager.deselectVerses();
+        this.actionMode = null;
     }
 
     @Override
     public NdefMessage createNdefMessage(NfcEvent event) {
-        return NfcHelper.createNdefMessage(this, currentTranslation, currentBook, currentChapter,
-                versePagerAdapter.getCurrentVerse(versePager.getCurrentItem()));
+        return NfcHelper.createNdefMessage(this, currentTranslation, currentBook, currentChapter, currentVerse);
     }
 }

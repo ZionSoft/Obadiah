@@ -15,13 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.biblereading;
+package net.zionsoft.obadiah.biblereading.verse;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.support.annotation.Nullable;
 import android.support.v4.view.PagerAdapter;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,17 +42,16 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 
 class VersePagerAdapter extends PagerAdapter implements VerseView {
-    interface Listener {
-        void onVersesSelectionChanged(boolean hasSelected);
-    }
-
     static class Page implements RecyclerView.OnChildAttachStateChangeListener, View.OnClickListener {
-        boolean inUse;
-        int position;
-        Listener listener;
-        VerseListAdapter verseListAdapter;
+        private final VersePresenter versePresenter;
+        private final VerseSelectionListener listener;
+        private final VerseListAdapter verseListAdapter;
 
-        View rootView;
+        private boolean inUse;
+        private int book;
+        private int chapter;
+
+        private final View rootView;
 
         @Bind(R.id.loading_spinner)
         View loadingSpinner;
@@ -58,9 +59,32 @@ class VersePagerAdapter extends PagerAdapter implements VerseView {
         @Bind(R.id.verse_list)
         RecyclerView verseList;
 
-        Page(View view) {
-            ButterKnife.bind(this, view);
-            rootView = view;
+        private Page(Context context, Settings settings, final VersePresenter versePresenter,
+                     VerseSelectionListener listener, View rootView) {
+            this.versePresenter = versePresenter;
+            this.listener = listener;
+            this.rootView = rootView;
+            ButterKnife.bind(this, rootView);
+
+            verseList.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false));
+
+            verseListAdapter = new VerseListAdapter(context, settings);
+            verseList.setAdapter(verseListAdapter);
+
+            verseList.addOnChildAttachStateChangeListener(this);
+            verseList.addOnScrollListener(new RecyclerView.OnScrollListener() {
+                @Override
+                public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                    super.onScrollStateChanged(recyclerView, newState);
+
+                    if (inUse && newState == RecyclerView.SCROLL_STATE_IDLE) {
+                        final LinearLayoutManager linearLayoutManager
+                                = (LinearLayoutManager) recyclerView.getLayoutManager();
+                        versePresenter.saveReadingProgress(book, chapter,
+                                linearLayoutManager.findFirstVisibleItemPosition());
+                    }
+                }
+            });
         }
 
         @Override
@@ -84,32 +108,35 @@ class VersePagerAdapter extends PagerAdapter implements VerseView {
     }
 
     private final Context context;
-    private final VersePresenter versePresenter;
     private final Settings settings;
-    private final Listener listener;
+    private final VersePresenter versePresenter;
     private final LayoutInflater inflater;
-    private final List<Page> pages;
+    private final ArrayList<Page> pages;
 
-    private String translationShortName;
-    private int currentBook = -1;
+    private VerseSelectionListener listener;
+
+    private String translation;
+    private int currentBook;
     private int currentChapter;
     private int currentVerse;
 
-    VersePagerAdapter(Context context, VersePresenter versePresenter, Settings settings,
-                      Listener listener, int offScreenPageLimit) {
-        super();
-
+    VersePagerAdapter(Context context, Settings settings,
+                      VersePresenter versePresenter, int offScreenPageLimit) {
         this.context = context;
-        this.versePresenter = versePresenter;
         this.settings = settings;
-        this.listener = listener;
+        this.versePresenter = versePresenter;
         this.inflater = LayoutInflater.from(context);
         this.pages = new ArrayList<>(1 + 2 * offScreenPageLimit);
+
+        translation = versePresenter.loadCurrentTranslation();
+        currentBook = versePresenter.loadCurrentBook();
+        currentChapter = versePresenter.loadCurrentChapter();
+        currentVerse = versePresenter.loadCurrentVerse();
     }
 
     @Override
     public int getCount() {
-        return currentBook < 0 || translationShortName == null ? 0 : Bible.getChapterCount(currentBook);
+        return listener == null || TextUtils.isEmpty(translation) ? 0 : Bible.getChapterCount(currentBook);
     }
 
     @Override
@@ -123,31 +150,27 @@ class VersePagerAdapter extends PagerAdapter implements VerseView {
                 break;
             }
         }
-
         if (page == null) {
-            page = new Page(inflater.inflate(R.layout.item_verse_pager, container, false));
-            final VerseListAdapter verseListAdapter = new VerseListAdapter(context, settings);
-            page.verseListAdapter = verseListAdapter;
-            page.listener = listener;
-            page.verseList.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false));
-            page.verseList.setAdapter(verseListAdapter);
-            page.verseList.addOnChildAttachStateChangeListener(page);
+            page = new Page(context, settings, versePresenter, listener,
+                    inflater.inflate(R.layout.item_verse_pager, container, false));
             pages.add(page);
         }
-
         container.addView(page.rootView, 0);
+
         page.inUse = true;
-        page.position = position;
+        page.book = currentBook;
+        page.chapter = position;
 
         page.loadingSpinner.setVisibility(View.VISIBLE);
         page.verseList.setVisibility(View.GONE);
+
         loadVerses(position);
 
         return page;
     }
 
-    private void loadVerses(int position) {
-        versePresenter.loadVerses(translationShortName, currentBook, position);
+    private void loadVerses(int chapter) {
+        versePresenter.loadVerses(translation, currentBook, chapter);
     }
 
     @Override
@@ -155,7 +178,7 @@ class VersePagerAdapter extends PagerAdapter implements VerseView {
         final int pageCount = pages.size();
         for (int i = 0; i < pageCount; ++i) {
             final Page page = pages.get(i);
-            if (page.position == position) {
+            if (page.chapter == position) {
                 page.inUse = false;
                 container.removeView(page.rootView);
                 return;
@@ -179,7 +202,7 @@ class VersePagerAdapter extends PagerAdapter implements VerseView {
         final int pageCount = pages.size();
         for (int i = 0; i < pageCount; ++i) {
             final Page page = pages.get(i);
-            if (page.position == chapter) {
+            if (page.chapter == chapter) {
                 AnimationHelper.fadeOut(page.loadingSpinner);
                 AnimationHelper.fadeIn(page.verseList);
 
@@ -190,7 +213,8 @@ class VersePagerAdapter extends PagerAdapter implements VerseView {
                     page.verseList.post(new Runnable() {
                         @Override
                         public void run() {
-                            page.verseList.scrollToPosition(currentVerse);
+                            ((LinearLayoutManager) page.verseList.getLayoutManager())
+                                    .scrollToPositionWithOffset(currentVerse, 0);
                             currentVerse = 0;
                         }
                     });
@@ -213,34 +237,34 @@ class VersePagerAdapter extends PagerAdapter implements VerseView {
                 }, null);
     }
 
-    void setTranslationShortName(String translationShortName) {
-        this.translationShortName = translationShortName;
+    @Override
+    public void onTranslationUpdated(String translation) {
+        this.translation = translation;
+        notifyDataSetChanged();
     }
 
-    void setSelected(int currentBook, int currentChapter, int currentVerse) {
-        this.currentBook = currentBook;
-        this.currentChapter = currentChapter;
-        this.currentVerse = currentVerse;
-    }
-
-    int getCurrentVerse(int chapter) {
-        final int pageCount = pages.size();
-        for (int i = 0; i < pageCount; ++i) {
-            final Page page = pages.get(i);
-            if (page.position == chapter) {
-                final LinearLayoutManager linearLayoutManager
-                        = (LinearLayoutManager) page.verseList.getLayoutManager();
-                return linearLayoutManager.findFirstVisibleItemPosition();
-            }
+    @Override
+    public void onReadingProgressUpdated(Verse.Index index) {
+        if (currentBook == index.book) {
+            return;
         }
-        return 0;
+        currentBook = index.book;
+        currentChapter = index.chapter;
+        currentVerse = index.verse;
+        notifyDataSetChanged();
     }
 
+    void setVerseSelectionListener(VerseSelectionListener listener) {
+        this.listener = listener;
+        notifyDataSetChanged();
+    }
+
+    @Nullable
     List<Verse> getSelectedVerses(int chapter) {
         final int pageCount = pages.size();
         for (int i = 0; i < pageCount; ++i) {
             final Page page = pages.get(i);
-            if (page.position == chapter)
+            if (page.chapter == chapter)
                 return page.verseListAdapter.getSelectedVerses();
         }
         return null;

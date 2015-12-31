@@ -23,6 +23,8 @@ import net.zionsoft.obadiah.biblereading.chapterselection.BibleReadingChapterCom
 import net.zionsoft.obadiah.biblereading.chapterselection.BibleReadingChapterModule;
 import net.zionsoft.obadiah.biblereading.toolbar.BibleReadingToolbarComponent;
 import net.zionsoft.obadiah.biblereading.toolbar.BibleReadingToolbarModule;
+import net.zionsoft.obadiah.biblereading.verse.BibleReadingVerseComponent;
+import net.zionsoft.obadiah.biblereading.verse.BibleReadingVerseModule;
 import net.zionsoft.obadiah.readingprogress.ReadingProgressComponent;
 import net.zionsoft.obadiah.biblereading.BibleReadingModule;
 import net.zionsoft.obadiah.readingprogress.ReadingProgressModule;
@@ -53,6 +55,8 @@ public interface InjectionComponent {
     BibleReadingToolbarComponent plus(BibleReadingToolbarModule bibleReadingToolbarModule);
 
     BibleReadingChapterComponent plus(BibleReadingChapterModule bibleReadingChapterModule);
+
+    BibleReadingVerseComponent plus(BibleReadingVerseModule bibleReadingVerseModule);
 
     OpenSourceLicenseComponent plus(OpenSourceLicenseModule openSourceLicenseModule);
 
