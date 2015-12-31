@@ -17,6 +17,10 @@
 
 package net.zionsoft.obadiah.biblereading;
 
+import net.zionsoft.obadiah.biblereading.chapterselection.ChapterPresenter;
+import net.zionsoft.obadiah.biblereading.toolbar.ToolbarPresenter;
+import net.zionsoft.obadiah.biblereading.verse.VersePagerPresenter;
+import net.zionsoft.obadiah.biblereading.verse.VersePresenter;
 import net.zionsoft.obadiah.injection.scopes.ActivityScope;
 import net.zionsoft.obadiah.model.datamodel.BibleReadingModel;
 import net.zionsoft.obadiah.model.datamodel.ReadingProgressModel;
@@ -31,5 +35,29 @@ public class BibleReadingModule {
     BibleReadingPresenter provideBibleReadingPresenter(BibleReadingModel bibleReadingModel,
                                                        ReadingProgressModel readingProgressModel) {
         return new BibleReadingPresenter(bibleReadingModel, readingProgressModel);
+    }
+
+    @Provides
+    @ActivityScope
+    ToolbarPresenter provideToolbarPresenter(BibleReadingModel bibleReadingModel) {
+        return new ToolbarPresenter(bibleReadingModel);
+    }
+
+    @Provides
+    @ActivityScope
+    ChapterPresenter provideChapterPresenter(BibleReadingModel bibleReadingModel) {
+        return new ChapterPresenter(bibleReadingModel);
+    }
+
+    @Provides
+    @ActivityScope
+    VersePagerPresenter provideVersePagerPresenter(BibleReadingModel bibleReadingModel) {
+        return new VersePagerPresenter(bibleReadingModel);
+    }
+
+    @Provides
+    @ActivityScope
+    VersePresenter provideVersePresenter(BibleReadingModel bibleReadingModel) {
+        return new VersePresenter(bibleReadingModel);
     }
 }

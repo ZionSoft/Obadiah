@@ -15,19 +15,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.biblereading;
+package net.zionsoft.obadiah.biblereading.toolbar;
 
 import net.zionsoft.obadiah.model.domain.Verse;
 import net.zionsoft.obadiah.mvp.MVPView;
 
 import java.util.List;
 
-interface BibleReadingView extends MVPView {
+interface ToolbarView extends MVPView {
+    void onTranslationsLoaded(List<String> translations);
+
     void onBookNamesLoaded(List<String> bookNames);
-
-    void onBookNamesLoadFailed();
-
-    void onTranslationUpdated(String translation);
 
     void onReadingProgressUpdated(Verse.Index index);
 }

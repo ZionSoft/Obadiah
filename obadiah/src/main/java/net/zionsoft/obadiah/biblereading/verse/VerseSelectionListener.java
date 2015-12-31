@@ -15,19 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.biblereading;
+package net.zionsoft.obadiah.biblereading.verse;
 
-import net.zionsoft.obadiah.model.domain.Verse;
-import net.zionsoft.obadiah.mvp.MVPView;
-
-import java.util.List;
-
-interface BibleReadingView extends MVPView {
-    void onBookNamesLoaded(List<String> bookNames);
-
-    void onBookNamesLoadFailed();
-
-    void onTranslationUpdated(String translation);
-
-    void onReadingProgressUpdated(Verse.Index index);
+public interface VerseSelectionListener {
+    void onVersesSelectionChanged(boolean hasSelected);
 }

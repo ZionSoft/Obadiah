@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <android.support.v7.widget.Toolbar
+    <net.zionsoft.obadiah.biblereading.toolbar.BibleReadingToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
@@ -18,21 +18,15 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <android.support.v4.view.ViewPager
+        <net.zionsoft.obadiah.biblereading.verse.VerseViewPager
             android:id="@+id/verse_pager"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
-        <ExpandableListView
+        <net.zionsoft.obadiah.biblereading.chapterselection.ChapterListView
             android:id="@+id/chapter_list"
             android:layout_width="@dimen/left_drawer_width"
             android:layout_height="match_parent"
-            android:layout_gravity="start"
-            android:background="@android:color/black"
-            android:childDivider="@android:color/transparent"
-            android:choiceMode="singleChoice"
-            android:divider="@color/dark_gray"
-            android:dividerHeight="1px"
-            android:groupIndicator="@null" />
+            android:layout_gravity="start" />
     </android.support.v4.widget.DrawerLayout>
 </LinearLayout>

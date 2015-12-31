@@ -15,13 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.biblereading;
+package net.zionsoft.obadiah.biblereading.verse;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import net.zionsoft.obadiah.model.datamodel.BibleReadingModel;
-import net.zionsoft.obadiah.model.datamodel.ReadingProgressModel;
 import net.zionsoft.obadiah.model.domain.Verse;
 import net.zionsoft.obadiah.mvp.MVPPresenter;
 
@@ -32,15 +30,12 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
-class BibleReadingPresenter extends MVPPresenter<BibleReadingView> {
+public class VersePresenter extends MVPPresenter<VerseView> {
     private final BibleReadingModel bibleReadingModel;
-    private final ReadingProgressModel readingProgressModel;
-
     private CompositeSubscription subscription;
 
-    BibleReadingPresenter(BibleReadingModel bibleReadingModel, ReadingProgressModel readingProgressModel) {
+    public VersePresenter(BibleReadingModel bibleReadingModel) {
         this.bibleReadingModel = bibleReadingModel;
-        this.readingProgressModel = readingProgressModel;
     }
 
     @Override
@@ -61,10 +56,9 @@ class BibleReadingPresenter extends MVPPresenter<BibleReadingView> {
 
                     @Override
                     public void onNext(String translation) {
-                        final BibleReadingView v = getView();
+                        final VerseView v = getView();
                         if (v != null) {
                             v.onTranslationUpdated(translation);
-                            loadBookNames(translation);
                         }
                     }
                 }));
@@ -83,7 +77,7 @@ class BibleReadingPresenter extends MVPPresenter<BibleReadingView> {
 
                     @Override
                     public void onNext(Verse.Index index) {
-                        final BibleReadingView v = getView();
+                        final VerseView v = getView();
                         if (v != null) {
                             v.onReadingProgressUpdated(index);
                         }
@@ -109,13 +103,8 @@ class BibleReadingPresenter extends MVPPresenter<BibleReadingView> {
         super.onViewDropped();
     }
 
-    @Nullable
     String loadCurrentTranslation() {
         return bibleReadingModel.loadCurrentTranslation();
-    }
-
-    void saveCurrentTranslation(String translation) {
-        bibleReadingModel.saveCurrentTranslation(translation);
     }
 
     int loadCurrentBook() {
@@ -126,26 +115,19 @@ class BibleReadingPresenter extends MVPPresenter<BibleReadingView> {
         return bibleReadingModel.loadCurrentChapter();
     }
 
+    int loadCurrentVerse() {
+        return bibleReadingModel.loadCurrentVerse();
+    }
+
     void saveReadingProgress(int book, int chapter, int verse) {
         bibleReadingModel.saveReadingProgress(new Verse.Index(book, chapter, verse));
     }
 
-    void trackReadingProgress(int book, int chapter) {
-        readingProgressModel.trackReadingProgress(book, chapter)
+    void loadVerses(final String translation, final int book, final int chapter) {
+        getSubscription().add(bibleReadingModel.loadVerses(translation, book, chapter)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe();
-    }
-
-    void loadBookNamesForCurrentTranslation() {
-        loadBookNames(bibleReadingModel.loadCurrentTranslation());
-    }
-
-    private void loadBookNames(String translation) {
-        getSubscription().add(bibleReadingModel.loadBookNames(translation)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<List<String>>() {
+                .subscribe(new Subscriber<List<Verse>>() {
                     @Override
                     public void onCompleted() {
                         // do nothing
@@ -153,21 +135,17 @@ class BibleReadingPresenter extends MVPPresenter<BibleReadingView> {
 
                     @Override
                     public void onError(Throwable e) {
-                        final BibleReadingView v = getView();
+                        final VerseView v = getView();
                         if (v != null) {
-                            v.onBookNamesLoadFailed();
+                            v.onVersesLoadFailed(translation, book, chapter);
                         }
                     }
 
                     @Override
-                    public void onNext(List<String> bookNames) {
-                        final BibleReadingView v = getView();
+                    public void onNext(List<Verse> verses) {
+                        final VerseView v = getView();
                         if (v != null) {
-                            // if the list is empty, it means the requested translation is not
-                            // installed yet, do nothing
-                            if (bookNames.size() > 0) {
-                                v.onBookNamesLoaded(bookNames);
-                            }
+                            v.onVersesLoaded(verses);
                         }
                     }
                 }));

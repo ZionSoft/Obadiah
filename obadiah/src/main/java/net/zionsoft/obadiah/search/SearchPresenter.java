@@ -90,8 +90,8 @@ class SearchPresenter extends MVPPresenter<SearchView> {
         return bibleReadingModel.loadCurrentTranslation();
     }
 
-    void setReadingProgress(int book, int chapter, int verse) {
-        bibleReadingModel.setReadingProgress(book, chapter, verse);
+    void saveReadingProgress(Verse.Index index) {
+        bibleReadingModel.saveReadingProgress(index);
     }
 
     void openBibleReadingActivity() {

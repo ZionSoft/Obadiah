@@ -21,18 +21,50 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 public class Verse implements Parcelable {
-    public final int bookIndex;
-    public final int chapterIndex;
-    public final int verseIndex;
+    public static class Index implements Parcelable {
+        public final int book;
+        public final int chapter;
+        public final int verse;
+
+        public Index(int book, int chapter, int verse) {
+            this.book = book;
+            this.chapter = chapter;
+            this.verse = verse;
+        }
+
+        @Override
+        public int describeContents() {
+            return 0;
+        }
+
+        @Override
+        public void writeToParcel(Parcel dst, int flags) {
+            dst.writeInt(book);
+            dst.writeInt(chapter);
+            dst.writeInt(verse);
+        }
+
+        public static final Parcelable.Creator<Index> CREATOR = new Parcelable.Creator<Index>() {
+            @Override
+            public Index createFromParcel(Parcel in) {
+                return new Index(in.readInt(), in.readInt(), in.readInt());
+            }
+
+            @Override
+            public Index[] newArray(int size) {
+                return new Index[size];
+            }
+        };
+    }
+
+    public final Index index;
     public final String bookName;
     public final String verseText;
 
-    public Verse(int bookIndex, int chapterIndex, int verseIndex, String bookName, String verseText) {
+    public Verse(Index index, String bookName, String verseText) {
         super();
 
-        this.bookIndex = bookIndex;
-        this.chapterIndex = chapterIndex;
-        this.verseIndex = verseIndex;
+        this.index = index;
         this.bookName = bookName;
         this.verseText = verseText;
     }
@@ -44,9 +76,7 @@ public class Verse implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dst, int flags) {
-        dst.writeInt(bookIndex);
-        dst.writeInt(chapterIndex);
-        dst.writeInt(verseIndex);
+        dst.writeParcelable(index, 0);
         dst.writeString(bookName);
         dst.writeString(verseText);
     }
@@ -54,7 +84,8 @@ public class Verse implements Parcelable {
     public static final Parcelable.Creator<Verse> CREATOR = new Parcelable.Creator<Verse>() {
         @Override
         public Verse createFromParcel(Parcel in) {
-            return new Verse(in.readInt(), in.readInt(), in.readInt(), in.readString(), in.readString());
+            return new Verse(in.<Index>readParcelable(Index.class.getClassLoader()),
+                    in.readString(), in.readString());
         }
 
         @Override

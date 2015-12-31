@@ -66,9 +66,9 @@ public class SearchActivity extends BaseAppCompatActivity
         return startIntent;
     }
 
-    private static final String KEY_CURRENT_TRANSLATION = "net.zionsoft.obadiah.search.SearchActivity.KEY_CURRENT_TRANSLATION";
-    private static final String KEY_QUERY = "net.zionsoft.obadiah.search.SearchActivity.KEY_QUERY";
-    private static final String KEY_VERSES = "net.zionsoft.obadiah.search.SearchActivity.KEY_VERSES";
+    private static final String KEY_CURRENT_TRANSLATION = "net.zionsoft.obadiah.KEY_CURRENT_TRANSLATION";
+    private static final String KEY_QUERY = "net.zionsoft.obadiah.KEY_QUERY";
+    private static final String KEY_VERSES = "net.zionsoft.obadiah.KEY_VERSES";
 
     @Inject
     SearchPresenter searchPresenter;
@@ -142,7 +142,7 @@ public class SearchActivity extends BaseAppCompatActivity
     private void initializeAdapter() {
         if (searchResultList == null || settings == null || searchPresenter == null || searchResultAdapter != null) {
             // if the activity is recreated due to screen orientation change, the component fragment
-            // is called before the UI is initialized, i.e. onAttachFragment() is called inside
+            // is attached before the UI is initialized, i.e. onAttachFragment() is called inside
             // super.onCreate()
             // therefore, we try to do the initialization in both places
             return;
@@ -293,6 +293,6 @@ public class SearchActivity extends BaseAppCompatActivity
 
     @Override
     public void openBibleReadingActivity() {
-        AnimationHelper.slideIn(this, BibleReadingActivity.newStartReorderToTopIntent(this));
+        startActivity(BibleReadingActivity.newStartReorderToTopIntent(this));
     }
 }

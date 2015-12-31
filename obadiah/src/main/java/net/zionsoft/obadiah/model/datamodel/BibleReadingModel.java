@@ -21,7 +21,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.Nullable;
 import android.support.v4.util.LruCache;
-import android.text.TextUtils;
 
 import com.crashlytics.android.Crashlytics;
 
@@ -31,7 +30,6 @@ import net.zionsoft.obadiah.model.database.BookNamesTableHelper;
 import net.zionsoft.obadiah.model.database.DatabaseHelper;
 import net.zionsoft.obadiah.model.database.TranslationHelper;
 import net.zionsoft.obadiah.model.database.TranslationsTableHelper;
-import net.zionsoft.obadiah.model.domain.TranslationInfo;
 import net.zionsoft.obadiah.model.domain.Verse;
 
 import java.util.Collections;
@@ -44,6 +42,8 @@ import rx.Observable;
 import rx.Subscriber;
 import rx.functions.Action1;
 import rx.functions.Func1;
+import rx.subjects.PublishSubject;
+import rx.subjects.SerializedSubject;
 
 @Singleton
 public class BibleReadingModel {
@@ -74,6 +74,11 @@ public class BibleReadingModel {
         }
     };
 
+    private final SerializedSubject<String, String> currentTranslationUpdatesSubject
+            = PublishSubject.<String>create().toSerialized();
+    private final SerializedSubject<Verse.Index, Verse.Index> currentReadingProgressUpdatesSubject
+            = PublishSubject.<Verse.Index>create().toSerialized();
+
     @Inject
     public BibleReadingModel(Context context, DatabaseHelper databaseHelper) {
         this.preferences = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
@@ -85,13 +90,14 @@ public class BibleReadingModel {
         return preferences.getString(Constants.PREF_KEY_LAST_READ_TRANSLATION, null);
     }
 
-    public void saveCurrentTranslation(TranslationInfo translation) {
-        preferences.edit().putString(Constants.PREF_KEY_LAST_READ_TRANSLATION, translation.shortName).apply();
-        Analytics.trackEvent(Analytics.CATEGORY_TRANSLATION, Analytics.TRANSLATION_ACTION_SELECTED, translation.shortName);
+    public void saveCurrentTranslation(String translation) {
+        preferences.edit().putString(Constants.PREF_KEY_LAST_READ_TRANSLATION, translation).apply();
+        currentTranslationUpdatesSubject.onNext(translation);
+        Analytics.trackEvent(Analytics.CATEGORY_TRANSLATION, Analytics.TRANSLATION_ACTION_SELECTED, translation);
     }
 
-    public boolean hasDownloadedTranslation() {
-        return !TextUtils.isEmpty(loadCurrentTranslation());
+    public Observable<String> observeCurrentTranslation() {
+        return currentTranslationUpdatesSubject.asObservable();
     }
 
     public int loadCurrentBook() {
@@ -106,16 +112,17 @@ public class BibleReadingModel {
         return preferences.getInt(Constants.PREF_KEY_LAST_READ_VERSE, 0);
     }
 
-    public void setCurrentTranslation(String translation) {
-        preferences.edit().putString(Constants.PREF_KEY_LAST_READ_TRANSLATION, translation).apply();
+    public void saveReadingProgress(Verse.Index index) {
+        preferences.edit()
+                .putInt(Constants.PREF_KEY_LAST_READ_BOOK, index.book)
+                .putInt(Constants.PREF_KEY_LAST_READ_CHAPTER, index.chapter)
+                .putInt(Constants.PREF_KEY_LAST_READ_VERSE, index.verse)
+                .apply();
+        currentReadingProgressUpdatesSubject.onNext(index);
     }
 
-    public void setReadingProgress(int book, int chapter, int verse) {
-        preferences.edit()
-                .putInt(Constants.PREF_KEY_LAST_READ_BOOK, book)
-                .putInt(Constants.PREF_KEY_LAST_READ_CHAPTER, chapter)
-                .putInt(Constants.PREF_KEY_LAST_READ_VERSE, verse)
-                .apply();
+    public Observable<Verse.Index> observeCurrentReadingProgress() {
+        return currentReadingProgressUpdatesSubject.asObservable();
     }
 
     public Observable<List<String>> loadTranslations() {

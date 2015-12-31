@@ -58,7 +58,7 @@ public class TranslationManagementActivity extends BaseAppCompatActivity
         implements TranslationManagementView, SwipeRefreshLayout.OnRefreshListener,
         RecyclerView.OnChildAttachStateChangeListener, View.OnClickListener,
         View.OnCreateContextMenuListener, Toolbar.OnMenuItemClickListener {
-    private static final String KEY_MESSAGE_TYPE = "net.zionsoft.obadiah.translations.TranslationManagementActivity.KEY_MESSAGE_TYPE";
+    private static final String KEY_MESSAGE_TYPE = "net.zionsoft.obadiah.KEY_MESSAGE_TYPE";
 
     public static Intent newStartReorderToTopIntent(Context context, String messageType) {
         final Intent startIntent = newStartIntent(context).putExtra(KEY_MESSAGE_TYPE, messageType);
@@ -167,7 +167,7 @@ public class TranslationManagementActivity extends BaseAppCompatActivity
     private void initializeAdapter() {
         if (translationList == null || settings == null || translationListAdapter != null) {
             // if the activity is recreated due to screen orientation change, the component fragment
-            // is called before the UI is initialized, i.e. onAttachFragment() is called inside
+            // is attached before the UI is initialized, i.e. onAttachFragment() is called inside
             // super.onCreate()
             // therefore, we try to do the initialization in both places
             return;
@@ -358,7 +358,8 @@ public class TranslationManagementActivity extends BaseAppCompatActivity
             return;
         }
         if (translationViewHolder.isDownloaded()) {
-            translationManagementPresenter.saveCurrentTranslation(translationViewHolder.getTranslationInfo());
+            translationManagementPresenter.saveCurrentTranslation(
+                    translationViewHolder.getTranslationInfo().shortName);
 
             finish();
             overridePendingTransition(R.anim.fade_in, R.anim.slide_out_left_to_right);

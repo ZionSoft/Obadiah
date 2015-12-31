@@ -22,7 +22,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
 
-import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.analytics.Analytics;
 
 import butterknife.ButterKnife;
@@ -54,12 +53,5 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         Analytics.trackScreen(getClass().getSimpleName());
-    }
-
-    @CallSuper
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        overridePendingTransition(R.anim.fade_in, R.anim.slide_out_left_to_right);
     }
 }

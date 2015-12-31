@@ -30,7 +30,9 @@ class UriHelper {
     // format: /bible/<translation-short-name>/<book-index>/<chapter-index>/<verse-index>
     private static final String VERSE_URI_TEMPLATE = "https://bible.zionsoft.net/bible/%s/%d/%d/%d";
 
-    static void checkDeepLink(@NonNull BibleReadingPresenter bibleReadingPresenter, @NonNull Uri uri) {
+    static void checkUri(@NonNull BibleReadingPresenter bibleReadingPresenter, @NonNull Uri uri) {
+        // TODO supports verse index
+
         final String path = uri.getPath();
         if (TextUtils.isEmpty(path)) {
             return;
@@ -42,24 +44,20 @@ class UriHelper {
         }
 
         try {
-            // validity of translation short name will be checked later
             final String translationShortName = parts[2];
-            if (TextUtils.isEmpty(translationShortName)) {
-                return;
-            }
-
             final int bookIndex = Integer.parseInt(parts[3]);
-            if (bookIndex < 0 || bookIndex >= Bible.getBookCount()) {
-                return;
-            }
-
             final int chapterIndex = Integer.parseInt(parts[4]);
-            if (chapterIndex < 0 || chapterIndex >= Bible.getChapterCount(bookIndex)) {
+
+            // validity of translation short name will be checked later when loading the available
+            // translation list
+            if (TextUtils.isEmpty(translationShortName)
+                    || bookIndex < 0 || bookIndex >= Bible.getBookCount()
+                    || chapterIndex < 0 || chapterIndex >= Bible.getChapterCount(bookIndex)) {
                 return;
             }
 
-            bibleReadingPresenter.setCurrentTranslation(translationShortName);
-            bibleReadingPresenter.setReadingProgress(bookIndex, chapterIndex, 0);
+            bibleReadingPresenter.saveCurrentTranslation(translationShortName);
+            bibleReadingPresenter.saveReadingProgress(bookIndex, chapterIndex, 0);
             Analytics.trackEvent(Analytics.CATEGORY_DEEP_LINK, Analytics.DEEP_LINK_ACTION_OPENED);
         } catch (Exception e) {
             Crashlytics.getInstance().core.logException(e);

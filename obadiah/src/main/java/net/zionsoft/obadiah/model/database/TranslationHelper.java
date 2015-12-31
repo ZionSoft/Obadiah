@@ -34,7 +34,6 @@ public class TranslationHelper {
     private static final String COLUMN_CHAPTER_INDEX = "COLUMN_CHAPTER_INDEX";
     private static final String COLUMN_VERSE_INDEX = "COLUMN_VERSE_INDEX";
     private static final String COLUMN_TEXT = "COLUMN_TEXT";
-    private static final String COLUMN_LAST_READING_TIMESTAMP = "COLUMN_LAST_READING_TIMESTAMP";
 
     public static void createTranslationTable(SQLiteDatabase db, String translationShortName) {
         db.execSQL(String.format("CREATE TABLE %s (%s INTEGER NOT NULL, %s INTEGER NOT NULL, %s INTEGER NOT NULL, %s TEXT NOT NULL);",
@@ -56,7 +55,7 @@ public class TranslationHelper {
                     new String[]{Integer.toString(book), Integer.toString(chapter), Integer.toString(verse)},
                     null, null, null);
             if (cursor.moveToFirst()) {
-                return new Verse(book, chapter, verse, bookName, cursor.getString(0));
+                return new Verse(new Verse.Index(book, chapter, verse), bookName, cursor.getString(0));
             } else {
                 return null;
             }
@@ -80,7 +79,7 @@ public class TranslationHelper {
             final List<Verse> verses = new ArrayList<>(cursor.getCount());
             int verseIndex = 0;
             while (cursor.moveToNext()) {
-                verses.add(new Verse(book, chapter, verseIndex++, bookName, cursor.getString(verse)));
+                verses.add(new Verse(new Verse.Index(book, chapter, verseIndex++), bookName, cursor.getString(verse)));
             }
             return verses;
         } finally {
@@ -113,8 +112,9 @@ public class TranslationHelper {
             final List<Verse> verses = new ArrayList<>(count);
             while (cursor.moveToNext()) {
                 final int book = cursor.getInt(bookIndex);
-                verses.add(new Verse(book, cursor.getInt(chapterIndex), cursor.getInt(verseIndex),
-                        bookNames.get(book), cursor.getString(verseText)));
+                final Verse.Index index = new Verse.Index(
+                        book, cursor.getInt(chapterIndex), cursor.getInt(verseIndex));
+                verses.add(new Verse(index, bookNames.get(book), cursor.getString(verseText)));
             }
             return verses;
         } finally {

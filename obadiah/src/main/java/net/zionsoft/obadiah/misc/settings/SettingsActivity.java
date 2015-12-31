@@ -19,7 +19,6 @@ package net.zionsoft.obadiah.misc.settings;
 
 import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
-import android.annotation.TargetApi;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -41,7 +40,6 @@ import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.misc.license.OpenSourceLicenseActivity;
 import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.datamodel.Settings;
-import net.zionsoft.obadiah.ui.utils.AnimationHelper;
 import net.zionsoft.obadiah.ui.utils.BaseAppCompatActivity;
 import net.zionsoft.obadiah.ui.utils.DialogHelper;
 import net.zionsoft.obadiah.ui.widget.SectionHeader;
@@ -199,8 +197,7 @@ public class SettingsActivity extends BaseAppCompatActivity {
         licenseSettingButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AnimationHelper.slideIn(SettingsActivity.this,
-                        OpenSourceLicenseActivity.newStartIntent(SettingsActivity.this));
+                startActivity(OpenSourceLicenseActivity.newStartIntent(SettingsActivity.this));
             }
         });
     }
