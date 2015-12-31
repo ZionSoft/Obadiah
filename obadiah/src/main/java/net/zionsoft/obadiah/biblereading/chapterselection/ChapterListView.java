@@ -27,18 +27,14 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.ExpandableListView;
 
-import net.zionsoft.obadiah.App;
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.domain.Verse;
 
 import java.util.List;
 
-import javax.inject.Inject;
-
 public class ChapterListView extends ExpandableListView implements ChapterView,
         ChapterListAdapter.Listener, ExpandableListView.OnGroupClickListener {
-    @Inject
-    ChapterPresenter chapterPresenter;
+    private ChapterPresenter chapterPresenter;
 
     private int currentBook;
     private int currentChapter;
@@ -68,8 +64,6 @@ public class ChapterListView extends ExpandableListView implements ChapterView,
     }
 
     private void initialize(Context context) {
-        BibleReadingChapterComponent.Initializer.init(App.getInjectionComponent(context)).inject(this);
-
         setBackgroundColor(Color.BLACK);
         setDivider(new ColorDrawable(ContextCompat.getColor(context, R.color.dark_gray)));
         setDividerHeight(1);
@@ -78,33 +72,6 @@ public class ChapterListView extends ExpandableListView implements ChapterView,
 
         chapterListAdapter = new ChapterListAdapter(context, this);
         setAdapter(chapterListAdapter);
-    }
-
-    @Override
-    protected void onAttachedToWindow() {
-        super.onAttachedToWindow();
-
-        chapterPresenter.takeView(this);
-        chapterPresenter.loadBookNamesForCurrentTranslation();
-
-        currentBook = chapterPresenter.loadCurrentBook();
-        currentChapter = chapterPresenter.loadCurrentChapter();
-        refresh();
-    }
-
-    private void refresh() {
-        chapterListAdapter.setCurrentChapter(currentBook, currentChapter);
-        chapterListAdapter.notifyDataSetChanged();
-
-        lastExpandedGroup = currentBook;
-        expandGroup(currentBook);
-        setSelectedGroup(currentBook);
-    }
-
-    @Override
-    protected void onDetachedFromWindow() {
-        chapterPresenter.dropView();
-        super.onDetachedFromWindow();
     }
 
     @Override
@@ -122,6 +89,15 @@ public class ChapterListView extends ExpandableListView implements ChapterView,
         currentChapter = index.chapter;
 
         refresh();
+    }
+
+    private void refresh() {
+        chapterListAdapter.setCurrentChapter(currentBook, currentChapter);
+        chapterListAdapter.notifyDataSetChanged();
+
+        lastExpandedGroup = currentBook;
+        expandGroup(currentBook);
+        setSelectedGroup(currentBook);
     }
 
     @Override
@@ -147,5 +123,22 @@ public class ChapterListView extends ExpandableListView implements ChapterView,
             }
         }
         return true;
+    }
+
+    public void setPresenter(ChapterPresenter chapterPresenter) {
+        this.chapterPresenter = chapterPresenter;
+    }
+
+    public void onResume() {
+        chapterPresenter.takeView(this);
+        chapterPresenter.loadBookNamesForCurrentTranslation();
+
+        currentBook = chapterPresenter.loadCurrentBook();
+        currentChapter = chapterPresenter.loadCurrentChapter();
+        refresh();
+    }
+
+    public void onPause() {
+        chapterPresenter.dropView();
     }
 }

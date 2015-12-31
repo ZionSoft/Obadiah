@@ -22,70 +22,24 @@ import android.support.annotation.Nullable;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 
-import net.zionsoft.obadiah.App;
 import net.zionsoft.obadiah.model.datamodel.Settings;
 import net.zionsoft.obadiah.model.domain.Verse;
 
 import java.util.List;
 
-import javax.inject.Inject;
-
 public class VerseViewPager extends ViewPager implements VersePagerView {
-    @Inject
-    Settings settings;
-
-    @Inject
-    VersePagerPresenter versePagerPresenter;
-
-    @Inject
-    VersePresenter versePresenter;
+    private VersePagerPresenter versePagerPresenter;
+    private VersePresenter versePresenter;
 
     private VersePagerAdapter adapter;
-
     private int currentChapter;
 
     public VerseViewPager(Context context) {
         super(context);
-        initialize(context);
     }
 
     public VerseViewPager(Context context, AttributeSet attrs) {
         super(context, attrs);
-        initialize(context);
-    }
-
-    private void initialize(Context context) {
-        BibleReadingVerseComponent.Initializer.init(App.getInjectionComponent(context)).inject(this);
-
-        adapter = new VersePagerAdapter(context, settings, versePresenter, getOffscreenPageLimit());
-        setAdapter(adapter);
-        addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
-            @Override
-            public void onPageSelected(int position) {
-                if (currentChapter == position) {
-                    return;
-                }
-                versePresenter.saveReadingProgress(versePresenter.loadCurrentBook(), position, 0);
-            }
-        });
-    }
-
-    @Override
-    protected void onAttachedToWindow() {
-        super.onAttachedToWindow();
-
-        versePagerPresenter.takeView(this);
-        currentChapter = versePresenter.loadCurrentChapter();
-        setCurrentItem(currentChapter);
-
-        versePresenter.takeView(adapter);
-    }
-
-    @Override
-    protected void onDetachedFromWindow() {
-        versePagerPresenter.dropView();
-        versePresenter.dropView();
-        super.onDetachedFromWindow();
     }
 
     @Override
@@ -98,10 +52,6 @@ public class VerseViewPager extends ViewPager implements VersePagerView {
         setCurrentItem(currentChapter, true);
     }
 
-    public void setVerseSelectionListener(VerseSelectionListener listener) {
-        adapter.setVerseSelectionListener(listener);
-    }
-
     @Nullable
     public List<Verse> getSelectedVerses() {
         return adapter.getSelectedVerses(getCurrentItem());
@@ -109,5 +59,38 @@ public class VerseViewPager extends ViewPager implements VersePagerView {
 
     public void deselectVerses() {
         adapter.deselectVerses();
+    }
+
+    public void initialize(Context context, Settings settings, VerseSelectionListener listener,
+                           VersePagerPresenter versePagerPresenter, VersePresenter versePresenter) {
+        this.versePagerPresenter = versePagerPresenter;
+        this.versePresenter = versePresenter;
+
+        adapter = new VersePagerAdapter(context, settings, versePresenter, getOffscreenPageLimit());
+        adapter.setVerseSelectionListener(listener);
+        setAdapter(adapter);
+        addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+            @Override
+            public void onPageSelected(int position) {
+                if (currentChapter == position) {
+                    return;
+                }
+                VerseViewPager.this.versePresenter.saveReadingProgress(
+                        VerseViewPager.this.versePresenter.loadCurrentBook(), position, 0);
+            }
+        });
+    }
+
+    public void onResume() {
+        versePagerPresenter.takeView(this);
+        currentChapter = versePresenter.loadCurrentChapter();
+        setCurrentItem(currentChapter);
+
+        versePresenter.takeView(adapter);
+    }
+
+    public void onPause() {
+        versePagerPresenter.dropView();
+        versePresenter.dropView();
     }
 }

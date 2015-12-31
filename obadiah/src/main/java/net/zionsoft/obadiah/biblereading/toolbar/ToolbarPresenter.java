@@ -31,11 +31,11 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
-class ToolbarPresenter extends MVPPresenter<ToolbarView> {
+public class ToolbarPresenter extends MVPPresenter<ToolbarView> {
     private final BibleReadingModel bibleReadingModel;
     private CompositeSubscription subscription;
 
-    ToolbarPresenter(BibleReadingModel bibleReadingModel) {
+    public ToolbarPresenter(BibleReadingModel bibleReadingModel) {
         this.bibleReadingModel = bibleReadingModel;
     }
 

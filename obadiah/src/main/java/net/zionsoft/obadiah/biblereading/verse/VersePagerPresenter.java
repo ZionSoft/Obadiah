@@ -8,11 +8,11 @@ import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 
-class VersePagerPresenter extends MVPPresenter<VersePagerView> {
+public class VersePagerPresenter extends MVPPresenter<VersePagerView> {
     private final BibleReadingModel bibleReadingModel;
     private Subscription subscription;
 
-    VersePagerPresenter(BibleReadingModel bibleReadingModel) {
+    public VersePagerPresenter(BibleReadingModel bibleReadingModel) {
         this.bibleReadingModel = bibleReadingModel;
     }
 

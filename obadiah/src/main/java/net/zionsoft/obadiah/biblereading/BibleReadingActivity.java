@@ -34,7 +34,6 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.view.ActionMode;
-import android.support.v7.widget.Toolbar;
 import android.text.ClipboardManager;
 import android.text.TextUtils;
 import android.view.Menu;
@@ -43,6 +42,12 @@ import android.view.View;
 import android.widget.Toast;
 
 import net.zionsoft.obadiah.R;
+import net.zionsoft.obadiah.biblereading.chapterselection.ChapterListView;
+import net.zionsoft.obadiah.biblereading.chapterselection.ChapterPresenter;
+import net.zionsoft.obadiah.biblereading.toolbar.BibleReadingToolbar;
+import net.zionsoft.obadiah.biblereading.toolbar.ToolbarPresenter;
+import net.zionsoft.obadiah.biblereading.verse.VersePagerPresenter;
+import net.zionsoft.obadiah.biblereading.verse.VersePresenter;
 import net.zionsoft.obadiah.biblereading.verse.VerseSelectionListener;
 import net.zionsoft.obadiah.biblereading.verse.VerseViewPager;
 import net.zionsoft.obadiah.model.analytics.Analytics;
@@ -92,13 +97,28 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
     BibleReadingPresenter bibleReadingPresenter;
 
     @Inject
+    ToolbarPresenter toolbarPresenter;
+
+    @Inject
+    ChapterPresenter chapterPresenter;
+
+    @Inject
+    VersePagerPresenter versePagerPresenter;
+
+    @Inject
+    VersePresenter versePresenter;
+
+    @Inject
     Settings settings;
 
     @Bind(R.id.drawer_layout)
     DrawerLayout drawerLayout;
 
     @Bind(R.id.toolbar)
-    Toolbar toolbar;
+    BibleReadingToolbar toolbar;
+
+    @Bind(R.id.chapter_list)
+    ChapterListView chapterList;
 
     @Bind(R.id.verse_pager)
     VerseViewPager versePager;
@@ -131,6 +151,7 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
         appIndexingManager = new AppIndexingManager(this);
 
         initializeUi();
+        updatePresenters();
     }
 
     private void initializeUi() {
@@ -138,8 +159,25 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
 
         drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, 0, 0);
         drawerLayout.setDrawerListener(drawerToggle);
+    }
 
-        versePager.setVerseSelectionListener(this);
+    private void updatePresenters() {
+        // if the activity is recreated due to screen orientation change, the component fragment
+        // is attached before the UI is initialized, i.e. onAttachFragment() is called inside
+        // super.onCreate()
+        // therefore, we try to do the initialization in both places
+
+        if (toolbar != null && toolbarPresenter != null) {
+            toolbar.setPresenter(toolbarPresenter);
+        }
+
+        if (chapterList != null && chapterPresenter != null) {
+            chapterList.setPresenter(chapterPresenter);
+        }
+
+        if (settings != null && versePager != null && versePagerPresenter != null && versePresenter != null) {
+            versePager.initialize(this, settings, this, versePagerPresenter, versePresenter);
+        }
     }
 
     @Override
@@ -148,6 +186,7 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
 
         if (fragment instanceof BibleReadingComponentFragment) {
             ((BibleReadingComponentFragment) fragment).getComponent().inject(this);
+            updatePresenters();
 
             final View rootView = getWindow().getDecorView();
             rootView.setKeepScreenOn(settings.keepScreenOn());
@@ -218,6 +257,10 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
         super.onResumeFragments();
 
         bibleReadingPresenter.takeView(this);
+        toolbar.onResume();
+        chapterList.onResume();
+        versePager.onResume();
+
         if (TextUtils.isEmpty(bibleReadingPresenter.loadCurrentTranslation())) {
             DialogHelper.showDialog(this, false, R.string.dialog_no_translation,
                     new DialogInterface.OnClickListener() {
@@ -245,6 +288,10 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
     @Override
     protected void onPause() {
         bibleReadingPresenter.dropView();
+        toolbar.onPause();
+        chapterList.onPause();
+        versePager.onPause();
+
         super.onPause();
     }
 

@@ -30,11 +30,11 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
-class ChapterPresenter extends MVPPresenter<ChapterView> {
+public class ChapterPresenter extends MVPPresenter<ChapterView> {
     private final BibleReadingModel bibleReadingModel;
     private CompositeSubscription subscription;
 
-    ChapterPresenter(BibleReadingModel bibleReadingModel) {
+    public ChapterPresenter(BibleReadingModel bibleReadingModel) {
         this.bibleReadingModel = bibleReadingModel;
     }
 

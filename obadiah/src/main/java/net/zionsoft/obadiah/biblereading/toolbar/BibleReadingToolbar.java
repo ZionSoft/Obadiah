@@ -29,7 +29,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
-import net.zionsoft.obadiah.App;
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.misc.settings.SettingsActivity;
 import net.zionsoft.obadiah.model.domain.Verse;
@@ -40,51 +39,30 @@ import net.zionsoft.obadiah.translations.TranslationManagementActivity;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
-
 public class BibleReadingToolbar extends Toolbar implements ToolbarView,
         Toolbar.OnMenuItemClickListener, AdapterView.OnItemSelectedListener {
-    @Inject
-    ToolbarPresenter toolbarPresenter;
-
+    private ToolbarPresenter toolbarPresenter;
     private List<String> bookNames;
 
     public BibleReadingToolbar(Context context) {
         super(context);
-        initialize(context);
+        initialize();
     }
 
     public BibleReadingToolbar(Context context, AttributeSet attrs) {
         super(context, attrs);
-        initialize(context);
+        initialize();
     }
 
     public BibleReadingToolbar(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        initialize(context);
+        initialize();
     }
 
-    private void initialize(Context context) {
-        BibleReadingToolbarComponent.Initializer.init(App.getInjectionComponent(context)).inject(this);
-
+    private void initialize() {
         setTitle(R.string.app_name);
         inflateMenu(R.menu.menu_bible_reading);
         setOnMenuItemClickListener(this);
-    }
-
-    @Override
-    protected void onAttachedToWindow() {
-        super.onAttachedToWindow();
-
-        toolbarPresenter.takeView(this);
-        toolbarPresenter.loadTranslations();
-        toolbarPresenter.loadBookNamesForCurrentTranslation();
-    }
-
-    @Override
-    protected void onDetachedFromWindow() {
-        toolbarPresenter.dropView();
-        super.onDetachedFromWindow();
     }
 
     @Override
@@ -180,5 +158,19 @@ public class BibleReadingToolbar extends Toolbar implements ToolbarView,
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
         // do nothing
+    }
+
+    public void setPresenter(ToolbarPresenter toolbarPresenter) {
+        this.toolbarPresenter = toolbarPresenter;
+    }
+
+    public void onResume() {
+        toolbarPresenter.takeView(this);
+        toolbarPresenter.loadTranslations();
+        toolbarPresenter.loadBookNamesForCurrentTranslation();
+    }
+
+    public void onPause() {
+        toolbarPresenter.dropView();
     }
 }

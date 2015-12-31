@@ -19,19 +19,13 @@ package net.zionsoft.obadiah.injection;
 
 import net.zionsoft.obadiah.App;
 import net.zionsoft.obadiah.biblereading.BibleReadingComponent;
-import net.zionsoft.obadiah.biblereading.chapterselection.BibleReadingChapterComponent;
-import net.zionsoft.obadiah.biblereading.chapterselection.BibleReadingChapterModule;
-import net.zionsoft.obadiah.biblereading.toolbar.BibleReadingToolbarComponent;
-import net.zionsoft.obadiah.biblereading.toolbar.BibleReadingToolbarModule;
-import net.zionsoft.obadiah.biblereading.verse.BibleReadingVerseComponent;
-import net.zionsoft.obadiah.biblereading.verse.BibleReadingVerseModule;
-import net.zionsoft.obadiah.readingprogress.ReadingProgressComponent;
 import net.zionsoft.obadiah.biblereading.BibleReadingModule;
-import net.zionsoft.obadiah.readingprogress.ReadingProgressModule;
 import net.zionsoft.obadiah.misc.license.OpenSourceLicenseComponent;
 import net.zionsoft.obadiah.misc.license.OpenSourceLicenseModule;
 import net.zionsoft.obadiah.misc.settings.SettingsActivity;
 import net.zionsoft.obadiah.model.notification.PushNotificationHandler;
+import net.zionsoft.obadiah.readingprogress.ReadingProgressComponent;
+import net.zionsoft.obadiah.readingprogress.ReadingProgressModule;
 import net.zionsoft.obadiah.search.SearchComponent;
 import net.zionsoft.obadiah.search.SearchModule;
 import net.zionsoft.obadiah.translations.TranslationManagementComponent;
@@ -51,12 +45,6 @@ public interface InjectionComponent {
     void inject(PushNotificationHandler pushNotificationHandler);
 
     BibleReadingComponent plus(BibleReadingModule bibleReadingModule);
-
-    BibleReadingToolbarComponent plus(BibleReadingToolbarModule bibleReadingToolbarModule);
-
-    BibleReadingChapterComponent plus(BibleReadingChapterModule bibleReadingChapterModule);
-
-    BibleReadingVerseComponent plus(BibleReadingVerseModule bibleReadingVerseModule);
 
     OpenSourceLicenseComponent plus(OpenSourceLicenseModule openSourceLicenseModule);
 
