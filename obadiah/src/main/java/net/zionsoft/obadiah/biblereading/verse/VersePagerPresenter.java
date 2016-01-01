@@ -52,4 +52,16 @@ public class VersePagerPresenter extends MVPPresenter<VersePagerView> {
 
         super.onViewDropped();
     }
+
+    int loadCurrentBook() {
+        return bibleReadingModel.loadCurrentBook();
+    }
+
+    int loadCurrentChapter() {
+        return bibleReadingModel.loadCurrentChapter();
+    }
+
+    void saveReadingProgress(int book, int chapter, int verse) {
+        bibleReadingModel.saveReadingProgress(new Verse.Index(book, chapter, verse));
+    }
 }

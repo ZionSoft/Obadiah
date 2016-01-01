@@ -29,7 +29,6 @@ import java.util.List;
 
 public class VerseViewPager extends ViewPager implements VersePagerView {
     private VersePagerPresenter versePagerPresenter;
-    private VersePresenter versePresenter;
 
     private VersePagerAdapter adapter;
     private int currentChapter;
@@ -64,7 +63,6 @@ public class VerseViewPager extends ViewPager implements VersePagerView {
     public void initialize(Context context, Settings settings, VerseSelectionListener listener,
                            VersePagerPresenter versePagerPresenter, VersePresenter versePresenter) {
         this.versePagerPresenter = versePagerPresenter;
-        this.versePresenter = versePresenter;
 
         adapter = new VersePagerAdapter(context, settings, versePresenter, getOffscreenPageLimit());
         adapter.setVerseSelectionListener(listener);
@@ -75,22 +73,22 @@ public class VerseViewPager extends ViewPager implements VersePagerView {
                 if (currentChapter == position) {
                     return;
                 }
-                VerseViewPager.this.versePresenter.saveReadingProgress(
-                        VerseViewPager.this.versePresenter.loadCurrentBook(), position, 0);
+                VerseViewPager.this.versePagerPresenter.saveReadingProgress(
+                        VerseViewPager.this.versePagerPresenter.loadCurrentBook(), position, 0);
             }
         });
     }
 
     public void onResume() {
         versePagerPresenter.takeView(this);
-        currentChapter = versePresenter.loadCurrentChapter();
+        currentChapter = versePagerPresenter.loadCurrentChapter();
         setCurrentItem(currentChapter);
 
-        versePresenter.takeView(adapter);
+        adapter.onResume();
     }
 
     public void onPause() {
         versePagerPresenter.dropView();
-        versePresenter.dropView();
+        adapter.onPause();
     }
 }

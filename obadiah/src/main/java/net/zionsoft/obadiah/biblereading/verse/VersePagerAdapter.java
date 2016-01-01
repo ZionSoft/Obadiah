@@ -254,6 +254,29 @@ class VersePagerAdapter extends PagerAdapter implements VerseView {
         notifyDataSetChanged();
     }
 
+    void onResume() {
+        versePresenter.takeView(this);
+
+        boolean isReadingProgressChanged = false;
+        final String translation = versePresenter.loadCurrentTranslation();
+        if (!TextUtils.isEmpty(translation) && !translation.equals(this.translation)) {
+            this.translation = translation;
+            isReadingProgressChanged = true;
+        }
+        final int book = versePresenter.loadCurrentBook();
+        if (book != currentBook) {
+            currentBook = book;
+            isReadingProgressChanged = true;
+        }
+        if (isReadingProgressChanged) {
+            notifyDataSetChanged();
+        }
+    }
+
+    void onPause() {
+        versePresenter.dropView();
+    }
+
     void setVerseSelectionListener(VerseSelectionListener listener) {
         this.listener = listener;
         notifyDataSetChanged();

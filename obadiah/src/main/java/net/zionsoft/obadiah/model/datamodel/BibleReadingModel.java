@@ -21,6 +21,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.Nullable;
 import android.support.v4.util.LruCache;
+import android.text.TextUtils;
 
 import com.crashlytics.android.Crashlytics;
 
@@ -144,16 +145,16 @@ public class BibleReadingModel {
     public Observable<List<String>> loadBookNames(String translation) {
         return Observable.concat(loadBookNamesFromCache(translation),
                 loadBookNamesFromDatabase(translation))
-                .first(new Func1<List<String>, Boolean>() {
+                .firstOrDefault(Collections.<String>emptyList(), new Func1<List<String>, Boolean>() {
                     @Override
                     public Boolean call(List<String> bookNames) {
-                        return bookNames != null && bookNames.size() > 0;
+                        return bookNames != null;
                     }
                 });
     }
 
     private Observable<List<String>> loadBookNamesFromCache(String translation) {
-        return Observable.just(bookNameCache.get(translation));
+        return Observable.just(TextUtils.isEmpty(translation) ? null : bookNameCache.get(translation));
     }
 
     private Observable<List<String>> loadBookNamesFromDatabase(final String translation) {
