@@ -31,6 +31,7 @@ import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 
 import com.crashlytics.android.Crashlytics;
+import com.squareup.moshi.Moshi;
 
 import net.zionsoft.obadiah.App;
 import net.zionsoft.obadiah.R;
@@ -39,9 +40,6 @@ import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.datamodel.BibleReadingModel;
 import net.zionsoft.obadiah.model.domain.Verse;
 import net.zionsoft.obadiah.translations.TranslationManagementActivity;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.List;
 
@@ -60,6 +58,9 @@ public class PushNotificationHandler extends IntentService {
 
     private static final String MESSAGE_TYPE_VERSE = "verse";
     private static final String MESSAGE_TYPE_NEW_TRANSLATION = "newTranslation";
+
+    @Inject
+    Moshi moshi;
 
     @Inject
     BibleReadingModel bibleReadingModel;
@@ -126,19 +127,17 @@ public class PushNotificationHandler extends IntentService {
         }
 
         try {
-            final JSONObject jsonObject = new JSONObject(messageAttrs);
-            final int bookIndex = jsonObject.getInt("book");
-            final int chapterIndex = jsonObject.getInt("chapter");
-            final int verseIndex = jsonObject.getInt("verse");
-
+            final PushAttrVerseIndex verseIndex = moshi.adapter(PushAttrVerseIndex.class).fromJson(messageAttrs);
+            final PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,
+                    BibleReadingActivity.newStartReorderToTopIntent(this, messageType,
+                            verseIndex.book, verseIndex.chapter, verseIndex.verse),
+                    PendingIntent.FLAG_UPDATE_CURRENT);
             final List<Verse> verses = bibleReadingModel
-                    .loadVerses(translationShortName, bookIndex, chapterIndex)
+                    .loadVerses(translationShortName, verseIndex.book, verseIndex.chapter)
                     .toBlocking().first();
-            final Verse verse = verses.get(verseIndex);
-            builder.setContentIntent(PendingIntent.getActivity(this, 0,
-                    BibleReadingActivity.newStartReorderToTopIntent(this, messageType, bookIndex, chapterIndex, verseIndex),
-                    PendingIntent.FLAG_UPDATE_CURRENT))
-                    .setContentTitle(String.format("%s, %d:%d", verse.bookName, chapterIndex + 1, verseIndex + 1))
+            final Verse verse = verses.get(verseIndex.verse);
+            builder.setContentIntent(pendingIntent)
+                    .setContentTitle(String.format("%s, %d:%d", verse.bookName, verseIndex.chapter + 1, verseIndex.verse + 1))
                     .setContentText(verse.verseText)
                     .setStyle(new NotificationCompat.BigTextStyle().bigText(verse.verseText));
         } catch (Exception e) {
@@ -148,13 +147,13 @@ public class PushNotificationHandler extends IntentService {
         return true;
     }
 
-    private static boolean prepareForNewTranslation(Context context, NotificationCompat.Builder builder,
-                                                    String messageType, String messageAttrs) {
+    private boolean prepareForNewTranslation(Context context, NotificationCompat.Builder builder,
+                                             String messageType, String messageAttrs) {
         try {
-            final JSONObject jsonObject = new JSONObject(messageAttrs);
-            final String translationName = jsonObject.getString("translationName");
+            final String translationName = moshi.adapter(PushAttrNewTranslation.class)
+                    .fromJson(messageAttrs).translationName;
             if (TextUtils.isEmpty(translationName)) {
-                throw new JSONException("Malformed push message: " + messageAttrs);
+                throw new IllegalArgumentException("Malformed push message: " + messageAttrs);
             }
 
             final String contentText = context.getString(R.string.text_new_translation_available,
