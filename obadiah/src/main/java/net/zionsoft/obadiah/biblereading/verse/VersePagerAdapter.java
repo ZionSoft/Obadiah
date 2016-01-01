@@ -100,6 +100,9 @@ class VersePagerAdapter extends PagerAdapter implements VerseView {
         @Override
         public void onClick(View v) {
             final int position = verseList.getChildAdapterPosition(v);
+            if (position == RecyclerView.NO_POSITION) {
+                return;
+            }
             verseListAdapter.select(position);
             verseListAdapter.notifyItemChanged(position);
 
