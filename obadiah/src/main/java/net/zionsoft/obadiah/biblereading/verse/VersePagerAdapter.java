@@ -43,7 +43,6 @@ import butterknife.ButterKnife;
 
 class VersePagerAdapter extends PagerAdapter implements VerseView {
     static class Page implements RecyclerView.OnChildAttachStateChangeListener, View.OnClickListener {
-        private final VersePresenter versePresenter;
         private final VerseSelectionListener listener;
         private final VerseListAdapter verseListAdapter;
 
@@ -61,7 +60,6 @@ class VersePagerAdapter extends PagerAdapter implements VerseView {
 
         private Page(Context context, Settings settings, final VersePresenter versePresenter,
                      VerseSelectionListener listener, View rootView) {
-            this.versePresenter = versePresenter;
             this.listener = listener;
             this.rootView = rootView;
             ButterKnife.bind(this, rootView);
@@ -218,7 +216,6 @@ class VersePagerAdapter extends PagerAdapter implements VerseView {
                         public void run() {
                             ((LinearLayoutManager) page.verseList.getLayoutManager())
                                     .scrollToPositionWithOffset(currentVerse, 0);
-                            currentVerse = 0;
                         }
                     });
                 } else {
@@ -248,12 +245,12 @@ class VersePagerAdapter extends PagerAdapter implements VerseView {
 
     @Override
     public void onReadingProgressUpdated(Verse.Index index) {
+        currentChapter = index.chapter;
+        currentVerse = index.verse;
         if (currentBook == index.book) {
             return;
         }
         currentBook = index.book;
-        currentChapter = index.chapter;
-        currentVerse = index.verse;
         notifyDataSetChanged();
     }
 
