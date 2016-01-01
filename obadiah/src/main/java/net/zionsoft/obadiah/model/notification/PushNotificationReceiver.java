@@ -31,7 +31,7 @@ public class PushNotificationReceiver extends BroadcastReceiver {
         final String messageType = intent.getStringExtra("message_type");
         Analytics.trackEvent(Analytics.CATEGORY_NOTIFICATION, Analytics.NOTIFICATION_ACTION_RECEIVED,
                 TextUtils.isEmpty(messageType) ? "empty message type" : messageType);
-        if ("gcm".equals(messageType)) {
+        if (TextUtils.isEmpty(messageType) || "gcm".equals(messageType)) {
             context.startService(PushNotificationHandler.newStartIntent(context, intent.getExtras()));
         }
     }
