@@ -26,6 +26,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.NavUtils;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -117,11 +118,26 @@ public class TranslationManagementActivity extends BaseAppCompatActivity
         checkDeepLink();
     }
 
+    private void checkDeepLink() {
+        final Intent startIntent = getIntent();
+        final String messageType = startIntent.getStringExtra(KEY_MESSAGE_TYPE);
+        if (TextUtils.isEmpty(messageType)) {
+            return;
+        }
+        Analytics.trackEvent(Analytics.CATEGORY_NOTIFICATION, Analytics.NOTIFICATION_ACTION_OPENED, messageType);
+    }
+
     private void initializeUi() {
         setContentView(R.layout.activity_translation_management);
 
-        toolbar.setLogo(R.drawable.ic_action_bar);
         toolbar.setTitle(R.string.activity_manage_translation);
+        toolbar.setNavigationIcon(R.drawable.ic_action_back);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finishAndOpenParentActivity();
+            }
+        });
 
         toolbar.setOnMenuItemClickListener(this);
         toolbar.inflateMenu(R.menu.menu_translation_management);
@@ -140,13 +156,11 @@ public class TranslationManagementActivity extends BaseAppCompatActivity
         initializeAdapter();
     }
 
-    private void checkDeepLink() {
-        final Intent startIntent = getIntent();
-        final String messageType = startIntent.getStringExtra(KEY_MESSAGE_TYPE);
-        if (TextUtils.isEmpty(messageType)) {
-            return;
-        }
-        Analytics.trackEvent(Analytics.CATEGORY_NOTIFICATION, Analytics.NOTIFICATION_ACTION_OPENED, messageType);
+    private void finishAndOpenParentActivity() {
+        startActivity(NavUtils.getParentActivityIntent(this)
+                .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP));
+        finish();
+        overridePendingTransition(R.anim.fade_in, R.anim.slide_out_left_to_right);
     }
 
     @Override
@@ -262,8 +276,7 @@ public class TranslationManagementActivity extends BaseAppCompatActivity
                 }, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        finish();
-                        overridePendingTransition(R.anim.fade_in, R.anim.slide_out_left_to_right);
+                        finishAndOpenParentActivity();
                     }
                 }
         );
@@ -360,9 +373,7 @@ public class TranslationManagementActivity extends BaseAppCompatActivity
         if (translationViewHolder.isDownloaded()) {
             translationManagementPresenter.saveCurrentTranslation(
                     translationViewHolder.getTranslationInfo().shortName);
-
-            finish();
-            overridePendingTransition(R.anim.fade_in, R.anim.slide_out_left_to_right);
+            finishAndOpenParentActivity();
         } else {
             downloadTranslation(translationViewHolder.getTranslationInfo());
         }
