@@ -17,15 +17,24 @@
 
 package net.zionsoft.obadiah.network;
 
+import com.squareup.moshi.Json;
+
 import java.util.List;
 
 /**
  * Used to parse the books.json file.
  */
 public class BackendTranslationInfo {
+    @Json(name = "name")
     public final String name;
+
+    @Json(name = "shortName")
     public final String shortName;
+
+    @Json(name = "language")
     public final String language;
+
+    @Json(name = "books")
     public final List<String> books;
 
     public BackendTranslationInfo(String name, String shortName, String language, List<String> books) {

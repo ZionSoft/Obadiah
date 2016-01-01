@@ -17,12 +17,15 @@
 
 package net.zionsoft.obadiah.network;
 
+import com.squareup.moshi.Json;
+
 import java.util.List;
 
 /**
  * Used to parse one single chapter.
  */
 public class BackendChapter {
+    @Json(name = "verses")
     public final List<String> verses;
 
     public BackendChapter(List<String> verses) {
