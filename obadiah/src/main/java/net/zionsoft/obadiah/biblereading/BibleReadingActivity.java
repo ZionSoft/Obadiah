@@ -245,8 +245,6 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
         rootView.setKeepScreenOn(settings.keepScreenOn());
         rootView.setBackgroundColor(settings.getBackgroundColor());
 
-        versePager.getAdapter().notifyDataSetChanged();
-
         currentTranslation = bibleReadingPresenter.loadCurrentTranslation();
         currentBook = bibleReadingPresenter.loadCurrentBook();
         currentChapter = bibleReadingPresenter.loadCurrentChapter();

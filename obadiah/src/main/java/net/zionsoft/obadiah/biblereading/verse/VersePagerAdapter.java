@@ -130,9 +130,6 @@ class VersePagerAdapter extends PagerAdapter implements VerseView {
         this.pages = new ArrayList<>(1 + 2 * offScreenPageLimit);
 
         translation = versePresenter.loadCurrentTranslation();
-        currentBook = versePresenter.loadCurrentBook();
-        currentChapter = versePresenter.loadCurrentChapter();
-        currentVerse = versePresenter.loadCurrentVerse();
     }
 
     @Override
@@ -257,20 +254,10 @@ class VersePagerAdapter extends PagerAdapter implements VerseView {
     void onResume() {
         versePresenter.takeView(this);
 
-        boolean isReadingProgressChanged = false;
-        final String translation = versePresenter.loadCurrentTranslation();
-        if (!TextUtils.isEmpty(translation) && !translation.equals(this.translation)) {
-            this.translation = translation;
-            isReadingProgressChanged = true;
-        }
-        final int book = versePresenter.loadCurrentBook();
-        if (book != currentBook) {
-            currentBook = book;
-            isReadingProgressChanged = true;
-        }
-        if (isReadingProgressChanged) {
-            notifyDataSetChanged();
-        }
+        currentBook = versePresenter.loadCurrentBook();
+        currentChapter = versePresenter.loadCurrentChapter();
+        currentVerse = versePresenter.loadCurrentVerse();
+        notifyDataSetChanged();
     }
 
     void onPause() {
