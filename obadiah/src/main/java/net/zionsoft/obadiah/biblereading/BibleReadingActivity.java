@@ -17,9 +17,13 @@
 
 package net.zionsoft.obadiah.biblereading;
 
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.LabeledIntent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.nfc.NdefMessage;
@@ -27,6 +31,7 @@ import android.nfc.NfcAdapter;
 import android.nfc.NfcEvent;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -57,6 +62,7 @@ import net.zionsoft.obadiah.translations.TranslationManagementActivity;
 import net.zionsoft.obadiah.ui.utils.BaseAppCompatActivity;
 import net.zionsoft.obadiah.ui.utils.DialogHelper;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -397,15 +403,24 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
                 final ClipboardManager clipboardManager = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
                 clipboardManager.setText(buildText(versePager.getSelectedVerses()));
                 Toast.makeText(this, R.string.toast_verses_copied, Toast.LENGTH_SHORT).show();
+
                 mode.finish();
                 return true;
             case R.id.action_share:
                 Analytics.trackEvent(Analytics.CATEGORY_UI, Analytics.UI_ACTION_BUTTON_CLICK, "share");
 
-                startActivity(Intent.createChooser(new Intent()
-                                .setAction(Intent.ACTION_SEND).setType("text/plain")
-                                .putExtra(Intent.EXTRA_TEXT, buildText(versePager.getSelectedVerses())),
-                        getResources().getText(R.string.text_share_with)));
+                // Facebook doesn't want us to pre-fill the message, but still captures ACTION_SEND
+                // therefore, I have to exclude their package from being shown
+                // it's a horrible way to force developers to use their SDK
+                // ref. https://developers.facebook.com/bugs/332619626816423
+                final Intent chooseIntent = createChooserExcludingPackage(
+                        this, "com.facebook.katana", buildText(versePager.getSelectedVerses()));
+                if (chooseIntent == null) {
+                    Toast.makeText(this, R.string.dialog_unknown_error, Toast.LENGTH_SHORT).show();
+                } else {
+                    startActivity(chooseIntent);
+                }
+
                 mode.finish();
                 return true;
             default:
@@ -425,6 +440,41 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
                     verse.index.verse + 1, verse.verseText));
         }
         return text.toString();
+    }
+
+    @Nullable
+    private static Intent createChooserExcludingPackage(
+            Context context, String packageToExclude, String text) {
+        final Intent sendIntent = new Intent(Intent.ACTION_SEND)
+                .setType("text/plain");
+        final PackageManager pm = context.getPackageManager();
+        final List<ResolveInfo> resolveInfoList = pm.queryIntentActivities(sendIntent, 0);
+        final int size = resolveInfoList.size();
+        if (size == 0) {
+            return null;
+        }
+        final ArrayList<Intent> filteredIntents = new ArrayList<>(size);
+        for (int i = 0; i < size; ++i) {
+            final ResolveInfo resolveInfo = resolveInfoList.get(i);
+            final String packageName = resolveInfo.activityInfo.packageName;
+            if (!packageToExclude.equals(packageName)) {
+                final LabeledIntent labeledIntent = new LabeledIntent(
+                        packageName, resolveInfo.loadLabel(pm), resolveInfo.getIconResource());
+                labeledIntent.setAction(Intent.ACTION_SEND).setPackage(packageName)
+                        .setComponent(new ComponentName(packageName, resolveInfo.activityInfo.name))
+                        .setType("text/plain").putExtra(Intent.EXTRA_TEXT, text);
+                filteredIntents.add(labeledIntent);
+            }
+        }
+
+        final Intent chooserIntent = Intent.createChooser(filteredIntents.remove(0),
+                context.getText(R.string.text_share_with));
+        final int extraIntents = filteredIntents.size();
+        if (extraIntents > 0) {
+            chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS,
+                    filteredIntents.toArray(new Parcelable[extraIntents]));
+        }
+        return chooserIntent;
     }
 
     @Override
