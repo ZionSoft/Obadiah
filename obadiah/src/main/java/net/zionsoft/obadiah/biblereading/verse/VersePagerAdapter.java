@@ -128,8 +128,6 @@ class VersePagerAdapter extends PagerAdapter implements VerseView {
         this.versePresenter = versePresenter;
         this.inflater = LayoutInflater.from(context);
         this.pages = new ArrayList<>(1 + 2 * offScreenPageLimit);
-
-        translation = versePresenter.loadCurrentTranslation();
     }
 
     @Override
@@ -254,6 +252,7 @@ class VersePagerAdapter extends PagerAdapter implements VerseView {
     void onResume() {
         versePresenter.takeView(this);
 
+        translation = versePresenter.loadCurrentTranslation();
         currentBook = versePresenter.loadCurrentBook();
         currentChapter = versePresenter.loadCurrentChapter();
         currentVerse = versePresenter.loadCurrentVerse();
