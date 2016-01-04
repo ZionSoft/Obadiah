@@ -159,15 +159,11 @@ class TranslationManagementModel {
             @Override
             public int compare(TranslationInfo translation1, TranslationInfo translation2) {
                 // first compares with user's default locale
-                final Locale userLocale = Locale.getDefault();
-                final String userLanguage = userLocale.getLanguage().toLowerCase();
-                final String userCountry = userLocale.getCountry().toLowerCase();
-                final String[] fields1 = translation1.language.split("_");
-                final String[] fields2 = translation2.language.split("_");
-                final int score1 = compareLocale(fields1[0], fields1[1],
-                        userLanguage, userCountry);
-                final int score2 = compareLocale(fields2[0], fields2[1],
-                        userLanguage, userCountry);
+                final String userLanguage = Locale.getDefault().getLanguage().toLowerCase();
+                final String targetLanguage1 = translation1.language.split("_")[0];
+                final String targetLanguage2 = translation2.language.split("_")[0];
+                final int score1 = userLanguage.equals(targetLanguage1) ? 1 : 0;
+                final int score2 = userLanguage.equals(targetLanguage2) ? 1 : 0;
                 int r = score2 - score1;
                 if (r != 0) {
                     return r;
@@ -179,13 +175,6 @@ class TranslationManagementModel {
             }
         });
         return translations;
-    }
-
-    private static int compareLocale(String language, String country, String targetLanguage, String targetCountry) {
-        if (language.equals(targetLanguage)) {
-            return (country.equals(targetCountry)) ? 2 : 1;
-        }
-        return 0;
     }
 
     Observable<Void> removeTranslation(final TranslationInfo translation) {
