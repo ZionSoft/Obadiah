@@ -17,16 +17,35 @@
 
 package net.zionsoft.obadiah.biblereading.verse;
 
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.LabeledIntent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.ActionMode;
+import android.text.ClipboardManager;
 import android.util.AttributeSet;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.widget.Toast;
 
+import net.zionsoft.obadiah.R;
+import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.domain.Verse;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class VerseViewPager extends ViewPager implements VersePagerView {
+public class VerseViewPager extends ViewPager implements VersePagerView, VerseSelectionListener,
+        ActionMode.Callback {
+    private AppCompatActivity activity;
+    private ActionMode actionMode;
+
     private VersePagerPresenter versePagerPresenter;
 
     private VersePagerAdapter adapter;
@@ -48,23 +67,135 @@ public class VerseViewPager extends ViewPager implements VersePagerView {
         currentChapter = index.chapter;
 
         setCurrentItem(currentChapter, true);
+
+        if (actionMode != null) {
+            actionMode.finish();
+        }
+    }
+
+    @Override
+    public void onVersesSelectionChanged(boolean hasSelected) {
+        if (hasSelected) {
+            if (actionMode != null) {
+                return;
+            }
+            actionMode = activity.startSupportActionMode(this);
+        } else {
+            if (actionMode != null) {
+                actionMode.finish();
+            }
+        }
+    }
+
+    @Override
+    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+        mode.getMenuInflater().inflate(R.menu.menu_text_selection_context, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+        return false;
+    }
+
+    @Override
+    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_copy:
+                Analytics.trackEvent(Analytics.CATEGORY_UI, Analytics.UI_ACTION_BUTTON_CLICK, "copy");
+
+                // noinspection deprecation
+                final ClipboardManager clipboardManager
+                        = (ClipboardManager) activity.getSystemService(Context.CLIPBOARD_SERVICE);
+                clipboardManager.setText(buildText(adapter.getSelectedVerses(getCurrentItem())));
+                Toast.makeText(activity, R.string.toast_verses_copied, Toast.LENGTH_SHORT).show();
+
+                mode.finish();
+                return true;
+            case R.id.action_share:
+                Analytics.trackEvent(Analytics.CATEGORY_UI, Analytics.UI_ACTION_BUTTON_CLICK, "share");
+
+                // Facebook doesn't want us to pre-fill the message, but still captures ACTION_SEND
+                // therefore, I have to exclude their package from being shown
+                // it's a horrible way to force developers to use their SDK
+                // ref. https://developers.facebook.com/bugs/332619626816423
+                final Intent chooseIntent = createChooserExcludingPackage(activity,
+                        "com.facebook.katana", buildText(adapter.getSelectedVerses(getCurrentItem())));
+                if (chooseIntent == null) {
+                    Toast.makeText(activity, R.string.error_unknown_error, Toast.LENGTH_SHORT).show();
+                } else {
+                    activity.startActivity(chooseIntent);
+                }
+
+                mode.finish();
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    private static String buildText(@Nullable List<Verse> verses) {
+        if (verses == null || verses.size() == 0) {
+            return null;
+        }
+
+        // format: <book name> <chapter index>:<verse index> <verse text>
+        final StringBuilder text = new StringBuilder();
+        for (Verse verse : verses) {
+            text.append(String.format("%S %d:%d %s\n", verse.bookName, verse.index.chapter + 1,
+                    verse.index.verse + 1, verse.verseText));
+        }
+        return text.toString();
     }
 
     @Nullable
-    public List<Verse> getSelectedVerses() {
-        return adapter.getSelectedVerses(getCurrentItem());
+    private static Intent createChooserExcludingPackage(
+            Context context, String packageToExclude, String text) {
+        final Intent sendIntent = new Intent(Intent.ACTION_SEND)
+                .setType("text/plain");
+        final PackageManager pm = context.getPackageManager();
+        final List<ResolveInfo> resolveInfoList = pm.queryIntentActivities(sendIntent, 0);
+        final int size = resolveInfoList.size();
+        if (size == 0) {
+            return null;
+        }
+        final ArrayList<Intent> filteredIntents = new ArrayList<>(size);
+        for (int i = 0; i < size; ++i) {
+            final ResolveInfo resolveInfo = resolveInfoList.get(i);
+            final String packageName = resolveInfo.activityInfo.packageName;
+            if (!packageToExclude.equals(packageName)) {
+                final LabeledIntent labeledIntent = new LabeledIntent(
+                        packageName, resolveInfo.loadLabel(pm), resolveInfo.getIconResource());
+                labeledIntent.setAction(Intent.ACTION_SEND).setPackage(packageName)
+                        .setComponent(new ComponentName(packageName, resolveInfo.activityInfo.name))
+                        .setType("text/plain").putExtra(Intent.EXTRA_TEXT, text);
+                filteredIntents.add(labeledIntent);
+            }
+        }
+
+        final Intent chooserIntent = Intent.createChooser(filteredIntents.remove(0),
+                context.getText(R.string.text_share_with));
+        final int extraIntents = filteredIntents.size();
+        if (extraIntents > 0) {
+            chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS,
+                    filteredIntents.toArray(new Parcelable[extraIntents]));
+        }
+        return chooserIntent;
     }
 
-    public void deselectVerses() {
+    @Override
+    public void onDestroyActionMode(ActionMode mode) {
         adapter.deselectVerses();
+        this.actionMode = null;
     }
 
-    public void initialize(Context context, VerseSelectionListener listener,
-                           VersePagerPresenter versePagerPresenter, VersePresenter versePresenter) {
+    public void initialize(AppCompatActivity activity, VersePagerPresenter versePagerPresenter,
+                           VersePresenter versePresenter) {
+        this.activity = activity;
         this.versePagerPresenter = versePagerPresenter;
 
-        adapter = new VersePagerAdapter(context, versePresenter, getOffscreenPageLimit());
-        adapter.setVerseSelectionListener(listener);
+        adapter = new VersePagerAdapter(activity, versePresenter, getOffscreenPageLimit());
+        adapter.setVerseSelectionListener(this);
         setAdapter(adapter);
         addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
@@ -87,6 +218,10 @@ public class VerseViewPager extends ViewPager implements VersePagerView {
     }
 
     public void onPause() {
+        if (actionMode != null) {
+            actionMode.finish();
+        }
+
         versePagerPresenter.dropView();
         adapter.onPause();
     }

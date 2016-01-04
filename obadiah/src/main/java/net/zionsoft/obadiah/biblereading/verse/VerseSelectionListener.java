@@ -17,6 +17,6 @@
 
 package net.zionsoft.obadiah.biblereading.verse;
 
-public interface VerseSelectionListener {
+interface VerseSelectionListener {
     void onVersesSelectionChanged(boolean hasSelected);
 }
