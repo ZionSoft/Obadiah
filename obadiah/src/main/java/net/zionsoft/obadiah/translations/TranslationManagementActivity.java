@@ -399,7 +399,12 @@ public class TranslationManagementActivity extends BaseAppCompatActivity
             return;
         }
         if (translationViewHolder.isDownloaded()) {
-            menu.setHeaderTitle(translationViewHolder.getTranslationInfo().name);
+            final TranslationInfo translation = translationViewHolder.getTranslationInfo();
+            if (translation.shortName.equals(translationManagementPresenter.loadCurrentTranslation())) {
+                // current translation, do nothing
+                return;
+            }
+            menu.setHeaderTitle(translation.name);
             menu.add(Menu.NONE, CONTEXT_MENU_ITEM_DELETE, Menu.NONE, R.string.action_delete_translation)
                     .setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                         @Override
