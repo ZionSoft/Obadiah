@@ -16,7 +16,7 @@
         <item name="android:windowAnimationStyle">@style/AppWindowAnimationStyle</item>
     </style>
 
-    <style name="AppSpinnerStyle" parent="android:style/Widget.ListView.DropDown">
+    <style name="AppSpinnerStyle" parent="style/ThemeOverlay.AppCompat.Light">
         <item name="android:divider">@color/dark_gray</item>
         <item name="android:dividerHeight">1px</item>
     </style>
