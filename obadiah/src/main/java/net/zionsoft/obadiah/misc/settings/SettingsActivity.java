@@ -140,7 +140,7 @@ public class SettingsActivity extends BaseAppCompatActivity {
                     startActivity(new Intent(Intent.ACTION_VIEW).setData(Constants.GOOGLE_PLAY_URI));
                     Analytics.trackEvent(Analytics.CATEGORY_UI, Analytics.UI_ACTION_BUTTON_CLICK, "rate_app");
                 } catch (ActivityNotFoundException e) {
-                    DialogHelper.showDialog(SettingsActivity.this, R.string.dialog_unknown_error, null);
+                    DialogHelper.showDialog(SettingsActivity.this, R.string.error_unknown_error, null);
                 }
             }
         });
@@ -156,7 +156,7 @@ public class SettingsActivity extends BaseAppCompatActivity {
                 try {
                     startActivityForResult(intent, REQUEST_CODE_INVITE_FRIENDS);
                 } catch (ActivityNotFoundException e) {
-                    DialogHelper.showDialog(SettingsActivity.this, R.string.dialog_unknown_error, null);
+                    DialogHelper.showDialog(SettingsActivity.this, R.string.error_unknown_error, null);
                 }
             }
         });

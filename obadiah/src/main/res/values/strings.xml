@@ -17,13 +17,13 @@
     <string name="action_settings">Settings</string>
     <string name="action_share">Share</string>
 
-    <string name="dialog_unknown_error">Unknown error.</string>
-    <string name="dialog_no_translation">No translation available, download now?</string>
-    <string name="dialog_retry">Fail to load, retry?</string>
-    <string name="dialog_retry_network">Fail to load, please check your network connection and retry.</string>
-    <string name="dialog_new_version_available_message">A new version is available, download now?</string>
     <string name="dialog_translation_delete_confirm_message">Are you sure to delete this translation?</string>
-    <string name="dialog_translation_remove_failure_message">Failed to remove the translation, try again?</string>
+
+    <string name="error_unknown_error">Unknown error.</string>
+    <string name="error_no_translation">No translation available, download now?</string>
+    <string name="error_failed_to_load">Fail to load, retry?</string>
+    <string name="error_network">Fail to load, please check your network connection and retry.</string>
+    <string name="error_failed_to_remove">Failed to remove the translation, try again?</string>
 
     <string name="pref_night_mode">Night Mode</string>
     <string name="pref_rate_me">Rate me on Google Play</string>

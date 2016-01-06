@@ -266,7 +266,7 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
         versePager.onResume();
 
         if (TextUtils.isEmpty(bibleReadingPresenter.loadCurrentTranslation())) {
-            DialogHelper.showDialog(this, false, R.string.dialog_no_translation,
+            DialogHelper.showDialog(this, false, R.string.error_no_translation,
                     new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
@@ -336,7 +336,7 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
 
     @Override
     public void onBookNamesLoadFailed() {
-        DialogHelper.showDialog(this, false, R.string.dialog_retry,
+        DialogHelper.showDialog(this, false, R.string.error_failed_to_load,
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -416,7 +416,7 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
                 final Intent chooseIntent = createChooserExcludingPackage(
                         this, "com.facebook.katana", buildText(versePager.getSelectedVerses()));
                 if (chooseIntent == null) {
-                    Toast.makeText(this, R.string.dialog_unknown_error, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, R.string.error_unknown_error, Toast.LENGTH_SHORT).show();
                 } else {
                     startActivity(chooseIntent);
                 }

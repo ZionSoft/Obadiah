@@ -17,13 +17,13 @@
     <string name="action_settings">Asetukset</string>
     <string name="action_share">Jakaa</string>
 
-    <string name="dialog_unknown_error">Tuntematon virhe.</string>
-    <string name="dialog_no_translation">Lataa käännökset?</string>
-    <string name="dialog_retry">Ei voi ladata, yritä uudelleen?</string>
-    <string name="dialog_retry_network">Ei voi ladata, tarkista verkkoyhteys ja yritä uudelleen.</string>
-    <string name="dialog_new_version_available_message">Uusi versio on saatavilla, lataa?</string>
     <string name="dialog_translation_delete_confirm_message">Poista?</string>
-    <string name="dialog_translation_remove_failure_message">Ei voi poistaa, yritä uudelleen?</string>
+
+    <string name="error_unknown_error">Tuntematon virhe.</string>
+    <string name="error_no_translation">Lataa käännökset?</string>
+    <string name="error_failed_to_load">Ei voi ladata, yritä uudelleen?</string>
+    <string name="error_network">Ei voi ladata, tarkista verkkoyhteys ja yritä uudelleen.</string>
+    <string name="error_failed_to_remove">Ei voi poistaa, yritä uudelleen?</string>
 
     <string name="pref_night_mode">Yökäyttötilassa</string>
     <string name="pref_rate_me">Arvostele</string>

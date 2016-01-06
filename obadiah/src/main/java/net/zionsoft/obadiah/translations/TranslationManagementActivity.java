@@ -267,7 +267,7 @@ public class TranslationManagementActivity extends BaseAppCompatActivity
 
     @Override
     public void onTranslationLoadFailed() {
-        DialogHelper.showDialog(this, false, R.string.dialog_retry_network,
+        DialogHelper.showDialog(this, false, R.string.error_network,
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -293,7 +293,7 @@ public class TranslationManagementActivity extends BaseAppCompatActivity
     public void onTranslationRemovalFailed(final TranslationInfo translation) {
         dismissRemoveProgressDialog();
 
-        DialogHelper.showDialog(this, true, R.string.dialog_translation_remove_failure_message,
+        DialogHelper.showDialog(this, true, R.string.error_failed_to_remove,
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         removeTranslation(translation);
@@ -334,7 +334,7 @@ public class TranslationManagementActivity extends BaseAppCompatActivity
     public void onTranslationDownloadFailed(final TranslationInfo translation) {
         dismissDownloadProgressDialog();
 
-        DialogHelper.showDialog(this, true, R.string.dialog_retry_network,
+        DialogHelper.showDialog(this, true, R.string.error_network,
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         downloadTranslation(translation);

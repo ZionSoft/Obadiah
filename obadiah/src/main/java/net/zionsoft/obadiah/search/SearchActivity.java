@@ -282,7 +282,7 @@ public class SearchActivity extends BaseAppCompatActivity
 
     @Override
     public void onVersesSearchFailed() {
-        DialogHelper.showDialog(this, false, R.string.dialog_retry,
+        DialogHelper.showDialog(this, false, R.string.error_failed_to_load,
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
