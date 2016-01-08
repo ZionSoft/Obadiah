@@ -20,8 +20,9 @@ package net.zionsoft.obadiah.search;
 import android.support.annotation.Nullable;
 
 import net.zionsoft.obadiah.model.datamodel.BibleReadingModel;
+import net.zionsoft.obadiah.model.datamodel.Settings;
 import net.zionsoft.obadiah.model.domain.Verse;
-import net.zionsoft.obadiah.mvp.MVPPresenter;
+import net.zionsoft.obadiah.mvp.BasePresenter;
 
 import java.util.List;
 
@@ -30,13 +31,14 @@ import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
-class SearchPresenter extends MVPPresenter<SearchView> {
+class SearchPresenter extends BasePresenter<SearchView> {
     private final BibleReadingModel bibleReadingModel;
     private final SearchModel searchModel;
 
     private Subscription subscription;
 
-    SearchPresenter(BibleReadingModel bibleReadingModel, SearchModel searchModel) {
+    SearchPresenter(BibleReadingModel bibleReadingModel, SearchModel searchModel, Settings settings) {
+        super(settings);
         this.bibleReadingModel = bibleReadingModel;
         this.searchModel = searchModel;
     }

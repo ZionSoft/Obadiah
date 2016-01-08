@@ -29,7 +29,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import net.zionsoft.obadiah.R;
-import net.zionsoft.obadiah.model.datamodel.Settings;
 import net.zionsoft.obadiah.model.domain.Bible;
 import net.zionsoft.obadiah.model.domain.Verse;
 import net.zionsoft.obadiah.ui.utils.AnimationHelper;
@@ -58,7 +57,7 @@ class VersePagerAdapter extends PagerAdapter implements VerseView {
         @Bind(R.id.verse_list)
         RecyclerView verseList;
 
-        private Page(Context context, Settings settings, final VersePresenter versePresenter,
+        private Page(Context context, final VersePresenter versePresenter,
                      VerseSelectionListener listener, View rootView) {
             this.listener = listener;
             this.rootView = rootView;
@@ -66,7 +65,7 @@ class VersePagerAdapter extends PagerAdapter implements VerseView {
 
             verseList.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false));
 
-            verseListAdapter = new VerseListAdapter(context, settings);
+            verseListAdapter = new VerseListAdapter(context, versePresenter.getSettings());
             verseList.setAdapter(verseListAdapter);
 
             verseList.addOnChildAttachStateChangeListener(this);
@@ -109,7 +108,6 @@ class VersePagerAdapter extends PagerAdapter implements VerseView {
     }
 
     private final Context context;
-    private final Settings settings;
     private final VersePresenter versePresenter;
     private final LayoutInflater inflater;
     private final ArrayList<Page> pages;
@@ -121,10 +119,8 @@ class VersePagerAdapter extends PagerAdapter implements VerseView {
     private int currentChapter;
     private int currentVerse;
 
-    VersePagerAdapter(Context context, Settings settings,
-                      VersePresenter versePresenter, int offScreenPageLimit) {
+    VersePagerAdapter(Context context, VersePresenter versePresenter, int offScreenPageLimit) {
         this.context = context;
-        this.settings = settings;
         this.versePresenter = versePresenter;
         this.inflater = LayoutInflater.from(context);
         this.pages = new ArrayList<>(1 + 2 * offScreenPageLimit);
@@ -147,7 +143,7 @@ class VersePagerAdapter extends PagerAdapter implements VerseView {
             }
         }
         if (page == null) {
-            page = new Page(context, settings, versePresenter, listener,
+            page = new Page(context, versePresenter, listener,
                     inflater.inflate(R.layout.item_verse_pager, container, false));
             pages.add(page);
         }

@@ -21,9 +21,10 @@ import android.app.Activity;
 import android.content.Intent;
 import android.text.TextUtils;
 
-import net.zionsoft.obadiah.model.domain.TranslationInfo;
 import net.zionsoft.obadiah.model.datamodel.BibleReadingModel;
-import net.zionsoft.obadiah.mvp.MVPPresenter;
+import net.zionsoft.obadiah.model.datamodel.Settings;
+import net.zionsoft.obadiah.model.domain.TranslationInfo;
+import net.zionsoft.obadiah.mvp.BasePresenter;
 
 import rx.Subscriber;
 import rx.Subscription;
@@ -32,7 +33,7 @@ import rx.functions.Action0;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
-class TranslationManagementPresenter extends MVPPresenter<TranslationManagementView>
+class TranslationManagementPresenter extends BasePresenter<TranslationManagementView>
         implements AdsModel.OnAdsRemovalPurchasedListener {
     private final AdsModel adsModel;
     private final BibleReadingModel bibleReadingModel;
@@ -43,7 +44,8 @@ class TranslationManagementPresenter extends MVPPresenter<TranslationManagementV
     private Subscription fetchTranslationSubscription;
 
     TranslationManagementPresenter(AdsModel adsModel, BibleReadingModel bibleReadingModel,
-                                   TranslationManagementModel translationManagementModel) {
+                                   TranslationManagementModel translationManagementModel, Settings settings) {
+        super(settings);
         this.adsModel = adsModel;
         this.bibleReadingModel = bibleReadingModel;
         this.translationManagementModel = translationManagementModel;

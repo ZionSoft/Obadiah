@@ -49,9 +49,6 @@ public class ReadingProgressActivity extends BaseAppCompatActivity implements Re
     @Inject
     ReadingProgressPresenter readingProgressPresenter;
 
-    @Inject
-    Settings settings;
-
     @Bind(R.id.toolbar)
     Toolbar toolbar;
 
@@ -87,6 +84,7 @@ public class ReadingProgressActivity extends BaseAppCompatActivity implements Re
             ((ReadingProgressComponentFragment) fragment).getComponent().inject(this);
 
             final View rootView = getWindow().getDecorView();
+            final Settings settings = readingProgressPresenter.getSettings();
             rootView.setKeepScreenOn(settings.keepScreenOn());
             rootView.setBackgroundColor(settings.getBackgroundColor());
         }
@@ -112,8 +110,8 @@ public class ReadingProgressActivity extends BaseAppCompatActivity implements Re
     @Override
     public void onReadingProgressLoaded(ReadingProgress readingProgress, List<String> bookNames) {
         AnimationHelper.fadeOut(loadingSpinner);
-        readingProgressList.setAdapter(
-                new ReadingProgressListAdapter(this, settings, bookNames, readingProgress));
+        readingProgressList.setAdapter(new ReadingProgressListAdapter(
+                this, readingProgressPresenter.getSettings(), bookNames, readingProgress));
     }
 
     @Override

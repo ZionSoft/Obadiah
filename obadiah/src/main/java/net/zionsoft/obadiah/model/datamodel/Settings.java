@@ -21,6 +21,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.preference.PreferenceManager;
+import android.support.annotation.ColorInt;
 import android.support.annotation.DimenRes;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
@@ -119,10 +120,12 @@ public class Settings {
                 .apply();
     }
 
+    @ColorInt
     public int getBackgroundColor() {
         return nightMode ? Color.BLACK : Color.WHITE;
     }
 
+    @ColorInt
     public int getTextColor() {
         return nightMode ? Color.WHITE : Color.BLACK;
     }

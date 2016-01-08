@@ -73,9 +73,6 @@ public class SearchActivity extends BaseAppCompatActivity
     @Inject
     SearchPresenter searchPresenter;
 
-    @Inject
-    Settings settings;
-
     @Bind(R.id.toolbar)
     Toolbar toolbar;
 
@@ -140,14 +137,14 @@ public class SearchActivity extends BaseAppCompatActivity
     }
 
     private void initializeAdapter() {
-        if (searchResultList == null || settings == null || searchPresenter == null || searchResultAdapter != null) {
+        if (searchResultList == null || searchPresenter == null || searchResultAdapter != null) {
             // if the activity is recreated due to screen orientation change, the component fragment
             // is attached before the UI is initialized, i.e. onAttachFragment() is called inside
             // super.onCreate()
             // therefore, we try to do the initialization in both places
             return;
         }
-        searchResultAdapter = new SearchResultListAdapter(this, searchPresenter, settings);
+        searchResultAdapter = new SearchResultListAdapter(this, searchPresenter);
         searchResultAdapter.setVerses(verses);
         searchResultList.setAdapter(searchResultAdapter);
     }
@@ -190,6 +187,7 @@ public class SearchActivity extends BaseAppCompatActivity
 
     private void populateUi() {
         final View rootView = getWindow().getDecorView();
+        final Settings settings = searchPresenter.getSettings();
         rootView.setKeepScreenOn(settings.keepScreenOn());
         rootView.setBackgroundColor(settings.getBackgroundColor());
 

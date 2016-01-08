@@ -24,6 +24,7 @@ import com.squareup.moshi.Moshi;
 import net.zionsoft.obadiah.injection.scopes.ActivityScope;
 import net.zionsoft.obadiah.model.database.DatabaseHelper;
 import net.zionsoft.obadiah.model.datamodel.BibleReadingModel;
+import net.zionsoft.obadiah.model.datamodel.Settings;
 import net.zionsoft.obadiah.network.BackendInterface;
 
 import dagger.Module;
@@ -46,7 +47,7 @@ public class TranslationManagementModule {
     @ActivityScope
     TranslationManagementPresenter provideTranslationManagementPresenter(
             AdsModel adsModel, BibleReadingModel bibleReadingModel,
-            TranslationManagementModel translationManagementModel) {
-        return new TranslationManagementPresenter(adsModel, bibleReadingModel, translationManagementModel);
+            TranslationManagementModel translationManagementModel, Settings settings) {
+        return new TranslationManagementPresenter(adsModel, bibleReadingModel, translationManagementModel, settings);
     }
 }

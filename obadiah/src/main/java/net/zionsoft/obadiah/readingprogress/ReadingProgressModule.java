@@ -20,6 +20,7 @@ package net.zionsoft.obadiah.readingprogress;
 import net.zionsoft.obadiah.injection.scopes.ActivityScope;
 import net.zionsoft.obadiah.model.datamodel.BibleReadingModel;
 import net.zionsoft.obadiah.model.datamodel.ReadingProgressModel;
+import net.zionsoft.obadiah.model.datamodel.Settings;
 
 import dagger.Module;
 import dagger.Provides;
@@ -29,7 +30,8 @@ public class ReadingProgressModule {
     @Provides
     @ActivityScope
     ReadingProgressPresenter progressPresenter(BibleReadingModel bibleReadingModel,
-                                               ReadingProgressModel readingProgressModel) {
-        return new ReadingProgressPresenter(bibleReadingModel, readingProgressModel);
+                                               ReadingProgressModel readingProgressModel,
+                                               Settings settings) {
+        return new ReadingProgressPresenter(bibleReadingModel, readingProgressModel, settings);
     }
 }

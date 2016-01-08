@@ -55,15 +55,13 @@ class SearchResultListAdapter extends RecyclerView.Adapter {
     private final SearchPresenter searchPresenter;
     private final LayoutInflater inflater;
     private final Resources resources;
-    private final Settings settings;
 
     private List<Verse> verses;
 
-    SearchResultListAdapter(Context context, SearchPresenter searchPresenter, Settings settings) {
+    SearchResultListAdapter(Context context, SearchPresenter searchPresenter) {
         this.searchPresenter = searchPresenter;
         this.inflater = LayoutInflater.from(context);
         this.resources = context.getResources();
-        this.settings = settings;
     }
 
     @Override
@@ -74,6 +72,7 @@ class SearchResultListAdapter extends RecyclerView.Adapter {
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         final TextView textView = (TextView) holder.itemView;
+        final Settings settings = searchPresenter.getSettings();
         textView.setTextColor(settings.getTextColor());
         textView.setTextSize(TypedValue.COMPLEX_UNIT_PX,
                 resources.getDimension(settings.getTextSize().textSize));

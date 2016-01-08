@@ -21,6 +21,7 @@ import android.content.Context;
 
 import net.zionsoft.obadiah.injection.scopes.ActivityScope;
 import net.zionsoft.obadiah.model.datamodel.BibleReadingModel;
+import net.zionsoft.obadiah.model.datamodel.Settings;
 
 import dagger.Module;
 import dagger.Provides;
@@ -34,7 +35,8 @@ public class SearchModule {
 
     @Provides
     @ActivityScope
-    SearchPresenter provideSearchPresenter(BibleReadingModel bibleReadingModel, SearchModel searchModel) {
-        return new SearchPresenter(bibleReadingModel, searchModel);
+    SearchPresenter provideSearchPresenter(BibleReadingModel bibleReadingModel,
+                                           SearchModel searchModel, Settings settings) {
+        return new SearchPresenter(bibleReadingModel, searchModel, settings);
     }
 }

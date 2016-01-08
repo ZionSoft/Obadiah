@@ -20,8 +20,9 @@ package net.zionsoft.obadiah.biblereading.verse;
 import android.support.annotation.NonNull;
 
 import net.zionsoft.obadiah.model.datamodel.BibleReadingModel;
+import net.zionsoft.obadiah.model.datamodel.Settings;
 import net.zionsoft.obadiah.model.domain.Verse;
-import net.zionsoft.obadiah.mvp.MVPPresenter;
+import net.zionsoft.obadiah.mvp.BasePresenter;
 
 import java.util.List;
 
@@ -30,11 +31,12 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
-public class VersePresenter extends MVPPresenter<VerseView> {
+public class VersePresenter extends BasePresenter<VerseView> {
     private final BibleReadingModel bibleReadingModel;
     private CompositeSubscription subscription;
 
-    public VersePresenter(BibleReadingModel bibleReadingModel) {
+    public VersePresenter(BibleReadingModel bibleReadingModel, Settings settings) {
+        super(settings);
         this.bibleReadingModel = bibleReadingModel;
     }
 

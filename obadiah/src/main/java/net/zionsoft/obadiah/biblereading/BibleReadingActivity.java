@@ -114,9 +114,6 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
     @Inject
     VersePresenter versePresenter;
 
-    @Inject
-    Settings settings;
-
     @Bind(R.id.drawer_layout)
     DrawerLayout drawerLayout;
 
@@ -181,8 +178,8 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
             chapterList.setPresenter(chapterPresenter);
         }
 
-        if (settings != null && versePager != null && versePagerPresenter != null && versePresenter != null) {
-            versePager.initialize(this, settings, this, versePagerPresenter, versePresenter);
+        if (versePager != null && versePagerPresenter != null && versePresenter != null) {
+            versePager.initialize(this, this, versePagerPresenter, versePresenter);
         }
     }
 
@@ -193,10 +190,6 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
         if (fragment instanceof BibleReadingComponentFragment) {
             ((BibleReadingComponentFragment) fragment).getComponent().inject(this);
             updatePresenters();
-
-            final View rootView = getWindow().getDecorView();
-            rootView.setKeepScreenOn(settings.keepScreenOn());
-            rootView.setBackgroundColor(settings.getBackgroundColor());
 
             checkDeepLink();
         }
@@ -248,6 +241,7 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
 
     private void populateUi() {
         final View rootView = getWindow().getDecorView();
+        final Settings settings = bibleReadingPresenter.getSettings();
         rootView.setKeepScreenOn(settings.keepScreenOn());
         rootView.setBackgroundColor(settings.getBackgroundColor());
 

@@ -22,7 +22,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 
-import net.zionsoft.obadiah.model.datamodel.Settings;
 import net.zionsoft.obadiah.model.domain.Verse;
 
 import java.util.List;
@@ -60,11 +59,11 @@ public class VerseViewPager extends ViewPager implements VersePagerView {
         adapter.deselectVerses();
     }
 
-    public void initialize(Context context, Settings settings, VerseSelectionListener listener,
+    public void initialize(Context context, VerseSelectionListener listener,
                            VersePagerPresenter versePagerPresenter, VersePresenter versePresenter) {
         this.versePagerPresenter = versePagerPresenter;
 
-        adapter = new VersePagerAdapter(context, settings, versePresenter, getOffscreenPageLimit());
+        adapter = new VersePagerAdapter(context, versePresenter, getOffscreenPageLimit());
         adapter.setVerseSelectionListener(listener);
         setAdapter(adapter);
         addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {

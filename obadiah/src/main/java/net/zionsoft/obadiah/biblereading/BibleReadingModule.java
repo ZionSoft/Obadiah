@@ -24,6 +24,7 @@ import net.zionsoft.obadiah.biblereading.verse.VersePresenter;
 import net.zionsoft.obadiah.injection.scopes.ActivityScope;
 import net.zionsoft.obadiah.model.datamodel.BibleReadingModel;
 import net.zionsoft.obadiah.model.datamodel.ReadingProgressModel;
+import net.zionsoft.obadiah.model.datamodel.Settings;
 
 import dagger.Module;
 import dagger.Provides;
@@ -32,9 +33,9 @@ import dagger.Provides;
 public class BibleReadingModule {
     @Provides
     @ActivityScope
-    BibleReadingPresenter provideBibleReadingPresenter(BibleReadingModel bibleReadingModel,
-                                                       ReadingProgressModel readingProgressModel) {
-        return new BibleReadingPresenter(bibleReadingModel, readingProgressModel);
+    BibleReadingPresenter provideBibleReadingPresenter(
+            BibleReadingModel bibleReadingModel, ReadingProgressModel readingProgressModel, Settings settings) {
+        return new BibleReadingPresenter(bibleReadingModel, readingProgressModel, settings);
     }
 
     @Provides
@@ -57,7 +58,7 @@ public class BibleReadingModule {
 
     @Provides
     @ActivityScope
-    VersePresenter provideVersePresenter(BibleReadingModel bibleReadingModel) {
-        return new VersePresenter(bibleReadingModel);
+    VersePresenter provideVersePresenter(BibleReadingModel bibleReadingModel, Settings settings) {
+        return new VersePresenter(bibleReadingModel, settings);
     }
 }

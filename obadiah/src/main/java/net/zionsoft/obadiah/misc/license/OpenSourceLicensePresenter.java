@@ -17,7 +17,8 @@
 
 package net.zionsoft.obadiah.misc.license;
 
-import net.zionsoft.obadiah.mvp.MVPPresenter;
+import net.zionsoft.obadiah.model.datamodel.Settings;
+import net.zionsoft.obadiah.mvp.BasePresenter;
 
 import java.util.List;
 
@@ -26,12 +27,13 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
-class OpenSourceLicensePresenter extends MVPPresenter<OpenSourceLicenseView> {
+class OpenSourceLicensePresenter extends BasePresenter<OpenSourceLicenseView> {
     private final OpenSourceLicenseModel openSourceLicenseModel;
 
     private Subscription subscription;
 
-    OpenSourceLicensePresenter(OpenSourceLicenseModel openSourceLicenseModel) {
+    OpenSourceLicensePresenter(OpenSourceLicenseModel openSourceLicenseModel, Settings settings) {
+        super(settings);
         this.openSourceLicenseModel = openSourceLicenseModel;
     }
 

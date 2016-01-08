@@ -46,9 +46,6 @@ public class OpenSourceLicenseActivity extends BaseAppCompatActivity implements 
     @Inject
     OpenSourceLicensePresenter openSourceLicensePresenter;
 
-    @Inject
-    Settings settings;
-
     @Bind(R.id.toolbar)
     Toolbar toolbar;
 
@@ -84,6 +81,7 @@ public class OpenSourceLicenseActivity extends BaseAppCompatActivity implements 
             ((OpenSourceLicenseComponentFragment) fragment).getComponent().inject(this);
 
             final View rootView = getWindow().getDecorView();
+            final Settings settings = openSourceLicensePresenter.getSettings();
             rootView.setKeepScreenOn(settings.keepScreenOn());
             rootView.setBackgroundColor(settings.getBackgroundColor());
         }
@@ -104,7 +102,8 @@ public class OpenSourceLicenseActivity extends BaseAppCompatActivity implements 
 
     @Override
     public void onLicensesLoaded(List<String> licenses) {
-        licenseList.setAdapter(new OpenSourceLicenseListAdapter(this, settings, licenses));
+        licenseList.setAdapter(new OpenSourceLicenseListAdapter(
+                this, openSourceLicensePresenter.getSettings(), licenses));
         loadingSpinner.setVisibility(View.GONE);
     }
 }

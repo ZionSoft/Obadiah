@@ -80,9 +80,6 @@ public class TranslationManagementActivity extends BaseAppCompatActivity
     @Inject
     TranslationManagementPresenter translationManagementPresenter;
 
-    @Inject
-    Settings settings;
-
     @Bind(R.id.toolbar)
     Toolbar toolbar;
 
@@ -171,6 +168,7 @@ public class TranslationManagementActivity extends BaseAppCompatActivity
             ((TranslationManagementComponentFragment) fragment).getComponent().inject(this);
 
             final View rootView = getWindow().getDecorView();
+            final Settings settings = translationManagementPresenter.getSettings();
             rootView.setBackgroundColor(settings.getBackgroundColor());
             rootView.setKeepScreenOn(settings.keepScreenOn());
 
@@ -179,7 +177,7 @@ public class TranslationManagementActivity extends BaseAppCompatActivity
     }
 
     private void initializeAdapter() {
-        if (translationList == null || settings == null || translationListAdapter != null) {
+        if (translationList == null || translationListAdapter != null || translationManagementPresenter == null) {
             // if the activity is recreated due to screen orientation change, the component fragment
             // is attached before the UI is initialized, i.e. onAttachFragment() is called inside
             // super.onCreate()
@@ -187,7 +185,7 @@ public class TranslationManagementActivity extends BaseAppCompatActivity
             return;
         }
 
-        translationListAdapter = new TranslationListAdapter(this, settings,
+        translationListAdapter = new TranslationListAdapter(this, translationManagementPresenter.getSettings(),
                 translationManagementPresenter.loadCurrentTranslation());
         translationList.setAdapter(translationListAdapter);
     }

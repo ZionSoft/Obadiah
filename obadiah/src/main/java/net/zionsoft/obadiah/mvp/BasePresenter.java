@@ -15,27 +15,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.misc.license;
+package net.zionsoft.obadiah.mvp;
 
-import android.content.Context;
-
-import net.zionsoft.obadiah.injection.scopes.ActivityScope;
 import net.zionsoft.obadiah.model.datamodel.Settings;
 
-import dagger.Module;
-import dagger.Provides;
+public abstract class BasePresenter<V extends MVPView> extends MVPPresenter<V> {
+    private final Settings settings;
 
-@Module
-public class OpenSourceLicenseModule {
-    @Provides
-    OpenSourceLicenseModel provideOpenSourceLicensesModel(Context context) {
-        return new OpenSourceLicenseModel(context);
+    protected BasePresenter(Settings settings) {
+        this.settings = settings;
     }
 
-    @Provides
-    @ActivityScope
-    OpenSourceLicensePresenter provideOpenSourceLicensePresenter(
-            OpenSourceLicenseModel openSourceLicenseModel, Settings settings) {
-        return new OpenSourceLicensePresenter(openSourceLicenseModel, settings);
+    public Settings getSettings() {
+        return settings;
     }
 }

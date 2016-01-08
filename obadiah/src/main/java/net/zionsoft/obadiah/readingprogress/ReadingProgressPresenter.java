@@ -19,10 +19,11 @@ package net.zionsoft.obadiah.readingprogress;
 
 import android.util.Pair;
 
-import net.zionsoft.obadiah.model.domain.ReadingProgress;
 import net.zionsoft.obadiah.model.datamodel.BibleReadingModel;
 import net.zionsoft.obadiah.model.datamodel.ReadingProgressModel;
-import net.zionsoft.obadiah.mvp.MVPPresenter;
+import net.zionsoft.obadiah.model.datamodel.Settings;
+import net.zionsoft.obadiah.model.domain.ReadingProgress;
+import net.zionsoft.obadiah.mvp.BasePresenter;
 
 import java.util.List;
 
@@ -33,14 +34,16 @@ import rx.functions.Func2;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
-class ReadingProgressPresenter extends MVPPresenter<ReadingProgressView> {
+class ReadingProgressPresenter extends BasePresenter<ReadingProgressView> {
     private final BibleReadingModel bibleReadingModel;
     private final ReadingProgressModel readingProgressModel;
 
     private CompositeSubscription subscription;
 
     ReadingProgressPresenter(BibleReadingModel bibleReadingModel,
-                             ReadingProgressModel readingProgressModel) {
+                             ReadingProgressModel readingProgressModel,
+                             Settings settings) {
+        super(settings);
         this.bibleReadingModel = bibleReadingModel;
         this.readingProgressModel = readingProgressModel;
     }

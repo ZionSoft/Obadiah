@@ -22,8 +22,9 @@ import android.support.annotation.Nullable;
 
 import net.zionsoft.obadiah.model.datamodel.BibleReadingModel;
 import net.zionsoft.obadiah.model.datamodel.ReadingProgressModel;
+import net.zionsoft.obadiah.model.datamodel.Settings;
 import net.zionsoft.obadiah.model.domain.Verse;
-import net.zionsoft.obadiah.mvp.MVPPresenter;
+import net.zionsoft.obadiah.mvp.BasePresenter;
 
 import java.util.List;
 
@@ -32,13 +33,14 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
-class BibleReadingPresenter extends MVPPresenter<BibleReadingView> {
+class BibleReadingPresenter extends BasePresenter<BibleReadingView> {
     private final BibleReadingModel bibleReadingModel;
     private final ReadingProgressModel readingProgressModel;
 
     private CompositeSubscription subscription;
 
-    BibleReadingPresenter(BibleReadingModel bibleReadingModel, ReadingProgressModel readingProgressModel) {
+    BibleReadingPresenter(BibleReadingModel bibleReadingModel, ReadingProgressModel readingProgressModel, Settings settings) {
+        super(settings);
         this.bibleReadingModel = bibleReadingModel;
         this.readingProgressModel = readingProgressModel;
     }
