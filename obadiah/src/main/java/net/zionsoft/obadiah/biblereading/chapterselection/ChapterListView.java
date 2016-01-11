@@ -67,6 +67,7 @@ public class ChapterListView extends ExpandableListView implements ChapterView,
         setBackgroundColor(Color.BLACK);
         setDivider(new ColorDrawable(ContextCompat.getColor(context, R.color.dark_gray)));
         setDividerHeight(1);
+        setGroupIndicator(null);
         setOnGroupClickListener(this);
         setChildDivider(new ColorDrawable(Color.TRANSPARENT));
 
