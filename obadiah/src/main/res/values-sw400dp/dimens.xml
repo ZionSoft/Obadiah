@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="title_bar_text_size">@dimen/text_size_medium</dimen>
+</resources>
