@@ -60,11 +60,11 @@ class TranslationListAdapter extends RecyclerView.Adapter {
             super(itemView);
         }
 
-        public TranslationInfo getTranslationInfo() {
+        TranslationInfo getTranslationInfo() {
             return translationInfo;
         }
 
-        public boolean isDownloaded() {
+        boolean isDownloaded() {
             return downloaded;
         }
     }

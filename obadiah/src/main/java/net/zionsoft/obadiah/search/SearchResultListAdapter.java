@@ -35,12 +35,26 @@ import java.util.List;
 class SearchResultListAdapter extends RecyclerView.Adapter {
     private static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private final SearchPresenter searchPresenter;
+        private final Resources resources;
         private Verse verse;
 
-        private ViewHolder(SearchPresenter searchPresenter, View itemView) {
+        private ViewHolder(View itemView, SearchPresenter searchPresenter, Resources resources) {
             super(itemView);
             this.searchPresenter = searchPresenter;
+            this.resources = resources;
             itemView.setOnClickListener(this);
+        }
+
+        private void bind(Verse verse) {
+            final TextView textView = (TextView) itemView;
+            final Settings settings = searchPresenter.getSettings();
+            textView.setTextColor(settings.getTextColor());
+            textView.setTextSize(TypedValue.COMPLEX_UNIT_PX,
+                    resources.getDimension(settings.getTextSize().textSize));
+
+            textView.setText(String.format("%s %d:%d\n%s", verse.bookName,
+                    verse.index.chapter + 1, verse.index.verse + 1, verse.verseText));
+            this.verse = verse;
         }
 
         @Override
@@ -66,21 +80,13 @@ class SearchResultListAdapter extends RecyclerView.Adapter {
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new ViewHolder(searchPresenter, inflater.inflate(R.layout.item_search_result, parent, false));
+        return new ViewHolder(inflater.inflate(R.layout.item_search_result, parent, false),
+                searchPresenter, resources);
     }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        final TextView textView = (TextView) holder.itemView;
-        final Settings settings = searchPresenter.getSettings();
-        textView.setTextColor(settings.getTextColor());
-        textView.setTextSize(TypedValue.COMPLEX_UNIT_PX,
-                resources.getDimension(settings.getTextSize().textSize));
-
-        final Verse verse = getVerse(position);
-        textView.setText(String.format("%s %d:%d\n%s", verse.bookName,
-                verse.index.chapter + 1, verse.index.verse + 1, verse.verseText));
-        ((ViewHolder) holder).verse = verse;
+        ((ViewHolder) holder).bind(getVerse(position));
     }
 
     @Override

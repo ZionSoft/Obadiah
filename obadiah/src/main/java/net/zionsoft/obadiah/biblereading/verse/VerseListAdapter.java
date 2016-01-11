@@ -38,15 +38,42 @@ import butterknife.ButterKnife;
 
 class VerseListAdapter extends RecyclerView.Adapter {
     static class ViewHolder extends RecyclerView.ViewHolder {
+        private final Settings settings;
+        private final Resources resources;
+
         @Bind(R.id.index)
         TextView index;
 
         @Bind(R.id.text)
         TextView text;
 
-        private ViewHolder(View itemView) {
+        private ViewHolder(View itemView, Settings settings, Resources resources) {
             super(itemView);
+
+            this.settings = settings;
+            this.resources = resources;
             ButterKnife.bind(this, itemView);
+        }
+
+        private void bind(Verse verse, int totalVerseCount, boolean selected) {
+            itemView.setSelected(selected);
+
+            final int textColor = settings.getTextColor();
+            final float textSize = resources.getDimension(settings.getTextSize().textSize);
+            index.setTextColor(textColor);
+            index.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+
+            if (totalVerseCount < 10) {
+                index.setText(Integer.toString(verse.index.verse + 1));
+            } else if (totalVerseCount < 100) {
+                index.setText(String.format("%2d", verse.index.verse + 1));
+            } else {
+                index.setText(String.format("%3d", verse.index.verse + 1));
+            }
+
+            text.setTextColor(textColor);
+            text.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+            text.setText(verse.verseText);
         }
     }
 
@@ -71,31 +98,12 @@ class VerseListAdapter extends RecyclerView.Adapter {
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new ViewHolder(inflater.inflate(R.layout.item_text, parent, false));
+        return new ViewHolder(inflater.inflate(R.layout.item_text, parent, false), settings, resources);
     }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        final ViewHolder viewHolder = (ViewHolder) holder;
-        viewHolder.itemView.setSelected(selected[position]);
-
-        final int textColor = settings.getTextColor();
-        final float textSize = resources.getDimension(settings.getTextSize().textSize);
-        viewHolder.index.setTextColor(textColor);
-        viewHolder.index.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
-
-        final int count = getItemCount();
-        if (count < 10) {
-            viewHolder.index.setText(Integer.toString(position + 1));
-        } else if (count < 100) {
-            viewHolder.index.setText(String.format("%2d", position + 1));
-        } else {
-            viewHolder.index.setText(String.format("%3d", position + 1));
-        }
-
-        viewHolder.text.setTextColor(textColor);
-        viewHolder.text.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
-        viewHolder.text.setText(verses.get(position).verseText);
+        ((ViewHolder) holder).bind(verses.get(position), getItemCount(), selected[position]);
     }
 
     void setVerses(List<Verse> verses) {

@@ -28,8 +28,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import net.zionsoft.obadiah.R;
-import net.zionsoft.obadiah.model.domain.ReadingProgress;
 import net.zionsoft.obadiah.model.datamodel.Settings;
+import net.zionsoft.obadiah.model.domain.ReadingProgress;
 import net.zionsoft.obadiah.ui.utils.DateFormatter;
 import net.zionsoft.obadiah.ui.widget.ProgressBar;
 
@@ -40,6 +40,8 @@ import butterknife.ButterKnife;
 
 class ReadingProgressListAdapter extends RecyclerView.Adapter {
     static class HeaderViewHolder extends RecyclerView.ViewHolder {
+        private final Resources resources;
+
         @Bind(R.id.continuous_reading_text_view)
         TextView continuousReading;
 
@@ -73,6 +75,7 @@ class ReadingProgressListAdapter extends RecyclerView.Adapter {
         HeaderViewHolder(View itemView, Settings settings, Resources resources) {
             super(itemView);
             ButterKnife.bind(this, itemView);
+            this.resources = resources;
 
             final int textColor = settings.getTextColor();
             final float textSize = resources.getDimension(settings.getTextSize().textSize);
@@ -108,6 +111,21 @@ class ReadingProgressListAdapter extends RecyclerView.Adapter {
             finishedNewTestamentCount.setTextColor(textColor);
             finishedNewTestamentCount.setTextSize(TypedValue.COMPLEX_UNIT_PX, smallerTextSize);
         }
+
+        private void bind(ReadingProgress readingProgress) {
+            continuousReadingCount.setText(resources.getString(
+                    R.string.text_continuous_reading_count, readingProgress.getContinuousReadingDays()));
+
+            chapterReadCount.setText(resources.getString(
+                    R.string.text_chapters_read_count, readingProgress.getTotalChapterRead()));
+
+            finishedBooksCount.setText(resources.getString(
+                    R.string.text_finished_books_count, readingProgress.getFinishedBooksCount()));
+            finishedOldTestamentCount.setText(resources.getString(
+                    R.string.text_finished_old_testament_count, readingProgress.getFinishedOldTestamentCount()));
+            finishedNewTestamentCount.setText(resources.getString(
+                    R.string.text_finished_new_testament_count, readingProgress.getFinishedNewTestamentCount()));
+        }
     }
 
     static class ItemViewHolder extends RecyclerView.ViewHolder {
@@ -120,8 +138,16 @@ class ReadingProgressListAdapter extends RecyclerView.Adapter {
         @Bind(R.id.last_read_chapter_text_view)
         TextView lastReadChapter;
 
-        ItemViewHolder(View itemView, Settings settings, Resources resources) {
+        private final Resources resources;
+        private final DateFormatter dateFormatter;
+        private final List<String> bookNames;
+
+        ItemViewHolder(View itemView, Settings settings, Resources resources, List<String> bookNames) {
             super(itemView);
+
+            this.resources = resources;
+            this.dateFormatter = new DateFormatter(resources);
+            this.bookNames = bookNames;
             ButterKnife.bind(this, itemView);
 
             final int textColor = settings.getTextColor();
@@ -132,6 +158,28 @@ class ReadingProgressListAdapter extends RecyclerView.Adapter {
             lastReadChapter.setTextColor(textColor);
             lastReadChapter.setTextSize(TypedValue.COMPLEX_UNIT_PX, smallerTextSize);
         }
+
+        private void bind(ReadingProgress readingProgress, int book) {
+            bookName.setText(bookNames.get(book));
+            final int chaptersRead = readingProgress.getChapterRead(book);
+            final int chaptersCount = readingProgress.getChapterCount(book);
+            int progress = chaptersRead * this.readingProgress.getMaxProgress() / chaptersCount;
+            if (progress == 0 && chaptersRead > 0) {
+                // always show something if progress has been made
+                progress = 1;
+            }
+            this.readingProgress.setProgress(progress);
+            this.readingProgress.setText(String.format("%d / %d", chaptersRead, chaptersCount));
+
+            if (chaptersRead > 0) {
+                final Pair<Integer, Long> lastReadChapter = readingProgress.getLastReadChapter(book);
+                this.lastReadChapter.setText(resources.getString(R.string.text_last_read_chapter,
+                        lastReadChapter.first + 1, dateFormatter.format(lastReadChapter.second)));
+                this.lastReadChapter.setVisibility(View.VISIBLE);
+            } else {
+                this.lastReadChapter.setVisibility(View.GONE);
+            }
+        }
     }
 
     private static final int VIEW_TYPE_HEADER = 0;
@@ -139,7 +187,6 @@ class ReadingProgressListAdapter extends RecyclerView.Adapter {
 
     private final LayoutInflater inflater;
     private final Resources resources;
-    private final DateFormatter dateFormatter;
     private final Settings settings;
 
     private final List<String> bookNames;
@@ -149,7 +196,6 @@ class ReadingProgressListAdapter extends RecyclerView.Adapter {
                                List<String> bookNames, ReadingProgress readingProgress) {
         this.inflater = LayoutInflater.from(context);
         this.resources = context.getResources();
-        this.dateFormatter = new DateFormatter(resources);
         this.settings = settings;
         this.bookNames = bookNames;
         this.readingProgress = readingProgress;
@@ -168,7 +214,7 @@ class ReadingProgressListAdapter extends RecyclerView.Adapter {
                         settings, resources);
             case VIEW_TYPE_ITEM:
                 return new ItemViewHolder(inflater.inflate(R.layout.item_reading_progress, parent, false),
-                        settings, resources);
+                        settings, resources, bookNames);
             default:
                 throw new IllegalStateException("Unknown view type: " + viewType);
         }
@@ -178,42 +224,11 @@ class ReadingProgressListAdapter extends RecyclerView.Adapter {
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         switch (getItemViewType(position)) {
             case VIEW_TYPE_HEADER:
-                HeaderViewHolder headerViewHolder = (HeaderViewHolder) holder;
-                headerViewHolder.continuousReadingCount.setText(resources.getString(
-                        R.string.text_continuous_reading_count, readingProgress.getContinuousReadingDays()));
-
-                headerViewHolder.chapterReadCount.setText(resources.getString(
-                        R.string.text_chapters_read_count, readingProgress.getTotalChapterRead()));
-
-                headerViewHolder.finishedBooksCount.setText(resources.getString(
-                        R.string.text_finished_books_count, readingProgress.getFinishedBooksCount()));
-                headerViewHolder.finishedOldTestamentCount.setText(resources.getString(
-                        R.string.text_finished_old_testament_count, readingProgress.getFinishedOldTestamentCount()));
-                headerViewHolder.finishedNewTestamentCount.setText(resources.getString(
-                        R.string.text_finished_new_testament_count, readingProgress.getFinishedNewTestamentCount()));
+                ((HeaderViewHolder) holder).bind(readingProgress);
                 break;
             case VIEW_TYPE_ITEM:
                 --position;
-                ItemViewHolder itemViewHolder = (ItemViewHolder) holder;
-                itemViewHolder.bookName.setText(bookNames.get(position));
-                final int chaptersRead = readingProgress.getChapterRead(position);
-                final int chaptersCount = readingProgress.getChapterCount(position);
-                int progress = chaptersRead * itemViewHolder.readingProgress.getMaxProgress() / chaptersCount;
-                if (progress == 0 && chaptersRead > 0) {
-                    // always show something if progress has been made
-                    progress = 1;
-                }
-                itemViewHolder.readingProgress.setProgress(progress);
-                itemViewHolder.readingProgress.setText(String.format("%d / %d", chaptersRead, chaptersCount));
-
-                if (chaptersRead > 0) {
-                    final Pair<Integer, Long> lastReadChapter = readingProgress.getLastReadChapter(position);
-                    itemViewHolder.lastReadChapter.setText(resources.getString(R.string.text_last_read_chapter,
-                            lastReadChapter.first + 1, dateFormatter.format(lastReadChapter.second)));
-                    itemViewHolder.lastReadChapter.setVisibility(View.VISIBLE);
-                } else {
-                    itemViewHolder.lastReadChapter.setVisibility(View.GONE);
-                }
+                ((ItemViewHolder) holder).bind(readingProgress, position - 1);
                 break;
             default:
                 throw new IllegalStateException("Unknown view type: " + getItemViewType(position));
