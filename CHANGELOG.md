@@ -3,6 +3,7 @@ CHANGELOG
 
 #### Next Release
 - Supported NFC for M and above.
+- Allowed app to be moved to external storage.
 
 #### v1.13.2 (2015-12-26)
 - Updated min SDK level to 15.
