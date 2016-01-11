@@ -227,7 +227,6 @@ class ReadingProgressListAdapter extends RecyclerView.Adapter {
                 ((HeaderViewHolder) holder).bind(readingProgress);
                 break;
             case VIEW_TYPE_ITEM:
-                --position;
                 ((ItemViewHolder) holder).bind(readingProgress, position - 1);
                 break;
             default:
