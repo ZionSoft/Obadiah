@@ -26,7 +26,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Adapter;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
 import net.zionsoft.obadiah.R;
@@ -90,7 +89,7 @@ public class BibleReadingToolbar extends Toolbar implements ToolbarView,
 
         final Spinner translationsSpinner = (Spinner) MenuItemCompat.getActionView(
                 getMenu().findItem(R.id.action_translations));
-        translationsSpinner.setAdapter(new ArrayAdapter<>(getContext(), R.layout.item_drop_down, names));
+        translationsSpinner.setAdapter(new TranslationSpinnerAdapter(getContext(), toolbarPresenter, names));
         translationsSpinner.setSelection(selected);
         translationsSpinner.setOnItemSelectedListener(this);
     }

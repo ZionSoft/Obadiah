@@ -33,6 +33,7 @@ import net.zionsoft.obadiah.model.database.TranslationHelper;
 import net.zionsoft.obadiah.model.database.TranslationsTableHelper;
 import net.zionsoft.obadiah.model.domain.Verse;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -80,6 +81,8 @@ public class BibleReadingModel {
     private final SerializedSubject<Verse.Index, Verse.Index> currentReadingProgressUpdatesSubject
             = PublishSubject.<Verse.Index>create().toSerialized();
 
+    private final List<String> parallelTranslations = new ArrayList<>();
+
     @Inject
     public BibleReadingModel(Context context, DatabaseHelper databaseHelper) {
         this.preferences = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
@@ -93,12 +96,27 @@ public class BibleReadingModel {
 
     public void saveCurrentTranslation(String translation) {
         preferences.edit().putString(Constants.PREF_KEY_LAST_READ_TRANSLATION, translation).apply();
+        removeParallelTranslation(translation);
         currentTranslationUpdatesSubject.onNext(translation);
         Analytics.trackEvent(Analytics.CATEGORY_TRANSLATION, Analytics.TRANSLATION_ACTION_SELECTED, translation);
     }
 
     public Observable<String> observeCurrentTranslation() {
         return currentTranslationUpdatesSubject.asObservable();
+    }
+
+    public boolean isParallelTranslation(String translation) {
+        return parallelTranslations.contains(translation);
+    }
+
+    public void loadParallelTranslation(String translation) {
+        if (!isParallelTranslation(translation) && !translation.equals(loadCurrentTranslation())) {
+            parallelTranslations.add(translation);
+        }
+    }
+
+    public void removeParallelTranslation(String translation) {
+        parallelTranslations.remove(translation);
     }
 
     public int loadCurrentBook() {

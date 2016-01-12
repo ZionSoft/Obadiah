@@ -174,6 +174,18 @@ public class ToolbarPresenter extends MVPPresenter<ToolbarView> {
                 }));
     }
 
+    boolean isParallelTranslation(String translation) {
+        return bibleReadingModel.isParallelTranslation(translation);
+    }
+
+    void loadParallelTranslation(String translation) {
+        bibleReadingModel.loadParallelTranslation(translation);
+    }
+
+    void removeParallelTranslation(String translation) {
+        bibleReadingModel.removeParallelTranslation(translation);
+    }
+
     void loadBookNamesForCurrentTranslation() {
         loadBookNames(bibleReadingModel.loadCurrentTranslation());
     }
