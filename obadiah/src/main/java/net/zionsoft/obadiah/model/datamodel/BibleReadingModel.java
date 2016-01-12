@@ -238,6 +238,17 @@ public class BibleReadingModel {
                 });
     }
 
+    public Observable<Verse> loadVerse(final String translation, final int book, final int chapter, final int verse) {
+        return loadBookNames(translation)
+                .map(new Func1<List<String>, Verse>() {
+                    @Override
+                    public Verse call(List<String> bookNames) {
+                        return TranslationHelper.getVerse(databaseHelper.getDatabase(),
+                                translation, bookNames.get(book), book, chapter, verse);
+                    }
+                });
+    }
+
     public Observable<List<Verse>> search(final String translation, final String query) {
         return loadBookNames(translation)
                 .map(new Func1<List<String>, List<Verse>>() {
