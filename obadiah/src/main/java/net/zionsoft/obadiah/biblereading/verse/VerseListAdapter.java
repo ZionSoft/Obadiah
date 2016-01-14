@@ -38,7 +38,10 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 
 class VerseListAdapter extends RecyclerView.Adapter {
-    static class ViewHolder extends RecyclerView.ViewHolder {
+    private static final int ITEM_TYPE_VERSE = 0;
+    private static final int ITEM_TYPE_VERSE_WITH_PARALLEL_TRANSLATIONS = 1;
+
+    static class VerseViewHolder extends RecyclerView.ViewHolder {
         private final Settings settings;
         private final Resources resources;
 
@@ -48,7 +51,7 @@ class VerseListAdapter extends RecyclerView.Adapter {
         @Bind(R.id.text)
         TextView text;
 
-        private ViewHolder(View itemView, Settings settings, Resources resources) {
+        private VerseViewHolder(View itemView, Settings settings, Resources resources) {
             super(itemView);
 
             this.settings = settings;
@@ -71,30 +74,40 @@ class VerseListAdapter extends RecyclerView.Adapter {
             } else {
                 index.setText(String.format("%3d", verse.index.verse + 1));
             }
-            index.setVisibility(View.VISIBLE);
 
             text.setTextColor(textColor);
             text.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
             text.setText(verse.verseText);
         }
+    }
+
+    private static class VerseWithParallelTranslationsViewHolder extends RecyclerView.ViewHolder {
+        private static final StringBuilder STRING_BUILDER = new StringBuilder();
+        private final Settings settings;
+        private final Resources resources;
+
+        private VerseWithParallelTranslationsViewHolder(View itemView, Settings settings, Resources resources) {
+            super(itemView);
+
+            this.settings = settings;
+            this.resources = resources;
+        }
 
         private void bind(VerseWithParallelTranslations verse) {
-            itemView.setSelected(false);
+            final TextView textView = (TextView) itemView;
 
-            index.setVisibility(View.GONE);
-
-            text.setTextColor(settings.getTextColor());
-            text.setTextSize(TypedValue.COMPLEX_UNIT_PX,
+            textView.setTextColor(settings.getTextColor());
+            textView.setTextSize(TypedValue.COMPLEX_UNIT_PX,
                     resources.getDimension(settings.getTextSize().textSize));
 
-            StringBuilder sb = new StringBuilder();
-            sb.append(verse.verseIndex.chapter + 1).append(':').append(verse.verseIndex.verse + 1);
+            STRING_BUILDER.setLength(0);
+            STRING_BUILDER.append(verse.verseIndex.chapter + 1).append(':').append(verse.verseIndex.verse + 1);
             final int size = verse.texts.size();
             for (int i = 0; i < size; ++i) {
                 final VerseWithParallelTranslations.Text text = verse.texts.get(i);
-                sb.append('\n').append(text.translation).append(": ").append(text.text);
+                STRING_BUILDER.append('\n').append(text.translation).append(": ").append(text.text);
             }
-            text.setText(sb.toString());
+            textView.setText(STRING_BUILDER.toString());
         }
     }
 
@@ -125,16 +138,34 @@ class VerseListAdapter extends RecyclerView.Adapter {
     }
 
     @Override
+    public int getItemViewType(int position) {
+        if (verses != null) {
+            return ITEM_TYPE_VERSE;
+        }
+        if (versesWithParallelTranslations != null) {
+            return ITEM_TYPE_VERSE_WITH_PARALLEL_TRANSLATIONS;
+        }
+        throw new IllegalStateException("Unknown view type for position - " + position);
+    }
+
+    @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new ViewHolder(inflater.inflate(R.layout.item_text, parent, false), settings, resources);
+        switch (viewType) {
+            case ITEM_TYPE_VERSE:
+                return new VerseViewHolder(inflater.inflate(R.layout.item_verse, parent, false), settings, resources);
+            case ITEM_TYPE_VERSE_WITH_PARALLEL_TRANSLATIONS:
+                return new VerseWithParallelTranslationsViewHolder(
+                        inflater.inflate(R.layout.item_verse_with_parallel_translations, parent, false), settings, resources);
+        }
+        throw new IllegalStateException("Unknown view type - " + viewType);
     }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        if (verses != null) {
-            ((ViewHolder) holder).bind(verses.get(position), getItemCount(), selected[position]);
-        } else {
-            ((ViewHolder) holder).bind(versesWithParallelTranslations.get(position));
+        if (holder instanceof VerseViewHolder) {
+            ((VerseViewHolder) holder).bind(verses.get(position), getItemCount(), selected[position]);
+        } else if (holder instanceof VerseWithParallelTranslationsViewHolder) {
+            ((VerseWithParallelTranslationsViewHolder) holder).bind(versesWithParallelTranslations.get(position));
         }
     }
 
