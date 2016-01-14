@@ -179,7 +179,7 @@ public class ToolbarPresenter extends MVPPresenter<ToolbarView> {
     }
 
     void loadParallelTranslation(String translation) {
-        bibleReadingModel.loadParallelTranslation(translation);
+        bibleReadingModel.addParallelTranslation(translation);
     }
 
     void removeParallelTranslation(String translation) {

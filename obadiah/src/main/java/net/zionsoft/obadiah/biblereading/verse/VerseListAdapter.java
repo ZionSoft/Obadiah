@@ -29,6 +29,7 @@ import android.widget.TextView;
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.datamodel.Settings;
 import net.zionsoft.obadiah.model.domain.Verse;
+import net.zionsoft.obadiah.model.domain.VerseWithParallelTranslations;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -70,10 +71,30 @@ class VerseListAdapter extends RecyclerView.Adapter {
             } else {
                 index.setText(String.format("%3d", verse.index.verse + 1));
             }
+            index.setVisibility(View.VISIBLE);
 
             text.setTextColor(textColor);
             text.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
             text.setText(verse.verseText);
+        }
+
+        private void bind(VerseWithParallelTranslations verse) {
+            itemView.setSelected(false);
+
+            index.setVisibility(View.GONE);
+
+            text.setTextColor(settings.getTextColor());
+            text.setTextSize(TypedValue.COMPLEX_UNIT_PX,
+                    resources.getDimension(settings.getTextSize().textSize));
+
+            StringBuilder sb = new StringBuilder();
+            sb.append(verse.verseIndex.chapter + 1).append(':').append(verse.verseIndex.verse + 1);
+            final int size = verse.texts.size();
+            for (int i = 0; i < size; ++i) {
+                final VerseWithParallelTranslations.Text text = verse.texts.get(i);
+                sb.append('\n').append(text.translation).append(": ").append(text.text);
+            }
+            text.setText(sb.toString());
         }
     }
 
@@ -82,6 +103,7 @@ class VerseListAdapter extends RecyclerView.Adapter {
     private final Resources resources;
 
     private List<Verse> verses;
+    private List<VerseWithParallelTranslations> versesWithParallelTranslations;
     private boolean[] selected;
     private int selectedCount;
 
@@ -93,7 +115,13 @@ class VerseListAdapter extends RecyclerView.Adapter {
 
     @Override
     public int getItemCount() {
-        return verses != null ? verses.size() : 0;
+        if (verses != null) {
+            return verses.size();
+        }
+        if (versesWithParallelTranslations != null) {
+            return versesWithParallelTranslations.size();
+        }
+        return 0;
     }
 
     @Override
@@ -103,20 +131,41 @@ class VerseListAdapter extends RecyclerView.Adapter {
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        ((ViewHolder) holder).bind(verses.get(position), getItemCount(), selected[position]);
+        if (verses != null) {
+            ((ViewHolder) holder).bind(verses.get(position), getItemCount(), selected[position]);
+        } else {
+            ((ViewHolder) holder).bind(versesWithParallelTranslations.get(position));
+        }
     }
 
     void setVerses(List<Verse> verses) {
         this.verses = verses;
+        this.versesWithParallelTranslations = null;
 
         final int size = this.verses.size();
         if (selected == null || selected.length < size) {
             selected = new boolean[size];
         }
         deselectVerses();
+
+        notifyDataSetChanged();
+    }
+
+    void setVersesWithParallelTranslations(List<VerseWithParallelTranslations> versesWithParallelTranslations) {
+        this.verses = null;
+        this.versesWithParallelTranslations = versesWithParallelTranslations;
+
+        deselectVerses();
+
+        notifyDataSetChanged();
     }
 
     void select(int position) {
+        if (verses == null) {
+            // TODO supports selection for verses with parallel translations
+            return;
+        }
+
         selected[position] ^= true;
         if (selected[position]) {
             ++selectedCount;
@@ -140,8 +189,10 @@ class VerseListAdapter extends RecyclerView.Adapter {
     }
 
     void deselectVerses() {
-        for (int i = 0; i < selected.length; ++i) {
-            selected[i] = false;
+        if (selected != null) {
+            for (int i = 0; i < selected.length; ++i) {
+                selected[i] = false;
+            }
         }
         selectedCount = 0;
     }

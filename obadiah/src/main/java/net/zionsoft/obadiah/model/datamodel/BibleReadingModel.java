@@ -32,6 +32,7 @@ import net.zionsoft.obadiah.model.database.DatabaseHelper;
 import net.zionsoft.obadiah.model.database.TranslationHelper;
 import net.zionsoft.obadiah.model.database.TranslationsTableHelper;
 import net.zionsoft.obadiah.model.domain.Verse;
+import net.zionsoft.obadiah.model.domain.VerseWithParallelTranslations;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -78,6 +79,8 @@ public class BibleReadingModel {
 
     private final SerializedSubject<String, String> currentTranslationUpdatesSubject
             = PublishSubject.<String>create().toSerialized();
+    private final SerializedSubject<Void, Void> parallelTranslationUpdatesSubject
+            = PublishSubject.<Void>create().toSerialized();
     private final SerializedSubject<Verse.Index, Verse.Index> currentReadingProgressUpdatesSubject
             = PublishSubject.<Verse.Index>create().toSerialized();
 
@@ -105,18 +108,29 @@ public class BibleReadingModel {
         return currentTranslationUpdatesSubject.asObservable();
     }
 
+    public boolean hasParallelTranslation() {
+        return parallelTranslations.size() > 0;
+    }
+
     public boolean isParallelTranslation(String translation) {
         return parallelTranslations.contains(translation);
     }
 
-    public void loadParallelTranslation(String translation) {
+    public void addParallelTranslation(String translation) {
         if (!isParallelTranslation(translation) && !translation.equals(loadCurrentTranslation())) {
             parallelTranslations.add(translation);
+            parallelTranslationUpdatesSubject.onNext(null);
         }
     }
 
     public void removeParallelTranslation(String translation) {
-        parallelTranslations.remove(translation);
+        if (parallelTranslations.remove(translation)) {
+            parallelTranslationUpdatesSubject.onNext(null);
+        }
+    }
+
+    public Observable<Void> observeParallelTranslation() {
+        return parallelTranslationUpdatesSubject.asObservable();
     }
 
     public int loadCurrentBook() {
@@ -194,6 +208,38 @@ public class BibleReadingModel {
                 bookNameCache.put(translation, bookNames);
             }
         });
+    }
+
+    public Observable<List<VerseWithParallelTranslations>> loadVersesWithParallelTranslations(final int book, final int chapter) {
+        // TODO optimizes me
+        return loadVerses(loadCurrentTranslation(), book, chapter)
+                .map(new Func1<List<Verse>, List<VerseWithParallelTranslations>>() {
+                    @Override
+                    public List<VerseWithParallelTranslations> call(List<Verse> verses) {
+                        final int translationsCount = parallelTranslations.size() + 1;
+                        final List<List<Verse>> versesFromAllTranslations = new ArrayList<>(translationsCount);
+                        versesFromAllTranslations.add(verses);
+                        for (int i = 1; i < translationsCount; ++i) {
+                            versesFromAllTranslations.add(loadVerses(parallelTranslations.get(i - 1), book, chapter)
+                                    .toBlocking().first());
+                        }
+
+                        final int versesCount = verses.size();
+                        final List<VerseWithParallelTranslations> results = new ArrayList<>(versesCount);
+                        for (int i = 0; i < versesCount; ++i) {
+                            final List<VerseWithParallelTranslations.Text> texts = new ArrayList<>(translationsCount);
+                            texts.add(new VerseWithParallelTranslations.Text(
+                                    loadCurrentTranslation(), verses.get(i).verseText));
+                            for (int j = 1; j < translationsCount; ++j) {
+                                texts.add(new VerseWithParallelTranslations.Text(
+                                        parallelTranslations.get(j - 1),
+                                        versesFromAllTranslations.get(j).get(i).verseText));
+                            }
+                            results.add(new VerseWithParallelTranslations(verses.get(i).index, texts));
+                        }
+                        return results;
+                    }
+                });
     }
 
     public Observable<List<Verse>> loadVerses(String translation, int book, int chapter) {

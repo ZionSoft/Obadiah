@@ -15,22 +15,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.biblereading.verse;
-
-import net.zionsoft.obadiah.model.domain.Verse;
-import net.zionsoft.obadiah.model.domain.VerseWithParallelTranslations;
-import net.zionsoft.obadiah.mvp.MVPView;
+package net.zionsoft.obadiah.model.domain;
 
 import java.util.List;
 
-interface VerseView extends MVPView {
-    void onVersesLoaded(List<Verse> verses);
+// TODO merge with Verse
+public class VerseWithParallelTranslations {
+    public static class Text {
+        public final String translation;
+        public final String text;
 
-    void onVersesWithParallelTranslationsLoaded(List<VerseWithParallelTranslations> verses);
+        public Text(String translation, String text) {
+            this.translation = translation;
+            this.text = text;
+        }
+    }
 
-    void onVersesLoadFailed(int book, int chapter);
+    public final Verse.Index verseIndex;
+    public final List<Text> texts;
 
-    void onTranslationUpdated();
-
-    void onReadingProgressUpdated(Verse.Index index);
+    public VerseWithParallelTranslations(Verse.Index verseIndex, List<Text> texts) {
+        this.verseIndex = verseIndex;
+        this.texts = texts;
+    }
 }
