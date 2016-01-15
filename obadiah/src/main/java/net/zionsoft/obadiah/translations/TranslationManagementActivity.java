@@ -185,8 +185,7 @@ public class TranslationManagementActivity extends BaseAppCompatActivity
             return;
         }
 
-        translationListAdapter = new TranslationListAdapter(this, translationManagementPresenter.getSettings(),
-                translationManagementPresenter.loadCurrentTranslation());
+        translationListAdapter = new TranslationListAdapter(this, translationManagementPresenter.getSettings());
         translationList.setAdapter(translationListAdapter);
     }
 
@@ -259,7 +258,8 @@ public class TranslationManagementActivity extends BaseAppCompatActivity
         swipeContainer.setRefreshing(false);
         AnimationHelper.fadeIn(translationList);
 
-        translationListAdapter.setTranslations(translations);
+        translationListAdapter.setTranslations(translations,
+                translationManagementPresenter.loadCurrentTranslation());
         translationListAdapter.notifyDataSetChanged();
     }
 

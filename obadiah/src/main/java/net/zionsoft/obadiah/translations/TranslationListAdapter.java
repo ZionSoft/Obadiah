@@ -77,15 +77,14 @@ class TranslationListAdapter extends RecyclerView.Adapter {
     private final AbsoluteSizeSpan mediumSizeSpan;
     private final AbsoluteSizeSpan smallSizeSpan;
 
-    private final String currentTranslation;
     private final ArrayList<String> sectionHeaders = new ArrayList<>();
     private final ArrayList<ArrayList<TranslationInfoHolder>> translationList = new ArrayList<>();
     private int count = 0;
+    private String currentTranslation;
 
-    TranslationListAdapter(Context context, Settings settings, String currentTranslation) {
+    TranslationListAdapter(Context context, Settings settings) {
         this.inflater = LayoutInflater.from(context);
         this.resources = context.getResources();
-        this.currentTranslation = currentTranslation;
 
         this.textColor = settings.getTextColor();
         this.textSize = resources.getDimension(settings.getTextSize().textSize);
@@ -175,7 +174,8 @@ class TranslationListAdapter extends RecyclerView.Adapter {
         return count;
     }
 
-    void setTranslations(Translations translations) {
+    void setTranslations(Translations translations, String currentTranslation) {
+        this.currentTranslation = currentTranslation;
         sectionHeaders.clear();
         translationList.clear();
         count = 0;
