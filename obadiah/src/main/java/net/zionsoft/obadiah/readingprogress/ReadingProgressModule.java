@@ -29,9 +29,9 @@ import dagger.Provides;
 public class ReadingProgressModule {
     @Provides
     @ActivityScope
-    ReadingProgressPresenter progressPresenter(BibleReadingModel bibleReadingModel,
-                                               ReadingProgressModel readingProgressModel,
-                                               Settings settings) {
+    ReadingProgressPresenter progressReadingProgressPresenter(BibleReadingModel bibleReadingModel,
+                                                              ReadingProgressModel readingProgressModel,
+                                                              Settings settings) {
         return new ReadingProgressPresenter(bibleReadingModel, readingProgressModel, settings);
     }
 }
