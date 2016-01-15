@@ -237,9 +237,10 @@ public class BibleReadingModel {
                                     currentTranslation, verse.verseText));
 
                             for (int j = 0; j < parallelTranslationsCount; ++j) {
+                                // just in case the translation has less verses (probably an error?)
+                                final List<String> t = textsFromParallelTranslations.get(j);
                                 texts.add(new VerseWithParallelTranslations.Text(
-                                        parallelTranslations.get(j),
-                                        textsFromParallelTranslations.get(j).get(i)));
+                                        parallelTranslations.get(j), t.size() > i ? t.get(i) : ""));
                             }
 
                             results.add(new VerseWithParallelTranslations(verse.index, texts));
