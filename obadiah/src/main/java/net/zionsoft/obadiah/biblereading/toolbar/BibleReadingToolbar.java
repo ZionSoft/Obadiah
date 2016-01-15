@@ -26,7 +26,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Adapter;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
 import net.zionsoft.obadiah.R;
@@ -90,7 +89,7 @@ public class BibleReadingToolbar extends Toolbar implements ToolbarView,
 
         final Spinner translationsSpinner = (Spinner) MenuItemCompat.getActionView(
                 getMenu().findItem(R.id.action_translations));
-        translationsSpinner.setAdapter(new ArrayAdapter<>(getContext(), R.layout.item_drop_down, names));
+        translationsSpinner.setAdapter(new TranslationSpinnerAdapter(getContext(), toolbarPresenter, names));
         translationsSpinner.setSelection(selected);
         translationsSpinner.setOnItemSelectedListener(this);
     }
@@ -98,18 +97,18 @@ public class BibleReadingToolbar extends Toolbar implements ToolbarView,
     @Override
     public void onBookNamesLoaded(List<String> bookNames) {
         this.bookNames = bookNames;
-        refresh(toolbarPresenter.loadCurrentBook(), toolbarPresenter.loadCurrentChapter());
+        refresh(toolbarPresenter.loadCurrentBook());
     }
 
-    private void refresh(int book, int chapter) {
+    private void refresh(int book) {
         if (bookNames != null) {
-            setTitle(String.format("%s, %d", bookNames.get(book), chapter + 1));
+            setTitle(bookNames.get(book));
         }
     }
 
     @Override
     public void onReadingProgressUpdated(Verse.Index index) {
-        refresh(index.book, index.chapter);
+        refresh(index.book);
     }
 
     @Override

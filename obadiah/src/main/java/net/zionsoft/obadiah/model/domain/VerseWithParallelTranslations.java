@@ -15,8 +15,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.biblereading.verse;
+package net.zionsoft.obadiah.model.domain;
 
-interface VerseSelectionListener {
-    void onVersesSelectionChanged(boolean hasSelected);
+import java.util.List;
+
+// TODO merge with Verse
+public class VerseWithParallelTranslations {
+    public static class Text {
+        public final String translation;
+        public final String text;
+
+        public Text(String translation, String text) {
+            this.translation = translation;
+            this.text = text;
+        }
+    }
+
+    public final Verse.Index verseIndex;
+    public final List<Text> texts;
+
+    public VerseWithParallelTranslations(Verse.Index verseIndex, List<Text> texts) {
+        this.verseIndex = verseIndex;
+        this.texts = texts;
+    }
 }

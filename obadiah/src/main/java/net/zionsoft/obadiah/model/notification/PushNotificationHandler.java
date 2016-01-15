@@ -41,8 +41,6 @@ import net.zionsoft.obadiah.model.datamodel.BibleReadingModel;
 import net.zionsoft.obadiah.model.domain.Verse;
 import net.zionsoft.obadiah.translations.TranslationManagementActivity;
 
-import java.util.List;
-
 import javax.inject.Inject;
 
 public class PushNotificationHandler extends IntentService {
@@ -132,10 +130,9 @@ public class PushNotificationHandler extends IntentService {
                     BibleReadingActivity.newStartReorderToTopIntent(this, messageType,
                             verseIndex.book, verseIndex.chapter, verseIndex.verse),
                     PendingIntent.FLAG_UPDATE_CURRENT);
-            final List<Verse> verses = bibleReadingModel
-                    .loadVerses(translationShortName, verseIndex.book, verseIndex.chapter)
+            final Verse verse = bibleReadingModel
+                    .loadVerse(translationShortName, verseIndex.book, verseIndex.chapter, verseIndex.verse)
                     .toBlocking().first();
-            final Verse verse = verses.get(verseIndex.verse);
             builder.setContentIntent(pendingIntent)
                     .setContentTitle(String.format("%s, %d:%d", verse.bookName, verseIndex.chapter + 1, verseIndex.verse + 1))
                     .setContentText(verse.verseText)

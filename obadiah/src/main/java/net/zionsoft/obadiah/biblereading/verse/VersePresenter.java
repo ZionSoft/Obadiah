@@ -22,12 +22,15 @@ import android.support.annotation.NonNull;
 import net.zionsoft.obadiah.model.datamodel.BibleReadingModel;
 import net.zionsoft.obadiah.model.datamodel.Settings;
 import net.zionsoft.obadiah.model.domain.Verse;
+import net.zionsoft.obadiah.model.domain.VerseWithParallelTranslations;
 import net.zionsoft.obadiah.mvp.BasePresenter;
 
 import java.util.List;
 
+import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
@@ -44,8 +47,16 @@ public class VersePresenter extends BasePresenter<VerseView> {
     protected void onViewTaken() {
         super.onViewTaken();
 
-        getSubscription().add(bibleReadingModel.observeCurrentTranslation()
-                .subscribe(new Subscriber<String>() {
+        getSubscription().add(Observable.merge(
+                bibleReadingModel.observeCurrentTranslation()
+                        .map(new Func1<String, Void>() {
+                            @Override
+                            public Void call(String s) {
+                                return null;
+                            }
+                        }),
+                bibleReadingModel.observeParallelTranslation())
+                .subscribe(new Subscriber<Void>() {
                     @Override
                     public void onCompleted() {
                         // do nothing
@@ -57,13 +68,14 @@ public class VersePresenter extends BasePresenter<VerseView> {
                     }
 
                     @Override
-                    public void onNext(String translation) {
+                    public void onNext(Void param) {
                         final VerseView v = getView();
                         if (v != null) {
-                            v.onTranslationUpdated(translation);
+                            v.onTranslationUpdated();
                         }
                     }
                 }));
+
         getSubscription().add(bibleReadingModel.observeCurrentReadingProgress()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<Verse.Index>() {
@@ -125,8 +137,16 @@ public class VersePresenter extends BasePresenter<VerseView> {
         bibleReadingModel.saveReadingProgress(new Verse.Index(book, chapter, verse));
     }
 
-    void loadVerses(final String translation, final int book, final int chapter) {
-        getSubscription().add(bibleReadingModel.loadVerses(translation, book, chapter)
+    void loadVerses(int book, int chapter) {
+        if (bibleReadingModel.hasParallelTranslation()) {
+            loadVersesWithParallelTranslations(book, chapter);
+        } else {
+            loadVersesOnly(book, chapter);
+        }
+    }
+
+    private void loadVersesOnly(final int book, final int chapter) {
+        getSubscription().add(bibleReadingModel.loadVerses(loadCurrentTranslation(), book, chapter)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<List<Verse>>() {
@@ -139,7 +159,7 @@ public class VersePresenter extends BasePresenter<VerseView> {
                     public void onError(Throwable e) {
                         final VerseView v = getView();
                         if (v != null) {
-                            v.onVersesLoadFailed(translation, book, chapter);
+                            v.onVersesLoadFailed(book, chapter);
                         }
                     }
 
@@ -148,6 +168,34 @@ public class VersePresenter extends BasePresenter<VerseView> {
                         final VerseView v = getView();
                         if (v != null) {
                             v.onVersesLoaded(verses);
+                        }
+                    }
+                }));
+    }
+
+    private void loadVersesWithParallelTranslations(final int book, final int chapter) {
+        getSubscription().add(bibleReadingModel.loadVersesWithParallelTranslations(book, chapter)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<List<VerseWithParallelTranslations>>() {
+                    @Override
+                    public void onCompleted() {
+                        // do nothing
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        final VerseView v = getView();
+                        if (v != null) {
+                            v.onVersesLoadFailed(book, chapter);
+                        }
+                    }
+
+                    @Override
+                    public void onNext(List<VerseWithParallelTranslations> verses) {
+                        final VerseView v = getView();
+                        if (v != null) {
+                            v.onVersesWithParallelTranslationsLoaded(verses);
                         }
                     }
                 }));

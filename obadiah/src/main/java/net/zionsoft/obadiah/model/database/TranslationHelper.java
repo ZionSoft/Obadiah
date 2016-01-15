@@ -90,6 +90,28 @@ public class TranslationHelper {
     }
 
     @NonNull
+    public static List<String> getVerseTexts(SQLiteDatabase db, String translationShortName, int book, int chapter) {
+        Cursor cursor = null;
+        try {
+            cursor = db.query(translationShortName, new String[]{COLUMN_TEXT},
+                    String.format("%s = ? AND %s = ?", COLUMN_BOOK_INDEX, COLUMN_CHAPTER_INDEX),
+                    new String[]{Integer.toString(book), Integer.toString(chapter)},
+                    null, null, String.format("%s ASC", COLUMN_VERSE_INDEX)
+            );
+            final int verse = cursor.getColumnIndex(COLUMN_TEXT);
+            final List<String> verseTexts = new ArrayList<>(cursor.getCount());
+            while (cursor.moveToNext()) {
+                verseTexts.add(cursor.getString(verse));
+            }
+            return verseTexts;
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+    }
+
+    @NonNull
     public static List<Verse> searchVerses(SQLiteDatabase db, String translationShortName,
                                            List<String> bookNames, String keyword) {
         Cursor cursor = null;

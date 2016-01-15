@@ -31,6 +31,7 @@ import android.view.ViewGroup;
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.domain.Bible;
 import net.zionsoft.obadiah.model.domain.Verse;
+import net.zionsoft.obadiah.model.domain.VerseWithParallelTranslations;
 import net.zionsoft.obadiah.ui.utils.AnimationHelper;
 import net.zionsoft.obadiah.ui.utils.DialogHelper;
 
@@ -114,7 +115,6 @@ class VersePagerAdapter extends PagerAdapter implements VerseView {
 
     private VerseSelectionListener listener;
 
-    private String translation;
     private int currentBook;
     private int currentChapter;
     private int currentVerse;
@@ -128,7 +128,8 @@ class VersePagerAdapter extends PagerAdapter implements VerseView {
 
     @Override
     public int getCount() {
-        return listener == null || TextUtils.isEmpty(translation) ? 0 : Bible.getChapterCount(currentBook);
+        return listener == null || TextUtils.isEmpty(versePresenter.loadCurrentTranslation())
+                ? 0 : Bible.getChapterCount(currentBook);
     }
 
     @Override
@@ -162,7 +163,7 @@ class VersePagerAdapter extends PagerAdapter implements VerseView {
     }
 
     private void loadVerses(int chapter) {
-        versePresenter.loadVerses(translation, currentBook, chapter);
+        versePresenter.loadVerses(currentBook, chapter);
     }
 
     @Override
@@ -191,34 +192,59 @@ class VersePagerAdapter extends PagerAdapter implements VerseView {
     @Override
     public void onVersesLoaded(List<Verse> verses) {
         final int chapter = verses.get(0).index.chapter;
+        final Page page = findPage(chapter);
+        if (page != null) {
+            AnimationHelper.fadeOut(page.loadingSpinner);
+            AnimationHelper.fadeIn(page.verseList);
+
+            page.verseListAdapter.setVerses(verses);
+
+            scrollPageToCurrentVerse(page, chapter);
+        }
+    }
+
+    @Nullable
+    private Page findPage(int chapter) {
         final int pageCount = pages.size();
         for (int i = 0; i < pageCount; ++i) {
             final Page page = pages.get(i);
             if (page.chapter == chapter) {
-                AnimationHelper.fadeOut(page.loadingSpinner);
-                AnimationHelper.fadeIn(page.verseList);
-
-                page.verseListAdapter.setVerses(verses);
-                page.verseListAdapter.notifyDataSetChanged();
-
-                if (currentVerse > 0 && currentChapter == chapter) {
-                    page.verseList.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            ((LinearLayoutManager) page.verseList.getLayoutManager())
-                                    .scrollToPositionWithOffset(currentVerse, 0);
-                        }
-                    });
-                } else {
-                    page.verseList.scrollToPosition(0);
-                }
-                break;
+                return page;
             }
+        }
+        return null;
+    }
+
+    private void scrollPageToCurrentVerse(final Page page, int chapter) {
+        if (currentVerse > 0 && currentChapter == chapter) {
+            page.verseList.post(new Runnable() {
+                @Override
+                public void run() {
+                    ((LinearLayoutManager) page.verseList.getLayoutManager())
+                            .scrollToPositionWithOffset(currentVerse, 0);
+                }
+            });
+        } else {
+            page.verseList.scrollToPosition(0);
         }
     }
 
     @Override
-    public void onVersesLoadFailed(String translation, int book, final int chapter) {
+    public void onVersesWithParallelTranslationsLoaded(List<VerseWithParallelTranslations> verses) {
+        final int chapter = verses.get(0).verseIndex.chapter;
+        final Page page = findPage(chapter);
+        if (page != null) {
+            AnimationHelper.fadeOut(page.loadingSpinner);
+            AnimationHelper.fadeIn(page.verseList);
+
+            page.verseListAdapter.setVersesWithParallelTranslations(verses);
+
+            scrollPageToCurrentVerse(page, chapter);
+        }
+    }
+
+    @Override
+    public void onVersesLoadFailed(int book, final int chapter) {
         DialogHelper.showDialog(context, false, R.string.error_failed_to_load,
                 new DialogInterface.OnClickListener() {
                     @Override
@@ -229,8 +255,7 @@ class VersePagerAdapter extends PagerAdapter implements VerseView {
     }
 
     @Override
-    public void onTranslationUpdated(String translation) {
-        this.translation = translation;
+    public void onTranslationUpdated() {
         notifyDataSetChanged();
     }
 
@@ -248,7 +273,6 @@ class VersePagerAdapter extends PagerAdapter implements VerseView {
     void onResume() {
         versePresenter.takeView(this);
 
-        translation = versePresenter.loadCurrentTranslation();
         currentBook = versePresenter.loadCurrentBook();
         currentChapter = versePresenter.loadCurrentChapter();
         currentVerse = versePresenter.loadCurrentVerse();

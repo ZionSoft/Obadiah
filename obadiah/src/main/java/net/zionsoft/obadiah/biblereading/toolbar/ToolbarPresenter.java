@@ -143,10 +143,6 @@ public class ToolbarPresenter extends MVPPresenter<ToolbarView> {
         return bibleReadingModel.loadCurrentBook();
     }
 
-    int loadCurrentChapter() {
-        return bibleReadingModel.loadCurrentChapter();
-    }
-
     void loadTranslations() {
         getSubscription().add(bibleReadingModel.loadTranslations()
                 .subscribeOn(Schedulers.io())
@@ -172,6 +168,18 @@ public class ToolbarPresenter extends MVPPresenter<ToolbarView> {
                         }
                     }
                 }));
+    }
+
+    boolean isParallelTranslation(String translation) {
+        return bibleReadingModel.isParallelTranslation(translation);
+    }
+
+    void loadParallelTranslation(String translation) {
+        bibleReadingModel.addParallelTranslation(translation);
+    }
+
+    void removeParallelTranslation(String translation) {
+        bibleReadingModel.removeParallelTranslation(translation);
     }
 
     void loadBookNamesForCurrentTranslation() {
