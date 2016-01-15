@@ -22,6 +22,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
 import net.zionsoft.obadiah.model.domain.Verse;
 
@@ -76,11 +77,28 @@ public class TranslationHelper {
                     null, null, String.format("%s ASC", COLUMN_VERSE_INDEX)
             );
             final int verse = cursor.getColumnIndex(COLUMN_TEXT);
-            final List<Verse> verses = new ArrayList<>(cursor.getCount());
+            final int verseCount = cursor.getCount();
+            final List<Verse> verses = new ArrayList<>(verseCount);
             int verseIndex = 0;
+            boolean hasNonEmptyVerseInTheBeginning = false;
             while (cursor.moveToNext()) {
-                verses.add(new Verse(new Verse.Index(book, chapter, verseIndex++), bookName, cursor.getString(verse)));
+                // ignores empty verses at the beginning
+                final String text = cursor.getString(verse);
+                if (hasNonEmptyVerseInTheBeginning || !TextUtils.isEmpty(text)) {
+                    verses.add(new Verse(new Verse.Index(book, chapter, verseIndex++), bookName, text));
+                    hasNonEmptyVerseInTheBeginning = true;
+                }
             }
+
+            // removes trailing verses at the end
+            for (int i = verseCount - 1; i >= 0; --i) {
+                if (TextUtils.isEmpty(verses.get(i).verseText)) {
+                    verses.remove(i);
+                } else {
+                    break;
+                }
+            }
+
             return verses;
         } finally {
             if (cursor != null) {
@@ -99,10 +117,27 @@ public class TranslationHelper {
                     null, null, String.format("%s ASC", COLUMN_VERSE_INDEX)
             );
             final int verse = cursor.getColumnIndex(COLUMN_TEXT);
-            final List<String> verseTexts = new ArrayList<>(cursor.getCount());
+            final int verseCount = cursor.getCount();
+            final List<String> verseTexts = new ArrayList<>(verseCount);
+            boolean hasNonEmptyVerseInTheBeginning = false;
             while (cursor.moveToNext()) {
-                verseTexts.add(cursor.getString(verse));
+                // ignores empty verses at the beginning
+                final String text = cursor.getString(verse);
+                if (hasNonEmptyVerseInTheBeginning || !TextUtils.isEmpty(text)) {
+                    verseTexts.add(text);
+                    hasNonEmptyVerseInTheBeginning = true;
+                }
             }
+
+            // removes trailing verses at the end
+            for (int i = verseCount - 1; i >= 0; --i) {
+                if (TextUtils.isEmpty(verseTexts.get(i))) {
+                    verseTexts.remove(i);
+                } else {
+                    break;
+                }
+            }
+
             return verseTexts;
         } finally {
             if (cursor != null) {
