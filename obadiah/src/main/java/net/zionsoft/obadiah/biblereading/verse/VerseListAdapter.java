@@ -38,10 +38,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 
 class VerseListAdapter extends RecyclerView.Adapter {
-    private static final int ITEM_TYPE_VERSE = 0;
-    private static final int ITEM_TYPE_VERSE_WITH_PARALLEL_TRANSLATIONS = 1;
-
-    static class VerseViewHolder extends RecyclerView.ViewHolder {
+    static class ViewHolder extends RecyclerView.ViewHolder {
         private static final StringBuilder STRING_BUILDER = new StringBuilder();
         private final Settings settings;
         private final Resources resources;
@@ -49,7 +46,7 @@ class VerseListAdapter extends RecyclerView.Adapter {
         @Bind(R.id.text)
         TextView text;
 
-        private VerseViewHolder(View itemView, Settings settings, Resources resources) {
+        private ViewHolder(View itemView, Settings settings, Resources resources) {
             super(itemView);
 
             this.settings = settings;
@@ -58,6 +55,7 @@ class VerseListAdapter extends RecyclerView.Adapter {
         }
 
         private void bind(Verse verse, boolean selected) {
+            itemView.setEnabled(true);
             itemView.setSelected(selected);
 
             text.setTextColor(settings.getTextColor());
@@ -70,25 +68,11 @@ class VerseListAdapter extends RecyclerView.Adapter {
                     .append(verse.verseText);
             text.setText(STRING_BUILDER.toString());
         }
-    }
-
-    static class VerseWithParallelTranslationsViewHolder extends RecyclerView.ViewHolder {
-        private static final StringBuilder STRING_BUILDER = new StringBuilder();
-        private final Settings settings;
-        private final Resources resources;
-
-        @Bind(R.id.text)
-        TextView text;
-
-        private VerseWithParallelTranslationsViewHolder(View itemView, Settings settings, Resources resources) {
-            super(itemView);
-
-            this.settings = settings;
-            this.resources = resources;
-            ButterKnife.bind(this, itemView);
-        }
 
         private void bind(VerseWithParallelTranslations verse) {
+            itemView.setEnabled(false);
+            itemView.setSelected(false);
+
             text.setTextColor(settings.getTextColor());
             text.setTextSize(TypedValue.COMPLEX_UNIT_PX,
                     resources.getDimension(settings.getTextSize().textSize));
@@ -132,34 +116,16 @@ class VerseListAdapter extends RecyclerView.Adapter {
     }
 
     @Override
-    public int getItemViewType(int position) {
-        if (verses != null) {
-            return ITEM_TYPE_VERSE;
-        }
-        if (versesWithParallelTranslations != null) {
-            return ITEM_TYPE_VERSE_WITH_PARALLEL_TRANSLATIONS;
-        }
-        throw new IllegalStateException("Unknown view type for position - " + position);
-    }
-
-    @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        switch (viewType) {
-            case ITEM_TYPE_VERSE:
-                return new VerseViewHolder(inflater.inflate(R.layout.item_verse, parent, false), settings, resources);
-            case ITEM_TYPE_VERSE_WITH_PARALLEL_TRANSLATIONS:
-                return new VerseWithParallelTranslationsViewHolder(
-                        inflater.inflate(R.layout.item_verse_with_parallel_translations, parent, false), settings, resources);
-        }
-        throw new IllegalStateException("Unknown view type - " + viewType);
+        return new ViewHolder(inflater.inflate(R.layout.item_verse, parent, false), settings, resources);
     }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        if (holder instanceof VerseViewHolder) {
-            ((VerseViewHolder) holder).bind(verses.get(position), selected[position]);
-        } else if (holder instanceof VerseWithParallelTranslationsViewHolder) {
-            ((VerseWithParallelTranslationsViewHolder) holder).bind(versesWithParallelTranslations.get(position));
+        if (verses != null) {
+            ((ViewHolder) holder).bind(verses.get(position), selected[position]);
+        } else if (versesWithParallelTranslations != null) {
+            ((ViewHolder) holder).bind(versesWithParallelTranslations.get(position));
         }
     }
 
