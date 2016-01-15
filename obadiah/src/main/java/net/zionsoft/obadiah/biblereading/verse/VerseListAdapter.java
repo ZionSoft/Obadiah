@@ -81,33 +81,36 @@ class VerseListAdapter extends RecyclerView.Adapter {
         }
     }
 
-    private static class VerseWithParallelTranslationsViewHolder extends RecyclerView.ViewHolder {
+    static class VerseWithParallelTranslationsViewHolder extends RecyclerView.ViewHolder {
         private static final StringBuilder STRING_BUILDER = new StringBuilder();
         private final Settings settings;
         private final Resources resources;
+
+        @Bind(R.id.text)
+        TextView text;
 
         private VerseWithParallelTranslationsViewHolder(View itemView, Settings settings, Resources resources) {
             super(itemView);
 
             this.settings = settings;
             this.resources = resources;
+            ButterKnife.bind(this, itemView);
         }
 
         private void bind(VerseWithParallelTranslations verse) {
-            final TextView textView = (TextView) itemView;
-
-            textView.setTextColor(settings.getTextColor());
-            textView.setTextSize(TypedValue.COMPLEX_UNIT_PX,
+            text.setTextColor(settings.getTextColor());
+            text.setTextSize(TypedValue.COMPLEX_UNIT_PX,
                     resources.getDimension(settings.getTextSize().textSize));
 
             STRING_BUILDER.setLength(0);
-            STRING_BUILDER.append(verse.verseIndex.chapter + 1).append(':').append(verse.verseIndex.verse + 1);
             final int size = verse.texts.size();
             for (int i = 0; i < size; ++i) {
                 final VerseWithParallelTranslations.Text text = verse.texts.get(i);
-                STRING_BUILDER.append('\n').append(text.translation).append(": ").append(text.text);
+                STRING_BUILDER.append(text.translation).append(' ')
+                        .append(verse.verseIndex.chapter + 1).append(':').append(verse.verseIndex.verse + 1)
+                        .append('\n').append(text.text).append('\n').append('\n');
             }
-            textView.setText(STRING_BUILDER.toString());
+            text.setText(STRING_BUILDER.substring(0, STRING_BUILDER.length() - 2));
         }
     }
 
