@@ -34,6 +34,8 @@ import java.util.List;
 
 class SearchResultListAdapter extends RecyclerView.Adapter {
     private static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        private static final StringBuilder STRING_BUILDER = new StringBuilder();
+
         private final SearchPresenter searchPresenter;
         private final Resources resources;
         private Verse verse;
@@ -52,8 +54,12 @@ class SearchResultListAdapter extends RecyclerView.Adapter {
             textView.setTextSize(TypedValue.COMPLEX_UNIT_PX,
                     resources.getDimension(settings.getTextSize().textSize));
 
-            textView.setText(String.format("%s %d:%d\n%s", verse.bookName,
-                    verse.index.chapter + 1, verse.index.verse + 1, verse.verseText));
+            STRING_BUILDER.setLength(0);
+            STRING_BUILDER.append(verse.bookName).append(' ')
+                    .append(verse.index.chapter + 1).append(':').append(verse.index.verse + 1)
+                    .append('\n').append(verse.verseText);
+            textView.setText(STRING_BUILDER.toString());
+
             this.verse = verse;
         }
 

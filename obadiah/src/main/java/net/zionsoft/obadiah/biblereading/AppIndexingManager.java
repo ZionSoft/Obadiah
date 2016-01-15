@@ -29,13 +29,9 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import net.zionsoft.obadiah.BuildConfig;
 
 class AppIndexingManager {
-    private final GoogleApiClient googleApiClient;
+    private static final StringBuilder STRING_BUILDER = new StringBuilder();
 
-    private static final String TITLE_TEMPLATE = "%s, %d (%s)";
-    private static final String APP_URI_TEMPLATE = BuildConfig.DEBUG
-            ? "android-app://net.zionsoft.obadiah.debug/http/bible.zionsoft.net/bible/%s/%d/%d"
-            : "android-app://net.zionsoft.obadiah/http/bible.zionsoft.net/bible/%s/%d/%d";
-    private static final String WEB_URI_TEMPLATE = "http://bible.zionsoft.net/bible/%s/%d/%d";
+    private final GoogleApiClient googleApiClient;
     private Action action;
 
     AppIndexingManager(Context context) {
@@ -60,10 +56,25 @@ class AppIndexingManager {
         if (googleApiClient != null) {
             onViewEnd();
 
-            action = Action.newAction(Action.TYPE_VIEW,
-                    String.format(TITLE_TEMPLATE, bookName, chapterIndex + 1, translationShortName),
-                    Uri.parse(String.format(WEB_URI_TEMPLATE, translationShortName, bookIndex, chapterIndex)),
-                    Uri.parse(String.format(APP_URI_TEMPLATE, translationShortName, bookIndex, chapterIndex)));
+            STRING_BUILDER.setLength(0);
+            STRING_BUILDER.append(bookName).append(", ").append(chapterIndex + 1)
+                    .append(" (").append(translationShortName).append(')');
+            final String title = STRING_BUILDER.toString();
+
+            STRING_BUILDER.setLength(0);
+            STRING_BUILDER.append("http://bible.zionsoft.net/bible/").append(translationShortName)
+                    .append('/').append(bookIndex).append('/').append(chapterIndex);
+            final Uri webUri = Uri.parse(STRING_BUILDER.toString());
+
+            STRING_BUILDER.setLength(0);
+            STRING_BUILDER.append(BuildConfig.DEBUG
+                    ? "android-app://net.zionsoft.obadiah.debug/http/bible.zionsoft.net/bible/"
+                    : "android-app://net.zionsoft.obadiah/http/bible.zionsoft.net/bible/")
+                    .append(translationShortName)
+                    .append('/').append(bookIndex).append('/').append(chapterIndex);
+            final Uri appUri = Uri.parse(STRING_BUILDER.toString());
+
+            action = Action.newAction(Action.TYPE_VIEW, title, webUri, appUri);
             AppIndex.AppIndexApi.start(googleApiClient, action);
         }
     }

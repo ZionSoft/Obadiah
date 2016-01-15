@@ -134,16 +134,19 @@ public class VerseViewPager extends ViewPager implements VersePagerView, VerseSe
         }
     }
 
+    @Nullable
     private static String buildText(@Nullable List<Verse> verses) {
-        if (verses == null || verses.size() == 0) {
+        final int versesCount = verses != null ? verses.size() : 0;
+        if (versesCount == 0) {
             return null;
         }
 
         // format: <book name> <chapter index>:<verse index> <verse text>
         final StringBuilder text = new StringBuilder();
-        for (Verse verse : verses) {
-            text.append(String.format("%S %d:%d %s\n", verse.bookName, verse.index.chapter + 1,
-                    verse.index.verse + 1, verse.verseText));
+        for (int i = 0; i < versesCount; ++i) {
+            final Verse verse = verses.get(i);
+            text.append(verse.bookName).append(' ').append(verse.index.chapter + 1).append(':')
+                    .append(verse.index.verse + 1).append(' ').append(verse.verseText).append('\n');
         }
         return text.toString();
     }

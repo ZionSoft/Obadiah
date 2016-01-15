@@ -129,6 +129,8 @@ class ReadingProgressListAdapter extends RecyclerView.Adapter {
     }
 
     static class ItemViewHolder extends RecyclerView.ViewHolder {
+        private static final StringBuilder STRING_BUILDER = new StringBuilder(9);
+
         @Bind(R.id.book_name_text_view)
         TextView bookName;
 
@@ -169,7 +171,10 @@ class ReadingProgressListAdapter extends RecyclerView.Adapter {
                 progress = 1;
             }
             this.readingProgress.setProgress(progress);
-            this.readingProgress.setText(String.format("%d / %d", chaptersRead, chaptersCount));
+
+            STRING_BUILDER.setLength(0);
+            STRING_BUILDER.append(chaptersRead).append(" / ").append(chaptersCount);
+            this.readingProgress.setText(STRING_BUILDER.toString());
 
             if (chaptersRead > 0) {
                 final Pair<Integer, Long> lastReadChapter = readingProgress.getLastReadChapter(book);
