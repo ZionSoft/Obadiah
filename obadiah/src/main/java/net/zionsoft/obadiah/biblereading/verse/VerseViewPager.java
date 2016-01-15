@@ -212,9 +212,9 @@ public class VerseViewPager extends ViewPager implements VersePagerView, VerseSe
     public void onResume() {
         versePagerPresenter.takeView(this);
         currentChapter = versePagerPresenter.loadCurrentChapter();
-        setCurrentItem(currentChapter);
 
         adapter.onResume();
+        setCurrentItem(currentChapter);
     }
 
     public void onPause() {
