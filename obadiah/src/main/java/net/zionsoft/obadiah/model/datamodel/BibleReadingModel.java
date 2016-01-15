@@ -19,6 +19,7 @@ package net.zionsoft.obadiah.model.datamodel;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.Nullable;
 import android.support.v4.util.LruCache;
 import android.text.TextUtils;
@@ -211,31 +212,37 @@ public class BibleReadingModel {
     }
 
     public Observable<List<VerseWithParallelTranslations>> loadVersesWithParallelTranslations(final int book, final int chapter) {
-        // TODO optimizes me
         return loadVerses(loadCurrentTranslation(), book, chapter)
                 .map(new Func1<List<Verse>, List<VerseWithParallelTranslations>>() {
                     @Override
                     public List<VerseWithParallelTranslations> call(List<Verse> verses) {
-                        final int translationsCount = parallelTranslations.size() + 1;
-                        final List<List<Verse>> versesFromAllTranslations = new ArrayList<>(translationsCount);
-                        versesFromAllTranslations.add(verses);
-                        for (int i = 1; i < translationsCount; ++i) {
-                            versesFromAllTranslations.add(loadVerses(parallelTranslations.get(i - 1), book, chapter)
-                                    .toBlocking().first());
+                        final int parallelTranslationsCount = parallelTranslations.size();
+                        final List<List<String>> textsFromParallelTranslations
+                                = new ArrayList<>(parallelTranslationsCount);
+                        final SQLiteDatabase database = databaseHelper.getDatabase();
+                        for (int i = 0; i < parallelTranslationsCount; ++i) {
+                            textsFromParallelTranslations.add(TranslationHelper.getVerseTexts(
+                                    database, parallelTranslations.get(i), book, chapter));
                         }
 
+                        final String currentTranslation = loadCurrentTranslation();
+                        final int translationsCount = parallelTranslationsCount + 1;
                         final int versesCount = verses.size();
                         final List<VerseWithParallelTranslations> results = new ArrayList<>(versesCount);
                         for (int i = 0; i < versesCount; ++i) {
-                            final List<VerseWithParallelTranslations.Text> texts = new ArrayList<>(translationsCount);
+                            final List<VerseWithParallelTranslations.Text> texts
+                                    = new ArrayList<>(translationsCount);
+                            final Verse verse = verses.get(i);
                             texts.add(new VerseWithParallelTranslations.Text(
-                                    loadCurrentTranslation(), verses.get(i).verseText));
-                            for (int j = 1; j < translationsCount; ++j) {
+                                    currentTranslation, verse.verseText));
+
+                            for (int j = 0; j < parallelTranslationsCount; ++j) {
                                 texts.add(new VerseWithParallelTranslations.Text(
-                                        parallelTranslations.get(j - 1),
-                                        versesFromAllTranslations.get(j).get(i).verseText));
+                                        parallelTranslations.get(j),
+                                        textsFromParallelTranslations.get(j).get(i)));
                             }
-                            results.add(new VerseWithParallelTranslations(verses.get(i).index, texts));
+
+                            results.add(new VerseWithParallelTranslations(verse.index, texts));
                         }
                         return results;
                     }
