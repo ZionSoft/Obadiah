@@ -97,18 +97,18 @@ public class BibleReadingToolbar extends Toolbar implements ToolbarView,
     @Override
     public void onBookNamesLoaded(List<String> bookNames) {
         this.bookNames = bookNames;
-        refresh(toolbarPresenter.loadCurrentBook(), toolbarPresenter.loadCurrentChapter());
+        refresh(toolbarPresenter.loadCurrentBook());
     }
 
-    private void refresh(int book, int chapter) {
+    private void refresh(int book) {
         if (bookNames != null) {
-            setTitle(String.format("%s, %d", bookNames.get(book), chapter + 1));
+            setTitle(bookNames.get(book));
         }
     }
 
     @Override
     public void onReadingProgressUpdated(Verse.Index index) {
-        refresh(index.book, index.chapter);
+        refresh(index.book);
     }
 
     @Override

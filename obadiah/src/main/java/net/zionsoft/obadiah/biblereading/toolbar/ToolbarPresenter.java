@@ -143,10 +143,6 @@ public class ToolbarPresenter extends MVPPresenter<ToolbarView> {
         return bibleReadingModel.loadCurrentBook();
     }
 
-    int loadCurrentChapter() {
-        return bibleReadingModel.loadCurrentChapter();
-    }
-
     void loadTranslations() {
         getSubscription().add(bibleReadingModel.loadTranslations()
                 .subscribeOn(Schedulers.io())

@@ -42,11 +42,9 @@ class VerseListAdapter extends RecyclerView.Adapter {
     private static final int ITEM_TYPE_VERSE_WITH_PARALLEL_TRANSLATIONS = 1;
 
     static class VerseViewHolder extends RecyclerView.ViewHolder {
+        private static final StringBuilder STRING_BUILDER = new StringBuilder();
         private final Settings settings;
         private final Resources resources;
-
-        @Bind(R.id.index)
-        TextView index;
 
         @Bind(R.id.text)
         TextView text;
@@ -59,25 +57,18 @@ class VerseListAdapter extends RecyclerView.Adapter {
             ButterKnife.bind(this, itemView);
         }
 
-        private void bind(Verse verse, int totalVerseCount, boolean selected) {
+        private void bind(Verse verse, boolean selected) {
             itemView.setSelected(selected);
 
-            final int textColor = settings.getTextColor();
-            final float textSize = resources.getDimension(settings.getTextSize().textSize);
-            index.setTextColor(textColor);
-            index.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+            text.setTextColor(settings.getTextColor());
+            text.setTextSize(TypedValue.COMPLEX_UNIT_PX,
+                    resources.getDimension(settings.getTextSize().textSize));
 
-            if (totalVerseCount < 10) {
-                index.setText(Integer.toString(verse.index.verse + 1));
-            } else if (totalVerseCount < 100) {
-                index.setText(String.format("%2d", verse.index.verse + 1));
-            } else {
-                index.setText(String.format("%3d", verse.index.verse + 1));
-            }
-
-            text.setTextColor(textColor);
-            text.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
-            text.setText(verse.verseText);
+            STRING_BUILDER.setLength(0);
+            STRING_BUILDER.append(verse.bookName).append(' ')
+                    .append(verse.index.chapter + 1).append(':').append(verse.index.verse + 1).append('\n')
+                    .append(verse.verseText);
+            text.setText(STRING_BUILDER.toString());
         }
     }
 
@@ -166,7 +157,7 @@ class VerseListAdapter extends RecyclerView.Adapter {
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof VerseViewHolder) {
-            ((VerseViewHolder) holder).bind(verses.get(position), getItemCount(), selected[position]);
+            ((VerseViewHolder) holder).bind(verses.get(position), selected[position]);
         } else if (holder instanceof VerseWithParallelTranslationsViewHolder) {
             ((VerseWithParallelTranslationsViewHolder) holder).bind(versesWithParallelTranslations.get(position));
         }
