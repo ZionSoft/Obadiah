@@ -96,10 +96,10 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
     ChapterPresenter chapterPresenter;
 
     @Inject
-    VersePagerPresenter versePagerPresenter;
+    VersePresenter versePresenter;
 
     @Inject
-    VersePresenter versePresenter;
+    VersePagerPresenter versePagerPresenter;
 
     @Bind(R.id.drawer_layout)
     DrawerLayout drawerLayout;
@@ -163,8 +163,8 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
             chapterList.setPresenter(chapterPresenter);
         }
 
-        if (versePager != null && versePagerPresenter != null && versePresenter != null) {
-            versePager.initialize(this, versePagerPresenter, versePresenter);
+        if (versePager != null && versePresenter != null && versePagerPresenter != null) {
+            versePager.initialize(this, versePresenter, versePagerPresenter);
         }
     }
 

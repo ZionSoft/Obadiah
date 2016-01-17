@@ -41,12 +41,12 @@ import net.zionsoft.obadiah.model.domain.Verse;
 import java.util.ArrayList;
 import java.util.List;
 
-public class VerseViewPager extends ViewPager implements VersePagerView, VerseSelectionListener,
+public class VerseViewPager extends ViewPager implements VerseView, VerseSelectionListener,
         ActionMode.Callback {
     private AppCompatActivity activity;
     private ActionMode actionMode;
 
-    private VersePagerPresenter versePagerPresenter;
+    private VersePresenter versePagerPresenter;
 
     private VersePagerAdapter adapter;
     private int currentChapter;
@@ -192,8 +192,8 @@ public class VerseViewPager extends ViewPager implements VersePagerView, VerseSe
         this.actionMode = null;
     }
 
-    public void initialize(AppCompatActivity activity, VersePagerPresenter versePagerPresenter,
-                           VersePresenter versePresenter) {
+    public void initialize(AppCompatActivity activity, VersePresenter versePagerPresenter,
+                           VersePagerPresenter versePresenter) {
         this.activity = activity;
         this.versePagerPresenter = versePagerPresenter;
 

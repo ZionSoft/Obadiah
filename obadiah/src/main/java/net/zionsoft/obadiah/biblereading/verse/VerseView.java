@@ -18,19 +18,8 @@
 package net.zionsoft.obadiah.biblereading.verse;
 
 import net.zionsoft.obadiah.model.domain.Verse;
-import net.zionsoft.obadiah.model.domain.VerseWithParallelTranslations;
 import net.zionsoft.obadiah.mvp.MVPView;
 
-import java.util.List;
-
-interface VerseView extends MVPView {
-    void onVersesLoaded(List<Verse> verses);
-
-    void onVersesWithParallelTranslationsLoaded(List<VerseWithParallelTranslations> verses);
-
-    void onVersesLoadFailed(int book, int chapter);
-
-    void onTranslationUpdated();
-
+public interface VerseView extends MVPView {
     void onReadingProgressUpdated(Verse.Index index);
 }

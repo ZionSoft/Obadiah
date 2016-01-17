@@ -41,7 +41,7 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-class VersePagerAdapter extends PagerAdapter implements VerseView {
+class VersePagerAdapter extends PagerAdapter implements VersePagerView {
     static class Page implements RecyclerView.OnChildAttachStateChangeListener, View.OnClickListener {
         private final VerseSelectionListener listener;
         private final VerseListAdapter verseListAdapter;
@@ -58,7 +58,7 @@ class VersePagerAdapter extends PagerAdapter implements VerseView {
         @Bind(R.id.verse_list)
         RecyclerView verseList;
 
-        private Page(Context context, final VersePresenter versePresenter,
+        private Page(Context context, final VersePagerPresenter versePagerPresenter,
                      VerseSelectionListener listener, View rootView) {
             this.listener = listener;
             this.rootView = rootView;
@@ -66,7 +66,7 @@ class VersePagerAdapter extends PagerAdapter implements VerseView {
 
             verseList.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false));
 
-            verseListAdapter = new VerseListAdapter(context, versePresenter.getSettings());
+            verseListAdapter = new VerseListAdapter(context, versePagerPresenter.getSettings());
             verseList.setAdapter(verseListAdapter);
 
             verseList.addOnChildAttachStateChangeListener(this);
@@ -78,7 +78,7 @@ class VersePagerAdapter extends PagerAdapter implements VerseView {
                     if (inUse && newState == RecyclerView.SCROLL_STATE_IDLE) {
                         final LinearLayoutManager linearLayoutManager
                                 = (LinearLayoutManager) recyclerView.getLayoutManager();
-                        versePresenter.saveReadingProgress(book, chapter,
+                        versePagerPresenter.saveReadingProgress(book, chapter,
                                 linearLayoutManager.findFirstVisibleItemPosition());
                     }
                 }
@@ -109,7 +109,7 @@ class VersePagerAdapter extends PagerAdapter implements VerseView {
     }
 
     private final Context context;
-    private final VersePresenter versePresenter;
+    private final VersePagerPresenter versePagerPresenter;
     private final LayoutInflater inflater;
     private final ArrayList<Page> pages;
 
@@ -119,16 +119,16 @@ class VersePagerAdapter extends PagerAdapter implements VerseView {
     private int currentChapter;
     private int currentVerse;
 
-    VersePagerAdapter(Context context, VersePresenter versePresenter, int offScreenPageLimit) {
+    VersePagerAdapter(Context context, VersePagerPresenter versePagerPresenter, int offScreenPageLimit) {
         this.context = context;
-        this.versePresenter = versePresenter;
+        this.versePagerPresenter = versePagerPresenter;
         this.inflater = LayoutInflater.from(context);
         this.pages = new ArrayList<>(1 + 2 * offScreenPageLimit);
     }
 
     @Override
     public int getCount() {
-        return listener == null || TextUtils.isEmpty(versePresenter.loadCurrentTranslation())
+        return listener == null || TextUtils.isEmpty(versePagerPresenter.loadCurrentTranslation())
                 ? 0 : Bible.getChapterCount(currentBook);
     }
 
@@ -144,7 +144,7 @@ class VersePagerAdapter extends PagerAdapter implements VerseView {
             }
         }
         if (page == null) {
-            page = new Page(context, versePresenter, listener,
+            page = new Page(context, versePagerPresenter, listener,
                     inflater.inflate(R.layout.item_verse_pager, container, false));
             pages.add(page);
         }
@@ -163,7 +163,7 @@ class VersePagerAdapter extends PagerAdapter implements VerseView {
     }
 
     private void loadVerses(int chapter) {
-        versePresenter.loadVerses(currentBook, chapter);
+        versePagerPresenter.loadVerses(currentBook, chapter);
     }
 
     @Override
@@ -271,16 +271,16 @@ class VersePagerAdapter extends PagerAdapter implements VerseView {
     }
 
     void onResume() {
-        versePresenter.takeView(this);
+        versePagerPresenter.takeView(this);
 
-        currentBook = versePresenter.loadCurrentBook();
-        currentChapter = versePresenter.loadCurrentChapter();
-        currentVerse = versePresenter.loadCurrentVerse();
+        currentBook = versePagerPresenter.loadCurrentBook();
+        currentChapter = versePagerPresenter.loadCurrentChapter();
+        currentVerse = versePagerPresenter.loadCurrentVerse();
         notifyDataSetChanged();
     }
 
     void onPause() {
-        versePresenter.dropView();
+        versePagerPresenter.dropView();
     }
 
     void setVerseSelectionListener(VerseSelectionListener listener) {

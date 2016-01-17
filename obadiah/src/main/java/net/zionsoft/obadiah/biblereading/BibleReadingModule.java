@@ -52,13 +52,13 @@ public class BibleReadingModule {
 
     @Provides
     @ActivityScope
-    VersePagerPresenter provideVersePagerPresenter(BibleReadingModel bibleReadingModel) {
-        return new VersePagerPresenter(bibleReadingModel);
+    VersePresenter provideVersePresenter(BibleReadingModel bibleReadingModel) {
+        return new VersePresenter(bibleReadingModel);
     }
 
     @Provides
     @ActivityScope
-    VersePresenter provideVersePresenter(BibleReadingModel bibleReadingModel, Settings settings) {
-        return new VersePresenter(bibleReadingModel, settings);
+    VersePagerPresenter provideVersePagerPresenter(BibleReadingModel bibleReadingModel, Settings settings) {
+        return new VersePagerPresenter(bibleReadingModel, settings);
     }
 }
