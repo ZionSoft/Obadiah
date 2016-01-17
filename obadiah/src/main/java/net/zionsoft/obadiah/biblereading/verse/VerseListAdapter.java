@@ -19,6 +19,10 @@ package net.zionsoft.obadiah.biblereading.verse;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
+import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.RecyclerView;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -38,23 +42,33 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 
 class VerseListAdapter extends RecyclerView.Adapter {
-    static class ViewHolder extends RecyclerView.ViewHolder {
+    static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private static final StringBuilder STRING_BUILDER = new StringBuilder();
+        private static final PorterDuffColorFilter FAVORITE_ON = new PorterDuffColorFilter(Color.RED, PorterDuff.Mode.MULTIPLY);
+        private static final PorterDuffColorFilter FAVORITE_OFF = new PorterDuffColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
+
         private final Settings settings;
         private final Resources resources;
 
         @Bind(R.id.text)
         TextView text;
 
+        @Bind(R.id.favorite)
+        AppCompatImageView favorite;
+
+        private boolean isFavorite;
+
         private ViewHolder(View itemView, Settings settings, Resources resources) {
             super(itemView);
 
             this.settings = settings;
             this.resources = resources;
+
             ButterKnife.bind(this, itemView);
+            favorite.setOnClickListener(this);
         }
 
-        private void bind(Verse verse, boolean selected) {
+        private void bind(Verse verse, boolean selected, boolean isFavorite) {
             itemView.setEnabled(true);
             itemView.setSelected(selected);
 
@@ -67,9 +81,15 @@ class VerseListAdapter extends RecyclerView.Adapter {
                     .append(verse.index.chapter + 1).append(':').append(verse.index.verse + 1).append('\n')
                     .append(verse.verseText);
             text.setText(STRING_BUILDER.toString());
+
+            setFavoriteIcon(isFavorite);
         }
 
-        private void bind(VerseWithParallelTranslations verse) {
+        private void setFavoriteIcon(boolean isFavorite) {
+            favorite.setColorFilter(isFavorite ? FAVORITE_ON : FAVORITE_OFF);
+        }
+
+        private void bind(VerseWithParallelTranslations verse, boolean isFavorite) {
             itemView.setEnabled(false);
             itemView.setSelected(false);
 
@@ -86,6 +106,17 @@ class VerseListAdapter extends RecyclerView.Adapter {
                         .append('\n').append(text.text).append('\n').append('\n');
             }
             text.setText(STRING_BUILDER.substring(0, STRING_BUILDER.length() - 2));
+
+            setFavoriteIcon(isFavorite);
+        }
+
+        @Override
+        public void onClick(View v) {
+            if (v == favorite) {
+                isFavorite = !isFavorite;
+                setFavoriteIcon(isFavorite);
+                // TODO informs the change
+            }
         }
     }
 
@@ -122,10 +153,11 @@ class VerseListAdapter extends RecyclerView.Adapter {
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+        // TODO
         if (verses != null) {
-            ((ViewHolder) holder).bind(verses.get(position), selected[position]);
+            ((ViewHolder) holder).bind(verses.get(position), selected[position], false);
         } else if (versesWithParallelTranslations != null) {
-            ((ViewHolder) holder).bind(versesWithParallelTranslations.get(position));
+            ((ViewHolder) holder).bind(versesWithParallelTranslations.get(position), false);
         }
     }
 
