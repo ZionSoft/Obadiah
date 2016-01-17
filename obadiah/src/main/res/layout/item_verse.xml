@@ -1,15 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="@dimen/padding"
-    android:foreground="@drawable/background_text"
-    app:cardCornerRadius="@dimen/padding"
-    app:contentPadding="@dimen/padding">
+    android:background="@drawable/background_text">
 
     <TextView
         android:id="@+id/text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-</android.support.v7.widget.CardView>
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/padding" />
+
+    <View
+        android:id="@+id/divider_view"
+        style="@style/Divider.Horizontal"
+        android:layout_gravity="bottom"
+        android:background="@color/dark_gray" />
+</FrameLayout>
