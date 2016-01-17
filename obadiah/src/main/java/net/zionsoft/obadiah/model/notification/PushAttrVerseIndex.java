@@ -17,7 +17,11 @@
 
 package net.zionsoft.obadiah.model.notification;
 
+import android.support.annotation.NonNull;
+
 import com.squareup.moshi.Json;
+
+import net.zionsoft.obadiah.model.domain.Verse;
 
 public class PushAttrVerseIndex {
     @Json(name = "book")
@@ -33,5 +37,10 @@ public class PushAttrVerseIndex {
         this.book = book;
         this.chapter = chapter;
         this.verse = verse;
+    }
+
+    @NonNull
+    public Verse.Index toVerseIndex() {
+        return new Verse.Index(book, chapter, verse);
     }
 }

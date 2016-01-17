@@ -127,8 +127,7 @@ public class PushNotificationHandler extends IntentService {
         try {
             final PushAttrVerseIndex verseIndex = moshi.adapter(PushAttrVerseIndex.class).fromJson(messageAttrs);
             final PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,
-                    BibleReadingActivity.newStartReorderToTopIntent(this, messageType,
-                            verseIndex.book, verseIndex.chapter, verseIndex.verse),
+                    BibleReadingActivity.newStartReorderToTopIntent(this, messageType, verseIndex.toVerseIndex()),
                     PendingIntent.FLAG_UPDATE_CURRENT);
             final Verse verse = bibleReadingModel
                     .loadVerse(translationShortName, verseIndex.book, verseIndex.chapter, verseIndex.verse)

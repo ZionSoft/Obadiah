@@ -27,6 +27,7 @@ import android.nfc.NfcAdapter;
 import android.nfc.NfcEvent;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
@@ -59,17 +60,12 @@ import butterknife.Bind;
 public class BibleReadingActivity extends BaseAppCompatActivity implements BibleReadingView,
         NfcAdapter.CreateNdefMessageCallback {
     private static final String KEY_MESSAGE_TYPE = "net.zionsoft.obadiah.KEY_MESSAGE_TYPE";
-    private static final String KEY_BOOK_INDEX = "net.zionsoft.obadiah.KEY_BOOK_INDEX";
-    private static final String KEY_CHAPTER_INDEX = "net.zionsoft.obadiah.KEY_CHAPTER_INDEX";
     private static final String KEY_VERSE_INDEX = "net.zionsoft.obadiah.KEY_VERSE_INDEX";
 
-    public static Intent newStartReorderToTopIntent(Context context, String messageType,
-                                                    int book, int chapter, int verse) {
+    public static Intent newStartReorderToTopIntent(Context context, String messageType, Verse.Index verseIndex) {
         return newStartReorderToTopIntent(context)
                 .putExtra(KEY_MESSAGE_TYPE, messageType)
-                .putExtra(KEY_BOOK_INDEX, book)
-                .putExtra(KEY_CHAPTER_INDEX, chapter)
-                .putExtra(KEY_VERSE_INDEX, verse);
+                .putExtra(KEY_VERSE_INDEX, verseIndex);
     }
 
     public static Intent newStartReorderToTopIntent(Context context) {
@@ -191,19 +187,15 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
             if (TextUtils.isEmpty(messageType)) {
                 return;
             }
-            final int bookIndex = startIntent.getIntExtra(KEY_BOOK_INDEX, -1);
-            final int chapterIndex = startIntent.getIntExtra(KEY_CHAPTER_INDEX, -1);
-            final int verseIndex = startIntent.getIntExtra(KEY_VERSE_INDEX, -1);
-            if (bookIndex < 0 || chapterIndex < 0 || verseIndex < 0) {
+            final Verse.Index verseIndex = startIntent.getParcelableExtra(KEY_VERSE_INDEX);
+            if (verseIndex == null || verseIndex.book < 0 || verseIndex.chapter < 0 || verseIndex.verse < 0) {
                 // should not happen, but just in case
                 return;
             }
             startIntent.putExtra(KEY_MESSAGE_TYPE, (String) null)
-                    .putExtra(KEY_BOOK_INDEX, -1)
-                    .putExtra(KEY_CHAPTER_INDEX, -1)
-                    .putExtra(KEY_VERSE_INDEX, -1);
+                    .putExtra(KEY_VERSE_INDEX, (Parcelable) null);
 
-            bibleReadingPresenter.saveReadingProgress(bookIndex, chapterIndex, verseIndex);
+            bibleReadingPresenter.saveReadingProgress(verseIndex);
 
             Analytics.trackEvent(Analytics.CATEGORY_NOTIFICATION, Analytics.NOTIFICATION_ACTION_OPENED, messageType);
         }

@@ -128,6 +128,10 @@ class BibleReadingPresenter extends BasePresenter<BibleReadingView> {
         return bibleReadingModel.loadCurrentChapter();
     }
 
+    void saveReadingProgress(Verse.Index verseIndex) {
+        bibleReadingModel.saveReadingProgress(verseIndex);
+    }
+
     void saveReadingProgress(int book, int chapter, int verse) {
         bibleReadingModel.saveReadingProgress(new Verse.Index(book, chapter, verse));
     }
