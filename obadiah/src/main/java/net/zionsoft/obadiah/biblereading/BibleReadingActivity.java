@@ -334,6 +334,8 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
         currentChapter = index.chapter;
         currentVerse = index.verse;
 
+        drawerLayout.closeDrawer(GravityCompat.START);
+
         trackingReadingProgress();
     }
 
