@@ -40,6 +40,8 @@ import java.util.List;
 
 public class BibleReadingToolbar extends Toolbar implements ToolbarView,
         Toolbar.OnMenuItemClickListener, AdapterView.OnItemSelectedListener {
+    private static final StringBuilder STRING_BUILDER = new StringBuilder();
+
     private ToolbarPresenter toolbarPresenter;
     private List<String> bookNames;
 
@@ -97,18 +99,20 @@ public class BibleReadingToolbar extends Toolbar implements ToolbarView,
     @Override
     public void onBookNamesLoaded(List<String> bookNames) {
         this.bookNames = bookNames;
-        refresh(toolbarPresenter.loadCurrentBook());
+        refresh(toolbarPresenter.loadCurrentBook(), toolbarPresenter.loadCurrentChapter());
     }
 
-    private void refresh(int book) {
+    private void refresh(int book, int chapter) {
         if (bookNames != null) {
-            setTitle(bookNames.get(book));
+            STRING_BUILDER.setLength(0);
+            STRING_BUILDER.append(bookNames.get(book)).append(", ").append(chapter + 1);
+            setTitle(STRING_BUILDER.toString());
         }
     }
 
     @Override
     public void onReadingProgressUpdated(Verse.Index index) {
-        refresh(index.book);
+        refresh(index.book, index.chapter);
     }
 
     @Override
