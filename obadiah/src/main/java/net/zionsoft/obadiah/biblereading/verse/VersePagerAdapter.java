@@ -66,7 +66,7 @@ class VersePagerAdapter extends PagerAdapter implements VersePagerView {
 
             verseList.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false));
 
-            verseListAdapter = new VerseListAdapter(context, versePagerPresenter.getSettings());
+            verseListAdapter = new VerseListAdapter(context, versePagerPresenter);
             verseList.setAdapter(verseListAdapter);
 
             verseList.addOnChildAttachStateChangeListener(this);

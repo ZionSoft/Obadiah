@@ -27,7 +27,7 @@ import javax.inject.Singleton;
 
 @Singleton
 public class DatabaseHelper extends SQLiteOpenHelper {
-    private static final int DATABASE_VERSION = 6;
+    private static final int DATABASE_VERSION = 7;
     private static final String DATABASE_NAME = "DB_OBADIAH";
 
     @Inject
@@ -43,6 +43,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             TranslationsTableHelper.createTable(db);
             BookNamesTableHelper.createTable(db);
             ReadingProgressTableHelper.createTable(db);
+            BookmarkTableHelper.createTable(db);
 
             db.setTransactionSuccessful();
         } finally {
@@ -77,6 +78,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             // version 6 introduced in 1.13.0
             if (oldVersion < 6) {
                 TranslationsTableHelper.createTable(db);
+            }
+
+            // version 7 introduced in 1.14.0
+            if (oldVersion < 7) {
+                BookmarkTableHelper.createTable(db);
             }
 
             db.setTransactionSuccessful();

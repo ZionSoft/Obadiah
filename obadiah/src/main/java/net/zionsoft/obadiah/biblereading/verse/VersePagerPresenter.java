@@ -20,6 +20,7 @@ package net.zionsoft.obadiah.biblereading.verse;
 import android.support.annotation.NonNull;
 
 import net.zionsoft.obadiah.model.datamodel.BibleReadingModel;
+import net.zionsoft.obadiah.model.datamodel.BookmarkModel;
 import net.zionsoft.obadiah.model.datamodel.Settings;
 import net.zionsoft.obadiah.model.domain.Verse;
 import net.zionsoft.obadiah.model.domain.VerseWithParallelTranslations;
@@ -36,11 +37,13 @@ import rx.subscriptions.CompositeSubscription;
 
 public class VersePagerPresenter extends BasePresenter<VersePagerView> {
     private final BibleReadingModel bibleReadingModel;
+    private final BookmarkModel bookmarkModel;
     private CompositeSubscription subscription;
 
-    public VersePagerPresenter(BibleReadingModel bibleReadingModel, Settings settings) {
+    public VersePagerPresenter(BibleReadingModel bibleReadingModel, BookmarkModel bookmarkModel, Settings settings) {
         super(settings);
         this.bibleReadingModel = bibleReadingModel;
+        this.bookmarkModel = bookmarkModel;
     }
 
     @Override
@@ -197,6 +200,50 @@ public class VersePagerPresenter extends BasePresenter<VersePagerView> {
                         if (v != null) {
                             v.onVersesWithParallelTranslationsLoaded(verses);
                         }
+                    }
+                }));
+    }
+
+    void addFavorite(Verse.Index verseIndex) {
+        getSubscription().add(bookmarkModel.addFavorite(verseIndex)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<Void>() {
+                    @Override
+                    public void onCompleted() {
+                        // TODO
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        // TODO
+                    }
+
+                    @Override
+                    public void onNext(Void v) {
+                        // should not reach here
+                    }
+                }));
+    }
+
+    void removeFavorite(Verse.Index verseIndex) {
+        getSubscription().add(bookmarkModel.removeFavorite(verseIndex)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<Void>() {
+                    @Override
+                    public void onCompleted() {
+                        // TODO
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        // TODO
+                    }
+
+                    @Override
+                    public void onNext(Void v) {
+                        // should not reach here
                     }
                 }));
     }

@@ -47,7 +47,7 @@ class VerseListAdapter extends RecyclerView.Adapter {
         private static final PorterDuffColorFilter FAVORITE_ON = new PorterDuffColorFilter(Color.RED, PorterDuff.Mode.MULTIPLY);
         private static final PorterDuffColorFilter FAVORITE_OFF = new PorterDuffColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
 
-        private final Settings settings;
+        private final VersePagerPresenter versePagerPresenter;
         private final Resources resources;
 
         @Bind(R.id.text)
@@ -56,12 +56,13 @@ class VerseListAdapter extends RecyclerView.Adapter {
         @Bind(R.id.favorite)
         AppCompatImageView favorite;
 
+        private Verse.Index verseIndex;
         private boolean isFavorite;
 
-        private ViewHolder(View itemView, Settings settings, Resources resources) {
+        private ViewHolder(View itemView, VersePagerPresenter versePagerPresenter, Resources resources) {
             super(itemView);
 
-            this.settings = settings;
+            this.versePagerPresenter = versePagerPresenter;
             this.resources = resources;
 
             ButterKnife.bind(this, itemView);
@@ -72,6 +73,7 @@ class VerseListAdapter extends RecyclerView.Adapter {
             itemView.setEnabled(true);
             itemView.setSelected(selected);
 
+            final Settings settings = versePagerPresenter.getSettings();
             text.setTextColor(settings.getTextColor());
             text.setTextSize(TypedValue.COMPLEX_UNIT_PX,
                     resources.getDimension(settings.getTextSize().textSize));
@@ -82,6 +84,7 @@ class VerseListAdapter extends RecyclerView.Adapter {
                     .append(verse.verseText);
             text.setText(STRING_BUILDER.toString());
 
+            verseIndex = verse.index;
             setFavoriteIcon(isFavorite);
         }
 
@@ -93,6 +96,7 @@ class VerseListAdapter extends RecyclerView.Adapter {
             itemView.setEnabled(false);
             itemView.setSelected(false);
 
+            final Settings settings = versePagerPresenter.getSettings();
             text.setTextColor(settings.getTextColor());
             text.setTextSize(TypedValue.COMPLEX_UNIT_PX,
                     resources.getDimension(settings.getTextSize().textSize));
@@ -107,20 +111,25 @@ class VerseListAdapter extends RecyclerView.Adapter {
             }
             text.setText(STRING_BUILDER.substring(0, STRING_BUILDER.length() - 2));
 
+            verseIndex = verse.verseIndex;
             setFavoriteIcon(isFavorite);
         }
 
         @Override
         public void onClick(View v) {
-            if (v == favorite) {
+            if (verseIndex != null && v == favorite) {
                 isFavorite = !isFavorite;
                 setFavoriteIcon(isFavorite);
-                // TODO informs the change
+                if (isFavorite) {
+                    versePagerPresenter.addFavorite(verseIndex);
+                } else {
+                    versePagerPresenter.removeFavorite(verseIndex);
+                }
             }
         }
     }
 
-    private final Settings settings;
+    private final VersePagerPresenter versePagerPresenter;
     private final LayoutInflater inflater;
     private final Resources resources;
 
@@ -129,8 +138,8 @@ class VerseListAdapter extends RecyclerView.Adapter {
     private boolean[] selected;
     private int selectedCount;
 
-    VerseListAdapter(Context context, Settings settings) {
-        this.settings = settings;
+    VerseListAdapter(Context context, VersePagerPresenter versePagerPresenter) {
+        this.versePagerPresenter = versePagerPresenter;
         this.inflater = LayoutInflater.from(context);
         this.resources = context.getResources();
     }
@@ -148,7 +157,7 @@ class VerseListAdapter extends RecyclerView.Adapter {
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new ViewHolder(inflater.inflate(R.layout.item_verse, parent, false), settings, resources);
+        return new ViewHolder(inflater.inflate(R.layout.item_verse, parent, false), versePagerPresenter, resources);
     }
 
     @Override
