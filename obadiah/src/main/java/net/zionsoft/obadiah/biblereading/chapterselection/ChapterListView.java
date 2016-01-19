@@ -28,7 +28,7 @@ import android.view.View;
 import android.widget.ExpandableListView;
 
 import net.zionsoft.obadiah.R;
-import net.zionsoft.obadiah.model.domain.Verse;
+import net.zionsoft.obadiah.model.domain.VerseIndex;
 
 import java.util.List;
 
@@ -82,7 +82,7 @@ public class ChapterListView extends ExpandableListView implements ChapterView,
     }
 
     @Override
-    public void onReadingProgressUpdated(Verse.Index index) {
+    public void onReadingProgressUpdated(VerseIndex index) {
         if (currentBook == index.book && currentChapter == index.chapter) {
             return;
         }

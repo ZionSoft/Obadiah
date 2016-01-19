@@ -23,7 +23,7 @@ import android.support.annotation.Nullable;
 import net.zionsoft.obadiah.model.datamodel.BibleReadingModel;
 import net.zionsoft.obadiah.model.datamodel.ReadingProgressModel;
 import net.zionsoft.obadiah.model.datamodel.Settings;
-import net.zionsoft.obadiah.model.domain.Verse;
+import net.zionsoft.obadiah.model.domain.VerseIndex;
 import net.zionsoft.obadiah.mvp.BasePresenter;
 
 import java.util.List;
@@ -72,7 +72,7 @@ class BibleReadingPresenter extends BasePresenter<BibleReadingView> {
                 }));
         getSubscription().add(bibleReadingModel.observeCurrentReadingProgress()
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<Verse.Index>() {
+                .subscribe(new Subscriber<VerseIndex>() {
                     @Override
                     public void onCompleted() {
                         // do nothing
@@ -84,7 +84,7 @@ class BibleReadingPresenter extends BasePresenter<BibleReadingView> {
                     }
 
                     @Override
-                    public void onNext(Verse.Index index) {
+                    public void onNext(VerseIndex index) {
                         final BibleReadingView v = getView();
                         if (v != null) {
                             v.onReadingProgressUpdated(index);
@@ -128,12 +128,12 @@ class BibleReadingPresenter extends BasePresenter<BibleReadingView> {
         return bibleReadingModel.loadCurrentChapter();
     }
 
-    void saveReadingProgress(Verse.Index verseIndex) {
+    void saveReadingProgress(VerseIndex verseIndex) {
         bibleReadingModel.saveReadingProgress(verseIndex);
     }
 
     void saveReadingProgress(int book, int chapter, int verse) {
-        bibleReadingModel.saveReadingProgress(new Verse.Index(book, chapter, verse));
+        bibleReadingModel.saveReadingProgress(new VerseIndex(book, chapter, verse));
     }
 
     void trackReadingProgress(int book, int chapter) {

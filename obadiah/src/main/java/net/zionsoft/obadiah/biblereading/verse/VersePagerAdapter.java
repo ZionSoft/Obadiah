@@ -31,6 +31,7 @@ import android.view.ViewGroup;
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.domain.Bible;
 import net.zionsoft.obadiah.model.domain.Verse;
+import net.zionsoft.obadiah.model.domain.VerseIndex;
 import net.zionsoft.obadiah.model.domain.VerseWithParallelTranslations;
 import net.zionsoft.obadiah.ui.utils.AnimationHelper;
 import net.zionsoft.obadiah.ui.utils.DialogHelper;
@@ -260,7 +261,7 @@ class VersePagerAdapter extends PagerAdapter implements VersePagerView {
     }
 
     @Override
-    public void onReadingProgressUpdated(Verse.Index index) {
+    public void onReadingProgressUpdated(VerseIndex index) {
         currentChapter = index.chapter;
         currentVerse = index.verse;
         if (currentBook == index.book) {

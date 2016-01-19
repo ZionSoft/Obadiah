@@ -17,7 +17,7 @@
 
 package net.zionsoft.obadiah.biblereading.chapterselection;
 
-import net.zionsoft.obadiah.model.domain.Verse;
+import net.zionsoft.obadiah.model.domain.VerseIndex;
 import net.zionsoft.obadiah.mvp.MVPView;
 
 import java.util.List;
@@ -25,5 +25,5 @@ import java.util.List;
 interface ChapterView extends MVPView {
     void onBookNamesLoaded(List<String> bookNames);
 
-    void onReadingProgressUpdated(Verse.Index index);
+    void onReadingProgressUpdated(VerseIndex index);
 }

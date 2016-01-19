@@ -21,7 +21,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import net.zionsoft.obadiah.model.datamodel.BibleReadingModel;
-import net.zionsoft.obadiah.model.domain.Verse;
+import net.zionsoft.obadiah.model.domain.VerseIndex;
 import net.zionsoft.obadiah.mvp.MVPPresenter;
 
 import java.util.List;
@@ -62,7 +62,7 @@ public class ToolbarPresenter extends MVPPresenter<ToolbarView> {
                 }));
         getSubscription().add(bibleReadingModel.observeCurrentReadingProgress()
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<Verse.Index>() {
+                .subscribe(new Subscriber<VerseIndex>() {
                     @Override
                     public void onCompleted() {
                         // do nothing
@@ -74,7 +74,7 @@ public class ToolbarPresenter extends MVPPresenter<ToolbarView> {
                     }
 
                     @Override
-                    public void onNext(Verse.Index index) {
+                    public void onNext(VerseIndex index) {
                         final ToolbarView v = getView();
                         if (v != null) {
                             v.onReadingProgressUpdated(index);

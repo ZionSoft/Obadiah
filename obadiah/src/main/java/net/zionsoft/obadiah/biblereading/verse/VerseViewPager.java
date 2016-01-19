@@ -37,6 +37,7 @@ import android.widget.Toast;
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.domain.Verse;
+import net.zionsoft.obadiah.model.domain.VerseIndex;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,7 +61,7 @@ public class VerseViewPager extends ViewPager implements VerseView, VerseSelecti
     }
 
     @Override
-    public void onReadingProgressUpdated(Verse.Index index) {
+    public void onReadingProgressUpdated(VerseIndex index) {
         if (currentChapter == index.chapter) {
             return;
         }
@@ -146,7 +147,7 @@ public class VerseViewPager extends ViewPager implements VerseView, VerseSelecti
         for (int i = 0; i < versesCount; ++i) {
             final Verse verse = verses.get(i);
             text.append(verse.bookName).append(' ').append(verse.index.chapter + 1).append(':')
-                    .append(verse.index.verse + 1).append(' ').append(verse.verseText).append('\n');
+                    .append(verse.index.verse + 1).append(' ').append(verse.text).append('\n');
         }
         return text.toString();
     }

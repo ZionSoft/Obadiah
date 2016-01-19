@@ -25,6 +25,7 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import net.zionsoft.obadiah.model.domain.Verse;
+import net.zionsoft.obadiah.model.domain.VerseIndex;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -56,7 +57,7 @@ public class TranslationHelper {
                     new String[]{Integer.toString(book), Integer.toString(chapter), Integer.toString(verse)},
                     null, null, null);
             if (cursor.moveToFirst()) {
-                return new Verse(new Verse.Index(book, chapter, verse), bookName, cursor.getString(0));
+                return new Verse(new VerseIndex(book, chapter, verse), bookName, cursor.getString(0));
             } else {
                 return null;
             }
@@ -85,14 +86,14 @@ public class TranslationHelper {
                 // ignores empty verses at the beginning
                 final String text = cursor.getString(verse);
                 if (hasNonEmptyVerseInTheBeginning || !TextUtils.isEmpty(text)) {
-                    verses.add(new Verse(new Verse.Index(book, chapter, verseIndex++), bookName, text));
+                    verses.add(new Verse(new VerseIndex(book, chapter, verseIndex++), bookName, text));
                     hasNonEmptyVerseInTheBeginning = true;
                 }
             }
 
             // removes trailing verses at the end
             for (int i = verseCount - 1; i >= 0; --i) {
-                if (TextUtils.isEmpty(verses.get(i).verseText)) {
+                if (TextUtils.isEmpty(verses.get(i).text)) {
                     verses.remove(i);
                 } else {
                     break;
@@ -169,7 +170,7 @@ public class TranslationHelper {
             final List<Verse> verses = new ArrayList<>(count);
             while (cursor.moveToNext()) {
                 final int book = cursor.getInt(bookIndex);
-                final Verse.Index index = new Verse.Index(
+                final VerseIndex index = new VerseIndex(
                         book, cursor.getInt(chapterIndex), cursor.getInt(verseIndex));
                 verses.add(new Verse(index, bookNames.get(book), cursor.getString(verseText)));
             }

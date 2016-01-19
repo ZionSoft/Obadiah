@@ -57,7 +57,7 @@ class SearchResultListAdapter extends RecyclerView.Adapter {
             STRING_BUILDER.setLength(0);
             STRING_BUILDER.append(verse.bookName).append(' ')
                     .append(verse.index.chapter + 1).append(':').append(verse.index.verse + 1)
-                    .append('\n').append(verse.verseText);
+                    .append('\n').append(verse.text);
             textView.setText(STRING_BUILDER.toString());
 
             this.verse = verse;

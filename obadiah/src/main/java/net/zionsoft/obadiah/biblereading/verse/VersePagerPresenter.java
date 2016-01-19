@@ -23,6 +23,7 @@ import net.zionsoft.obadiah.model.datamodel.BibleReadingModel;
 import net.zionsoft.obadiah.model.datamodel.BookmarkModel;
 import net.zionsoft.obadiah.model.datamodel.Settings;
 import net.zionsoft.obadiah.model.domain.Verse;
+import net.zionsoft.obadiah.model.domain.VerseIndex;
 import net.zionsoft.obadiah.model.domain.VerseWithParallelTranslations;
 import net.zionsoft.obadiah.mvp.BasePresenter;
 
@@ -81,7 +82,7 @@ public class VersePagerPresenter extends BasePresenter<VersePagerView> {
 
         getSubscription().add(bibleReadingModel.observeCurrentReadingProgress()
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<Verse.Index>() {
+                .subscribe(new Subscriber<VerseIndex>() {
                     @Override
                     public void onCompleted() {
                         // do nothing
@@ -93,7 +94,7 @@ public class VersePagerPresenter extends BasePresenter<VersePagerView> {
                     }
 
                     @Override
-                    public void onNext(Verse.Index index) {
+                    public void onNext(VerseIndex index) {
                         final VersePagerView v = getView();
                         if (v != null) {
                             v.onReadingProgressUpdated(index);
@@ -137,7 +138,7 @@ public class VersePagerPresenter extends BasePresenter<VersePagerView> {
     }
 
     void saveReadingProgress(int book, int chapter, int verse) {
-        bibleReadingModel.saveReadingProgress(new Verse.Index(book, chapter, verse));
+        bibleReadingModel.saveReadingProgress(new VerseIndex(book, chapter, verse));
     }
 
     void loadVerses(int book, int chapter) {
@@ -204,7 +205,7 @@ public class VersePagerPresenter extends BasePresenter<VersePagerView> {
                 }));
     }
 
-    void addFavorite(Verse.Index verseIndex) {
+    void addFavorite(VerseIndex verseIndex) {
         getSubscription().add(bookmarkModel.addBookmark(verseIndex)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -226,7 +227,7 @@ public class VersePagerPresenter extends BasePresenter<VersePagerView> {
                 }));
     }
 
-    void removeFavorite(Verse.Index verseIndex) {
+    void removeFavorite(VerseIndex verseIndex) {
         getSubscription().add(bookmarkModel.removeBookmark(verseIndex)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

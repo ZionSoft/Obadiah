@@ -21,7 +21,7 @@ import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
 
 import net.zionsoft.obadiah.model.domain.Bookmark;
-import net.zionsoft.obadiah.model.domain.Verse;
+import net.zionsoft.obadiah.model.domain.VerseIndex;
 
 public class BookmarkTableHelper {
     private static final String TABLE_BOOKMARK = "TABLE_BOOKMARK";
@@ -45,7 +45,7 @@ public class BookmarkTableHelper {
         db.insertWithOnConflict(TABLE_BOOKMARK, null, bookmarkValues, SQLiteDatabase.CONFLICT_REPLACE);
     }
 
-    public static void removeBookmark(SQLiteDatabase db, Verse.Index verseIndex) {
+    public static void removeBookmark(SQLiteDatabase db, VerseIndex verseIndex) {
         db.delete(TABLE_BOOKMARK, String.format("%s = ? AND %s = ? AND %s = ?",
                         COLUMN_BOOK_INDEX, COLUMN_CHAPTER_INDEX, COLUMN_VERSE_INDEX),
                 new String[]{Integer.toString(verseIndex.book), Integer.toString(verseIndex.chapter),

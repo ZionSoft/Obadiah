@@ -22,6 +22,7 @@ import android.support.annotation.Nullable;
 import net.zionsoft.obadiah.model.datamodel.BibleReadingModel;
 import net.zionsoft.obadiah.model.datamodel.Settings;
 import net.zionsoft.obadiah.model.domain.Verse;
+import net.zionsoft.obadiah.model.domain.VerseIndex;
 import net.zionsoft.obadiah.mvp.BasePresenter;
 
 import java.util.List;
@@ -92,7 +93,7 @@ class SearchPresenter extends BasePresenter<SearchView> {
         return bibleReadingModel.loadCurrentTranslation();
     }
 
-    void saveReadingProgress(Verse.Index index) {
+    void saveReadingProgress(VerseIndex index) {
         bibleReadingModel.saveReadingProgress(index);
     }
 

@@ -15,32 +15,43 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.model.notification;
+package net.zionsoft.obadiah.model.domain;
 
-import android.support.annotation.NonNull;
+import android.os.Parcel;
+import android.os.Parcelable;
 
-import com.squareup.moshi.Json;
-
-import net.zionsoft.obadiah.model.domain.VerseIndex;
-
-public class PushAttrVerseIndex {
-    @Json(name = "book")
+public class VerseIndex implements Parcelable {
     public final int book;
-
-    @Json(name = "chapter")
     public final int chapter;
-
-    @Json(name = "verse")
     public final int verse;
 
-    public PushAttrVerseIndex(int book, int chapter, int verse) {
+    public VerseIndex(int book, int chapter, int verse) {
         this.book = book;
         this.chapter = chapter;
         this.verse = verse;
     }
 
-    @NonNull
-    public VerseIndex toVerseIndex() {
-        return new VerseIndex(book, chapter, verse);
+    @Override
+    public int describeContents() {
+        return 0;
     }
+
+    @Override
+    public void writeToParcel(Parcel dst, int flags) {
+        dst.writeInt(book);
+        dst.writeInt(chapter);
+        dst.writeInt(verse);
+    }
+
+    public static final Parcelable.Creator<VerseIndex> CREATOR = new Parcelable.Creator<VerseIndex>() {
+        @Override
+        public VerseIndex createFromParcel(Parcel in) {
+            return new VerseIndex(in.readInt(), in.readInt(), in.readInt());
+        }
+
+        @Override
+        public VerseIndex[] newArray(int size) {
+            return new VerseIndex[size];
+        }
+    };
 }

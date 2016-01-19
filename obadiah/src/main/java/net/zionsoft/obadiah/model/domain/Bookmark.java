@@ -18,10 +18,10 @@
 package net.zionsoft.obadiah.model.domain;
 
 public class Bookmark {
-    public final Verse.Index verseIndex;
+    public final VerseIndex verseIndex;
     public final long timestamp;
 
-    public Bookmark(Verse.Index verseIndex, long timestamp) {
+    public Bookmark(VerseIndex verseIndex, long timestamp) {
         this.verseIndex = verseIndex;
         this.timestamp = timestamp;
     }

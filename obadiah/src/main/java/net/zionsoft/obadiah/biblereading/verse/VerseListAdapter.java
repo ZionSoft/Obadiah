@@ -33,6 +33,7 @@ import android.widget.TextView;
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.datamodel.Settings;
 import net.zionsoft.obadiah.model.domain.Verse;
+import net.zionsoft.obadiah.model.domain.VerseIndex;
 import net.zionsoft.obadiah.model.domain.VerseWithParallelTranslations;
 
 import java.util.ArrayList;
@@ -56,7 +57,7 @@ class VerseListAdapter extends RecyclerView.Adapter {
         @Bind(R.id.bookmark)
         AppCompatImageView bookmark;
 
-        private Verse.Index verseIndex;
+        private VerseIndex verseIndex;
         private boolean isBookmarked;
 
         private ViewHolder(View itemView, VersePagerPresenter versePagerPresenter, Resources resources) {
@@ -81,7 +82,7 @@ class VerseListAdapter extends RecyclerView.Adapter {
             STRING_BUILDER.setLength(0);
             STRING_BUILDER.append(verse.bookName).append(' ')
                     .append(verse.index.chapter + 1).append(':').append(verse.index.verse + 1).append('\n')
-                    .append(verse.verseText);
+                    .append(verse.text);
             text.setText(STRING_BUILDER.toString());
 
             verseIndex = verse.index;

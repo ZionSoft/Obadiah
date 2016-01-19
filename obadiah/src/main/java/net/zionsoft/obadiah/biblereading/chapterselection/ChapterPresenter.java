@@ -20,7 +20,7 @@ package net.zionsoft.obadiah.biblereading.chapterselection;
 import android.support.annotation.NonNull;
 
 import net.zionsoft.obadiah.model.datamodel.BibleReadingModel;
-import net.zionsoft.obadiah.model.domain.Verse;
+import net.zionsoft.obadiah.model.domain.VerseIndex;
 import net.zionsoft.obadiah.mvp.MVPPresenter;
 
 import java.util.List;
@@ -61,7 +61,7 @@ public class ChapterPresenter extends MVPPresenter<ChapterView> {
                 }));
         getSubscription().add(bibleReadingModel.observeCurrentReadingProgress()
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<Verse.Index>() {
+                .subscribe(new Subscriber<VerseIndex>() {
                     @Override
                     public void onCompleted() {
                         // do nothing
@@ -73,7 +73,7 @@ public class ChapterPresenter extends MVPPresenter<ChapterView> {
                     }
 
                     @Override
-                    public void onNext(Verse.Index index) {
+                    public void onNext(VerseIndex index) {
                         final ChapterView v = getView();
                         if (v != null) {
                             v.onReadingProgressUpdated(index);
@@ -142,6 +142,6 @@ public class ChapterPresenter extends MVPPresenter<ChapterView> {
     }
 
     void saveReadingProgress(int book, int chapter, int verse) {
-        bibleReadingModel.saveReadingProgress(new Verse.Index(book, chapter, verse));
+        bibleReadingModel.saveReadingProgress(new VerseIndex(book, chapter, verse));
     }
 }

@@ -31,10 +31,10 @@ public class VerseWithParallelTranslations {
         }
     }
 
-    public final Verse.Index verseIndex;
+    public final VerseIndex verseIndex;
     public final List<Text> texts;
 
-    public VerseWithParallelTranslations(Verse.Index verseIndex, List<Text> texts) {
+    public VerseWithParallelTranslations(VerseIndex verseIndex, List<Text> texts) {
         this.verseIndex = verseIndex;
         this.texts = texts;
     }

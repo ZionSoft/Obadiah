@@ -21,6 +21,7 @@ import net.zionsoft.obadiah.model.database.BookmarkTableHelper;
 import net.zionsoft.obadiah.model.database.DatabaseHelper;
 import net.zionsoft.obadiah.model.domain.Bookmark;
 import net.zionsoft.obadiah.model.domain.Verse;
+import net.zionsoft.obadiah.model.domain.VerseIndex;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -37,7 +38,7 @@ public class BookmarkModel {
         this.databaseHelper = databaseHelper;
     }
 
-    public Observable<Void> addBookmark(final Verse.Index verseIndex) {
+    public Observable<Void> addBookmark(final VerseIndex verseIndex) {
         return Observable.create(new Observable.OnSubscribe<Void>() {
             @Override
             public void call(Subscriber<? super Void> subscriber) {
@@ -52,7 +53,7 @@ public class BookmarkModel {
         });
     }
 
-    public Observable<Void> removeBookmark(final Verse.Index verseIndex) {
+    public Observable<Void> removeBookmark(final VerseIndex verseIndex) {
         return Observable.create(new Observable.OnSubscribe<Void>() {
             @Override
             public void call(Subscriber<? super Void> subscriber) {

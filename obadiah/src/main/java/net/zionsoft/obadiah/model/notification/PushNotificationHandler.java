@@ -134,8 +134,8 @@ public class PushNotificationHandler extends IntentService {
                     .toBlocking().first();
             builder.setContentIntent(pendingIntent)
                     .setContentTitle(String.format("%s, %d:%d", verse.bookName, verseIndex.chapter + 1, verseIndex.verse + 1))
-                    .setContentText(verse.verseText)
-                    .setStyle(new NotificationCompat.BigTextStyle().bigText(verse.verseText));
+                    .setContentText(verse.text)
+                    .setStyle(new NotificationCompat.BigTextStyle().bigText(verse.text));
         } catch (Exception e) {
             Crashlytics.getInstance().core.logException(e);
             return false;

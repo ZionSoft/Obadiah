@@ -18,7 +18,7 @@
 package net.zionsoft.obadiah.biblereading.verse;
 
 import net.zionsoft.obadiah.model.datamodel.BibleReadingModel;
-import net.zionsoft.obadiah.model.domain.Verse;
+import net.zionsoft.obadiah.model.domain.VerseIndex;
 import net.zionsoft.obadiah.mvp.MVPPresenter;
 
 import rx.Subscriber;
@@ -39,7 +39,7 @@ public class VersePresenter extends MVPPresenter<VerseView> {
 
         subscription = bibleReadingModel.observeCurrentReadingProgress()
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<Verse.Index>() {
+                .subscribe(new Subscriber<VerseIndex>() {
                     @Override
                     public void onCompleted() {
                         // do nothing
@@ -51,7 +51,7 @@ public class VersePresenter extends MVPPresenter<VerseView> {
                     }
 
                     @Override
-                    public void onNext(Verse.Index index) {
+                    public void onNext(VerseIndex index) {
                         final VerseView v = getView();
                         if (v != null) {
                             v.onReadingProgressUpdated(index);
@@ -79,6 +79,6 @@ public class VersePresenter extends MVPPresenter<VerseView> {
     }
 
     void saveReadingProgress(int book, int chapter, int verse) {
-        bibleReadingModel.saveReadingProgress(new Verse.Index(book, chapter, verse));
+        bibleReadingModel.saveReadingProgress(new VerseIndex(book, chapter, verse));
     }
 }

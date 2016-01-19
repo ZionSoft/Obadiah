@@ -18,6 +18,7 @@
 package net.zionsoft.obadiah.biblereading.verse;
 
 import net.zionsoft.obadiah.model.domain.Verse;
+import net.zionsoft.obadiah.model.domain.VerseIndex;
 import net.zionsoft.obadiah.model.domain.VerseWithParallelTranslations;
 import net.zionsoft.obadiah.mvp.MVPView;
 
@@ -32,5 +33,5 @@ interface VersePagerView extends MVPView {
 
     void onTranslationUpdated();
 
-    void onReadingProgressUpdated(Verse.Index index);
+    void onReadingProgressUpdated(VerseIndex index);
 }

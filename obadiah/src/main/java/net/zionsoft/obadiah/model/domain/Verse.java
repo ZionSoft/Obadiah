@@ -21,52 +21,16 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 public class Verse implements Parcelable {
-    public static class Index implements Parcelable {
-        public final int book;
-        public final int chapter;
-        public final int verse;
-
-        public Index(int book, int chapter, int verse) {
-            this.book = book;
-            this.chapter = chapter;
-            this.verse = verse;
-        }
-
-        @Override
-        public int describeContents() {
-            return 0;
-        }
-
-        @Override
-        public void writeToParcel(Parcel dst, int flags) {
-            dst.writeInt(book);
-            dst.writeInt(chapter);
-            dst.writeInt(verse);
-        }
-
-        public static final Parcelable.Creator<Index> CREATOR = new Parcelable.Creator<Index>() {
-            @Override
-            public Index createFromParcel(Parcel in) {
-                return new Index(in.readInt(), in.readInt(), in.readInt());
-            }
-
-            @Override
-            public Index[] newArray(int size) {
-                return new Index[size];
-            }
-        };
-    }
-
-    public final Index index;
+    public final VerseIndex index;
     public final String bookName;
-    public final String verseText;
+    public final String text;
 
-    public Verse(Index index, String bookName, String verseText) {
+    public Verse(VerseIndex index, String bookName, String text) {
         super();
 
         this.index = index;
         this.bookName = bookName;
-        this.verseText = verseText;
+        this.text = text;
     }
 
     @Override
@@ -78,13 +42,13 @@ public class Verse implements Parcelable {
     public void writeToParcel(Parcel dst, int flags) {
         dst.writeParcelable(index, 0);
         dst.writeString(bookName);
-        dst.writeString(verseText);
+        dst.writeString(text);
     }
 
     public static final Parcelable.Creator<Verse> CREATOR = new Parcelable.Creator<Verse>() {
         @Override
         public Verse createFromParcel(Parcel in) {
-            return new Verse(in.<Index>readParcelable(Index.class.getClassLoader()),
+            return new Verse(in.<VerseIndex>readParcelable(VerseIndex.class.getClassLoader()),
                     in.readString(), in.readString());
         }
 

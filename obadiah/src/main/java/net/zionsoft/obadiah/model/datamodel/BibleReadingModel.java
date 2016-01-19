@@ -33,6 +33,7 @@ import net.zionsoft.obadiah.model.database.DatabaseHelper;
 import net.zionsoft.obadiah.model.database.TranslationHelper;
 import net.zionsoft.obadiah.model.database.TranslationsTableHelper;
 import net.zionsoft.obadiah.model.domain.Verse;
+import net.zionsoft.obadiah.model.domain.VerseIndex;
 import net.zionsoft.obadiah.model.domain.VerseWithParallelTranslations;
 
 import java.util.ArrayList;
@@ -73,7 +74,7 @@ public class BibleReadingModel {
             // strings are UTF-16 encoded (with a length of one or two 16-bit code units)
             int length = 0;
             for (Verse verse : verses)
-                length += 12 + (verse.bookName.length() + verse.verseText.length()) * 4;
+                length += 12 + (verse.bookName.length() + verse.text.length()) * 4;
             return length;
         }
     };
@@ -82,8 +83,8 @@ public class BibleReadingModel {
             = PublishSubject.<String>create().toSerialized();
     private final SerializedSubject<Void, Void> parallelTranslationUpdatesSubject
             = PublishSubject.<Void>create().toSerialized();
-    private final SerializedSubject<Verse.Index, Verse.Index> currentReadingProgressUpdatesSubject
-            = PublishSubject.<Verse.Index>create().toSerialized();
+    private final SerializedSubject<VerseIndex, VerseIndex> currentReadingProgressUpdatesSubject
+            = PublishSubject.<VerseIndex>create().toSerialized();
 
     private final List<String> parallelTranslations = new ArrayList<>();
 
@@ -146,7 +147,7 @@ public class BibleReadingModel {
         return preferences.getInt(Constants.PREF_KEY_LAST_READ_VERSE, 0);
     }
 
-    public void saveReadingProgress(Verse.Index index) {
+    public void saveReadingProgress(VerseIndex index) {
         preferences.edit()
                 .putInt(Constants.PREF_KEY_LAST_READ_BOOK, index.book)
                 .putInt(Constants.PREF_KEY_LAST_READ_CHAPTER, index.chapter)
@@ -155,7 +156,7 @@ public class BibleReadingModel {
         currentReadingProgressUpdatesSubject.onNext(index);
     }
 
-    public Observable<Verse.Index> observeCurrentReadingProgress() {
+    public Observable<VerseIndex> observeCurrentReadingProgress() {
         return currentReadingProgressUpdatesSubject.asObservable();
     }
 
@@ -234,7 +235,7 @@ public class BibleReadingModel {
                                     = new ArrayList<>(translationsCount);
                             final Verse verse = verses.get(i);
                             texts.add(new VerseWithParallelTranslations.Text(
-                                    currentTranslation, verse.verseText));
+                                    currentTranslation, verse.text));
 
                             for (int j = 0; j < parallelTranslationsCount; ++j) {
                                 // just in case the translation has less verses (probably an error?)
