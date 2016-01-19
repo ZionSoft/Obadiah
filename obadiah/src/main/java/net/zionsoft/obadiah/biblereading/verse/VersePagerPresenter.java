@@ -205,7 +205,7 @@ public class VersePagerPresenter extends BasePresenter<VersePagerView> {
     }
 
     void addFavorite(Verse.Index verseIndex) {
-        getSubscription().add(bookmarkModel.addFavorite(verseIndex)
+        getSubscription().add(bookmarkModel.addBookmark(verseIndex)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<Void>() {
@@ -227,7 +227,7 @@ public class VersePagerPresenter extends BasePresenter<VersePagerView> {
     }
 
     void removeFavorite(Verse.Index verseIndex) {
-        getSubscription().add(bookmarkModel.removeFavorite(verseIndex)
+        getSubscription().add(bookmarkModel.removeBookmark(verseIndex)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<Void>() {

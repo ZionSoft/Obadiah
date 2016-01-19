@@ -53,11 +53,11 @@ class VerseListAdapter extends RecyclerView.Adapter {
         @Bind(R.id.text)
         TextView text;
 
-        @Bind(R.id.favorite)
-        AppCompatImageView favorite;
+        @Bind(R.id.bookmark)
+        AppCompatImageView bookmark;
 
         private Verse.Index verseIndex;
-        private boolean isFavorite;
+        private boolean isBookmarked;
 
         private ViewHolder(View itemView, VersePagerPresenter versePagerPresenter, Resources resources) {
             super(itemView);
@@ -66,10 +66,10 @@ class VerseListAdapter extends RecyclerView.Adapter {
             this.resources = resources;
 
             ButterKnife.bind(this, itemView);
-            favorite.setOnClickListener(this);
+            bookmark.setOnClickListener(this);
         }
 
-        private void bind(Verse verse, boolean selected, boolean isFavorite) {
+        private void bind(Verse verse, boolean selected, boolean isBookmarked) {
             itemView.setEnabled(true);
             itemView.setSelected(selected);
 
@@ -85,14 +85,16 @@ class VerseListAdapter extends RecyclerView.Adapter {
             text.setText(STRING_BUILDER.toString());
 
             verseIndex = verse.index;
-            setFavoriteIcon(isFavorite);
+
+            setBookmark(isBookmarked);
         }
 
-        private void setFavoriteIcon(boolean isFavorite) {
-            favorite.setColorFilter(isFavorite ? FAVORITE_ON : FAVORITE_OFF);
+        private void setBookmark(boolean isBookmarked) {
+            this.isBookmarked = isBookmarked;
+            bookmark.setColorFilter(isBookmarked ? FAVORITE_ON : FAVORITE_OFF);
         }
 
-        private void bind(VerseWithParallelTranslations verse, boolean isFavorite) {
+        private void bind(VerseWithParallelTranslations verse, boolean isBookmarked) {
             itemView.setEnabled(false);
             itemView.setSelected(false);
 
@@ -112,15 +114,15 @@ class VerseListAdapter extends RecyclerView.Adapter {
             text.setText(STRING_BUILDER.substring(0, STRING_BUILDER.length() - 2));
 
             verseIndex = verse.verseIndex;
-            setFavoriteIcon(isFavorite);
+
+            setBookmark(isBookmarked);
         }
 
         @Override
         public void onClick(View v) {
-            if (verseIndex != null && v == favorite) {
-                isFavorite = !isFavorite;
-                setFavoriteIcon(isFavorite);
-                if (isFavorite) {
+            if (verseIndex != null && v == bookmark) {
+                setBookmark(!isBookmarked);
+                if (isBookmarked) {
                     versePagerPresenter.addFavorite(verseIndex);
                 } else {
                     versePagerPresenter.removeFavorite(verseIndex);

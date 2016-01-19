@@ -37,7 +37,7 @@ public class BookmarkModel {
         this.databaseHelper = databaseHelper;
     }
 
-    public Observable<Void> addFavorite(final Verse.Index verseIndex) {
+    public Observable<Void> addBookmark(final Verse.Index verseIndex) {
         return Observable.create(new Observable.OnSubscribe<Void>() {
             @Override
             public void call(Subscriber<? super Void> subscriber) {
@@ -52,7 +52,7 @@ public class BookmarkModel {
         });
     }
 
-    public Observable<Void> removeFavorite(final Verse.Index verseIndex) {
+    public Observable<Void> removeBookmark(final Verse.Index verseIndex) {
         return Observable.create(new Observable.OnSubscribe<Void>() {
             @Override
             public void call(Subscriber<? super Void> subscriber) {
