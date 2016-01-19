@@ -21,8 +21,8 @@ import android.support.annotation.Nullable;
 
 import net.zionsoft.obadiah.model.datamodel.BibleReadingModel;
 import net.zionsoft.obadiah.model.datamodel.Settings;
-import net.zionsoft.obadiah.model.domain.Verse;
 import net.zionsoft.obadiah.model.domain.VerseIndex;
+import net.zionsoft.obadiah.model.domain.VerseSearchResult;
 import net.zionsoft.obadiah.mvp.BasePresenter;
 
 import java.util.List;
@@ -58,7 +58,7 @@ class SearchPresenter extends BasePresenter<SearchView> {
         subscription = searchModel.search(translation, query)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<List<Verse>>() {
+                .subscribe(new Subscriber<List<VerseSearchResult>>() {
                     @Override
                     public void onCompleted() {
                         // do nothing
@@ -73,7 +73,7 @@ class SearchPresenter extends BasePresenter<SearchView> {
                     }
 
                     @Override
-                    public void onNext(List<Verse> verses) {
+                    public void onNext(List<VerseSearchResult> verses) {
                         SearchView v = getView();
                         if (v != null) {
                             v.onVersesSearched(verses);

@@ -20,8 +20,8 @@ package net.zionsoft.obadiah.search;
 import android.content.Context;
 import android.provider.SearchRecentSuggestions;
 
-import net.zionsoft.obadiah.model.domain.Verse;
 import net.zionsoft.obadiah.model.datamodel.BibleReadingModel;
+import net.zionsoft.obadiah.model.domain.VerseSearchResult;
 
 import java.util.List;
 
@@ -38,7 +38,7 @@ class SearchModel {
                 RecentSearchProvider.AUTHORITY, RecentSearchProvider.MODE);
     }
 
-    Observable<List<Verse>> search(String translation, String query) {
+    Observable<List<VerseSearchResult>> search(String translation, String query) {
         recentSearches.saveRecentQuery(query, null);
         return bibleReadingModel.search(translation, query);
     }

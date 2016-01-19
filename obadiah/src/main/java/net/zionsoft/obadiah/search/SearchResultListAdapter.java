@@ -28,7 +28,7 @@ import android.widget.TextView;
 
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.datamodel.Settings;
-import net.zionsoft.obadiah.model.domain.Verse;
+import net.zionsoft.obadiah.model.domain.VerseSearchResult;
 
 import java.util.List;
 
@@ -38,7 +38,7 @@ class SearchResultListAdapter extends RecyclerView.Adapter {
 
         private final SearchPresenter searchPresenter;
         private final Resources resources;
-        private Verse verse;
+        private VerseSearchResult verse;
 
         private ViewHolder(View itemView, SearchPresenter searchPresenter, Resources resources) {
             super(itemView);
@@ -47,7 +47,7 @@ class SearchResultListAdapter extends RecyclerView.Adapter {
             itemView.setOnClickListener(this);
         }
 
-        private void bind(Verse verse) {
+        private void bind(VerseSearchResult verse) {
             final TextView textView = (TextView) itemView;
             final Settings settings = searchPresenter.getSettings();
             textView.setTextColor(settings.getTextColor());
@@ -76,7 +76,7 @@ class SearchResultListAdapter extends RecyclerView.Adapter {
     private final LayoutInflater inflater;
     private final Resources resources;
 
-    private List<Verse> verses;
+    private List<VerseSearchResult> verses;
 
     SearchResultListAdapter(Context context, SearchPresenter searchPresenter) {
         this.searchPresenter = searchPresenter;
@@ -92,7 +92,7 @@ class SearchResultListAdapter extends RecyclerView.Adapter {
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        ((ViewHolder) holder).bind(getVerse(position));
+        ((ViewHolder) holder).bind(verses.get(position));
     }
 
     @Override
@@ -100,11 +100,7 @@ class SearchResultListAdapter extends RecyclerView.Adapter {
         return verses != null ? verses.size() : 0;
     }
 
-    void setVerses(List<Verse> verses) {
+    void setVerses(List<VerseSearchResult> verses) {
         this.verses = verses;
-    }
-
-    Verse getVerse(int position) {
-        return verses.get(position);
     }
 }

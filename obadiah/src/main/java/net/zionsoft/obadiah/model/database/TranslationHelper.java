@@ -26,6 +26,7 @@ import android.text.TextUtils;
 
 import net.zionsoft.obadiah.model.domain.Verse;
 import net.zionsoft.obadiah.model.domain.VerseIndex;
+import net.zionsoft.obadiah.model.domain.VerseSearchResult;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -148,8 +149,8 @@ public class TranslationHelper {
     }
 
     @NonNull
-    public static List<Verse> searchVerses(SQLiteDatabase db, String translationShortName,
-                                           List<String> bookNames, String keyword) {
+    public static List<VerseSearchResult> searchVerses(SQLiteDatabase db, String translationShortName,
+                                                       List<String> bookNames, String keyword) {
         Cursor cursor = null;
         try {
             cursor = db.query(translationShortName,
@@ -167,12 +168,12 @@ public class TranslationHelper {
             final int chapterIndex = cursor.getColumnIndex(COLUMN_CHAPTER_INDEX);
             final int verseIndex = cursor.getColumnIndex(COLUMN_VERSE_INDEX);
             final int verseText = cursor.getColumnIndex(COLUMN_TEXT);
-            final List<Verse> verses = new ArrayList<>(count);
+            final List<VerseSearchResult> verses = new ArrayList<>(count);
             while (cursor.moveToNext()) {
                 final int book = cursor.getInt(bookIndex);
                 final VerseIndex index = new VerseIndex(
                         book, cursor.getInt(chapterIndex), cursor.getInt(verseIndex));
-                verses.add(new Verse(index, bookNames.get(book), cursor.getString(verseText)));
+                verses.add(new VerseSearchResult(index, bookNames.get(book), cursor.getString(verseText)));
             }
             return verses;
         } finally {

@@ -34,6 +34,7 @@ import net.zionsoft.obadiah.model.database.TranslationHelper;
 import net.zionsoft.obadiah.model.database.TranslationsTableHelper;
 import net.zionsoft.obadiah.model.domain.Verse;
 import net.zionsoft.obadiah.model.domain.VerseIndex;
+import net.zionsoft.obadiah.model.domain.VerseSearchResult;
 import net.zionsoft.obadiah.model.domain.VerseWithParallelTranslations;
 
 import java.util.ArrayList;
@@ -304,11 +305,11 @@ public class BibleReadingModel {
                 });
     }
 
-    public Observable<List<Verse>> search(final String translation, final String query) {
+    public Observable<List<VerseSearchResult>> search(final String translation, final String query) {
         return loadBookNames(translation)
-                .map(new Func1<List<String>, List<Verse>>() {
+                .map(new Func1<List<String>, List<VerseSearchResult>>() {
                     @Override
-                    public List<Verse> call(List<String> bookNames) {
+                    public List<VerseSearchResult> call(List<String> bookNames) {
                         return TranslationHelper.searchVerses(
                                 databaseHelper.getDatabase(), translation, bookNames, query);
                     }

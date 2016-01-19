@@ -41,7 +41,7 @@ import com.google.android.gms.actions.SearchIntents;
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.biblereading.BibleReadingActivity;
 import net.zionsoft.obadiah.model.datamodel.Settings;
-import net.zionsoft.obadiah.model.domain.Verse;
+import net.zionsoft.obadiah.model.domain.VerseSearchResult;
 import net.zionsoft.obadiah.ui.utils.AnimationHelper;
 import net.zionsoft.obadiah.ui.utils.BaseAppCompatActivity;
 import net.zionsoft.obadiah.ui.utils.DialogHelper;
@@ -258,7 +258,7 @@ public class SearchActivity extends BaseAppCompatActivity
     }
 
     @Override
-    public void onVersesSearched(List<Verse> verses) {
+    public void onVersesSearched(List<VerseSearchResult> verses) {
         AnimationHelper.fadeOut(loadingSpinner);
         AnimationHelper.fadeIn(searchResultList);
 
