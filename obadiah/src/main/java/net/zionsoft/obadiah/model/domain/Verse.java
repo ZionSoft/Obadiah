@@ -17,10 +17,7 @@
 
 package net.zionsoft.obadiah.model.domain;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
-public class Verse implements Parcelable {
+public class Verse {
     public final VerseIndex index;
     public final String bookName;
     public final String text;
@@ -32,29 +29,4 @@ public class Verse implements Parcelable {
         this.bookName = bookName;
         this.text = text;
     }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dst, int flags) {
-        dst.writeParcelable(index, 0);
-        dst.writeString(bookName);
-        dst.writeString(text);
-    }
-
-    public static final Parcelable.Creator<Verse> CREATOR = new Parcelable.Creator<Verse>() {
-        @Override
-        public Verse createFromParcel(Parcel in) {
-            return new Verse(in.<VerseIndex>readParcelable(VerseIndex.class.getClassLoader()),
-                    in.readString(), in.readString());
-        }
-
-        @Override
-        public Verse[] newArray(int size) {
-            return new Verse[size];
-        }
-    };
 }

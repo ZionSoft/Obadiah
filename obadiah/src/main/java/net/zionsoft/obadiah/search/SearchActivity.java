@@ -46,7 +46,6 @@ import net.zionsoft.obadiah.ui.utils.AnimationHelper;
 import net.zionsoft.obadiah.ui.utils.BaseAppCompatActivity;
 import net.zionsoft.obadiah.ui.utils.DialogHelper;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -66,9 +65,7 @@ public class SearchActivity extends BaseAppCompatActivity
         return startIntent;
     }
 
-    private static final String KEY_CURRENT_TRANSLATION = "net.zionsoft.obadiah.KEY_CURRENT_TRANSLATION";
     private static final String KEY_QUERY = "net.zionsoft.obadiah.KEY_QUERY";
-    private static final String KEY_VERSES = "net.zionsoft.obadiah.KEY_VERSES";
 
     @Inject
     SearchPresenter searchPresenter;
@@ -84,7 +81,6 @@ public class SearchActivity extends BaseAppCompatActivity
 
     private String currentTranslation;
     private String query;
-    private ArrayList<Verse> verses;
 
     private SearchResultListAdapter searchResultAdapter;
     private SearchView searchView;
@@ -102,9 +98,7 @@ public class SearchActivity extends BaseAppCompatActivity
         }
 
         if (savedInstanceState != null) {
-            currentTranslation = savedInstanceState.getString(KEY_CURRENT_TRANSLATION);
             query = savedInstanceState.getString(KEY_QUERY);
-            verses = savedInstanceState.getParcelableArrayList(KEY_VERSES);
         }
 
         setContentView(R.layout.activity_search);
@@ -145,8 +139,9 @@ public class SearchActivity extends BaseAppCompatActivity
             return;
         }
         searchResultAdapter = new SearchResultListAdapter(this, searchPresenter);
-        searchResultAdapter.setVerses(verses);
         searchResultList.setAdapter(searchResultAdapter);
+
+        search();
     }
 
     private void handleStartIntent(Intent intent) {
@@ -166,6 +161,7 @@ public class SearchActivity extends BaseAppCompatActivity
 
         if (fragment instanceof SearchComponentFragment) {
             ((SearchComponentFragment) fragment).getComponent().inject(this);
+            currentTranslation = searchPresenter.loadCurrentTranslation();
             initializeAdapter();
         }
     }
@@ -218,9 +214,7 @@ public class SearchActivity extends BaseAppCompatActivity
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putString(KEY_CURRENT_TRANSLATION, currentTranslation);
         outState.putString(KEY_QUERY, query);
-        outState.putParcelableArrayList(KEY_VERSES, verses);
     }
 
     @Override
@@ -272,10 +266,8 @@ public class SearchActivity extends BaseAppCompatActivity
         searchResultAdapter.notifyDataSetChanged();
         searchResultList.scrollToPosition(0);
 
-        this.verses = new ArrayList<>(verses);
-
-        String text = getResources().getString(R.string.toast_verses_searched, verses.size());
-        Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, getString(R.string.toast_verses_searched, verses.size()),
+                Toast.LENGTH_SHORT).show();
     }
 
     @Override
