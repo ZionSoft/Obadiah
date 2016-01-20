@@ -24,7 +24,6 @@ import net.zionsoft.obadiah.model.datamodel.BookmarkModel;
 import net.zionsoft.obadiah.model.datamodel.Settings;
 import net.zionsoft.obadiah.model.domain.Verse;
 import net.zionsoft.obadiah.model.domain.VerseIndex;
-import net.zionsoft.obadiah.model.domain.VerseWithParallelTranslations;
 import net.zionsoft.obadiah.mvp.BasePresenter;
 
 import java.util.List;
@@ -181,7 +180,7 @@ public class VersePagerPresenter extends BasePresenter<VersePagerView> {
         getSubscription().add(bibleReadingModel.loadVersesWithParallelTranslations(book, chapter)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<List<VerseWithParallelTranslations>>() {
+                .subscribe(new Subscriber<List<Verse>>() {
                     @Override
                     public void onCompleted() {
                         // do nothing
@@ -196,10 +195,10 @@ public class VersePagerPresenter extends BasePresenter<VersePagerView> {
                     }
 
                     @Override
-                    public void onNext(List<VerseWithParallelTranslations> verses) {
+                    public void onNext(List<Verse> verses) {
                         final VersePagerView v = getView();
                         if (v != null) {
-                            v.onVersesWithParallelTranslationsLoaded(verses);
+                            v.onVersesLoaded(verses);
                         }
                     }
                 }));

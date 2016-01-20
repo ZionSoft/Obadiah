@@ -34,7 +34,6 @@ import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.datamodel.Settings;
 import net.zionsoft.obadiah.model.domain.Verse;
 import net.zionsoft.obadiah.model.domain.VerseIndex;
-import net.zionsoft.obadiah.model.domain.VerseWithParallelTranslations;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -71,7 +70,6 @@ class VerseListAdapter extends RecyclerView.Adapter {
         }
 
         private void bind(Verse verse, boolean selected, boolean isBookmarked) {
-            itemView.setEnabled(true);
             itemView.setSelected(selected);
 
             final Settings settings = versePagerPresenter.getSettings();
@@ -80,43 +78,35 @@ class VerseListAdapter extends RecyclerView.Adapter {
                     resources.getDimension(settings.getTextSize().textSize));
 
             STRING_BUILDER.setLength(0);
-            STRING_BUILDER.append(verse.bookName).append(' ')
-                    .append(verse.index.chapter + 1).append(':').append(verse.index.verse + 1).append('\n')
-                    .append(verse.text);
-            text.setText(STRING_BUILDER.toString());
+            if (verse.parallel.size() == 0) {
+                STRING_BUILDER.append(verse.text.bookName).append(' ')
+                        .append(verse.verseIndex.chapter + 1).append(':').append(verse.verseIndex.verse + 1).append('\n')
+                        .append(verse.text.text);
+                text.setText(STRING_BUILDER.toString());
+            } else {
+                buildVerse(STRING_BUILDER, verse.verseIndex, verse.text);
+                final int size = verse.parallel.size();
+                for (int i = 0; i < size; ++i) {
+                    final Verse.Text text = verse.parallel.get(i);
+                    buildVerse(STRING_BUILDER, verse.verseIndex, text);
+                }
+                text.setText(STRING_BUILDER.substring(0, STRING_BUILDER.length() - 2));
+            }
 
-            verseIndex = verse.index;
+            verseIndex = verse.verseIndex;
 
             setBookmark(isBookmarked);
+        }
+
+        private static void buildVerse(StringBuilder sb, VerseIndex verseIndex, Verse.Text text) {
+            sb.append(text.translation).append(' ')
+                    .append(verseIndex.chapter + 1).append(':').append(verseIndex.verse + 1)
+                    .append('\n').append(text.text).append('\n').append('\n');
         }
 
         private void setBookmark(boolean isBookmarked) {
             this.isBookmarked = isBookmarked;
             bookmark.setColorFilter(isBookmarked ? FAVORITE_ON : FAVORITE_OFF);
-        }
-
-        private void bind(VerseWithParallelTranslations verse, boolean isBookmarked) {
-            itemView.setEnabled(false);
-            itemView.setSelected(false);
-
-            final Settings settings = versePagerPresenter.getSettings();
-            text.setTextColor(settings.getTextColor());
-            text.setTextSize(TypedValue.COMPLEX_UNIT_PX,
-                    resources.getDimension(settings.getTextSize().textSize));
-
-            STRING_BUILDER.setLength(0);
-            final int size = verse.texts.size();
-            for (int i = 0; i < size; ++i) {
-                final VerseWithParallelTranslations.Text text = verse.texts.get(i);
-                STRING_BUILDER.append(text.translation).append(' ')
-                        .append(verse.verseIndex.chapter + 1).append(':').append(verse.verseIndex.verse + 1)
-                        .append('\n').append(text.text).append('\n').append('\n');
-            }
-            text.setText(STRING_BUILDER.substring(0, STRING_BUILDER.length() - 2));
-
-            verseIndex = verse.verseIndex;
-
-            setBookmark(isBookmarked);
         }
 
         @Override
@@ -137,7 +127,6 @@ class VerseListAdapter extends RecyclerView.Adapter {
     private final Resources resources;
 
     private List<Verse> verses;
-    private List<VerseWithParallelTranslations> versesWithParallelTranslations;
     private boolean[] selected;
     private int selectedCount;
 
@@ -149,13 +138,7 @@ class VerseListAdapter extends RecyclerView.Adapter {
 
     @Override
     public int getItemCount() {
-        if (verses != null) {
-            return verses.size();
-        }
-        if (versesWithParallelTranslations != null) {
-            return versesWithParallelTranslations.size();
-        }
-        return 0;
+        return verses != null ? verses.size() : 0;
     }
 
     @Override
@@ -166,16 +149,11 @@ class VerseListAdapter extends RecyclerView.Adapter {
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         // TODO
-        if (verses != null) {
-            ((ViewHolder) holder).bind(verses.get(position), selected[position], false);
-        } else if (versesWithParallelTranslations != null) {
-            ((ViewHolder) holder).bind(versesWithParallelTranslations.get(position), false);
-        }
+        ((ViewHolder) holder).bind(verses.get(position), selected[position], false);
     }
 
     void setVerses(List<Verse> verses) {
         this.verses = verses;
-        this.versesWithParallelTranslations = null;
 
         final int size = this.verses.size();
         if (selected == null || selected.length < size) {
@@ -186,21 +164,7 @@ class VerseListAdapter extends RecyclerView.Adapter {
         notifyDataSetChanged();
     }
 
-    void setVersesWithParallelTranslations(List<VerseWithParallelTranslations> versesWithParallelTranslations) {
-        this.verses = null;
-        this.versesWithParallelTranslations = versesWithParallelTranslations;
-
-        deselectVerses();
-
-        notifyDataSetChanged();
-    }
-
     void select(int position) {
-        if (verses == null) {
-            // TODO supports selection for verses with parallel translations
-            return;
-        }
-
         selected[position] ^= true;
         if (selected[position]) {
             ++selectedCount;

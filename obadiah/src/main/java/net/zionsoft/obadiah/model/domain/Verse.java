@@ -17,16 +17,33 @@
 
 package net.zionsoft.obadiah.model.domain;
 
-public class Verse {
-    public final VerseIndex index;
-    public final String bookName;
-    public final String text;
+import android.support.annotation.Nullable;
 
-    public Verse(VerseIndex index, String bookName, String text) {
+import java.util.Collections;
+import java.util.List;
+
+public class Verse {
+    public static class Text {
+        public final String translation;
+        public final String bookName;
+        public final String text;
+
+        public Text(String translation, String bookName, String text) {
+            this.translation = translation;
+            this.bookName = bookName;
+            this.text = text;
+        }
+    }
+
+    public final VerseIndex verseIndex;
+    public final Text text;
+    public final List<Text> parallel;
+
+    public Verse(VerseIndex verseIndex, Text text, @Nullable List<Text> parallel) {
         super();
 
-        this.index = index;
-        this.bookName = bookName;
+        this.verseIndex = verseIndex;
         this.text = text;
+        this.parallel = parallel != null ? parallel : Collections.<Text>emptyList();
     }
 }

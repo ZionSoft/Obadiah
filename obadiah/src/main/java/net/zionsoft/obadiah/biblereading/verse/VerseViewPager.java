@@ -142,12 +142,13 @@ public class VerseViewPager extends ViewPager implements VerseView, VerseSelecti
             return null;
         }
 
-        // format: <book name> <chapter index>:<verse index> <verse text>
+        // TODO supports selection for verses with parallel translations
+        // format: <book name> <chapter verseIndex>:<verse verseIndex> <verse text>
         final StringBuilder text = new StringBuilder();
         for (int i = 0; i < versesCount; ++i) {
             final Verse verse = verses.get(i);
-            text.append(verse.bookName).append(' ').append(verse.index.chapter + 1).append(':')
-                    .append(verse.index.verse + 1).append(' ').append(verse.text).append('\n');
+            text.append(verse.text.bookName).append(' ').append(verse.verseIndex.chapter + 1).append(':')
+                    .append(verse.verseIndex.verse + 1).append(' ').append(verse.text.text).append('\n');
         }
         return text.toString();
     }

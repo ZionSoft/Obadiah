@@ -27,11 +27,11 @@ import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.domain.Bible;
 
 class UriHelper {
-    // format: /bible/<translation-short-name>/<book-index>/<chapter-index>/<verse-index>
+    // format: /bible/<translation-short-name>/<book-verseIndex>/<chapter-verseIndex>/<verse-verseIndex>
     private static final String VERSE_URI_TEMPLATE = "https://bible.zionsoft.net/bible/%s/%d/%d/%d";
 
     static void checkUri(@NonNull BibleReadingPresenter bibleReadingPresenter, @NonNull Uri uri) {
-        // TODO supports verse index
+        // TODO supports verse verseIndex
 
         final String path = uri.getPath();
         if (TextUtils.isEmpty(path)) {

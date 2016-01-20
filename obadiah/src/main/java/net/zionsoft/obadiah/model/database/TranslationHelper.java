@@ -58,7 +58,8 @@ public class TranslationHelper {
                     new String[]{Integer.toString(book), Integer.toString(chapter), Integer.toString(verse)},
                     null, null, null);
             if (cursor.moveToFirst()) {
-                return new Verse(new VerseIndex(book, chapter, verse), bookName, cursor.getString(0));
+                return new Verse(new VerseIndex(book, chapter, verse),
+                        new Verse.Text(translationShortName, bookName, cursor.getString(0)), null);
             } else {
                 return null;
             }
@@ -87,14 +88,15 @@ public class TranslationHelper {
                 // ignores empty verses at the beginning
                 final String text = cursor.getString(verse);
                 if (hasNonEmptyVerseInTheBeginning || !TextUtils.isEmpty(text)) {
-                    verses.add(new Verse(new VerseIndex(book, chapter, verseIndex++), bookName, text));
+                    verses.add(new Verse(new VerseIndex(book, chapter, verseIndex++),
+                            new Verse.Text(translationShortName, bookName, text), null));
                     hasNonEmptyVerseInTheBeginning = true;
                 }
             }
 
             // removes trailing verses at the end
             for (int i = verseCount - 1; i >= 0; --i) {
-                if (TextUtils.isEmpty(verses.get(i).text)) {
+                if (TextUtils.isEmpty(verses.get(i).text.text)) {
                     verses.remove(i);
                 } else {
                     break;

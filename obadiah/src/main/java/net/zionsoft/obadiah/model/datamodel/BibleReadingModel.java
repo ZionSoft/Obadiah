@@ -35,7 +35,6 @@ import net.zionsoft.obadiah.model.database.TranslationsTableHelper;
 import net.zionsoft.obadiah.model.domain.Verse;
 import net.zionsoft.obadiah.model.domain.VerseIndex;
 import net.zionsoft.obadiah.model.domain.VerseSearchResult;
-import net.zionsoft.obadiah.model.domain.VerseWithParallelTranslations;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -75,7 +74,7 @@ public class BibleReadingModel {
             // strings are UTF-16 encoded (with a length of one or two 16-bit code units)
             int length = 0;
             for (Verse verse : verses)
-                length += 12 + (verse.bookName.length() + verse.text.length()) * 4;
+                length += 12 + (verse.text.bookName.length() + verse.text.text.length()) * 4;
             return length;
         }
     };
@@ -213,39 +212,40 @@ public class BibleReadingModel {
         });
     }
 
-    public Observable<List<VerseWithParallelTranslations>> loadVersesWithParallelTranslations(final int book, final int chapter) {
+    public Observable<List<Verse>> loadVersesWithParallelTranslations(final int book, final int chapter) {
         return loadVerses(loadCurrentTranslation(), book, chapter)
-                .map(new Func1<List<Verse>, List<VerseWithParallelTranslations>>() {
+                .map(new Func1<List<Verse>, List<Verse>>() {
                     @Override
-                    public List<VerseWithParallelTranslations> call(List<Verse> verses) {
+                    public List<Verse> call(List<Verse> verses) {
                         final int parallelTranslationsCount = parallelTranslations.size();
                         final List<List<String>> textsFromParallelTranslations
                                 = new ArrayList<>(parallelTranslationsCount);
+                        final List<String> bookNamesFormParallelTranslations
+                                = new ArrayList<>(parallelTranslationsCount);
                         final SQLiteDatabase database = databaseHelper.getDatabase();
                         for (int i = 0; i < parallelTranslationsCount; ++i) {
+                            final String translation = parallelTranslations.get(i);
                             textsFromParallelTranslations.add(TranslationHelper.getVerseTexts(
-                                    database, parallelTranslations.get(i), book, chapter));
+                                    database, translation, book, chapter));
+                            bookNamesFormParallelTranslations.add(loadBookNames(translation)
+                                    .toBlocking().first().get(book));
                         }
 
-                        final String currentTranslation = loadCurrentTranslation();
-                        final int translationsCount = parallelTranslationsCount + 1;
                         final int versesCount = verses.size();
-                        final List<VerseWithParallelTranslations> results = new ArrayList<>(versesCount);
+                        final List<Verse> results = new ArrayList<>(versesCount);
                         for (int i = 0; i < versesCount; ++i) {
-                            final List<VerseWithParallelTranslations.Text> texts
-                                    = new ArrayList<>(translationsCount);
+                            final List<Verse.Text> texts = new ArrayList<>(parallelTranslationsCount);
                             final Verse verse = verses.get(i);
-                            texts.add(new VerseWithParallelTranslations.Text(
-                                    currentTranslation, verse.text));
 
                             for (int j = 0; j < parallelTranslationsCount; ++j) {
                                 // just in case the translation has less verses (probably an error?)
                                 final List<String> t = textsFromParallelTranslations.get(j);
-                                texts.add(new VerseWithParallelTranslations.Text(
-                                        parallelTranslations.get(j), t.size() > i ? t.get(i) : ""));
+                                texts.add(new Verse.Text(parallelTranslations.get(j),
+                                        bookNamesFormParallelTranslations.get(j),
+                                        t.size() > i ? t.get(i) : ""));
                             }
 
-                            results.add(new VerseWithParallelTranslations(verse.index, texts));
+                            results.add(new Verse(verse.verseIndex, verse.text, texts));
                         }
                         return results;
                     }

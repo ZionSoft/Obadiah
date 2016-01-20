@@ -32,7 +32,6 @@ import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.domain.Bible;
 import net.zionsoft.obadiah.model.domain.Verse;
 import net.zionsoft.obadiah.model.domain.VerseIndex;
-import net.zionsoft.obadiah.model.domain.VerseWithParallelTranslations;
 import net.zionsoft.obadiah.ui.utils.AnimationHelper;
 import net.zionsoft.obadiah.ui.utils.DialogHelper;
 
@@ -192,55 +191,29 @@ class VersePagerAdapter extends PagerAdapter implements VersePagerView {
 
     @Override
     public void onVersesLoaded(List<Verse> verses) {
-        final int chapter = verses.get(0).index.chapter;
-        final Page page = findPage(chapter);
-        if (page != null) {
-            AnimationHelper.fadeOut(page.loadingSpinner);
-            AnimationHelper.fadeIn(page.verseList);
-
-            page.verseListAdapter.setVerses(verses);
-
-            scrollPageToCurrentVerse(page, chapter);
-        }
-    }
-
-    @Nullable
-    private Page findPage(int chapter) {
+        final int chapter = verses.get(0).verseIndex.chapter;
         final int pageCount = pages.size();
         for (int i = 0; i < pageCount; ++i) {
             final Page page = pages.get(i);
             if (page.chapter == chapter) {
-                return page;
-            }
-        }
-        return null;
-    }
+                AnimationHelper.fadeOut(page.loadingSpinner);
+                AnimationHelper.fadeIn(page.verseList);
 
-    private void scrollPageToCurrentVerse(final Page page, int chapter) {
-        if (currentVerse > 0 && currentChapter == chapter) {
-            page.verseList.post(new Runnable() {
-                @Override
-                public void run() {
-                    ((LinearLayoutManager) page.verseList.getLayoutManager())
-                            .scrollToPositionWithOffset(currentVerse, 0);
+                page.verseListAdapter.setVerses(verses);
+
+                if (currentVerse > 0 && currentChapter == chapter) {
+                    page.verseList.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            ((LinearLayoutManager) page.verseList.getLayoutManager())
+                                    .scrollToPositionWithOffset(currentVerse, 0);
+                        }
+                    });
+                } else {
+                    page.verseList.scrollToPosition(0);
                 }
-            });
-        } else {
-            page.verseList.scrollToPosition(0);
-        }
-    }
-
-    @Override
-    public void onVersesWithParallelTranslationsLoaded(List<VerseWithParallelTranslations> verses) {
-        final int chapter = verses.get(0).verseIndex.chapter;
-        final Page page = findPage(chapter);
-        if (page != null) {
-            AnimationHelper.fadeOut(page.loadingSpinner);
-            AnimationHelper.fadeIn(page.verseList);
-
-            page.verseListAdapter.setVersesWithParallelTranslations(verses);
-
-            scrollPageToCurrentVerse(page, chapter);
+                return;
+            }
         }
     }
 
