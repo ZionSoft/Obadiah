@@ -30,6 +30,7 @@ import android.view.ViewGroup;
 
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.domain.Bible;
+import net.zionsoft.obadiah.model.domain.Bookmark;
 import net.zionsoft.obadiah.model.domain.Verse;
 import net.zionsoft.obadiah.model.domain.VerseIndex;
 import net.zionsoft.obadiah.ui.utils.AnimationHelper;
@@ -190,7 +191,7 @@ class VersePagerAdapter extends PagerAdapter implements VersePagerView {
     }
 
     @Override
-    public void onVersesLoaded(List<Verse> verses) {
+    public void onVersesLoaded(List<Verse> verses, List<Bookmark> bookmarks) {
         final int chapter = verses.get(0).verseIndex.chapter;
         final int pageCount = pages.size();
         for (int i = 0; i < pageCount; ++i) {
@@ -199,7 +200,7 @@ class VersePagerAdapter extends PagerAdapter implements VersePagerView {
                 AnimationHelper.fadeOut(page.loadingSpinner);
                 AnimationHelper.fadeIn(page.verseList);
 
-                page.verseListAdapter.setVerses(verses);
+                page.verseListAdapter.setVerses(verses, bookmarks);
 
                 if (currentVerse > 0 && currentChapter == chapter) {
                     page.verseList.post(new Runnable() {

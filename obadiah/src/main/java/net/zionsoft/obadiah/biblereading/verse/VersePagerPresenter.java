@@ -18,10 +18,12 @@
 package net.zionsoft.obadiah.biblereading.verse;
 
 import android.support.annotation.NonNull;
+import android.util.Pair;
 
 import net.zionsoft.obadiah.model.datamodel.BibleReadingModel;
 import net.zionsoft.obadiah.model.datamodel.BookmarkModel;
 import net.zionsoft.obadiah.model.datamodel.Settings;
+import net.zionsoft.obadiah.model.domain.Bookmark;
 import net.zionsoft.obadiah.model.domain.Verse;
 import net.zionsoft.obadiah.model.domain.VerseIndex;
 import net.zionsoft.obadiah.mvp.BasePresenter;
@@ -32,6 +34,7 @@ import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
+import rx.functions.Func2;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
@@ -140,19 +143,22 @@ public class VersePagerPresenter extends BasePresenter<VersePagerView> {
         bibleReadingModel.saveReadingProgress(new VerseIndex(book, chapter, verse));
     }
 
-    void loadVerses(int book, int chapter) {
+    void loadVerses(final int book, final int chapter) {
+        final Observable<List<Verse>> loadVerseObservable;
         if (bibleReadingModel.hasParallelTranslation()) {
-            loadVersesWithParallelTranslations(book, chapter);
+            loadVerseObservable = bibleReadingModel.loadVersesWithParallelTranslations(book, chapter);
         } else {
-            loadVersesOnly(book, chapter);
+            loadVerseObservable = bibleReadingModel.loadVerses(loadCurrentTranslation(), book, chapter);
         }
-    }
-
-    private void loadVersesOnly(final int book, final int chapter) {
-        getSubscription().add(bibleReadingModel.loadVerses(loadCurrentTranslation(), book, chapter)
-                .subscribeOn(Schedulers.io())
+        getSubscription().add(loadVerseObservable.zipWith(bookmarkModel.loadBookmarks(book, chapter),
+                new Func2<List<Verse>, List<Bookmark>, Pair<List<Verse>, List<Bookmark>>>() {
+                    @Override
+                    public Pair<List<Verse>, List<Bookmark>> call(List<Verse> verses, List<Bookmark> bookmarks) {
+                        return new Pair<>(verses, bookmarks);
+                    }
+                }).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<List<Verse>>() {
+                .subscribe(new Subscriber<Pair<List<Verse>, List<Bookmark>>>() {
                     @Override
                     public void onCompleted() {
                         // do nothing
@@ -167,38 +173,10 @@ public class VersePagerPresenter extends BasePresenter<VersePagerView> {
                     }
 
                     @Override
-                    public void onNext(List<Verse> verses) {
+                    public void onNext(Pair<List<Verse>, List<Bookmark>> result) {
                         final VersePagerView v = getView();
                         if (v != null) {
-                            v.onVersesLoaded(verses);
-                        }
-                    }
-                }));
-    }
-
-    private void loadVersesWithParallelTranslations(final int book, final int chapter) {
-        getSubscription().add(bibleReadingModel.loadVersesWithParallelTranslations(book, chapter)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<List<Verse>>() {
-                    @Override
-                    public void onCompleted() {
-                        // do nothing
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        final VersePagerView v = getView();
-                        if (v != null) {
-                            v.onVersesLoadFailed(book, chapter);
-                        }
-                    }
-
-                    @Override
-                    public void onNext(List<Verse> verses) {
-                        final VersePagerView v = getView();
-                        if (v != null) {
-                            v.onVersesLoaded(verses);
+                            v.onVersesLoaded(result.first, result.second);
                         }
                     }
                 }));

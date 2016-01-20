@@ -32,6 +32,7 @@ import android.widget.TextView;
 
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.datamodel.Settings;
+import net.zionsoft.obadiah.model.domain.Bookmark;
 import net.zionsoft.obadiah.model.domain.Verse;
 import net.zionsoft.obadiah.model.domain.VerseIndex;
 
@@ -126,6 +127,7 @@ class VerseListAdapter extends RecyclerView.Adapter {
     private final LayoutInflater inflater;
     private final Resources resources;
 
+    private List<Bookmark> bookmarks;
     private List<Verse> verses;
     private boolean[] selected;
     private int selectedCount;
@@ -148,12 +150,23 @@ class VerseListAdapter extends RecyclerView.Adapter {
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        // TODO
-        ((ViewHolder) holder).bind(verses.get(position), selected[position], false);
+        boolean isBookmarked = false;
+        final int bookmarkCount = bookmarks.size();
+        for (int i = 0; i < bookmarkCount; ++i) {
+            final VerseIndex verseIndex = bookmarks.get(i).verseIndex;
+            if (verseIndex.verse == position) {
+                isBookmarked = true;
+                break;
+            } else if (verseIndex.verse > position) {
+                break;
+            }
+        }
+        ((ViewHolder) holder).bind(verses.get(position), selected[position], isBookmarked);
     }
 
-    void setVerses(List<Verse> verses) {
+    void setVerses(List<Verse> verses, List<Bookmark> bookmarks) {
         this.verses = verses;
+        this.bookmarks = bookmarks;
 
         final int size = this.verses.size();
         if (selected == null || selected.length < size) {

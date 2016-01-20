@@ -20,8 +20,9 @@ package net.zionsoft.obadiah.model.datamodel;
 import net.zionsoft.obadiah.model.database.BookmarkTableHelper;
 import net.zionsoft.obadiah.model.database.DatabaseHelper;
 import net.zionsoft.obadiah.model.domain.Bookmark;
-import net.zionsoft.obadiah.model.domain.Verse;
 import net.zionsoft.obadiah.model.domain.VerseIndex;
+
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -59,6 +60,21 @@ public class BookmarkModel {
             public void call(Subscriber<? super Void> subscriber) {
                 try {
                     BookmarkTableHelper.removeBookmark(databaseHelper.getDatabase(), verseIndex);
+                    subscriber.onCompleted();
+                } catch (Exception e) {
+                    subscriber.onError(e);
+                }
+            }
+        });
+    }
+
+    public Observable<List<Bookmark>> loadBookmarks(final int book, final int chapter) {
+        return Observable.create(new Observable.OnSubscribe<List<Bookmark>>() {
+            @Override
+            public void call(Subscriber<? super List<Bookmark>> subscriber) {
+                try {
+                    subscriber.onNext(BookmarkTableHelper.getBookmarks(
+                            databaseHelper.getDatabase(), book, chapter));
                     subscriber.onCompleted();
                 } catch (Exception e) {
                     subscriber.onError(e);

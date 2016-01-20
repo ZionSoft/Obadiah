@@ -18,10 +18,15 @@
 package net.zionsoft.obadiah.model.database;
 
 import android.content.ContentValues;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.support.annotation.NonNull;
 
 import net.zionsoft.obadiah.model.domain.Bookmark;
 import net.zionsoft.obadiah.model.domain.VerseIndex;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class BookmarkTableHelper {
     private static final String TABLE_BOOKMARK = "TABLE_BOOKMARK";
@@ -50,5 +55,30 @@ public class BookmarkTableHelper {
                         COLUMN_BOOK_INDEX, COLUMN_CHAPTER_INDEX, COLUMN_VERSE_INDEX),
                 new String[]{Integer.toString(verseIndex.book), Integer.toString(verseIndex.chapter),
                         Integer.toString(verseIndex.verse)});
+    }
+
+    @NonNull
+    public static List<Bookmark> getBookmarks(SQLiteDatabase db, int book, int chapter) {
+        Cursor cursor = null;
+        try {
+            cursor = db.query(TABLE_BOOKMARK, new String[]{COLUMN_TIMESTAMP, COLUMN_VERSE_INDEX},
+                    String.format("%s = ? AND %s = ?", COLUMN_BOOK_INDEX, COLUMN_CHAPTER_INDEX),
+                    new String[]{Integer.toString(book), Integer.toString(chapter)},
+                    null, null, String.format("%s ASC", COLUMN_VERSE_INDEX)
+            );
+            final int timestamp = cursor.getColumnIndex(COLUMN_TIMESTAMP);
+            final int verseIndex = cursor.getColumnIndex(COLUMN_VERSE_INDEX);
+            final int bookmarkCount = cursor.getCount();
+            final List<Bookmark> bookmarks = new ArrayList<>(bookmarkCount);
+            while (cursor.moveToNext()) {
+                bookmarks.add(new Bookmark(new VerseIndex(book, chapter, cursor.getInt(verseIndex)),
+                        cursor.getLong(timestamp)));
+            }
+            return bookmarks;
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
     }
 }
