@@ -81,4 +81,29 @@ public class BookmarkTableHelper {
             }
         }
     }
+
+    @NonNull
+    public static List<Bookmark> getBookmarks(SQLiteDatabase db) {
+        Cursor cursor = null;
+        try {
+            cursor = db.query(TABLE_BOOKMARK, new String[]{COLUMN_TIMESTAMP, COLUMN_BOOK_INDEX,
+                            COLUMN_CHAPTER_INDEX, COLUMN_VERSE_INDEX}, null, null, null, null,
+                    String.format("%s DESC", COLUMN_TIMESTAMP));
+            final int timestamp = cursor.getColumnIndex(COLUMN_TIMESTAMP);
+            final int bookIndex = cursor.getColumnIndex(COLUMN_BOOK_INDEX);
+            final int chapterIndex = cursor.getColumnIndex(COLUMN_CHAPTER_INDEX);
+            final int verseIndex = cursor.getColumnIndex(COLUMN_VERSE_INDEX);
+            final int bookmarkCount = cursor.getCount();
+            final List<Bookmark> bookmarks = new ArrayList<>(bookmarkCount);
+            while (cursor.moveToNext()) {
+                bookmarks.add(new Bookmark(new VerseIndex(cursor.getInt(bookIndex),
+                        cursor.getInt(chapterIndex), cursor.getInt(verseIndex)), cursor.getLong(timestamp)));
+            }
+            return bookmarks;
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+    }
 }

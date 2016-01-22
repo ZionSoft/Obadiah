@@ -20,6 +20,8 @@ package net.zionsoft.obadiah.injection;
 import net.zionsoft.obadiah.App;
 import net.zionsoft.obadiah.biblereading.BibleReadingComponent;
 import net.zionsoft.obadiah.biblereading.BibleReadingModule;
+import net.zionsoft.obadiah.bookmarks.BookmarksComponent;
+import net.zionsoft.obadiah.bookmarks.BookmarksModule;
 import net.zionsoft.obadiah.misc.license.OpenSourceLicenseComponent;
 import net.zionsoft.obadiah.misc.license.OpenSourceLicenseModule;
 import net.zionsoft.obadiah.misc.settings.SettingsActivity;
@@ -45,6 +47,8 @@ public interface InjectionComponent {
     void inject(PushNotificationHandler pushNotificationHandler);
 
     BibleReadingComponent plus(BibleReadingModule bibleReadingModule);
+
+    BookmarksComponent plus(BookmarksModule bookmarksModule);
 
     OpenSourceLicenseComponent plus(OpenSourceLicenseModule openSourceLicenseModule);
 

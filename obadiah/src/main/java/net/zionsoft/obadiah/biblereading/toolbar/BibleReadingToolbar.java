@@ -29,6 +29,7 @@ import android.widget.AdapterView;
 import android.widget.Spinner;
 
 import net.zionsoft.obadiah.R;
+import net.zionsoft.obadiah.bookmarks.BookmarksActivity;
 import net.zionsoft.obadiah.misc.settings.SettingsActivity;
 import net.zionsoft.obadiah.model.domain.VerseIndex;
 import net.zionsoft.obadiah.readingprogress.ReadingProgressActivity;
@@ -121,6 +122,11 @@ public class BibleReadingToolbar extends Toolbar implements ToolbarView,
             case R.id.action_search: {
                 final Context context = getContext();
                 context.startActivity(SearchActivity.newStartReorderToTopIntent(context));
+                return true;
+            }
+            case R.id.action_bookmarks: {
+                final Context context = getContext();
+                context.startActivity(BookmarksActivity.newStartIntent(context));
                 return true;
             }
             case R.id.action_reading_progress: {

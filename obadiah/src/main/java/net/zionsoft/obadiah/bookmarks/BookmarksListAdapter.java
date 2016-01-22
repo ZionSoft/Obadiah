@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.search;
+package net.zionsoft.obadiah.bookmarks;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -28,81 +28,72 @@ import android.widget.TextView;
 
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.datamodel.Settings;
-import net.zionsoft.obadiah.model.domain.VerseSearchResult;
+import net.zionsoft.obadiah.model.domain.Bookmark;
+import net.zionsoft.obadiah.model.domain.Verse;
 
 import java.util.List;
 
-class SearchResultListAdapter extends RecyclerView.Adapter {
-    private static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+class BookmarksListAdapter extends RecyclerView.Adapter {
+    private static class ViewHolder extends RecyclerView.ViewHolder {
         private static final StringBuilder STRING_BUILDER = new StringBuilder();
 
-        private final SearchPresenter searchPresenter;
+        private final BookmarksPresenter bookmarksPresenter;
         private final Resources resources;
         private final TextView textView;
 
-        private VerseSearchResult verse;
-
-        private ViewHolder(View itemView, SearchPresenter searchPresenter, Resources resources) {
+        private ViewHolder(View itemView, BookmarksPresenter bookmarksPresenter, Resources resources) {
             super(itemView);
-            this.searchPresenter = searchPresenter;
+            this.bookmarksPresenter = bookmarksPresenter;
             this.resources = resources;
             this.textView = (TextView) itemView;
-            itemView.setOnClickListener(this);
         }
 
-        private void bind(VerseSearchResult verse) {
-            final Settings settings = searchPresenter.getSettings();
+        private void bind(Bookmark bookmark, Verse verse) {
+            final Settings settings = bookmarksPresenter.getSettings();
             textView.setTextColor(settings.getTextColor());
             textView.setTextSize(TypedValue.COMPLEX_UNIT_PX,
                     resources.getDimension(settings.getTextSize().textSize));
 
             STRING_BUILDER.setLength(0);
-            STRING_BUILDER.append(verse.bookName).append(' ')
-                    .append(verse.index.chapter + 1).append(':').append(verse.index.verse + 1)
-                    .append('\n').append(verse.text);
+            STRING_BUILDER.append(verse.text.bookName).append(' ')
+                    .append(verse.verseIndex.chapter + 1).append(':').append(verse.verseIndex.verse + 1)
+                    .append('\n').append(verse.text.text);
             textView.setText(STRING_BUILDER.toString());
-
-            this.verse = verse;
-        }
-
-        @Override
-        public void onClick(View v) {
-            if (verse != null) {
-                searchPresenter.saveReadingProgress(verse.index);
-                searchPresenter.openBibleReadingActivity();
-            }
         }
     }
 
-    private final SearchPresenter searchPresenter;
+    private final BookmarksPresenter bookmarksPresenter;
     private final LayoutInflater inflater;
     private final Resources resources;
 
-    private List<VerseSearchResult> verses;
+    private List<Bookmark> bookmarks;
+    private List<Verse> verses;
 
-    SearchResultListAdapter(Context context, SearchPresenter searchPresenter) {
-        this.searchPresenter = searchPresenter;
+    BookmarksListAdapter(Context context, BookmarksPresenter bookmarksPresenter) {
+        this.bookmarksPresenter = bookmarksPresenter;
         this.inflater = LayoutInflater.from(context);
         this.resources = context.getResources();
     }
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new ViewHolder(inflater.inflate(R.layout.item_search_result, parent, false),
-                searchPresenter, resources);
+        return new ViewHolder(inflater.inflate(R.layout.item_bookmark, parent, false),
+                bookmarksPresenter, resources);
     }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        ((ViewHolder) holder).bind(verses.get(position));
+        ((ViewHolder) holder).bind(bookmarks.get(position), verses.get(position));
     }
 
     @Override
     public int getItemCount() {
-        return verses != null ? verses.size() : 0;
+        return bookmarks != null ? bookmarks.size() : 0;
     }
 
-    void setVerses(List<VerseSearchResult> verses) {
+    void setBookmarks(List<Bookmark> bookmarks, List<Verse> verses) {
+        this.bookmarks = bookmarks;
         this.verses = verses;
+        notifyDataSetChanged();
     }
 }

@@ -68,6 +68,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".biblereading.BibleReadingActivity" />
         </activity>
+        <activity android:name=".bookmarks.BookmarksActivity" />
         <activity android:name=".readingprogress.ReadingProgressActivity" />
         <activity android:name=".misc.settings.SettingsActivity" />
         <activity android:name=".misc.license.OpenSourceLicenseActivity" />

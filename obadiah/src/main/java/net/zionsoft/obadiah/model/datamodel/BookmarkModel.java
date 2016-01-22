@@ -82,4 +82,18 @@ public class BookmarkModel {
             }
         });
     }
+
+    public Observable<List<Bookmark>> loadBookmarks() {
+        return Observable.create(new Observable.OnSubscribe<List<Bookmark>>() {
+            @Override
+            public void call(Subscriber<? super List<Bookmark>> subscriber) {
+                try {
+                    subscriber.onNext(BookmarkTableHelper.getBookmarks(databaseHelper.getDatabase()));
+                    subscriber.onCompleted();
+                } catch (Exception e) {
+                    subscriber.onError(e);
+                }
+            }
+        });
+    }
 }
