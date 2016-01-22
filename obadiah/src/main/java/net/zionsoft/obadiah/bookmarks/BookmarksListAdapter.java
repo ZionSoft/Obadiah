@@ -33,32 +33,32 @@ import net.zionsoft.obadiah.model.domain.Verse;
 
 import java.util.List;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
+
 class BookmarksListAdapter extends RecyclerView.Adapter {
-    private static class ViewHolder extends RecyclerView.ViewHolder {
+    static class ViewHolder extends RecyclerView.ViewHolder {
         private static final StringBuilder STRING_BUILDER = new StringBuilder();
 
-        private final BookmarksPresenter bookmarksPresenter;
-        private final Resources resources;
-        private final TextView textView;
+        @Bind(R.id.text)
+        TextView text;
 
         private ViewHolder(View itemView, BookmarksPresenter bookmarksPresenter, Resources resources) {
             super(itemView);
-            this.bookmarksPresenter = bookmarksPresenter;
-            this.resources = resources;
-            this.textView = (TextView) itemView;
+
+            ButterKnife.bind(this, itemView);
+            final Settings settings = bookmarksPresenter.getSettings();
+            text.setTextColor(settings.getTextColor());
+            text.setTextSize(TypedValue.COMPLEX_UNIT_PX,
+                    resources.getDimension(settings.getTextSize().textSize));
         }
 
         private void bind(Bookmark bookmark, Verse verse) {
-            final Settings settings = bookmarksPresenter.getSettings();
-            textView.setTextColor(settings.getTextColor());
-            textView.setTextSize(TypedValue.COMPLEX_UNIT_PX,
-                    resources.getDimension(settings.getTextSize().textSize));
-
             STRING_BUILDER.setLength(0);
             STRING_BUILDER.append(verse.text.bookName).append(' ')
                     .append(verse.verseIndex.chapter + 1).append(':').append(verse.verseIndex.verse + 1)
                     .append('\n').append(verse.text.text);
-            textView.setText(STRING_BUILDER.toString());
+            text.setText(STRING_BUILDER.toString());
         }
     }
 
@@ -95,5 +95,9 @@ class BookmarksListAdapter extends RecyclerView.Adapter {
         this.bookmarks = bookmarks;
         this.verses = verses;
         notifyDataSetChanged();
+    }
+
+    Verse getVerse(int position) {
+        return verses.get(position);
     }
 }

@@ -43,7 +43,8 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 
-public class BookmarksActivity extends BaseAppCompatActivity implements BookmarksView {
+public class BookmarksActivity extends BaseAppCompatActivity implements BookmarksView,
+        RecyclerView.OnChildAttachStateChangeListener, View.OnClickListener {
     @NonNull
     public static Intent newStartIntent(Context context) {
         return new Intent(context, BookmarksActivity.class);
@@ -81,6 +82,7 @@ public class BookmarksActivity extends BaseAppCompatActivity implements Bookmark
         toolbar.setTitle(R.string.activity_bookmarks);
 
         bookmarkList.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+        bookmarkList.addOnChildAttachStateChangeListener(this);
         initializeAdapter();
     }
 
@@ -146,5 +148,27 @@ public class BookmarksActivity extends BaseAppCompatActivity implements Bookmark
                         loadBookmarks();
                     }
                 }, null);
+    }
+
+    @Override
+    public void onChildViewAttachedToWindow(View view) {
+        view.setOnClickListener(this);
+    }
+
+    @Override
+    public void onChildViewDetachedFromWindow(View view) {
+        view.setOnClickListener(null);
+    }
+
+    @Override
+    public void onClick(View v) {
+        final int position = bookmarkList.getChildAdapterPosition(v);
+        if (position == RecyclerView.NO_POSITION) {
+            return;
+        }
+
+        final Verse verse = bookmarksListAdapter.getVerse(position);
+        bookmarksPresenter.saveReadingProgress(verse.verseIndex);
+        finish();
     }
 }

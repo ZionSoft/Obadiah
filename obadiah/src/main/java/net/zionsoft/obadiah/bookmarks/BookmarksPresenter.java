@@ -98,4 +98,8 @@ class BookmarksPresenter extends BasePresenter<BookmarksView> {
                     }
                 });
     }
+
+    void saveReadingProgress(VerseIndex index) {
+        bibleReadingModel.saveReadingProgress(index);
+    }
 }
