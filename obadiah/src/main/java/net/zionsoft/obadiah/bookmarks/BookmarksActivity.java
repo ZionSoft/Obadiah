@@ -168,7 +168,9 @@ public class BookmarksActivity extends BaseAppCompatActivity implements Bookmark
         }
 
         final Verse verse = bookmarksListAdapter.getVerse(position);
-        bookmarksPresenter.saveReadingProgress(verse.verseIndex);
-        finish();
+        if (verse != null) {
+            bookmarksPresenter.saveReadingProgress(verse.verseIndex);
+            finish();
+        }
     }
 }
