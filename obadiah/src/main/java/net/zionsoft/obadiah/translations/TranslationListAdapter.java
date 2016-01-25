@@ -116,7 +116,7 @@ class TranslationListAdapter extends RecyclerView.Adapter {
         switch (viewType) {
             case VIEW_TYPE_HEADER:
                 final SectionHeader header = (SectionHeader)
-                        inflater.inflate(R.layout.item_translation_section, parent, false);
+                        inflater.inflate(R.layout.item_section_header, parent, false);
                 header.setHeaderTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
                 return new RecyclerView.ViewHolder(header) {
                 };
