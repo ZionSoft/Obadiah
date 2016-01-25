@@ -81,28 +81,6 @@ public class VersePagerPresenter extends BasePresenter<VersePagerView> {
                         }
                     }
                 }));
-
-        getSubscription().add(bibleReadingModel.observeCurrentReadingProgress()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<VerseIndex>() {
-                    @Override
-                    public void onCompleted() {
-                        // do nothing
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        // do nothing
-                    }
-
-                    @Override
-                    public void onNext(VerseIndex index) {
-                        final VersePagerView v = getView();
-                        if (v != null) {
-                            v.onReadingProgressUpdated(index);
-                        }
-                    }
-                }));
     }
 
     @NonNull

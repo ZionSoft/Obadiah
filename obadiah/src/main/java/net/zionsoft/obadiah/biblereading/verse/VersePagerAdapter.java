@@ -234,17 +234,6 @@ class VersePagerAdapter extends PagerAdapter implements VersePagerView {
         notifyDataSetChanged();
     }
 
-    @Override
-    public void onReadingProgressUpdated(VerseIndex index) {
-        currentChapter = index.chapter;
-        currentVerse = index.verse;
-        if (currentBook == index.book) {
-            return;
-        }
-        currentBook = index.book;
-        notifyDataSetChanged();
-    }
-
     void onResume() {
         versePagerPresenter.takeView(this);
 
@@ -256,6 +245,12 @@ class VersePagerAdapter extends PagerAdapter implements VersePagerView {
 
     void onPause() {
         versePagerPresenter.dropView();
+    }
+
+    void setReadingProgress(VerseIndex index) {
+        currentBook = index.book;
+        currentChapter = index.chapter;
+        currentVerse = index.verse;
     }
 
     void setVerseSelectionListener(VerseSelectionListener listener) {
