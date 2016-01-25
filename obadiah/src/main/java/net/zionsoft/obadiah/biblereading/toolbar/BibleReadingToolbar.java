@@ -29,8 +29,9 @@ import android.widget.AdapterView;
 import android.widget.Spinner;
 
 import net.zionsoft.obadiah.R;
+import net.zionsoft.obadiah.bookmarks.BookmarksActivity;
 import net.zionsoft.obadiah.misc.settings.SettingsActivity;
-import net.zionsoft.obadiah.model.domain.Verse;
+import net.zionsoft.obadiah.model.domain.VerseIndex;
 import net.zionsoft.obadiah.readingprogress.ReadingProgressActivity;
 import net.zionsoft.obadiah.search.SearchActivity;
 import net.zionsoft.obadiah.translations.TranslationManagementActivity;
@@ -111,7 +112,7 @@ public class BibleReadingToolbar extends Toolbar implements ToolbarView,
     }
 
     @Override
-    public void onReadingProgressUpdated(Verse.Index index) {
+    public void onReadingProgressUpdated(VerseIndex index) {
         refresh(index.book, index.chapter);
     }
 
@@ -121,6 +122,11 @@ public class BibleReadingToolbar extends Toolbar implements ToolbarView,
             case R.id.action_search: {
                 final Context context = getContext();
                 context.startActivity(SearchActivity.newStartReorderToTopIntent(context));
+                return true;
+            }
+            case R.id.action_bookmarks: {
+                final Context context = getContext();
+                context.startActivity(BookmarksActivity.newStartIntent(context));
                 return true;
             }
             case R.id.action_reading_progress: {

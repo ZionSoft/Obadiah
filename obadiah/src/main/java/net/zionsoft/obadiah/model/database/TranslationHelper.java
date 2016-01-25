@@ -25,6 +25,8 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import net.zionsoft.obadiah.model.domain.Verse;
+import net.zionsoft.obadiah.model.domain.VerseIndex;
+import net.zionsoft.obadiah.model.domain.VerseSearchResult;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -56,7 +58,8 @@ public class TranslationHelper {
                     new String[]{Integer.toString(book), Integer.toString(chapter), Integer.toString(verse)},
                     null, null, null);
             if (cursor.moveToFirst()) {
-                return new Verse(new Verse.Index(book, chapter, verse), bookName, cursor.getString(0));
+                return new Verse(new VerseIndex(book, chapter, verse),
+                        new Verse.Text(translationShortName, bookName, cursor.getString(0)), null);
             } else {
                 return null;
             }
@@ -85,14 +88,15 @@ public class TranslationHelper {
                 // ignores empty verses at the beginning
                 final String text = cursor.getString(verse);
                 if (hasNonEmptyVerseInTheBeginning || !TextUtils.isEmpty(text)) {
-                    verses.add(new Verse(new Verse.Index(book, chapter, verseIndex++), bookName, text));
+                    verses.add(new Verse(new VerseIndex(book, chapter, verseIndex++),
+                            new Verse.Text(translationShortName, bookName, text), null));
                     hasNonEmptyVerseInTheBeginning = true;
                 }
             }
 
             // removes trailing verses at the end
             for (int i = verseCount - 1; i >= 0; --i) {
-                if (TextUtils.isEmpty(verses.get(i).verseText)) {
+                if (TextUtils.isEmpty(verses.get(i).text.text)) {
                     verses.remove(i);
                 } else {
                     break;
@@ -147,8 +151,8 @@ public class TranslationHelper {
     }
 
     @NonNull
-    public static List<Verse> searchVerses(SQLiteDatabase db, String translationShortName,
-                                           List<String> bookNames, String keyword) {
+    public static List<VerseSearchResult> searchVerses(SQLiteDatabase db, String translationShortName,
+                                                       List<String> bookNames, String keyword) {
         Cursor cursor = null;
         try {
             cursor = db.query(translationShortName,
@@ -166,12 +170,12 @@ public class TranslationHelper {
             final int chapterIndex = cursor.getColumnIndex(COLUMN_CHAPTER_INDEX);
             final int verseIndex = cursor.getColumnIndex(COLUMN_VERSE_INDEX);
             final int verseText = cursor.getColumnIndex(COLUMN_TEXT);
-            final List<Verse> verses = new ArrayList<>(count);
+            final List<VerseSearchResult> verses = new ArrayList<>(count);
             while (cursor.moveToNext()) {
                 final int book = cursor.getInt(bookIndex);
-                final Verse.Index index = new Verse.Index(
+                final VerseIndex index = new VerseIndex(
                         book, cursor.getInt(chapterIndex), cursor.getInt(verseIndex));
-                verses.add(new Verse(index, bookNames.get(book), cursor.getString(verseText)));
+                verses.add(new VerseSearchResult(index, bookNames.get(book), cursor.getString(verseText)));
             }
             return verses;
         } finally {

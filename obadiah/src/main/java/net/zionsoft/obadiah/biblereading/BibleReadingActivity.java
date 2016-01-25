@@ -47,6 +47,7 @@ import net.zionsoft.obadiah.biblereading.verse.VerseViewPager;
 import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.datamodel.Settings;
 import net.zionsoft.obadiah.model.domain.Verse;
+import net.zionsoft.obadiah.model.domain.VerseIndex;
 import net.zionsoft.obadiah.translations.TranslationManagementActivity;
 import net.zionsoft.obadiah.ui.utils.BaseAppCompatActivity;
 import net.zionsoft.obadiah.ui.utils.DialogHelper;
@@ -62,7 +63,7 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
     private static final String KEY_MESSAGE_TYPE = "net.zionsoft.obadiah.KEY_MESSAGE_TYPE";
     private static final String KEY_VERSE_INDEX = "net.zionsoft.obadiah.KEY_VERSE_INDEX";
 
-    public static Intent newStartReorderToTopIntent(Context context, String messageType, Verse.Index verseIndex) {
+    public static Intent newStartReorderToTopIntent(Context context, String messageType, VerseIndex verseIndex) {
         return newStartReorderToTopIntent(context)
                 .putExtra(KEY_MESSAGE_TYPE, messageType)
                 .putExtra(KEY_VERSE_INDEX, verseIndex);
@@ -187,7 +188,7 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
             if (TextUtils.isEmpty(messageType)) {
                 return;
             }
-            final Verse.Index verseIndex = startIntent.getParcelableExtra(KEY_VERSE_INDEX);
+            final VerseIndex verseIndex = startIntent.getParcelableExtra(KEY_VERSE_INDEX);
             if (verseIndex == null || verseIndex.book < 0 || verseIndex.chapter < 0 || verseIndex.verse < 0) {
                 // should not happen, but just in case
                 return;
@@ -318,7 +319,7 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
     }
 
     @Override
-    public void onReadingProgressUpdated(Verse.Index index) {
+    public void onReadingProgressUpdated(VerseIndex index) {
         if (currentBook == index.book && currentChapter == index.chapter) {
             return;
         }

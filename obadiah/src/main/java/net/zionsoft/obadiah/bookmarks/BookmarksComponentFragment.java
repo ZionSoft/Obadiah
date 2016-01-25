@@ -15,18 +15,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.biblereading.verse;
+package net.zionsoft.obadiah.bookmarks;
 
-import net.zionsoft.obadiah.model.domain.Bookmark;
-import net.zionsoft.obadiah.model.domain.Verse;
-import net.zionsoft.obadiah.mvp.MVPView;
+import net.zionsoft.obadiah.injection.InjectionComponent;
+import net.zionsoft.obadiah.injection.components.ComponentFragment;
+import net.zionsoft.obadiah.readingprogress.ReadingProgressComponent;
 
-import java.util.List;
+public class BookmarksComponentFragment extends ComponentFragment<BookmarksComponent> {
+    static final String FRAGMENT_TAG = "net.zionsoft.obadiah.BookmarksComponentFragment.FRAGMENT_TAG";
 
-interface VersePagerView extends MVPView {
-    void onVersesLoaded(List<Verse> verses, List<Bookmark> bookmarks);
+    static BookmarksComponentFragment newInstance() {
+        return new BookmarksComponentFragment();
+    }
 
-    void onVersesLoadFailed(int book, int chapter);
-
-    void onTranslationUpdated();
+    @Override
+    protected BookmarksComponent createComponent(InjectionComponent injectionComponent) {
+        return BookmarksComponent.Initializer.init(injectionComponent);
+    }
 }

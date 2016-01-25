@@ -15,18 +15,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.biblereading.verse;
+package net.zionsoft.obadiah.bookmarks;
 
-import net.zionsoft.obadiah.model.domain.Bookmark;
-import net.zionsoft.obadiah.model.domain.Verse;
-import net.zionsoft.obadiah.mvp.MVPView;
+import net.zionsoft.obadiah.injection.scopes.ActivityScope;
+import net.zionsoft.obadiah.model.datamodel.BibleReadingModel;
+import net.zionsoft.obadiah.model.datamodel.BookmarkModel;
+import net.zionsoft.obadiah.model.datamodel.Settings;
 
-import java.util.List;
+import dagger.Module;
+import dagger.Provides;
 
-interface VersePagerView extends MVPView {
-    void onVersesLoaded(List<Verse> verses, List<Bookmark> bookmarks);
-
-    void onVersesLoadFailed(int book, int chapter);
-
-    void onTranslationUpdated();
+@Module
+public class BookmarksModule {
+    @Provides
+    @ActivityScope
+    BookmarksPresenter provideBookmarksPresenter(BibleReadingModel bibleReadingModel,
+                                                 BookmarkModel bookmarkModel, Settings settings) {
+        return new BookmarksPresenter(bibleReadingModel, bookmarkModel, settings);
+    }
 }

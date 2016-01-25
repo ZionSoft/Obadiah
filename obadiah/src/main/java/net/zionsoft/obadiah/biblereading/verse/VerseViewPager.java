@@ -37,18 +37,31 @@ import android.widget.Toast;
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.domain.Verse;
+import net.zionsoft.obadiah.model.domain.VerseIndex;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class VerseViewPager extends ViewPager implements VerseView, VerseSelectionListener,
         ActionMode.Callback {
+    private final ViewPager.SimpleOnPageChangeListener onPageChangeListener
+            = new ViewPager.SimpleOnPageChangeListener() {
+        @Override
+        public void onPageSelected(int position) {
+            if (currentChapter == position) {
+                return;
+            }
+            versePagerPresenter.saveReadingProgress(currentBook, position, 0);
+        }
+    };
+
     private AppCompatActivity activity;
     private ActionMode actionMode;
 
     private VersePresenter versePagerPresenter;
 
     private VersePagerAdapter adapter;
+    private int currentBook;
     private int currentChapter;
 
     public VerseViewPager(Context context) {
@@ -60,13 +73,30 @@ public class VerseViewPager extends ViewPager implements VerseView, VerseSelecti
     }
 
     @Override
-    public void onReadingProgressUpdated(Verse.Index index) {
-        if (currentChapter == index.chapter) {
-            return;
+    public void onReadingProgressUpdated(VerseIndex index) {
+        boolean chapterChanged = false;
+        if (currentChapter != index.chapter) {
+            currentChapter = index.chapter;
+            chapterChanged = true;
         }
-        currentChapter = index.chapter;
 
-        setCurrentItem(currentChapter, true);
+        boolean bookChanged = false;
+        if (currentBook != index.book) {
+            currentBook = index.book;
+            adapter.setReadingProgress(index);
+            bookChanged = true;
+        }
+
+        // removes the listener here, otherwise the callback will be invoked and update reading
+        // progress unexpectedly
+        removeOnPageChangeListener(onPageChangeListener);
+        if (bookChanged) {
+            adapter.notifyDataSetChanged();
+        }
+        if (chapterChanged) {
+            setCurrentItem(currentChapter, true);
+        }
+        addOnPageChangeListener(onPageChangeListener);
 
         if (actionMode != null) {
             actionMode.finish();
@@ -141,12 +171,13 @@ public class VerseViewPager extends ViewPager implements VerseView, VerseSelecti
             return null;
         }
 
-        // format: <book name> <chapter index>:<verse index> <verse text>
+        // TODO supports selection for verses with parallel translations
+        // format: <book name> <chapter verseIndex>:<verse verseIndex> <verse text>
         final StringBuilder text = new StringBuilder();
         for (int i = 0; i < versesCount; ++i) {
             final Verse verse = verses.get(i);
-            text.append(verse.bookName).append(' ').append(verse.index.chapter + 1).append(':')
-                    .append(verse.index.verse + 1).append(' ').append(verse.verseText).append('\n');
+            text.append(verse.text.bookName).append(' ').append(verse.verseIndex.chapter + 1).append(':')
+                    .append(verse.verseIndex.verse + 1).append(' ').append(verse.text.text).append('\n');
         }
         return text.toString();
     }
@@ -200,20 +231,12 @@ public class VerseViewPager extends ViewPager implements VerseView, VerseSelecti
         adapter = new VersePagerAdapter(activity, versePresenter, getOffscreenPageLimit());
         adapter.setVerseSelectionListener(this);
         setAdapter(adapter);
-        addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
-            @Override
-            public void onPageSelected(int position) {
-                if (currentChapter == position) {
-                    return;
-                }
-                VerseViewPager.this.versePagerPresenter.saveReadingProgress(
-                        VerseViewPager.this.versePagerPresenter.loadCurrentBook(), position, 0);
-            }
-        });
+        addOnPageChangeListener(onPageChangeListener);
     }
 
     public void onResume() {
         versePagerPresenter.takeView(this);
+        currentBook = versePagerPresenter.loadCurrentBook();
         currentChapter = versePagerPresenter.loadCurrentChapter();
 
         adapter.onResume();

@@ -17,13 +17,13 @@
 
 package net.zionsoft.obadiah.search;
 
-import net.zionsoft.obadiah.model.domain.Verse;
+import net.zionsoft.obadiah.model.domain.VerseSearchResult;
 import net.zionsoft.obadiah.mvp.MVPView;
 
 import java.util.List;
 
 interface SearchView extends MVPView {
-    void onVersesSearched(List<Verse> verses);
+    void onVersesSearched(List<VerseSearchResult> verses);
 
     void onVersesSearchFailed();
 

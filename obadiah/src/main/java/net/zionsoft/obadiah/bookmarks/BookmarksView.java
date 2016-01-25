@@ -15,27 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.model.domain;
+package net.zionsoft.obadiah.bookmarks;
+
+import net.zionsoft.obadiah.model.domain.Bookmark;
+import net.zionsoft.obadiah.model.domain.Verse;
+import net.zionsoft.obadiah.mvp.MVPView;
 
 import java.util.List;
 
-// TODO merge with Verse
-public class VerseWithParallelTranslations {
-    public static class Text {
-        public final String translation;
-        public final String text;
+interface BookmarksView extends MVPView {
+    void onBookmarksLoaded(List<Bookmark> bookmarks, List<Verse> verses);
 
-        public Text(String translation, String text) {
-            this.translation = translation;
-            this.text = text;
-        }
-    }
-
-    public final Verse.Index verseIndex;
-    public final List<Text> texts;
-
-    public VerseWithParallelTranslations(Verse.Index verseIndex, List<Text> texts) {
-        this.verseIndex = verseIndex;
-        this.texts = texts;
-    }
+    void onBookmarksLoadFailed();
 }

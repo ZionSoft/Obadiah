@@ -15,18 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.biblereading.verse;
+package net.zionsoft.obadiah.model.domain;
 
-import net.zionsoft.obadiah.model.domain.Bookmark;
-import net.zionsoft.obadiah.model.domain.Verse;
-import net.zionsoft.obadiah.mvp.MVPView;
+public class VerseSearchResult {
+    public final VerseIndex index;
+    public final String bookName;
+    public final String text;
 
-import java.util.List;
-
-interface VersePagerView extends MVPView {
-    void onVersesLoaded(List<Verse> verses, List<Bookmark> bookmarks);
-
-    void onVersesLoadFailed(int book, int chapter);
-
-    void onTranslationUpdated();
+    public VerseSearchResult(VerseIndex index, String bookName, String text) {
+        this.index = index;
+        this.bookName = bookName;
+        this.text = text;
+    }
 }

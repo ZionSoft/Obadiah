@@ -17,9 +17,9 @@
 
 package net.zionsoft.obadiah.biblereading.verse;
 
-import net.zionsoft.obadiah.model.domain.Verse;
+import net.zionsoft.obadiah.model.domain.VerseIndex;
 import net.zionsoft.obadiah.mvp.MVPView;
 
 public interface VerseView extends MVPView {
-    void onReadingProgressUpdated(Verse.Index index);
+    void onReadingProgressUpdated(VerseIndex index);
 }

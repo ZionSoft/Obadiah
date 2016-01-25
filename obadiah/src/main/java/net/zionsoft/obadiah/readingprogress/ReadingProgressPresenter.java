@@ -29,16 +29,16 @@ import java.util.List;
 
 import rx.Observable;
 import rx.Subscriber;
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func2;
 import rx.schedulers.Schedulers;
-import rx.subscriptions.CompositeSubscription;
 
 class ReadingProgressPresenter extends BasePresenter<ReadingProgressView> {
     private final BibleReadingModel bibleReadingModel;
     private final ReadingProgressModel readingProgressModel;
 
-    private CompositeSubscription subscription;
+    private Subscription subscription;
 
     ReadingProgressPresenter(BibleReadingModel bibleReadingModel,
                              ReadingProgressModel readingProgressModel,
@@ -46,12 +46,6 @@ class ReadingProgressPresenter extends BasePresenter<ReadingProgressView> {
         super(settings);
         this.bibleReadingModel = bibleReadingModel;
         this.readingProgressModel = readingProgressModel;
-    }
-
-    @Override
-    protected void onViewTaken() {
-        super.onViewTaken();
-        subscription = new CompositeSubscription();
     }
 
     @Override
@@ -65,7 +59,7 @@ class ReadingProgressPresenter extends BasePresenter<ReadingProgressView> {
     }
 
     void loadReadingProgress() {
-        subscription.add(Observable.zip(readingProgressModel.loadReadingProgress(),
+        subscription = Observable.zip(readingProgressModel.loadReadingProgress(),
                 bibleReadingModel.loadBookNames(bibleReadingModel.loadCurrentTranslation()),
                 new Func2<ReadingProgress, List<String>, Pair<ReadingProgress, List<String>>>() {
                     @Override
@@ -95,6 +89,6 @@ class ReadingProgressPresenter extends BasePresenter<ReadingProgressView> {
                             v.onReadingProgressLoaded(readingProgress.first, readingProgress.second);
                         }
                     }
-                }));
+                });
     }
 }

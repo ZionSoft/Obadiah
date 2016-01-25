@@ -8,10 +8,20 @@
         android:id="@+id/text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/padding" />
+        android:layout_marginBottom="@dimen/verse_icon_size"
+        android:layout_marginLeft="@dimen/padding"
+        android:layout_marginRight="@dimen/padding"
+        android:layout_marginTop="@dimen/padding" />
+
+    <android.support.v7.widget.AppCompatImageView
+        android:id="@+id/bookmark"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|right"
+        android:padding="@dimen/padding"
+        android:src="@drawable/ic_bookmark" />
 
     <View
-        android:id="@+id/divider_view"
         style="@style/Divider.Horizontal"
         android:layout_gravity="bottom"
         android:background="@color/dark_gray" />

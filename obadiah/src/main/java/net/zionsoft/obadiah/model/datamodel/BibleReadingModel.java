@@ -33,7 +33,8 @@ import net.zionsoft.obadiah.model.database.DatabaseHelper;
 import net.zionsoft.obadiah.model.database.TranslationHelper;
 import net.zionsoft.obadiah.model.database.TranslationsTableHelper;
 import net.zionsoft.obadiah.model.domain.Verse;
-import net.zionsoft.obadiah.model.domain.VerseWithParallelTranslations;
+import net.zionsoft.obadiah.model.domain.VerseIndex;
+import net.zionsoft.obadiah.model.domain.VerseSearchResult;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -73,7 +74,7 @@ public class BibleReadingModel {
             // strings are UTF-16 encoded (with a length of one or two 16-bit code units)
             int length = 0;
             for (Verse verse : verses)
-                length += 12 + (verse.bookName.length() + verse.verseText.length()) * 4;
+                length += 12 + (verse.text.bookName.length() + verse.text.text.length()) * 4;
             return length;
         }
     };
@@ -82,8 +83,8 @@ public class BibleReadingModel {
             = PublishSubject.<String>create().toSerialized();
     private final SerializedSubject<Void, Void> parallelTranslationUpdatesSubject
             = PublishSubject.<Void>create().toSerialized();
-    private final SerializedSubject<Verse.Index, Verse.Index> currentReadingProgressUpdatesSubject
-            = PublishSubject.<Verse.Index>create().toSerialized();
+    private final SerializedSubject<VerseIndex, VerseIndex> currentReadingProgressUpdatesSubject
+            = PublishSubject.<VerseIndex>create().toSerialized();
 
     private final List<String> parallelTranslations = new ArrayList<>();
 
@@ -146,7 +147,7 @@ public class BibleReadingModel {
         return preferences.getInt(Constants.PREF_KEY_LAST_READ_VERSE, 0);
     }
 
-    public void saveReadingProgress(Verse.Index index) {
+    public void saveReadingProgress(VerseIndex index) {
         preferences.edit()
                 .putInt(Constants.PREF_KEY_LAST_READ_BOOK, index.book)
                 .putInt(Constants.PREF_KEY_LAST_READ_CHAPTER, index.chapter)
@@ -155,7 +156,7 @@ public class BibleReadingModel {
         currentReadingProgressUpdatesSubject.onNext(index);
     }
 
-    public Observable<Verse.Index> observeCurrentReadingProgress() {
+    public Observable<VerseIndex> observeCurrentReadingProgress() {
         return currentReadingProgressUpdatesSubject.asObservable();
     }
 
@@ -211,39 +212,40 @@ public class BibleReadingModel {
         });
     }
 
-    public Observable<List<VerseWithParallelTranslations>> loadVersesWithParallelTranslations(final int book, final int chapter) {
+    public Observable<List<Verse>> loadVersesWithParallelTranslations(final int book, final int chapter) {
         return loadVerses(loadCurrentTranslation(), book, chapter)
-                .map(new Func1<List<Verse>, List<VerseWithParallelTranslations>>() {
+                .map(new Func1<List<Verse>, List<Verse>>() {
                     @Override
-                    public List<VerseWithParallelTranslations> call(List<Verse> verses) {
+                    public List<Verse> call(List<Verse> verses) {
                         final int parallelTranslationsCount = parallelTranslations.size();
                         final List<List<String>> textsFromParallelTranslations
                                 = new ArrayList<>(parallelTranslationsCount);
+                        final List<String> bookNamesFormParallelTranslations
+                                = new ArrayList<>(parallelTranslationsCount);
                         final SQLiteDatabase database = databaseHelper.getDatabase();
                         for (int i = 0; i < parallelTranslationsCount; ++i) {
+                            final String translation = parallelTranslations.get(i);
                             textsFromParallelTranslations.add(TranslationHelper.getVerseTexts(
-                                    database, parallelTranslations.get(i), book, chapter));
+                                    database, translation, book, chapter));
+                            bookNamesFormParallelTranslations.add(loadBookNames(translation)
+                                    .toBlocking().first().get(book));
                         }
 
-                        final String currentTranslation = loadCurrentTranslation();
-                        final int translationsCount = parallelTranslationsCount + 1;
                         final int versesCount = verses.size();
-                        final List<VerseWithParallelTranslations> results = new ArrayList<>(versesCount);
+                        final List<Verse> results = new ArrayList<>(versesCount);
                         for (int i = 0; i < versesCount; ++i) {
-                            final List<VerseWithParallelTranslations.Text> texts
-                                    = new ArrayList<>(translationsCount);
+                            final List<Verse.Text> texts = new ArrayList<>(parallelTranslationsCount);
                             final Verse verse = verses.get(i);
-                            texts.add(new VerseWithParallelTranslations.Text(
-                                    currentTranslation, verse.verseText));
 
                             for (int j = 0; j < parallelTranslationsCount; ++j) {
                                 // just in case the translation has less verses (probably an error?)
                                 final List<String> t = textsFromParallelTranslations.get(j);
-                                texts.add(new VerseWithParallelTranslations.Text(
-                                        parallelTranslations.get(j), t.size() > i ? t.get(i) : ""));
+                                texts.add(new Verse.Text(parallelTranslations.get(j),
+                                        bookNamesFormParallelTranslations.get(j),
+                                        t.size() > i ? t.get(i) : ""));
                             }
 
-                            results.add(new VerseWithParallelTranslations(verse.index, texts));
+                            results.add(new Verse(verse.verseIndex, verse.text, texts));
                         }
                         return results;
                     }
@@ -303,11 +305,11 @@ public class BibleReadingModel {
                 });
     }
 
-    public Observable<List<Verse>> search(final String translation, final String query) {
+    public Observable<List<VerseSearchResult>> search(final String translation, final String query) {
         return loadBookNames(translation)
-                .map(new Func1<List<String>, List<Verse>>() {
+                .map(new Func1<List<String>, List<VerseSearchResult>>() {
                     @Override
-                    public List<Verse> call(List<String> bookNames) {
+                    public List<VerseSearchResult> call(List<String> bookNames) {
                         return TranslationHelper.searchVerses(
                                 databaseHelper.getDatabase(), translation, bookNames, query);
                     }

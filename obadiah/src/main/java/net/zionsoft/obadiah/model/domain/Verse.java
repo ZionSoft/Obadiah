@@ -17,80 +17,33 @@
 
 package net.zionsoft.obadiah.model.domain;
 
-import android.os.Parcel;
-import android.os.Parcelable;
+import android.support.annotation.Nullable;
 
-public class Verse implements Parcelable {
-    public static class Index implements Parcelable {
-        public final int book;
-        public final int chapter;
-        public final int verse;
+import java.util.Collections;
+import java.util.List;
 
-        public Index(int book, int chapter, int verse) {
-            this.book = book;
-            this.chapter = chapter;
-            this.verse = verse;
+public class Verse {
+    public static class Text {
+        public final String translation;
+        public final String bookName;
+        public final String text;
+
+        public Text(String translation, String bookName, String text) {
+            this.translation = translation;
+            this.bookName = bookName;
+            this.text = text;
         }
-
-        @Override
-        public int describeContents() {
-            return 0;
-        }
-
-        @Override
-        public void writeToParcel(Parcel dst, int flags) {
-            dst.writeInt(book);
-            dst.writeInt(chapter);
-            dst.writeInt(verse);
-        }
-
-        public static final Parcelable.Creator<Index> CREATOR = new Parcelable.Creator<Index>() {
-            @Override
-            public Index createFromParcel(Parcel in) {
-                return new Index(in.readInt(), in.readInt(), in.readInt());
-            }
-
-            @Override
-            public Index[] newArray(int size) {
-                return new Index[size];
-            }
-        };
     }
 
-    public final Index index;
-    public final String bookName;
-    public final String verseText;
+    public final VerseIndex verseIndex;
+    public final Text text;
+    public final List<Text> parallel;
 
-    public Verse(Index index, String bookName, String verseText) {
+    public Verse(VerseIndex verseIndex, Text text, @Nullable List<Text> parallel) {
         super();
 
-        this.index = index;
-        this.bookName = bookName;
-        this.verseText = verseText;
+        this.verseIndex = verseIndex;
+        this.text = text;
+        this.parallel = parallel != null ? parallel : Collections.<Text>emptyList();
     }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dst, int flags) {
-        dst.writeParcelable(index, 0);
-        dst.writeString(bookName);
-        dst.writeString(verseText);
-    }
-
-    public static final Parcelable.Creator<Verse> CREATOR = new Parcelable.Creator<Verse>() {
-        @Override
-        public Verse createFromParcel(Parcel in) {
-            return new Verse(in.<Index>readParcelable(Index.class.getClassLoader()),
-                    in.readString(), in.readString());
-        }
-
-        @Override
-        public Verse[] newArray(int size) {
-            return new Verse[size];
-        }
-    };
 }

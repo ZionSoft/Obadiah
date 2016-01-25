@@ -19,6 +19,10 @@ package net.zionsoft.obadiah.biblereading.verse;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
+import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.RecyclerView;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -28,8 +32,9 @@ import android.widget.TextView;
 
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.datamodel.Settings;
+import net.zionsoft.obadiah.model.domain.Bookmark;
 import net.zionsoft.obadiah.model.domain.Verse;
-import net.zionsoft.obadiah.model.domain.VerseWithParallelTranslations;
+import net.zionsoft.obadiah.model.domain.VerseIndex;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,100 +43,130 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 
 class VerseListAdapter extends RecyclerView.Adapter {
-    static class ViewHolder extends RecyclerView.ViewHolder {
+    static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private static final StringBuilder STRING_BUILDER = new StringBuilder();
-        private final Settings settings;
+        private static final PorterDuffColorFilter FAVORITE_ON = new PorterDuffColorFilter(Color.RED, PorterDuff.Mode.MULTIPLY);
+        private static final PorterDuffColorFilter FAVORITE_OFF = new PorterDuffColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
+
+        private final VersePagerPresenter versePagerPresenter;
         private final Resources resources;
 
         @Bind(R.id.text)
         TextView text;
 
-        private ViewHolder(View itemView, Settings settings, Resources resources) {
+        @Bind(R.id.bookmark)
+        AppCompatImageView bookmark;
+
+        private VerseIndex verseIndex;
+        private boolean isBookmarked;
+
+        private ViewHolder(View itemView, VersePagerPresenter versePagerPresenter, Resources resources) {
             super(itemView);
 
-            this.settings = settings;
+            this.versePagerPresenter = versePagerPresenter;
             this.resources = resources;
+
             ButterKnife.bind(this, itemView);
+            bookmark.setOnClickListener(this);
         }
 
-        private void bind(Verse verse, boolean selected) {
-            itemView.setEnabled(true);
+        private void bind(Verse verse, boolean selected, boolean isBookmarked) {
             itemView.setSelected(selected);
 
+            final Settings settings = versePagerPresenter.getSettings();
             text.setTextColor(settings.getTextColor());
             text.setTextSize(TypedValue.COMPLEX_UNIT_PX,
                     resources.getDimension(settings.getTextSize().textSize));
 
             STRING_BUILDER.setLength(0);
-            STRING_BUILDER.append(verse.bookName).append(' ')
-                    .append(verse.index.chapter + 1).append(':').append(verse.index.verse + 1).append('\n')
-                    .append(verse.verseText);
-            text.setText(STRING_BUILDER.toString());
+            if (verse.parallel.size() == 0) {
+                STRING_BUILDER.append(verse.text.bookName).append(' ')
+                        .append(verse.verseIndex.chapter + 1).append(':').append(verse.verseIndex.verse + 1).append('\n')
+                        .append(verse.text.text);
+                text.setText(STRING_BUILDER.toString());
+            } else {
+                buildVerse(STRING_BUILDER, verse.verseIndex, verse.text);
+                final int size = verse.parallel.size();
+                for (int i = 0; i < size; ++i) {
+                    final Verse.Text text = verse.parallel.get(i);
+                    buildVerse(STRING_BUILDER, verse.verseIndex, text);
+                }
+                text.setText(STRING_BUILDER.substring(0, STRING_BUILDER.length() - 2));
+            }
+
+            verseIndex = verse.verseIndex;
+
+            setBookmark(isBookmarked);
         }
 
-        private void bind(VerseWithParallelTranslations verse) {
-            itemView.setEnabled(false);
-            itemView.setSelected(false);
+        private static void buildVerse(StringBuilder sb, VerseIndex verseIndex, Verse.Text text) {
+            sb.append(text.translation).append(' ')
+                    .append(verseIndex.chapter + 1).append(':').append(verseIndex.verse + 1)
+                    .append('\n').append(text.text).append('\n').append('\n');
+        }
 
-            text.setTextColor(settings.getTextColor());
-            text.setTextSize(TypedValue.COMPLEX_UNIT_PX,
-                    resources.getDimension(settings.getTextSize().textSize));
+        private void setBookmark(boolean isBookmarked) {
+            this.isBookmarked = isBookmarked;
+            bookmark.setColorFilter(isBookmarked ? FAVORITE_ON : FAVORITE_OFF);
+        }
 
-            STRING_BUILDER.setLength(0);
-            final int size = verse.texts.size();
-            for (int i = 0; i < size; ++i) {
-                final VerseWithParallelTranslations.Text text = verse.texts.get(i);
-                STRING_BUILDER.append(text.translation).append(' ')
-                        .append(verse.verseIndex.chapter + 1).append(':').append(verse.verseIndex.verse + 1)
-                        .append('\n').append(text.text).append('\n').append('\n');
+        @Override
+        public void onClick(View v) {
+            if (verseIndex != null && v == bookmark) {
+                setBookmark(!isBookmarked);
+                if (isBookmarked) {
+                    versePagerPresenter.addFavorite(verseIndex);
+                } else {
+                    versePagerPresenter.removeFavorite(verseIndex);
+                }
             }
-            text.setText(STRING_BUILDER.substring(0, STRING_BUILDER.length() - 2));
         }
     }
 
-    private final Settings settings;
+    private final VersePagerPresenter versePagerPresenter;
     private final LayoutInflater inflater;
     private final Resources resources;
 
+    private List<Bookmark> bookmarks;
     private List<Verse> verses;
-    private List<VerseWithParallelTranslations> versesWithParallelTranslations;
     private boolean[] selected;
     private int selectedCount;
 
-    VerseListAdapter(Context context, Settings settings) {
-        this.settings = settings;
+    VerseListAdapter(Context context, VersePagerPresenter versePagerPresenter) {
+        this.versePagerPresenter = versePagerPresenter;
         this.inflater = LayoutInflater.from(context);
         this.resources = context.getResources();
     }
 
     @Override
     public int getItemCount() {
-        if (verses != null) {
-            return verses.size();
-        }
-        if (versesWithParallelTranslations != null) {
-            return versesWithParallelTranslations.size();
-        }
-        return 0;
+        return verses != null ? verses.size() : 0;
     }
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new ViewHolder(inflater.inflate(R.layout.item_verse, parent, false), settings, resources);
+        return new ViewHolder(inflater.inflate(R.layout.item_verse, parent, false), versePagerPresenter, resources);
     }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        if (verses != null) {
-            ((ViewHolder) holder).bind(verses.get(position), selected[position]);
-        } else if (versesWithParallelTranslations != null) {
-            ((ViewHolder) holder).bind(versesWithParallelTranslations.get(position));
+        boolean isBookmarked = false;
+        final int bookmarkCount = bookmarks.size();
+        for (int i = 0; i < bookmarkCount; ++i) {
+            final VerseIndex verseIndex = bookmarks.get(i).verseIndex;
+            if (verseIndex.verse == position) {
+                isBookmarked = true;
+                break;
+            } else if (verseIndex.verse > position) {
+                break;
+            }
         }
+        ((ViewHolder) holder).bind(verses.get(position), selected[position], isBookmarked);
     }
 
-    void setVerses(List<Verse> verses) {
+    void setVerses(List<Verse> verses, List<Bookmark> bookmarks) {
         this.verses = verses;
-        this.versesWithParallelTranslations = null;
+        this.bookmarks = bookmarks;
 
         final int size = this.verses.size();
         if (selected == null || selected.length < size) {
@@ -142,21 +177,7 @@ class VerseListAdapter extends RecyclerView.Adapter {
         notifyDataSetChanged();
     }
 
-    void setVersesWithParallelTranslations(List<VerseWithParallelTranslations> versesWithParallelTranslations) {
-        this.verses = null;
-        this.versesWithParallelTranslations = versesWithParallelTranslations;
-
-        deselectVerses();
-
-        notifyDataSetChanged();
-    }
-
     void select(int position) {
-        if (verses == null) {
-            // TODO supports selection for verses with parallel translations
-            return;
-        }
-
         selected[position] ^= true;
         if (selected[position]) {
             ++selectedCount;
