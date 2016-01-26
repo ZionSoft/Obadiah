@@ -98,7 +98,7 @@ public class VerseViewPager extends ViewPager implements VerseView, VerseSelecti
         }
         addOnPageChangeListener(onPageChangeListener);
 
-        if (actionMode != null) {
+        if ((bookChanged || chapterChanged) && actionMode != null) {
             actionMode.finish();
         }
     }
