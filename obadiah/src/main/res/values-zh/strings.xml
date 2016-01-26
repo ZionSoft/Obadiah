@@ -3,11 +3,13 @@
 
     <string name="app_name">聖經</string>
 
+    <string name="activity_bookmarks">書籤</string>
     <string name="activity_manage_translation">譯本</string>
     <string name="activity_open_source_license">开源软体协议</string>
     <string name="activity_reading_progress">讀經進度</string>
     <string name="activity_settings">設置</string>
 
+    <string name="action_bookmarks">書籤</string>
     <string name="action_copy">拷貝</string>
     <string name="action_clear_search_history">刪除搜尋紀錄</string>
     <string name="action_delete_translation">刪除</string>

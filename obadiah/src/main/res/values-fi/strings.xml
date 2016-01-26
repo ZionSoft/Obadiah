@@ -3,11 +3,13 @@
 
     <string name="app_name">Raamattu</string>
 
+    <string name="activity_bookmarks">Kirjanmerkit</string>
     <string name="activity_manage_translation">Käännökset</string>
     <string name="activity_open_source_license">Avoimen Lähdekoodin Käyttöluv.</string>
     <string name="activity_reading_progress">Lukeminen Edistyminen</string>
     <string name="activity_settings">Asetukset</string>
 
+    <string name="action_bookmarks">Kirjanmerkit</string>
     <string name="action_copy">Kopioida</string>
     <string name="action_clear_search_history">Tyhjennä Hakuhistoria</string>
     <string name="action_delete_translation">Poista</string>

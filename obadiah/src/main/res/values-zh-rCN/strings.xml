@@ -3,11 +3,13 @@
 
     <string name="app_name">圣经</string>
 
+    <string name="activity_bookmarks">书签</string>
     <string name="activity_manage_translation">译本</string>
     <string name="activity_open_source_license">开源软件协议</string>
     <string name="activity_reading_progress">读经进度</string>
     <string name="activity_settings">设置</string>
 
+    <string name="action_bookmarks">书签</string>
     <string name="action_copy">复制</string>
     <string name="action_clear_search_history">清空搜索历史</string>
     <string name="action_delete_translation">删除</string>
