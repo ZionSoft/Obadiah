@@ -32,6 +32,18 @@ public class VerseIndex implements Parcelable {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof VerseIndex)) {
+            return false;
+        }
+        final VerseIndex other = (VerseIndex) o;
+        return book == other.book && chapter == other.chapter && verse == other.verse;
+    }
+
+    @Override
     public int describeContents() {
         return 0;
     }

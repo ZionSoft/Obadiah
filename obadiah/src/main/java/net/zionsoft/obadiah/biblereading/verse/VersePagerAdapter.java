@@ -230,6 +230,52 @@ class VersePagerAdapter extends PagerAdapter implements VersePagerView {
     }
 
     @Override
+    public void onBookmarkAdded(Bookmark bookmark) {
+        final int pageCount = pages.size();
+        for (int i = 0; i < pageCount; ++i) {
+            final Page page = pages.get(i);
+            if (page.chapter == bookmark.verseIndex.chapter) {
+                page.verseListAdapter.addBookmark(bookmark);
+                return;
+            }
+        }
+    }
+
+    @Override
+    public void onBookmarkAddFailed(final VerseIndex verseIndex) {
+        DialogHelper.showDialog(context, true, R.string.error_unknown_error,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        versePagerPresenter.addBookmark(verseIndex);
+                    }
+                }, null);
+    }
+
+    @Override
+    public void onBookmarkRemoved(VerseIndex verseIndex) {
+        final int pageCount = pages.size();
+        for (int i = 0; i < pageCount; ++i) {
+            final Page page = pages.get(i);
+            if (page.chapter == verseIndex.chapter) {
+                page.verseListAdapter.removeBookmark(verseIndex);
+                return;
+            }
+        }
+    }
+
+    @Override
+    public void onBookmarkRemoveFailed(final VerseIndex verseIndex) {
+        DialogHelper.showDialog(context, true, R.string.error_unknown_error,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        versePagerPresenter.removeBookmark(verseIndex);
+                    }
+                }, null);
+    }
+
+    @Override
     public void onTranslationUpdated() {
         notifyDataSetChanged();
     }
@@ -263,8 +309,9 @@ class VersePagerAdapter extends PagerAdapter implements VersePagerView {
         final int pageCount = pages.size();
         for (int i = 0; i < pageCount; ++i) {
             final Page page = pages.get(i);
-            if (page.chapter == chapter)
+            if (page.chapter == chapter) {
                 return page.verseListAdapter.getSelectedVerses();
+            }
         }
         return null;
     }

@@ -39,13 +39,14 @@ public class BookmarkModel {
         this.databaseHelper = databaseHelper;
     }
 
-    public Observable<Void> addBookmark(final VerseIndex verseIndex) {
-        return Observable.create(new Observable.OnSubscribe<Void>() {
+    public Observable<Bookmark> addBookmark(final VerseIndex verseIndex) {
+        return Observable.create(new Observable.OnSubscribe<Bookmark>() {
             @Override
-            public void call(Subscriber<? super Void> subscriber) {
+            public void call(Subscriber<? super Bookmark> subscriber) {
                 try {
-                    BookmarkTableHelper.saveBookmark(databaseHelper.getDatabase(),
-                            new Bookmark(verseIndex, System.currentTimeMillis()));
+                    final Bookmark bookmark = new Bookmark(verseIndex, System.currentTimeMillis());
+                    BookmarkTableHelper.saveBookmark(databaseHelper.getDatabase(), bookmark);
+                    subscriber.onNext(bookmark);
                     subscriber.onCompleted();
                 } catch (Exception e) {
                     subscriber.onError(e);

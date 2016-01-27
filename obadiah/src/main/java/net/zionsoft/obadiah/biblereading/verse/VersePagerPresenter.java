@@ -160,41 +160,53 @@ public class VersePagerPresenter extends BasePresenter<VersePagerView> {
                 }));
     }
 
-    void addFavorite(VerseIndex verseIndex) {
+    void addBookmark(final VerseIndex verseIndex) {
         getSubscription().add(bookmarkModel.addBookmark(verseIndex)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<Void>() {
+                .subscribe(new Subscriber<Bookmark>() {
                     @Override
                     public void onCompleted() {
-                        // TODO
+                        // do nothing
                     }
 
                     @Override
                     public void onError(Throwable e) {
-                        // TODO
+                        final VersePagerView v = getView();
+                        if (v != null) {
+                            v.onBookmarkAddFailed(verseIndex);
+                        }
                     }
 
                     @Override
-                    public void onNext(Void v) {
-                        // should not reach here
+                    public void onNext(Bookmark bookmark) {
+                        final VersePagerView v = getView();
+                        if (v != null) {
+                            v.onBookmarkAdded(bookmark);
+                        }
                     }
                 }));
     }
 
-    void removeFavorite(VerseIndex verseIndex) {
+    void removeBookmark(final VerseIndex verseIndex) {
         getSubscription().add(bookmarkModel.removeBookmark(verseIndex)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<Void>() {
                     @Override
                     public void onCompleted() {
-                        // TODO
+                        final VersePagerView v = getView();
+                        if (v != null) {
+                            v.onBookmarkRemoved(verseIndex);
+                        }
                     }
 
                     @Override
                     public void onError(Throwable e) {
-                        // TODO
+                        final VersePagerView v = getView();
+                        if (v != null) {
+                            v.onBookmarkRemoveFailed(verseIndex);
+                        }
                     }
 
                     @Override

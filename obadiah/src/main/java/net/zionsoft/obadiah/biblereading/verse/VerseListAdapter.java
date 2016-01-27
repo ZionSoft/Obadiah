@@ -45,8 +45,8 @@ import butterknife.ButterKnife;
 class VerseListAdapter extends RecyclerView.Adapter {
     static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private static final StringBuilder STRING_BUILDER = new StringBuilder();
-        private static final PorterDuffColorFilter FAVORITE_ON = new PorterDuffColorFilter(Color.RED, PorterDuff.Mode.MULTIPLY);
-        private static final PorterDuffColorFilter FAVORITE_OFF = new PorterDuffColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
+        private static final PorterDuffColorFilter BOOKMARK_ON = new PorterDuffColorFilter(Color.RED, PorterDuff.Mode.MULTIPLY);
+        private static final PorterDuffColorFilter BOOKMARK_OFF = new PorterDuffColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
 
         private final VersePagerPresenter versePagerPresenter;
         private final Resources resources;
@@ -96,7 +96,8 @@ class VerseListAdapter extends RecyclerView.Adapter {
 
             verseIndex = verse.verseIndex;
 
-            setBookmark(isBookmarked);
+            this.isBookmarked = isBookmarked;
+            bookmark.setColorFilter(isBookmarked ? BOOKMARK_ON : BOOKMARK_OFF);
         }
 
         private static void buildVerse(StringBuilder sb, VerseIndex verseIndex, Verse.Text text) {
@@ -105,19 +106,13 @@ class VerseListAdapter extends RecyclerView.Adapter {
                     .append('\n').append(text.text).append('\n').append('\n');
         }
 
-        private void setBookmark(boolean isBookmarked) {
-            this.isBookmarked = isBookmarked;
-            bookmark.setColorFilter(isBookmarked ? FAVORITE_ON : FAVORITE_OFF);
-        }
-
         @Override
         public void onClick(View v) {
             if (verseIndex != null && v == bookmark) {
-                setBookmark(!isBookmarked);
                 if (isBookmarked) {
-                    versePagerPresenter.addFavorite(verseIndex);
+                    versePagerPresenter.removeBookmark(verseIndex);
                 } else {
-                    versePagerPresenter.removeFavorite(verseIndex);
+                    versePagerPresenter.addBookmark(verseIndex);
                 }
             }
         }
@@ -157,8 +152,6 @@ class VerseListAdapter extends RecyclerView.Adapter {
             if (verseIndex.verse == position) {
                 isBookmarked = true;
                 break;
-            } else if (verseIndex.verse > position) {
-                break;
             }
         }
         ((ViewHolder) holder).bind(verses.get(position), selected[position], isBookmarked);
@@ -175,6 +168,22 @@ class VerseListAdapter extends RecyclerView.Adapter {
         deselectVerses();
 
         notifyDataSetChanged();
+    }
+
+    void addBookmark(Bookmark bookmark) {
+        bookmarks.add(bookmark);
+        notifyItemChanged(bookmark.verseIndex.verse);
+    }
+
+    void removeBookmark(VerseIndex verseIndex) {
+        final int bookmarkCount = bookmarks.size();
+        for (int i = 0; i < bookmarkCount; ++i) {
+            if (bookmarks.get(i).verseIndex.equals(verseIndex)) {
+                bookmarks.remove(i);
+                notifyItemChanged(verseIndex.verse);
+                return;
+            }
+        }
     }
 
     void select(int position) {
