@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="@drawable/background_text">
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:background="@drawable/background_text">
 
     <TextView
         android:id="@+id/text"
@@ -11,18 +11,19 @@
         android:layout_marginBottom="@dimen/verse_icon_size"
         android:layout_marginLeft="@dimen/padding"
         android:layout_marginRight="@dimen/padding"
-        android:layout_marginTop="@dimen/padding" />
+        android:layout_marginTop="@dimen/padding"/>
 
     <android.support.v7.widget.AppCompatImageView
         android:id="@+id/bookmark"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|right"
+        android:background="@drawable/background_touchable"
         android:padding="@dimen/padding"
-        android:src="@drawable/ic_bookmark" />
+        android:src="@drawable/ic_bookmark"/>
 
     <View
         style="@style/Divider.Horizontal"
         android:layout_gravity="bottom"
-        android:background="@color/dark_gray" />
+        android:background="@color/dark_gray"/>
 </FrameLayout>
