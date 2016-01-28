@@ -19,19 +19,10 @@ package net.zionsoft.obadiah.biblereading.verse;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.graphics.Color;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffColorFilter;
-import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.RecyclerView;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
-import net.zionsoft.obadiah.R;
-import net.zionsoft.obadiah.model.datamodel.Settings;
 import net.zionsoft.obadiah.model.domain.Bookmark;
 import net.zionsoft.obadiah.model.domain.Verse;
 import net.zionsoft.obadiah.model.domain.VerseIndex;
@@ -39,85 +30,7 @@ import net.zionsoft.obadiah.model.domain.VerseIndex;
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.Bind;
-import butterknife.ButterKnife;
-
-class VerseListAdapter extends RecyclerView.Adapter {
-    static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        private static final StringBuilder STRING_BUILDER = new StringBuilder();
-        private static final PorterDuffColorFilter BOOKMARK_ON = new PorterDuffColorFilter(Color.RED, PorterDuff.Mode.MULTIPLY);
-        private static final PorterDuffColorFilter BOOKMARK_OFF = new PorterDuffColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
-
-        private final VersePagerPresenter versePagerPresenter;
-        private final Resources resources;
-
-        @Bind(R.id.text)
-        TextView text;
-
-        @Bind(R.id.bookmark)
-        AppCompatImageView bookmark;
-
-        private VerseIndex verseIndex;
-        private boolean isBookmarked;
-
-        private ViewHolder(View itemView, VersePagerPresenter versePagerPresenter, Resources resources) {
-            super(itemView);
-
-            this.versePagerPresenter = versePagerPresenter;
-            this.resources = resources;
-
-            ButterKnife.bind(this, itemView);
-            bookmark.setOnClickListener(this);
-        }
-
-        private void bind(Verse verse, boolean selected, boolean isBookmarked) {
-            itemView.setSelected(selected);
-
-            final Settings settings = versePagerPresenter.getSettings();
-            text.setTextColor(settings.getTextColor());
-            text.setTextSize(TypedValue.COMPLEX_UNIT_PX,
-                    resources.getDimension(settings.getTextSize().textSize));
-
-            STRING_BUILDER.setLength(0);
-            if (verse.parallel.size() == 0) {
-                STRING_BUILDER.append(verse.text.bookName).append(' ')
-                        .append(verse.verseIndex.chapter + 1).append(':').append(verse.verseIndex.verse + 1).append('\n')
-                        .append(verse.text.text);
-                text.setText(STRING_BUILDER.toString());
-            } else {
-                buildVerse(STRING_BUILDER, verse.verseIndex, verse.text);
-                final int size = verse.parallel.size();
-                for (int i = 0; i < size; ++i) {
-                    final Verse.Text text = verse.parallel.get(i);
-                    buildVerse(STRING_BUILDER, verse.verseIndex, text);
-                }
-                text.setText(STRING_BUILDER.substring(0, STRING_BUILDER.length() - 2));
-            }
-
-            verseIndex = verse.verseIndex;
-
-            this.isBookmarked = isBookmarked;
-            bookmark.setColorFilter(isBookmarked ? BOOKMARK_ON : BOOKMARK_OFF);
-        }
-
-        private static void buildVerse(StringBuilder sb, VerseIndex verseIndex, Verse.Text text) {
-            sb.append(text.translation).append(' ')
-                    .append(verseIndex.chapter + 1).append(':').append(verseIndex.verse + 1)
-                    .append('\n').append(text.text).append('\n').append('\n');
-        }
-
-        @Override
-        public void onClick(View v) {
-            if (verseIndex != null && v == bookmark) {
-                if (isBookmarked) {
-                    versePagerPresenter.removeBookmark(verseIndex);
-                } else {
-                    versePagerPresenter.addBookmark(verseIndex);
-                }
-            }
-        }
-    }
-
+class VerseListAdapter extends RecyclerView.Adapter<VerseItemViewHolder> {
     private final VersePagerPresenter versePagerPresenter;
     private final LayoutInflater inflater;
     private final Resources resources;
@@ -139,12 +52,12 @@ class VerseListAdapter extends RecyclerView.Adapter {
     }
 
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new ViewHolder(inflater.inflate(R.layout.item_verse, parent, false), versePagerPresenter, resources);
+    public VerseItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        return new VerseItemViewHolder(inflater, parent, versePagerPresenter, resources);
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(VerseItemViewHolder holder, int position) {
         boolean isBookmarked = false;
         final int bookmarkCount = bookmarks.size();
         for (int i = 0; i < bookmarkCount; ++i) {
@@ -154,7 +67,7 @@ class VerseListAdapter extends RecyclerView.Adapter {
                 break;
             }
         }
-        ((ViewHolder) holder).bind(verses.get(position), selected[position], isBookmarked);
+        holder.bind(verses.get(position), selected[position], isBookmarked);
     }
 
     void setVerses(List<Verse> verses, List<Bookmark> bookmarks) {
