@@ -70,6 +70,14 @@ class VerseListAdapter extends RecyclerView.Adapter<VerseItemViewHolder> {
         holder.bind(verses.get(position), selected[position], isBookmarked);
     }
 
+    @Override
+    public void onBindViewHolder(VerseItemViewHolder holder, int position, List<Object> payloads) {
+        if (payloads.size() == 0) {
+            onBindViewHolder(holder, position);
+        }
+        // if there are payloads, the view will be updated by VerseItemAnimator
+    }
+
     void setVerses(List<Verse> verses, List<Bookmark> bookmarks) {
         this.verses = verses;
         this.bookmarks = bookmarks;
@@ -85,7 +93,7 @@ class VerseListAdapter extends RecyclerView.Adapter<VerseItemViewHolder> {
 
     void addBookmark(Bookmark bookmark) {
         bookmarks.add(bookmark);
-        notifyItemChanged(bookmark.verseIndex.verse);
+        notifyItemChanged(bookmark.verseIndex.verse, VerseItemAnimator.VerseItemHolderInfo.ACTION_ADD_BOOKMARK);
     }
 
     void removeBookmark(VerseIndex verseIndex) {
@@ -93,7 +101,7 @@ class VerseListAdapter extends RecyclerView.Adapter<VerseItemViewHolder> {
         for (int i = 0; i < bookmarkCount; ++i) {
             if (bookmarks.get(i).verseIndex.equals(verseIndex)) {
                 bookmarks.remove(i);
-                notifyItemChanged(verseIndex.verse);
+                notifyItemChanged(verseIndex.verse, VerseItemAnimator.VerseItemHolderInfo.ACTION_REMOVE_BOOKMARK);
                 return;
             }
         }

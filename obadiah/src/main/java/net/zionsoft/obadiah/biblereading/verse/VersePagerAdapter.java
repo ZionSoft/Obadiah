@@ -66,6 +66,7 @@ class VersePagerAdapter extends PagerAdapter implements VersePagerView {
             ButterKnife.bind(this, rootView);
 
             verseList.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false));
+            verseList.setItemAnimator(new VerseItemAnimator());
 
             verseListAdapter = new VerseListAdapter(context, versePagerPresenter);
             verseList.setAdapter(verseListAdapter);

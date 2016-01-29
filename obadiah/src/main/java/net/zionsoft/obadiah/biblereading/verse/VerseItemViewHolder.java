@@ -91,14 +91,18 @@ class VerseItemViewHolder extends RecyclerView.ViewHolder implements View.OnClic
 
         verseIndex = verse.verseIndex;
 
-        this.isBookmarked = isBookmarked;
-        bookmark.setColorFilter(isBookmarked ? BOOKMARK_ON : BOOKMARK_OFF);
+        setBookmark(isBookmarked);
     }
 
     private static void buildVerse(StringBuilder sb, VerseIndex verseIndex, Verse.Text text) {
         sb.append(text.translation).append(' ')
                 .append(verseIndex.chapter + 1).append(':').append(verseIndex.verse + 1)
                 .append('\n').append(text.text).append('\n').append('\n');
+    }
+
+    void setBookmark(boolean isBookmarked) {
+        this.isBookmarked = isBookmarked;
+        bookmark.setColorFilter(isBookmarked ? BOOKMARK_ON : BOOKMARK_OFF);
     }
 
     @Override
