@@ -67,7 +67,10 @@ class VerseListAdapter extends RecyclerView.Adapter<VerseItemViewHolder> {
                 break;
             }
         }
-        holder.bind(verses.get(position), selected[position], isBookmarked);
+
+        // TODO
+        holder.bind(verses.get(position), selected[position], isBookmarked,
+                position % 2 == 0 ? null : "Random note for verse " + (position + 1));
     }
 
     @Override

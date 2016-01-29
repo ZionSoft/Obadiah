@@ -73,15 +73,15 @@ class VerseItemAnimator extends DefaultItemAnimator {
             final VerseItemViewHolder holder = (VerseItemViewHolder) oldHolder;
             final Integer action = ((VerseItemHolderInfo) preLayoutInfo).action;
             if (VerseItemAnimator.VerseItemHolderInfo.ACTION_ADD_BOOKMARK.equals(action)) {
-                holder.bookmark.animate().rotation(360.0F).scaleX(0.0F).scaleY(0.0F)
+                holder.bookmarkIcon.animate().rotation(360.0F).scaleX(0.0F).scaleY(0.0F)
                         .setDuration(500L)
                         .setInterpolator(decelerateInterpolator)
                         .setListener(new AnimatorListenerAdapter() {
                             @Override
                             public void onAnimationEnd(Animator animation) {
                                 holder.setBookmark(true);
-                                holder.bookmark.setRotation(0.0F);
-                                holder.bookmark.animate().scaleX(1.0F).scaleY(1.0F)
+                                holder.bookmarkIcon.setRotation(0.0F);
+                                holder.bookmarkIcon.animate().scaleX(1.0F).scaleY(1.0F)
                                         .setInterpolator(overshootInterpolator)
                                         .setDuration(500L)
                                         .setListener(new AnimatorListenerAdapter() {
