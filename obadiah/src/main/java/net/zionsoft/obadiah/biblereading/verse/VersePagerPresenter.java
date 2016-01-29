@@ -215,4 +215,22 @@ public class VersePagerPresenter extends BasePresenter<VersePagerView> {
                     }
                 }));
     }
+
+    void addNote(final VerseIndex verseIndex) {
+        // TODO
+    }
+
+    void showNote(VerseIndex verseIndex) {
+        final VersePagerView v = getView();
+        if (v != null) {
+            v.showNote(verseIndex);
+        }
+    }
+
+    void hideNote(VerseIndex verseIndex) {
+        final VersePagerView v = getView();
+        if (v != null) {
+            v.hideNote(verseIndex);
+        }
+    }
 }

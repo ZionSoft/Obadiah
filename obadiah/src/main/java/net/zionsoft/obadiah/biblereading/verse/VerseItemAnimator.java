@@ -25,12 +25,17 @@ import android.support.v7.widget.RecyclerView;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.OvershootInterpolator;
 
+import net.zionsoft.obadiah.R;
+import net.zionsoft.obadiah.ui.utils.AnimationHelper;
+
 import java.util.List;
 
 class VerseItemAnimator extends DefaultItemAnimator {
     static class VerseItemHolderInfo extends ItemHolderInfo {
         static final Integer ACTION_ADD_BOOKMARK = 1;
         static final Integer ACTION_REMOVE_BOOKMARK = 2;
+        static final Integer ACTION_SHOW_NOTE = 3;
+        static final Integer ACTION_HIDE_NOTE = 4;
 
         private final Integer action;
 
@@ -72,15 +77,14 @@ class VerseItemAnimator extends DefaultItemAnimator {
         if (oldHolder instanceof VerseItemViewHolder && preLayoutInfo instanceof VerseItemHolderInfo) {
             final VerseItemViewHolder holder = (VerseItemViewHolder) oldHolder;
             final Integer action = ((VerseItemHolderInfo) preLayoutInfo).action;
-            if (VerseItemAnimator.VerseItemHolderInfo.ACTION_ADD_BOOKMARK.equals(action)) {
-                holder.bookmarkIcon.animate().rotation(360.0F).scaleX(0.0F).scaleY(0.0F)
-                        .setDuration(500L)
+            if (VerseItemHolderInfo.ACTION_ADD_BOOKMARK.equals(action)) {
+                holder.bookmarkIcon.animate().scaleX(1.5F).scaleY(1.5F)
+                        .setDuration(250L)
                         .setInterpolator(decelerateInterpolator)
                         .setListener(new AnimatorListenerAdapter() {
                             @Override
                             public void onAnimationEnd(Animator animation) {
                                 holder.setBookmark(true);
-                                holder.bookmarkIcon.setRotation(0.0F);
                                 holder.bookmarkIcon.animate().scaleX(1.0F).scaleY(1.0F)
                                         .setInterpolator(overshootInterpolator)
                                         .setDuration(500L)
@@ -92,9 +96,48 @@ class VerseItemAnimator extends DefaultItemAnimator {
                                         });
                             }
                         });
-            } else if (VerseItemAnimator.VerseItemHolderInfo.ACTION_REMOVE_BOOKMARK.equals(action)) {
+            } else if (VerseItemHolderInfo.ACTION_REMOVE_BOOKMARK.equals(action)) {
                 holder.setBookmark(false);
                 dispatchAnimationFinished(holder);
+            } else if (VerseItemHolderInfo.ACTION_SHOW_NOTE.equals(action)) {
+                AnimationHelper.fadeIn(holder.note);
+                holder.noteIcon.animate().rotationX(90.0F)
+                        .setDuration(150L)
+                        .setInterpolator(decelerateInterpolator)
+                        .setListener(new AnimatorListenerAdapter() {
+                            @Override
+                            public void onAnimationEnd(Animator animation) {
+                                holder.noteIcon.setImageResource(R.drawable.ic_arrow_up);
+                                holder.noteIcon.animate().rotationX(0.0F)
+                                        .setInterpolator(decelerateInterpolator)
+                                        .setDuration(150L)
+                                        .setListener(new AnimatorListenerAdapter() {
+                                            @Override
+                                            public void onAnimationEnd(Animator animation) {
+                                                dispatchAnimationFinished(holder);
+                                            }
+                                        });
+                            }
+                        });
+            } else if (VerseItemHolderInfo.ACTION_HIDE_NOTE.equals(action)) {
+                holder.noteIcon.animate().rotationX(90.0F)
+                        .setDuration(150L)
+                        .setInterpolator(decelerateInterpolator)
+                        .setListener(new AnimatorListenerAdapter() {
+                            @Override
+                            public void onAnimationEnd(Animator animation) {
+                                holder.noteIcon.setImageResource(R.drawable.ic_note);
+                                holder.noteIcon.animate().rotationX(0.0F)
+                                        .setInterpolator(decelerateInterpolator)
+                                        .setDuration(150L)
+                                        .setListener(new AnimatorListenerAdapter() {
+                                            @Override
+                                            public void onAnimationEnd(Animator animation) {
+                                                dispatchAnimationFinished(holder);
+                                            }
+                                        });
+                            }
+                        });
             }
             return false;
         }

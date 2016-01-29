@@ -49,6 +49,9 @@ class VerseItemViewHolder extends RecyclerView.ViewHolder implements View.OnClic
     @Bind(R.id.text)
     TextView text;
 
+    @Bind(R.id.note)
+    TextView note;
+
     @Bind(R.id.bookmarkIcon)
     AppCompatImageView bookmarkIcon;
 
@@ -58,6 +61,7 @@ class VerseItemViewHolder extends RecyclerView.ViewHolder implements View.OnClic
     private VerseIndex verseIndex;
     private boolean isBookmarked;
     private boolean hasNote;
+    private boolean isExpanded;
 
     VerseItemViewHolder(LayoutInflater inflater, ViewGroup parent,
                         VersePagerPresenter versePagerPresenter, Resources resources) {
@@ -71,13 +75,14 @@ class VerseItemViewHolder extends RecyclerView.ViewHolder implements View.OnClic
         noteIcon.setOnClickListener(this);
     }
 
-    void bind(Verse verse, boolean selected, boolean isBookmarked, String note) {
+    void bind(Verse verse, boolean selected, boolean isBookmarked, String note, boolean expanded) {
         itemView.setSelected(selected);
 
         final Settings settings = versePagerPresenter.getSettings();
-        text.setTextColor(settings.getTextColor());
-        text.setTextSize(TypedValue.COMPLEX_UNIT_PX,
-                resources.getDimension(settings.getTextSize().textSize));
+        final int textColor = settings.getTextColor();
+        final Settings.TextSize textSize = settings.getTextSize();
+        text.setTextColor(textColor);
+        text.setTextSize(TypedValue.COMPLEX_UNIT_PX, resources.getDimension(textSize.textSize));
 
         STRING_BUILDER.setLength(0);
         if (verse.parallel.size() == 0) {
@@ -98,7 +103,11 @@ class VerseItemViewHolder extends RecyclerView.ViewHolder implements View.OnClic
         verseIndex = verse.verseIndex;
 
         setBookmark(isBookmarked);
-        setNote(note);
+
+        this.note.setTextColor(textColor);
+        this.note.setTextSize(TypedValue.COMPLEX_UNIT_PX, resources.getDimension(textSize.smallerTextSize));
+        setNote(note, expanded);
+        setExpanded(expanded);
     }
 
     private static void buildVerse(StringBuilder sb, VerseIndex verseIndex, Verse.Text text) {
@@ -112,24 +121,38 @@ class VerseItemViewHolder extends RecyclerView.ViewHolder implements View.OnClic
         bookmarkIcon.setColorFilter(isBookmarked ? ON : OFF);
     }
 
-    void setNote(String note) {
+    void setNote(String note, boolean expanded) {
+        this.note.setText(note);
         hasNote = !TextUtils.isEmpty(note);
-        if (hasNote) {
-            noteIcon.setImageResource(R.drawable.ic_note);
-            noteIcon.setColorFilter(ON);
-        } else {
-            noteIcon.setImageResource(R.drawable.ic_note_add);
-            noteIcon.setColorFilter(OFF);
-        }
+        noteIcon.setColorFilter(hasNote ? ON : OFF);
+        noteIcon.setImageResource(expanded ? R.drawable.ic_arrow_up : R.drawable.ic_note);
+    }
+
+    private void setExpanded(boolean expanded) {
+        isExpanded = expanded;
+        note.setVisibility(expanded ? View.VISIBLE : View.GONE);
     }
 
     @Override
     public void onClick(View v) {
-        if (verseIndex != null && v == bookmarkIcon) {
-            if (isBookmarked) {
-                versePagerPresenter.removeBookmark(verseIndex);
-            } else {
-                versePagerPresenter.addBookmark(verseIndex);
+        if (verseIndex != null) {
+            if (v == bookmarkIcon) {
+                if (isBookmarked) {
+                    versePagerPresenter.removeBookmark(verseIndex);
+                } else {
+                    versePagerPresenter.addBookmark(verseIndex);
+                }
+            } else if (v == noteIcon) {
+                if (hasNote) {
+                    if (isExpanded) {
+                        versePagerPresenter.hideNote(verseIndex);
+                    } else {
+                        versePagerPresenter.showNote(verseIndex);
+                    }
+                    setExpanded(!isExpanded);
+                } else {
+                    versePagerPresenter.addNote(verseIndex);
+                }
             }
         }
     }

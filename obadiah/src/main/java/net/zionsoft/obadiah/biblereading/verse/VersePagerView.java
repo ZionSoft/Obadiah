@@ -37,5 +37,9 @@ interface VersePagerView extends MVPView {
 
     void onBookmarkRemoveFailed(VerseIndex verseIndex);
 
+    void showNote(VerseIndex verseIndex);
+
+    void hideNote(VerseIndex verseIndex);
+
     void onTranslationUpdated();
 }

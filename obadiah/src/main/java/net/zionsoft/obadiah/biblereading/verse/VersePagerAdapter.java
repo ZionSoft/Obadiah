@@ -277,6 +277,30 @@ class VersePagerAdapter extends PagerAdapter implements VersePagerView {
     }
 
     @Override
+    public void showNote(VerseIndex verseIndex) {
+        final int pageCount = pages.size();
+        for (int i = 0; i < pageCount; ++i) {
+            final Page page = pages.get(i);
+            if (page.chapter == verseIndex.chapter) {
+                page.verseListAdapter.showNote(verseIndex);
+                return;
+            }
+        }
+    }
+
+    @Override
+    public void hideNote(VerseIndex verseIndex) {
+        final int pageCount = pages.size();
+        for (int i = 0; i < pageCount; ++i) {
+            final Page page = pages.get(i);
+            if (page.chapter == verseIndex.chapter) {
+                page.verseListAdapter.hideNote(verseIndex);
+                return;
+            }
+        }
+    }
+
+    @Override
     public void onTranslationUpdated() {
         notifyDataSetChanged();
     }

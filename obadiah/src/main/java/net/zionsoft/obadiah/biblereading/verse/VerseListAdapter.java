@@ -39,6 +39,7 @@ class VerseListAdapter extends RecyclerView.Adapter<VerseItemViewHolder> {
     private List<Verse> verses;
     private boolean[] selected;
     private int selectedCount;
+    private boolean[] expanded;
 
     VerseListAdapter(Context context, VersePagerPresenter versePagerPresenter) {
         this.versePagerPresenter = versePagerPresenter;
@@ -70,7 +71,7 @@ class VerseListAdapter extends RecyclerView.Adapter<VerseItemViewHolder> {
 
         // TODO
         holder.bind(verses.get(position), selected[position], isBookmarked,
-                position % 2 == 0 ? null : "Random note for verse " + (position + 1));
+                position % 2 == 0 ? null : "Random note for verse " + (position + 1), expanded[position]);
     }
 
     @Override
@@ -91,6 +92,13 @@ class VerseListAdapter extends RecyclerView.Adapter<VerseItemViewHolder> {
         }
         deselectVerses();
 
+        if (expanded == null || expanded.length < size) {
+            expanded = new boolean[size];
+        }
+        for (int i = 0; i < expanded.length; ++i) {
+            expanded[i] = false;
+        }
+
         notifyDataSetChanged();
     }
 
@@ -108,6 +116,16 @@ class VerseListAdapter extends RecyclerView.Adapter<VerseItemViewHolder> {
                 return;
             }
         }
+    }
+
+    void showNote(VerseIndex verseIndex) {
+        expanded[verseIndex.verse] = true;
+        notifyItemChanged(verseIndex.verse, VerseItemAnimator.VerseItemHolderInfo.ACTION_SHOW_NOTE);
+    }
+
+    void hideNote(VerseIndex verseIndex) {
+        expanded[verseIndex.verse] = false;
+        notifyItemChanged(verseIndex.verse, VerseItemAnimator.VerseItemHolderInfo.ACTION_HIDE_NOTE);
     }
 
     void select(int position) {
