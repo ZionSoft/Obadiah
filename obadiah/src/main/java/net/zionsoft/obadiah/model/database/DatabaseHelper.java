@@ -44,6 +44,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             BookNamesTableHelper.createTable(db);
             ReadingProgressTableHelper.createTable(db);
             BookmarkTableHelper.createTable(db);
+            NoteTableHelper.createTable(db);
 
             db.setTransactionSuccessful();
         } finally {
@@ -83,6 +84,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             // version 7 introduced in 1.14.0
             if (oldVersion < 7) {
                 BookmarkTableHelper.createTable(db);
+                NoteTableHelper.createTable(db);
             }
 
             db.setTransactionSuccessful();

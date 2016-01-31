@@ -36,6 +36,8 @@ class VerseItemAnimator extends DefaultItemAnimator {
         static final Integer ACTION_REMOVE_BOOKMARK = 2;
         static final Integer ACTION_SHOW_NOTE = 3;
         static final Integer ACTION_HIDE_NOTE = 4;
+        static final Integer ACTION_UPDATE_NOTE = 5;
+        static final Integer ACTION_REMOVE_NOTE = 6;
 
         private final Integer action;
 
@@ -138,6 +140,12 @@ class VerseItemAnimator extends DefaultItemAnimator {
                                         });
                             }
                         });
+            } else if (VerseItemHolderInfo.ACTION_UPDATE_NOTE.equals(action)) {
+                holder.noteIcon.setColorFilter(VerseItemViewHolder.ON);
+                dispatchAnimationFinished(holder);
+            } else if (VerseItemHolderInfo.ACTION_REMOVE_NOTE.equals(action)) {
+                holder.noteIcon.setColorFilter(VerseItemViewHolder.OFF);
+                dispatchAnimationFinished(holder);
             }
             return false;
         }

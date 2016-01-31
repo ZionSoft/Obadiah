@@ -26,6 +26,7 @@ import net.zionsoft.obadiah.App;
 import net.zionsoft.obadiah.model.database.DatabaseHelper;
 import net.zionsoft.obadiah.model.datamodel.BibleReadingModel;
 import net.zionsoft.obadiah.model.datamodel.BookmarkModel;
+import net.zionsoft.obadiah.model.datamodel.NoteModel;
 import net.zionsoft.obadiah.model.datamodel.ReadingProgressModel;
 import net.zionsoft.obadiah.model.datamodel.Settings;
 import net.zionsoft.obadiah.network.BackendInterface;
@@ -70,6 +71,12 @@ public class BaseInjectionModule {
     @Singleton
     public BookmarkModel provideBookmarkModel(DatabaseHelper databaseHelper) {
         return new BookmarkModel(databaseHelper);
+    }
+
+    @Provides
+    @Singleton
+    public NoteModel provideNoteModel(DatabaseHelper databaseHelper) {
+        return new NoteModel(databaseHelper);
     }
 
     @Provides

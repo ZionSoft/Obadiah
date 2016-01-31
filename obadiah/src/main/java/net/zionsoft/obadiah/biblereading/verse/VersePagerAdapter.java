@@ -31,6 +31,7 @@ import android.view.ViewGroup;
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.domain.Bible;
 import net.zionsoft.obadiah.model.domain.Bookmark;
+import net.zionsoft.obadiah.model.domain.Note;
 import net.zionsoft.obadiah.model.domain.Verse;
 import net.zionsoft.obadiah.model.domain.VerseIndex;
 import net.zionsoft.obadiah.ui.utils.AnimationHelper;
@@ -192,7 +193,7 @@ class VersePagerAdapter extends PagerAdapter implements VersePagerView {
     }
 
     @Override
-    public void onVersesLoaded(List<Verse> verses, List<Bookmark> bookmarks) {
+    public void onVersesLoaded(List<Verse> verses, List<Bookmark> bookmarks, List<Note> notes) {
         final int chapter = verses.get(0).verseIndex.chapter;
         final int pageCount = pages.size();
         for (int i = 0; i < pageCount; ++i) {
@@ -201,7 +202,7 @@ class VersePagerAdapter extends PagerAdapter implements VersePagerView {
                 AnimationHelper.fadeOut(page.loadingSpinner);
                 AnimationHelper.fadeIn(page.verseList);
 
-                page.verseListAdapter.setVerses(verses, bookmarks);
+                page.verseListAdapter.setVerses(verses, bookmarks, notes);
 
                 if (currentVerse > 0 && currentChapter == chapter) {
                     page.verseList.post(new Runnable() {
@@ -272,6 +273,52 @@ class VersePagerAdapter extends PagerAdapter implements VersePagerView {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         versePagerPresenter.removeBookmark(verseIndex);
+                    }
+                }, null);
+    }
+
+    @Override
+    public void onNoteUpdated(Note note) {
+        final int pageCount = pages.size();
+        for (int i = 0; i < pageCount; ++i) {
+            final Page page = pages.get(i);
+            if (page.chapter == note.verseIndex.chapter) {
+                page.verseListAdapter.updateNote(note);
+                return;
+            }
+        }
+    }
+
+    @Override
+    public void onNoteUpdateFailed(final VerseIndex verseIndex, final String note) {
+        DialogHelper.showDialog(context, true, R.string.error_unknown_error,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        versePagerPresenter.updateNote(verseIndex, note);
+                    }
+                }, null);
+    }
+
+    @Override
+    public void onNoteRemoved(VerseIndex verseIndex) {
+        final int pageCount = pages.size();
+        for (int i = 0; i < pageCount; ++i) {
+            final Page page = pages.get(i);
+            if (page.chapter == verseIndex.chapter) {
+                page.verseListAdapter.removeNote(verseIndex);
+                return;
+            }
+        }
+    }
+
+    @Override
+    public void onNoteRemoveFailed(final VerseIndex verseIndex) {
+        DialogHelper.showDialog(context, true, R.string.error_unknown_error,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        versePagerPresenter.removeNote(verseIndex);
                     }
                 }, null);
     }

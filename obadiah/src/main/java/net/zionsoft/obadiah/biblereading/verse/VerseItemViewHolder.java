@@ -42,8 +42,8 @@ import butterknife.ButterKnife;
 
 class VerseItemViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, TextWatcher {
     private static final StringBuilder STRING_BUILDER = new StringBuilder();
-    private static final PorterDuffColorFilter ON = new PorterDuffColorFilter(Color.RED, PorterDuff.Mode.MULTIPLY);
-    private static final PorterDuffColorFilter OFF = new PorterDuffColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
+    static final PorterDuffColorFilter ON = new PorterDuffColorFilter(Color.RED, PorterDuff.Mode.MULTIPLY);
+    static final PorterDuffColorFilter OFF = new PorterDuffColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
 
     private final VersePagerPresenter versePagerPresenter;
     private final Resources resources;
@@ -105,7 +105,6 @@ class VerseItemViewHolder extends RecyclerView.ViewHolder implements View.OnClic
 
         setBookmark(isBookmarked);
 
-        this.note.addTextChangedListener(this);
         this.note.setTextColor(textColor);
         this.note.setTextSize(TypedValue.COMPLEX_UNIT_PX, resources.getDimension(textSize.smallerTextSize));
         setNote(note, expanded);
@@ -123,8 +122,11 @@ class VerseItemViewHolder extends RecyclerView.ViewHolder implements View.OnClic
         bookmarkIcon.setColorFilter(isBookmarked ? ON : OFF);
     }
 
-    void setNote(String note, boolean expanded) {
+    private void setNote(String note, boolean expanded) {
+        this.note.removeTextChangedListener(this);
         this.note.setText(note);
+        this.note.addTextChangedListener(this);
+
         noteIcon.setColorFilter(TextUtils.isEmpty(note) ? OFF : ON);
         noteIcon.setImageResource(expanded ? R.drawable.ic_arrow_up : R.drawable.ic_note);
     }
@@ -167,7 +169,12 @@ class VerseItemViewHolder extends RecyclerView.ViewHolder implements View.OnClic
     @Override
     public void afterTextChanged(Editable s) {
         if (verseIndex != null) {
-            versePagerPresenter.updateNote(verseIndex, s.toString());
+            final String note = s.toString();
+            if (TextUtils.isEmpty(note)) {
+                versePagerPresenter.removeNote(verseIndex);
+            } else {
+                versePagerPresenter.updateNote(verseIndex, s.toString());
+            }
         }
     }
 }
