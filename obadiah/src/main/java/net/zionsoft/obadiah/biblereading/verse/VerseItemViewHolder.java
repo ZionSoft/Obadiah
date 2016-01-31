@@ -23,7 +23,9 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,7 +40,7 @@ import net.zionsoft.obadiah.model.domain.VerseIndex;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-class VerseItemViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+class VerseItemViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, TextWatcher {
     private static final StringBuilder STRING_BUILDER = new StringBuilder();
     private static final PorterDuffColorFilter ON = new PorterDuffColorFilter(Color.RED, PorterDuff.Mode.MULTIPLY);
     private static final PorterDuffColorFilter OFF = new PorterDuffColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
@@ -60,7 +62,6 @@ class VerseItemViewHolder extends RecyclerView.ViewHolder implements View.OnClic
 
     private VerseIndex verseIndex;
     private boolean isBookmarked;
-    private boolean hasNote;
     private boolean isExpanded;
 
     VerseItemViewHolder(LayoutInflater inflater, ViewGroup parent,
@@ -104,6 +105,7 @@ class VerseItemViewHolder extends RecyclerView.ViewHolder implements View.OnClic
 
         setBookmark(isBookmarked);
 
+        this.note.addTextChangedListener(this);
         this.note.setTextColor(textColor);
         this.note.setTextSize(TypedValue.COMPLEX_UNIT_PX, resources.getDimension(textSize.smallerTextSize));
         setNote(note, expanded);
@@ -123,8 +125,7 @@ class VerseItemViewHolder extends RecyclerView.ViewHolder implements View.OnClic
 
     void setNote(String note, boolean expanded) {
         this.note.setText(note);
-        hasNote = !TextUtils.isEmpty(note);
-        noteIcon.setColorFilter(hasNote ? ON : OFF);
+        noteIcon.setColorFilter(TextUtils.isEmpty(note) ? OFF : ON);
         noteIcon.setImageResource(expanded ? R.drawable.ic_arrow_up : R.drawable.ic_note);
     }
 
@@ -143,17 +144,30 @@ class VerseItemViewHolder extends RecyclerView.ViewHolder implements View.OnClic
                     versePagerPresenter.addBookmark(verseIndex);
                 }
             } else if (v == noteIcon) {
-                if (hasNote) {
-                    if (isExpanded) {
-                        versePagerPresenter.hideNote(verseIndex);
-                    } else {
-                        versePagerPresenter.showNote(verseIndex);
-                    }
-                    setExpanded(!isExpanded);
+                if (isExpanded) {
+                    versePagerPresenter.hideNote(verseIndex);
                 } else {
-                    versePagerPresenter.addNote(verseIndex);
+                    versePagerPresenter.showNote(verseIndex);
                 }
+                setExpanded(!isExpanded);
             }
+        }
+    }
+
+    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        // do nothing
+    }
+
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+        // do nothing
+    }
+
+    @Override
+    public void afterTextChanged(Editable s) {
+        if (verseIndex != null) {
+            versePagerPresenter.updateNote(verseIndex, s.toString());
         }
     }
 }

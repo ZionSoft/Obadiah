@@ -216,7 +216,7 @@ public class VersePagerPresenter extends BasePresenter<VersePagerView> {
                 }));
     }
 
-    void addNote(final VerseIndex verseIndex) {
+    void updateNote(final VerseIndex verseIndex, final String note) {
         // TODO
     }
 
