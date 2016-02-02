@@ -5,6 +5,7 @@
 
     <string name="activity_bookmarks">Bookmarks</string>
     <string name="activity_manage_translation">Translations</string>
+    <string name="activity_notes">Notes</string>
     <string name="activity_open_source_license">Open Sources Licenses</string>
     <string name="activity_reading_progress">Reading Progress</string>
     <string name="activity_settings">Settings</string>
@@ -13,6 +14,7 @@
     <string name="action_copy">Copy</string>
     <string name="action_clear_search_history">Delete Search History</string>
     <string name="action_delete_translation">Delete</string>
+    <string name="action_notes">Notes</string>
     <string name="action_reading_progress">Reading Progress</string>
     <string name="action_remove_ads">Remove Ads</string>
     <string name="action_search">Search</string>

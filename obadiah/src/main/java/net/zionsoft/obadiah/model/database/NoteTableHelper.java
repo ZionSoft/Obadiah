@@ -84,4 +84,31 @@ public class NoteTableHelper {
             }
         }
     }
+
+    @NonNull
+    public static List<Note> getNotes(SQLiteDatabase db) {
+        Cursor cursor = null;
+        try {
+            cursor = db.query(TABLE_NOTE, new String[]{COLUMN_TIMESTAMP, COLUMN_NOTE, COLUMN_BOOK_INDEX,
+                            COLUMN_CHAPTER_INDEX, COLUMN_VERSE_INDEX}, null, null, null, null,
+                    String.format("%s DESC", COLUMN_TIMESTAMP));
+            final int timestamp = cursor.getColumnIndex(COLUMN_TIMESTAMP);
+            final int note = cursor.getColumnIndex(COLUMN_NOTE);
+            final int bookIndex = cursor.getColumnIndex(COLUMN_BOOK_INDEX);
+            final int chapterIndex = cursor.getColumnIndex(COLUMN_CHAPTER_INDEX);
+            final int verseIndex = cursor.getColumnIndex(COLUMN_VERSE_INDEX);
+            final int notesCount = cursor.getCount();
+            final List<Note> notes = new ArrayList<>(notesCount);
+            while (cursor.moveToNext()) {
+                notes.add(new Note(new VerseIndex(cursor.getInt(bookIndex),
+                        cursor.getInt(chapterIndex), cursor.getInt(verseIndex)),
+                        cursor.getString(note), cursor.getLong(timestamp)));
+            }
+            return notes;
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+    }
 }

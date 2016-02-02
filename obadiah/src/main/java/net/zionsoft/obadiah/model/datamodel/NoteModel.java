@@ -83,4 +83,18 @@ public class NoteModel {
             }
         });
     }
+
+    public Observable<List<Note>> loadNotes() {
+        return Observable.create(new Observable.OnSubscribe<List<Note>>() {
+            @Override
+            public void call(Subscriber<? super List<Note>> subscriber) {
+                try {
+                    subscriber.onNext(NoteTableHelper.getNotes(databaseHelper.getDatabase()));
+                    subscriber.onCompleted();
+                } catch (Exception e) {
+                    subscriber.onError(e);
+                }
+            }
+        });
+    }
 }
