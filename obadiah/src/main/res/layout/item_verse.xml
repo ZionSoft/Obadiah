@@ -43,7 +43,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="48dp"
-            android:background="@drawable/background_touchable"
+            android:background="@drawable/background_touchable_round"
             android:padding="@dimen/padding"
             tools:src="@drawable/ic_note"/>
 
@@ -51,7 +51,7 @@
             android:id="@+id/bookmarkIcon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/background_touchable"
+            android:background="@drawable/background_touchable_round"
             android:padding="@dimen/padding"
             android:src="@drawable/ic_bookmark"/>
     </LinearLayout>

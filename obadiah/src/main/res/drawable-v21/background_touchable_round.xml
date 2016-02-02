@@ -3,9 +3,11 @@
         android:color="@color/blue">
     <item>
         <selector>
-            <item
-                android:drawable="@color/blue_semi_transparent"
-                android:state_pressed="true"/>
+            <item android:state_pressed="true">
+                <shape android:shape="oval">
+                    <solid android:color="@color/blue_semi_transparent"/>
+                </shape>
+            </item>
             <item android:drawable="@android:color/transparent"/>
         </selector>
     </item>

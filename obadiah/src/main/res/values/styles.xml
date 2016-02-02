@@ -6,7 +6,7 @@
         <item name="colorPrimary">@color/blue</item>
         <item name="colorPrimaryDark">@color/dark_blue</item>
         <item name="colorAccent">@color/gold</item>
-        <item name="popupTheme">@style/ThemeOverlay.AppCompat.Light</item>
+        <item name="popupTheme">@style/AppPopUpStyle</item>
         <item name="titleTextColor">@android:color/white</item>
         <item name="windowActionModeOverlay">true</item>
         <item name="android:colorForeground">@color/dark_gray</item>
@@ -14,6 +14,10 @@
         <item name="android:scrollbarSize">2dp</item>
         <item name="android:scrollbarThumbVertical">@color/dark_gray</item>
         <item name="android:windowAnimationStyle">@style/AppWindowAnimationStyle</item>
+    </style>
+
+    <style name="AppPopUpStyle" parent="style/Theme.AppCompat.Light">
+        <item name="android:itemBackground">@drawable/background_touchable</item>
     </style>
 
     <style name="AppSpinnerStyle" parent="style/ThemeOverlay.AppCompat.Light">
@@ -33,6 +37,14 @@
         <item name="colorControlActivated">@color/blue</item>
         <item name="android:textColorHighlight">@color/blue_semi_transparent</item>
         <item name="android:textColorHint">@color/dark_gray</item>
+    </style>
+
+    <style name="AppCheckBoxStyle">
+        <item name="colorControlNormal">@color/dark_gray</item>
+        <item name="colorControlActivated">@color/blue</item>
+        <item name="colorControlHighlight">@color/blue</item>
+        <item name="colorAccent">@color/blue</item>
+        <item name="android:textColorSecondary">@color/dark_gray</item>
     </style>
 
     <style name="Divider"/>
