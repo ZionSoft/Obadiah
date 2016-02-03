@@ -24,6 +24,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.util.Pair;
 import android.view.View;
 
 import net.zionsoft.obadiah.R;
@@ -73,7 +74,7 @@ public class NotesActivity extends BaseRecyclerViewActivity implements NotesView
             // therefore, we try to do the initialization in both places
             return;
         }
-        notesListAdapter = new NotesListAdapter(this, notesPresenter);
+        notesListAdapter = new NotesListAdapter(this, notesPresenter.getSettings());
         recyclerView.setAdapter(notesListAdapter);
     }
 
@@ -131,9 +132,9 @@ public class NotesActivity extends BaseRecyclerViewActivity implements NotesView
 
     @Override
     protected void onChildClicked(int position) {
-        final Verse verse = notesListAdapter.getVerse(position);
-        if (verse != null) {
-            notesPresenter.saveReadingProgress(verse.verseIndex);
+        final Pair<Note, Verse> item = notesListAdapter.getItem(position);
+        if (item != null) {
+            notesPresenter.saveReadingProgress(item.second.verseIndex);
             finish();
         }
     }

@@ -260,7 +260,6 @@ public class TranslationManagementActivity extends BaseAppCompatActivity
 
         translationListAdapter.setTranslations(translations,
                 translationManagementPresenter.loadCurrentTranslation());
-        translationListAdapter.notifyDataSetChanged();
     }
 
     @Override

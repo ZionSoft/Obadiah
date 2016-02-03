@@ -73,7 +73,7 @@ public class BookmarksActivity extends BaseRecyclerViewActivity implements Bookm
             // therefore, we try to do the initialization in both places
             return;
         }
-        bookmarksListAdapter = new BookmarksListAdapter(this, bookmarksPresenter);
+        bookmarksListAdapter = new BookmarksListAdapter(this, bookmarksPresenter.getSettings());
         recyclerView.setAdapter(bookmarksListAdapter);
     }
 
@@ -131,7 +131,7 @@ public class BookmarksActivity extends BaseRecyclerViewActivity implements Bookm
 
     @Override
     protected void onChildClicked(int position) {
-        final Verse verse = bookmarksListAdapter.getVerse(position);
+        final Verse verse = bookmarksListAdapter.getItem(position);
         if (verse != null) {
             bookmarksPresenter.saveReadingProgress(verse.verseIndex);
             finish();

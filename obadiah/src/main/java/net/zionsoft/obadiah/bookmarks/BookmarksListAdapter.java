@@ -18,11 +18,8 @@
 package net.zionsoft.obadiah.bookmarks;
 
 import android.content.Context;
-import android.content.res.Resources;
-import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.util.TypedValue;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -31,8 +28,8 @@ import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.datamodel.Settings;
 import net.zionsoft.obadiah.model.domain.Bookmark;
 import net.zionsoft.obadiah.model.domain.Verse;
+import net.zionsoft.obadiah.ui.utils.BaseSectionAdapter;
 import net.zionsoft.obadiah.ui.utils.DateFormatter;
-import net.zionsoft.obadiah.ui.widget.SectionHeader;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -41,10 +38,7 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-class BookmarksListAdapter extends RecyclerView.Adapter {
-    private static final int VIEW_TYPE_HEADER = 0;
-    private static final int VIEW_TYPE_BOOKMARK = 1;
-
+class BookmarksListAdapter extends BaseSectionAdapter<Verse> {
     static class ViewHolder extends RecyclerView.ViewHolder {
         private static final StringBuilder STRING_BUILDER = new StringBuilder();
 
@@ -74,104 +68,28 @@ class BookmarksListAdapter extends RecyclerView.Adapter {
         }
     }
 
-    private final LayoutInflater inflater;
-    private final int textColor;
-    private final float textSize;
-    private final float smallerTextSize;
-
     private final DateFormatter dateFormatter;
 
-    private final ArrayList<String> sectionHeaders = new ArrayList<>();
-    private ArrayList<ArrayList<Verse>> versesByDay = new ArrayList<>();
-    private int count = 0;
-
-    BookmarksListAdapter(Context context, BookmarksPresenter bookmarksPresenter) {
-        this.inflater = LayoutInflater.from(context);
-
-        final Resources resources = context.getResources();
-        final Settings settings = bookmarksPresenter.getSettings();
-        this.textColor = settings.getTextColor();
-        final Settings.TextSize textSize = settings.getTextSize();
-        this.textSize = resources.getDimension(textSize.textSize);
-        this.smallerTextSize = resources.getDimension(textSize.smallerTextSize);
-
-        this.dateFormatter = new DateFormatter(resources);
+    BookmarksListAdapter(Context context, Settings settings) {
+        super(context, settings);
+        this.dateFormatter = new DateFormatter(context.getResources());
     }
 
     @Override
-    public int getItemViewType(int position) {
-        if (position == 0) {
-            return VIEW_TYPE_HEADER;
-        }
-
-        final int size = versesByDay.size();
-        for (int i = 0; i < size; ++i) {
-            position -= versesByDay.get(i).size() + 1;
-            if (position < 0) {
-                return VIEW_TYPE_BOOKMARK;
-            } else if (position == 0) {
-                return VIEW_TYPE_HEADER;
-            }
-        }
-
-        throw new IllegalStateException("Unknown view type for position - " + position);
+    protected RecyclerView.ViewHolder createItemViewHolder(ViewGroup parent) {
+        return new ViewHolder(inflater.inflate(R.layout.item_bookmark, parent, false),
+                textColor, textSize, smallerTextSize);
     }
 
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        switch (viewType) {
-            case VIEW_TYPE_HEADER:
-                final SectionHeader header = (SectionHeader)
-                        inflater.inflate(R.layout.item_section_header, parent, false);
-                header.setHeaderTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
-                return new RecyclerView.ViewHolder(header) {
-                };
-            case VIEW_TYPE_BOOKMARK:
-                return new ViewHolder(inflater.inflate(R.layout.item_bookmark, parent, false),
-                        textColor, textSize, smallerTextSize);
-            default:
-                throw new IllegalStateException("Unknown view type - " + viewType);
-        }
-    }
-
-    @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        if (position == 0) {
-            // VIEW_TYPE_HEADER
-            ((SectionHeader) holder.itemView).setHeaderText(sectionHeaders.get(0));
-            return;
-        }
-
-        final int versesByDaySize = versesByDay.size();
-        for (int i = 0; i < versesByDaySize; ++i) {
-            final ArrayList<Verse> verses = versesByDay.get(i);
-            --position;
-            final int size = verses.size();
-            if (position < size) {
-                // VIEW_TYPE_BOOKMARK
-                ((ViewHolder) holder).bind(verses.get(position));
-                return;
-            }
-
-            position -= size;
-            if (position == 0) {
-                // VIEW_TYPE_HEADER
-                ((SectionHeader) holder.itemView).setHeaderText(sectionHeaders.get(i + 1));
-                return;
-            }
-        }
-
-        throw new IllegalStateException("Unknown view type for position - " + position);
-    }
-
-    @Override
-    public int getItemCount() {
-        return count;
+    protected void bindItemViewHeader(RecyclerView.ViewHolder holder, Verse item) {
+        ((ViewHolder) holder).bind(item);
     }
 
     void setBookmarks(List<Bookmark> bookmarks, List<Verse> verses) {
-        sectionHeaders.clear();
-        versesByDay.clear();
+        final ArrayList<String> headers = new ArrayList<>();
+        final ArrayList<ArrayList<Verse>> versesByDay = new ArrayList<>();
+        int count = 0;
 
         final Calendar calendar = Calendar.getInstance();
         int previousYear = -1;
@@ -185,7 +103,7 @@ class BookmarksListAdapter extends RecyclerView.Adapter {
             final int currentDayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
             if (previousDayOfYear != currentDayOfYear || previousYear != currentYear) {
                 ++count;
-                sectionHeaders.add(dateFormatter.format(timestamp));
+                headers.add(dateFormatter.format(timestamp));
 
                 versesOfSameDay = new ArrayList<>();
                 versesByDay.add(versesOfSameDay);
@@ -199,33 +117,6 @@ class BookmarksListAdapter extends RecyclerView.Adapter {
             versesOfSameDay.add(verses.get(i));
         }
 
-        notifyDataSetChanged();
-    }
-
-    @Nullable
-    Verse getVerse(int position) {
-        if (position == 0) {
-            // VIEW_TYPE_HEADER
-            return null;
-        }
-
-        final int versesByDaySize = versesByDay.size();
-        for (int i = 0; i < versesByDaySize; ++i) {
-            final ArrayList<Verse> verses = versesByDay.get(i);
-            --position;
-            final int size = verses.size();
-            if (position < size) {
-                // VIEW_TYPE_BOOKMARK
-                return verses.get(position);
-            }
-
-            position -= size;
-            if (position == 0) {
-                // VIEW_TYPE_HEADER
-                return null;
-            }
-        }
-
-        throw new IllegalStateException("Unknown view type for position - " + position);
+        setData(headers, versesByDay, count);
     }
 }

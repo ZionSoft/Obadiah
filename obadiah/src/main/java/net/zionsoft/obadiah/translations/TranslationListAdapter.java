@@ -22,8 +22,6 @@ import android.content.res.Resources;
 import android.support.v7.widget.RecyclerView;
 import android.text.SpannableStringBuilder;
 import android.text.style.AbsoluteSizeSpan;
-import android.util.TypedValue;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -31,16 +29,13 @@ import android.widget.TextView;
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.datamodel.Settings;
 import net.zionsoft.obadiah.model.domain.TranslationInfo;
-import net.zionsoft.obadiah.ui.widget.SectionHeader;
+import net.zionsoft.obadiah.ui.utils.BaseSectionAdapter;
 
 import java.util.ArrayList;
 import java.util.Locale;
 
-class TranslationListAdapter extends RecyclerView.Adapter {
-    private static final int VIEW_TYPE_HEADER = 0;
-    private static final int VIEW_TYPE_TRANSLATION = 1;
-
-    private static class TranslationInfoHolder {
+class TranslationListAdapter extends BaseSectionAdapter<TranslationListAdapter.TranslationInfoHolder> {
+    public static class TranslationInfoHolder {
         private final TranslationInfo translationInfo;
         private final SpannableStringBuilder title;
         private final boolean downloaded;
@@ -69,116 +64,44 @@ class TranslationListAdapter extends RecyclerView.Adapter {
         }
     }
 
-    private final LayoutInflater inflater;
     private final Resources resources;
-
-    private final int textColor;
-    private final float textSize;
     private final AbsoluteSizeSpan mediumSizeSpan;
     private final AbsoluteSizeSpan smallSizeSpan;
 
-    private final ArrayList<String> sectionHeaders = new ArrayList<>();
-    private final ArrayList<ArrayList<TranslationInfoHolder>> translationList = new ArrayList<>();
-    private int count = 0;
     private String currentTranslation;
 
     TranslationListAdapter(Context context, Settings settings) {
-        this.inflater = LayoutInflater.from(context);
+        super(context, settings);
         this.resources = context.getResources();
-
-        this.textColor = settings.getTextColor();
-        this.textSize = resources.getDimension(settings.getTextSize().textSize);
         this.mediumSizeSpan = new AbsoluteSizeSpan((int) textSize);
-        this.smallSizeSpan = new AbsoluteSizeSpan((int) resources.getDimension(settings.getTextSize().smallerTextSize));
+        this.smallSizeSpan = new AbsoluteSizeSpan((int) smallerTextSize);
     }
 
     @Override
-    public int getItemViewType(int position) {
-        if (position == 0) {
-            return VIEW_TYPE_HEADER;
-        }
-
-        final int size = translationList.size();
-        for (int i = 0; i < size; ++i) {
-            position -= translationList.get(i).size() + 1;
-            if (position < 0) {
-                return VIEW_TYPE_TRANSLATION;
-            } else if (position == 0) {
-                return VIEW_TYPE_HEADER;
-            }
-        }
-
-        throw new IllegalStateException("Unknown view type for position - " + position);
+    protected RecyclerView.ViewHolder createItemViewHolder(ViewGroup parent) {
+        final TextView translation = (TextView)
+                inflater.inflate(R.layout.item_translation, parent, false);
+        translation.setTextColor(textColor);
+        return new TranslationViewHolder(translation);
     }
 
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        switch (viewType) {
-            case VIEW_TYPE_HEADER:
-                final SectionHeader header = (SectionHeader)
-                        inflater.inflate(R.layout.item_section_header, parent, false);
-                header.setHeaderTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
-                return new RecyclerView.ViewHolder(header) {
-                };
-            case VIEW_TYPE_TRANSLATION:
-                final TextView translation = (TextView)
-                        inflater.inflate(R.layout.item_translation, parent, false);
-                translation.setTextColor(textColor);
-                return new TranslationViewHolder(translation);
-            default:
-                throw new IllegalStateException("Unknown view type - " + viewType);
-        }
-    }
+    protected void bindItemViewHeader(RecyclerView.ViewHolder holder, TranslationInfoHolder item) {
+        final TextView textView = ((TextView) holder.itemView);
+        textView.setText(item.title);
+        textView.setCompoundDrawablesWithIntrinsicBounds(0, 0,
+                item.translationInfo.shortName.equals(currentTranslation) ? R.drawable.ic_check : 0, 0);
 
-    @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        if (position == 0) {
-            // VIEW_TYPE_HEADER
-            ((SectionHeader) holder.itemView).setHeaderText(sectionHeaders.get(0));
-            return;
-        }
-
-        final int translationListSize = translationList.size();
-        for (int i = 0; i < translationListSize; ++i) {
-            final ArrayList<TranslationInfoHolder> translations = translationList.get(i);
-            --position;
-            final int size = translations.size();
-            if (position < size) {
-                // VIEW_TYPE_TRANSLATION
-                final TextView textView = ((TextView) holder.itemView);
-                final TranslationInfoHolder translation = translations.get(position);
-                textView.setText(translations.get(position).title);
-                textView.setCompoundDrawablesWithIntrinsicBounds(0, 0,
-                        translation.translationInfo.shortName.equals(currentTranslation) ? R.drawable.ic_check : 0, 0);
-
-                final TranslationViewHolder viewHolder = (TranslationViewHolder) holder;
-                viewHolder.translationInfo = translation.translationInfo;
-                viewHolder.downloaded = translation.downloaded;
-
-                return;
-            }
-
-            position -= size;
-            if (position == 0) {
-                // VIEW_TYPE_HEADER
-                ((SectionHeader) holder.itemView).setHeaderText(sectionHeaders.get(i + 1));
-                return;
-            }
-        }
-
-        throw new IllegalStateException("Unknown view type for position - " + position);
-    }
-
-    @Override
-    public int getItemCount() {
-        return count;
+        final TranslationViewHolder viewHolder = (TranslationViewHolder) holder;
+        viewHolder.translationInfo = item.translationInfo;
+        viewHolder.downloaded = item.downloaded;
     }
 
     void setTranslations(Translations translations, String currentTranslation) {
         this.currentTranslation = currentTranslation;
-        sectionHeaders.clear();
-        translationList.clear();
-        count = 0;
+        final ArrayList<String> headers = new ArrayList<>();
+        final ArrayList<ArrayList<TranslationInfoHolder>> translationList = new ArrayList<>();
+        int count = 0;
 
         final int downloaded = translations.downloaded.size();
         if (downloaded > 0) {
@@ -190,7 +113,7 @@ class TranslationListAdapter extends RecyclerView.Adapter {
                 downloadedTranslations.add(new TranslationInfoHolder(translationInfo, text, true));
             }
 
-            sectionHeaders.add(resources.getString(R.string.text_downloaded_translations));
+            headers.add(resources.getString(R.string.text_downloaded_translations));
             translationList.add(downloadedTranslations);
             count = downloaded + 1;
         }
@@ -201,16 +124,16 @@ class TranslationListAdapter extends RecyclerView.Adapter {
 
             ArrayList<TranslationInfoHolder> availableTranslations = null;
             final String language = new Locale(translationInfo.language.split("_")[0]).getDisplayLanguage();
-            final int sections = sectionHeaders.size();
+            final int sections = headers.size();
             for (int j = 0; j < sections; ++j) {
-                if (sectionHeaders.get(j).equals(language)) {
+                if (headers.get(j).equals(language)) {
                     availableTranslations = translationList.get(j);
                     break;
                 }
             }
             if (availableTranslations == null) {
                 availableTranslations = new ArrayList<>();
-                sectionHeaders.add(language);
+                headers.add(language);
                 translationList.add(availableTranslations);
                 ++count;
             }
@@ -225,5 +148,7 @@ class TranslationListAdapter extends RecyclerView.Adapter {
             availableTranslations.add(new TranslationInfoHolder(translationInfo, text, false));
             ++count;
         }
+
+        setData(headers, translationList, count);
     }
 }
