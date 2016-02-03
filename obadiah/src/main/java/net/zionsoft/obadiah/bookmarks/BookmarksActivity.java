@@ -24,9 +24,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.view.View;
 
 import net.zionsoft.obadiah.R;
@@ -34,17 +31,14 @@ import net.zionsoft.obadiah.model.datamodel.Settings;
 import net.zionsoft.obadiah.model.domain.Bookmark;
 import net.zionsoft.obadiah.model.domain.Verse;
 import net.zionsoft.obadiah.ui.utils.AnimationHelper;
-import net.zionsoft.obadiah.ui.utils.BaseAppCompatActivity;
+import net.zionsoft.obadiah.ui.utils.BaseRecyclerViewActivity;
 import net.zionsoft.obadiah.ui.utils.DialogHelper;
 
 import java.util.List;
 
 import javax.inject.Inject;
 
-import butterknife.Bind;
-
-public class BookmarksActivity extends BaseAppCompatActivity implements BookmarksView,
-        RecyclerView.OnChildAttachStateChangeListener, View.OnClickListener {
+public class BookmarksActivity extends BaseRecyclerViewActivity implements BookmarksView {
     @NonNull
     public static Intent newStartIntent(Context context) {
         return new Intent(context, BookmarksActivity.class);
@@ -52,15 +46,6 @@ public class BookmarksActivity extends BaseAppCompatActivity implements Bookmark
 
     @Inject
     BookmarksPresenter bookmarksPresenter;
-
-    @Bind(R.id.toolbar)
-    Toolbar toolbar;
-
-    @Bind(R.id.bookmark_list)
-    RecyclerView bookmarkList;
-
-    @Bind(R.id.loading_spinner)
-    View loadingSpinner;
 
     private BookmarksListAdapter bookmarksListAdapter;
 
@@ -76,18 +61,12 @@ public class BookmarksActivity extends BaseAppCompatActivity implements Bookmark
                     .commit();
         }
 
-        setContentView(R.layout.activity_bookmarks);
-
-        toolbar.setLogo(R.drawable.ic_action_bar);
         toolbar.setTitle(R.string.activity_bookmarks);
-
-        bookmarkList.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-        bookmarkList.addOnChildAttachStateChangeListener(this);
         initializeAdapter();
     }
 
     private void initializeAdapter() {
-        if (bookmarkList == null || bookmarksPresenter == null || bookmarksListAdapter != null) {
+        if (recyclerView == null || bookmarksPresenter == null || bookmarksListAdapter != null) {
             // if the activity is recreated due to screen orientation change, the component fragment
             // is attached before the UI is initialized, i.e. onAttachFragment() is called inside
             // super.onCreate()
@@ -95,7 +74,7 @@ public class BookmarksActivity extends BaseAppCompatActivity implements Bookmark
             return;
         }
         bookmarksListAdapter = new BookmarksListAdapter(this, bookmarksPresenter);
-        bookmarkList.setAdapter(bookmarksListAdapter);
+        recyclerView.setAdapter(bookmarksListAdapter);
     }
 
     @Override
@@ -134,7 +113,7 @@ public class BookmarksActivity extends BaseAppCompatActivity implements Bookmark
     @Override
     public void onBookmarksLoaded(List<Bookmark> bookmarks, List<Verse> verses) {
         AnimationHelper.fadeOut(loadingSpinner);
-        AnimationHelper.fadeIn(bookmarkList);
+        AnimationHelper.fadeIn(recyclerView);
 
         bookmarksListAdapter.setBookmarks(bookmarks, verses);
     }
@@ -151,22 +130,7 @@ public class BookmarksActivity extends BaseAppCompatActivity implements Bookmark
     }
 
     @Override
-    public void onChildViewAttachedToWindow(View view) {
-        view.setOnClickListener(this);
-    }
-
-    @Override
-    public void onChildViewDetachedFromWindow(View view) {
-        view.setOnClickListener(null);
-    }
-
-    @Override
-    public void onClick(View v) {
-        final int position = bookmarkList.getChildAdapterPosition(v);
-        if (position == RecyclerView.NO_POSITION) {
-            return;
-        }
-
+    protected void onChildClicked(int position) {
         final Verse verse = bookmarksListAdapter.getVerse(position);
         if (verse != null) {
             bookmarksPresenter.saveReadingProgress(verse.verseIndex);
