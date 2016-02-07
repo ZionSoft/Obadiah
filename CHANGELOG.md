@@ -6,6 +6,9 @@ CHANGELOG
 - Allowed app to be moved to external storage.
 - Supported loading multiple translations.
 - Supported bookmarks and notes.
+- Updated 3rd-party libraries:
+  - Updated Retrofit to 2.0.0 Beta 4.
+  - Updated Stetho to 1.3.0.
 
 #### v1.13.2 (2015-12-26)
 - Updated min SDK level to 15.

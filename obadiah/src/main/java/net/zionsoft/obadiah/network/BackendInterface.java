@@ -17,16 +17,15 @@
 
 package net.zionsoft.obadiah.network;
 
-import com.squareup.okhttp.ResponseBody;
-
 import net.zionsoft.obadiah.model.domain.TranslationInfo;
 
 import java.util.List;
 
-import retrofit.Call;
-import retrofit.http.GET;
-import retrofit.http.Query;
-import retrofit.http.Streaming;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.http.GET;
+import retrofit2.http.Query;
+import retrofit2.http.Streaming;
 import rx.Observable;
 
 public interface BackendInterface {

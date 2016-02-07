@@ -76,14 +76,14 @@ dependencies {
 
     compile 'com.jakewharton:butterknife:' + rootProject.ext.butterKnifeVersion
 
-    compile 'com.squareup.retrofit:retrofit:' + rootProject.ext.retrofitVersion
-    compile 'com.squareup.retrofit:converter-moshi:' + rootProject.ext.retrofitVersion
-    compile 'com.squareup.retrofit:adapter-rxjava:' + rootProject.ext.retrofitVersion
+    compile 'com.squareup.retrofit2:retrofit:' + rootProject.ext.retrofitVersion
+    compile 'com.squareup.retrofit2:converter-moshi:' + rootProject.ext.retrofitVersion
+    compile 'com.squareup.retrofit2:adapter-rxjava:' + rootProject.ext.retrofitVersion
 
     compile('com.crashlytics.sdk.android:crashlytics:2.3.2@aar') {
         transitive = true;
     }
 
     debugCompile 'com.facebook.stetho:stetho:' + rootProject.ext.stethoVersion
-    debugCompile 'com.facebook.stetho:stetho-okhttp:' + rootProject.ext.stethoVersion
+    debugCompile 'com.facebook.stetho:stetho-okhttp3:' + rootProject.ext.stethoVersion
 }

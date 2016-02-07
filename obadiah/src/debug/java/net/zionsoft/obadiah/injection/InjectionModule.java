@@ -17,10 +17,13 @@
 
 package net.zionsoft.obadiah.injection;
 
-import com.facebook.stetho.okhttp.StethoInterceptor;
-import com.squareup.okhttp.OkHttpClient;
+import com.facebook.stetho.okhttp3.StethoInterceptor;
 
 import net.zionsoft.obadiah.App;
+
+import java.util.concurrent.TimeUnit;
+
+import okhttp3.OkHttpClient;
 
 public final class InjectionModule extends BaseInjectionModule {
     public InjectionModule(App application) {
@@ -29,8 +32,11 @@ public final class InjectionModule extends BaseInjectionModule {
 
     @Override
     public OkHttpClient provideOkHttpClient() {
-        final OkHttpClient okHttpClient = super.provideOkHttpClient();
-        okHttpClient.networkInterceptors().add(new StethoInterceptor());
-        return okHttpClient;
+        return new OkHttpClient.Builder()
+                .connectTimeout(30L, TimeUnit.SECONDS)
+                .readTimeout(30L, TimeUnit.SECONDS)
+                .writeTimeout(30L, TimeUnit.SECONDS)
+                .addNetworkInterceptor(new StethoInterceptor())
+                .build();
     }
 }

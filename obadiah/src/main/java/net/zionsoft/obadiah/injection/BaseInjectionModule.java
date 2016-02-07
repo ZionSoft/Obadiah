@@ -20,7 +20,6 @@ package net.zionsoft.obadiah.injection;
 import android.content.Context;
 
 import com.squareup.moshi.Moshi;
-import com.squareup.okhttp.OkHttpClient;
 
 import net.zionsoft.obadiah.App;
 import net.zionsoft.obadiah.model.database.DatabaseHelper;
@@ -37,9 +36,10 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
-import retrofit.MoshiConverterFactory;
-import retrofit.Retrofit;
-import retrofit.RxJavaCallAdapterFactory;
+import okhttp3.OkHttpClient;
+import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
+import retrofit2.converter.moshi.MoshiConverterFactory;
 
 @Module
 public class BaseInjectionModule {
@@ -100,11 +100,11 @@ public class BaseInjectionModule {
     @Provides
     @Singleton
     public OkHttpClient provideOkHttpClient() {
-        final OkHttpClient okHttpClient = new OkHttpClient();
-        okHttpClient.setConnectTimeout(30L, TimeUnit.SECONDS);
-        okHttpClient.setReadTimeout(30L, TimeUnit.SECONDS);
-        okHttpClient.setWriteTimeout(30L, TimeUnit.SECONDS);
-        return okHttpClient;
+        return new OkHttpClient.Builder()
+                .connectTimeout(30L, TimeUnit.SECONDS)
+                .readTimeout(30L, TimeUnit.SECONDS)
+                .writeTimeout(30L, TimeUnit.SECONDS)
+                .build();
     }
 
     @Provides

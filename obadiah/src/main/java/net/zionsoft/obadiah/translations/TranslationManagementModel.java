@@ -23,7 +23,6 @@ import android.os.SystemClock;
 import com.crashlytics.android.Crashlytics;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
-import com.squareup.okhttp.ResponseBody;
 
 import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.database.BookNamesTableHelper;
@@ -44,9 +43,10 @@ import java.util.Locale;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import okhttp3.ResponseBody;
 import okio.BufferedSource;
 import okio.Okio;
-import retrofit.Response;
+import retrofit2.Response;
 import rx.Observable;
 import rx.Subscriber;
 import rx.functions.Action1;
