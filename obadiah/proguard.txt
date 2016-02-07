@@ -44,14 +44,16 @@
 
 # Retrofit
 -dontwarn okio.**
--dontwarn retrofit.**
--keep class retrofit.** { *; }
+-dontwarn retrofit2.**
+-keep class retrofit2.** { *; }
 -keep class com.squareup.moshi.** { *; }
--keep class com.squareup.okhttp.** { *; }
--keep interface com.squareup.okhttp.** { *; }
+-keep class okhttp3.** { *; }
+-keep interface okhttp3.** { *; }
 -keepattributes Signature
 -keepattributes Exceptions
 
 -keep class net.zionsoft.obadiah.billing.InAppPurchaseData { *; }
 -keep class net.zionsoft.obadiah.model.domain.TranslationInfo { *; }
 -keep class net.zionsoft.obadiah.network.** { *; }
+-keep class net.zionsoft.obadiah.model.notification.PushAttrNewTranslation { *; }
+-keep class net.zionsoft.obadiah.model.notification.PushAttrVerseIndex { *; }
