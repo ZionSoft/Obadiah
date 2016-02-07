@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item android:drawable="@color/dark_blue" android:state_pressed="true" />
-    <item android:drawable="@color/blue" />
-
+    <item android:drawable="@drawable/background_touchable" android:state_pressed="true"/>
+    <item android:drawable="@android:color/white"/>
 </selector>

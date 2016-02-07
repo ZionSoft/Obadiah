@@ -15,10 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.bookmarks;
+package net.zionsoft.obadiah.notes;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Pair;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,7 +27,7 @@ import android.widget.TextView;
 
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.datamodel.Settings;
-import net.zionsoft.obadiah.model.domain.Bookmark;
+import net.zionsoft.obadiah.model.domain.Note;
 import net.zionsoft.obadiah.model.domain.Verse;
 import net.zionsoft.obadiah.ui.utils.BaseSectionAdapter;
 import net.zionsoft.obadiah.ui.utils.DateFormatter;
@@ -38,15 +39,18 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-class BookmarksListAdapter extends BaseSectionAdapter<Verse> {
+public class NotesListAdapter extends BaseSectionAdapter<Pair<Note, Verse>> {
     static class ViewHolder extends RecyclerView.ViewHolder {
         private static final StringBuilder STRING_BUILDER = new StringBuilder();
 
         @Bind(R.id.title)
         TextView title;
 
-        @Bind(R.id.text)
-        TextView text;
+        @Bind(R.id.verse)
+        TextView verse;
+
+        @Bind(R.id.note)
+        TextView note;
 
         private ViewHolder(View itemView, int textColor, float textSize, float smallerTextSize) {
             super(itemView);
@@ -54,50 +58,54 @@ class BookmarksListAdapter extends BaseSectionAdapter<Verse> {
             ButterKnife.bind(this, itemView);
             title.setTextColor(textColor);
             title.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
-            text.setTextColor(textColor);
-            text.setTextSize(TypedValue.COMPLEX_UNIT_PX, smallerTextSize);
+            verse.setTextColor(textColor);
+            verse.setTextSize(TypedValue.COMPLEX_UNIT_PX, smallerTextSize);
+            note.setTextColor(textColor);
+            note.setTextSize(TypedValue.COMPLEX_UNIT_PX, smallerTextSize);
         }
 
-        private void bind(Verse verse) {
+        private void bind(Note note, Verse verse) {
+            this.note.setText(note.note);
+
             STRING_BUILDER.setLength(0);
             STRING_BUILDER.append(verse.text.bookName).append(' ')
                     .append(verse.verseIndex.chapter + 1).append(':').append(verse.verseIndex.verse + 1);
             title.setText(STRING_BUILDER.toString());
-            text.setText(verse.text.text);
-
+            this.verse.setText(verse.text.text);
         }
     }
 
     private final DateFormatter dateFormatter;
 
-    BookmarksListAdapter(Context context, Settings settings) {
+    NotesListAdapter(Context context, Settings settings) {
         super(context, settings);
         this.dateFormatter = new DateFormatter(context.getResources());
     }
 
     @Override
     protected RecyclerView.ViewHolder createItemViewHolder(ViewGroup parent) {
-        return new ViewHolder(inflater.inflate(R.layout.item_bookmark, parent, false),
+        return new ViewHolder(inflater.inflate(R.layout.item_note, parent, false),
                 textColor, textSize, smallerTextSize);
     }
 
     @Override
-    protected void bindItemViewHeader(RecyclerView.ViewHolder holder, Verse item) {
-        ((ViewHolder) holder).bind(item);
+    protected void bindItemViewHeader(RecyclerView.ViewHolder holder, Pair<Note, Verse> item) {
+        ((ViewHolder) holder).bind(item.first, item.second);
     }
 
-    void setBookmarks(List<Bookmark> bookmarks, List<Verse> verses) {
+    void setNotes(List<Note> notes, List<Verse> verses) {
         final ArrayList<String> headers = new ArrayList<>();
-        final ArrayList<ArrayList<Verse>> versesByDay = new ArrayList<>();
+        final ArrayList<ArrayList<Pair<Note, Verse>>> notesByDay = new ArrayList<>();
         int count = 0;
 
         final Calendar calendar = Calendar.getInstance();
         int previousYear = -1;
         int previousDayOfYear = -1;
-        ArrayList<Verse> versesOfSameDay = null;
-        final int bookmarksCount = bookmarks.size();
-        for (int i = 0; i < bookmarksCount; ++i) {
-            final long timestamp = bookmarks.get(i).timestamp;
+        ArrayList<Pair<Note, Verse>> notesOfSameDay = null;
+        final int notesCount = notes.size();
+        for (int i = 0; i < notesCount; ++i) {
+            final Note note = notes.get(i);
+            final long timestamp = note.timestamp;
             calendar.setTimeInMillis(timestamp);
             final int currentYear = calendar.get(Calendar.YEAR);
             final int currentDayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
@@ -105,18 +113,18 @@ class BookmarksListAdapter extends BaseSectionAdapter<Verse> {
                 ++count;
                 headers.add(dateFormatter.format(timestamp));
 
-                versesOfSameDay = new ArrayList<>();
-                versesByDay.add(versesOfSameDay);
+                notesOfSameDay = new ArrayList<>();
+                notesByDay.add(notesOfSameDay);
 
                 previousYear = currentYear;
                 previousDayOfYear = currentDayOfYear;
             }
             ++count;
 
-            assert versesOfSameDay != null;
-            versesOfSameDay.add(verses.get(i));
+            assert notesOfSameDay != null;
+            notesOfSameDay.add(new Pair<>(note, verses.get(i)));
         }
 
-        setData(headers, versesByDay, count);
+        setData(headers, notesByDay, count);
     }
 }

@@ -23,6 +23,9 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -37,10 +40,10 @@ import net.zionsoft.obadiah.model.domain.VerseIndex;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-class VerseItemViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+class VerseItemViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, TextWatcher {
     private static final StringBuilder STRING_BUILDER = new StringBuilder();
-    private static final PorterDuffColorFilter BOOKMARK_ON = new PorterDuffColorFilter(Color.RED, PorterDuff.Mode.MULTIPLY);
-    private static final PorterDuffColorFilter BOOKMARK_OFF = new PorterDuffColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
+    static final PorterDuffColorFilter ON = new PorterDuffColorFilter(Color.RED, PorterDuff.Mode.MULTIPLY);
+    static final PorterDuffColorFilter OFF = new PorterDuffColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
 
     private final VersePagerPresenter versePagerPresenter;
     private final Resources resources;
@@ -48,11 +51,18 @@ class VerseItemViewHolder extends RecyclerView.ViewHolder implements View.OnClic
     @Bind(R.id.text)
     TextView text;
 
-    @Bind(R.id.bookmark)
-    AppCompatImageView bookmark;
+    @Bind(R.id.note)
+    TextView note;
+
+    @Bind(R.id.bookmarkIcon)
+    AppCompatImageView bookmarkIcon;
+
+    @Bind(R.id.noteIcon)
+    AppCompatImageView noteIcon;
 
     private VerseIndex verseIndex;
     private boolean isBookmarked;
+    private boolean isExpanded;
 
     VerseItemViewHolder(LayoutInflater inflater, ViewGroup parent,
                         VersePagerPresenter versePagerPresenter, Resources resources) {
@@ -62,16 +72,18 @@ class VerseItemViewHolder extends RecyclerView.ViewHolder implements View.OnClic
         this.resources = resources;
 
         ButterKnife.bind(this, itemView);
-        bookmark.setOnClickListener(this);
+        bookmarkIcon.setOnClickListener(this);
+        noteIcon.setOnClickListener(this);
     }
 
-    void bind(Verse verse, boolean selected, boolean isBookmarked) {
+    void bind(Verse verse, boolean selected, boolean isBookmarked, String note, boolean expanded) {
         itemView.setSelected(selected);
 
         final Settings settings = versePagerPresenter.getSettings();
-        text.setTextColor(settings.getTextColor());
-        text.setTextSize(TypedValue.COMPLEX_UNIT_PX,
-                resources.getDimension(settings.getTextSize().textSize));
+        final int textColor = settings.getTextColor();
+        final Settings.TextSize textSize = settings.getTextSize();
+        text.setTextColor(textColor);
+        text.setTextSize(TypedValue.COMPLEX_UNIT_PX, resources.getDimension(textSize.textSize));
 
         STRING_BUILDER.setLength(0);
         if (verse.parallel.size() == 0) {
@@ -92,6 +104,11 @@ class VerseItemViewHolder extends RecyclerView.ViewHolder implements View.OnClic
         verseIndex = verse.verseIndex;
 
         setBookmark(isBookmarked);
+
+        this.note.setTextColor(textColor);
+        this.note.setTextSize(TypedValue.COMPLEX_UNIT_PX, resources.getDimension(textSize.smallerTextSize));
+        setNote(note, expanded);
+        setExpanded(expanded);
     }
 
     private static void buildVerse(StringBuilder sb, VerseIndex verseIndex, Verse.Text text) {
@@ -102,16 +119,61 @@ class VerseItemViewHolder extends RecyclerView.ViewHolder implements View.OnClic
 
     void setBookmark(boolean isBookmarked) {
         this.isBookmarked = isBookmarked;
-        bookmark.setColorFilter(isBookmarked ? BOOKMARK_ON : BOOKMARK_OFF);
+        bookmarkIcon.setColorFilter(isBookmarked ? ON : OFF);
+    }
+
+    private void setNote(String note, boolean expanded) {
+        this.note.removeTextChangedListener(this);
+        this.note.setText(note);
+        this.note.addTextChangedListener(this);
+
+        noteIcon.setColorFilter(TextUtils.isEmpty(note) ? OFF : ON);
+        noteIcon.setImageResource(expanded ? R.drawable.ic_arrow_up : R.drawable.ic_note);
+    }
+
+    private void setExpanded(boolean expanded) {
+        isExpanded = expanded;
+        note.setVisibility(expanded ? View.VISIBLE : View.GONE);
     }
 
     @Override
     public void onClick(View v) {
-        if (verseIndex != null && v == bookmark) {
-            if (isBookmarked) {
-                versePagerPresenter.removeBookmark(verseIndex);
+        if (verseIndex != null) {
+            if (v == bookmarkIcon) {
+                if (isBookmarked) {
+                    versePagerPresenter.removeBookmark(verseIndex);
+                } else {
+                    versePagerPresenter.addBookmark(verseIndex);
+                }
+            } else if (v == noteIcon) {
+                if (isExpanded) {
+                    versePagerPresenter.hideNote(verseIndex);
+                } else {
+                    versePagerPresenter.showNote(verseIndex);
+                }
+                setExpanded(!isExpanded);
+            }
+        }
+    }
+
+    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        // do nothing
+    }
+
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+        // do nothing
+    }
+
+    @Override
+    public void afterTextChanged(Editable s) {
+        if (verseIndex != null) {
+            final String note = s.toString();
+            if (TextUtils.isEmpty(note)) {
+                versePagerPresenter.removeNote(verseIndex);
             } else {
-                versePagerPresenter.addBookmark(verseIndex);
+                versePagerPresenter.updateNote(verseIndex, s.toString());
             }
         }
     }

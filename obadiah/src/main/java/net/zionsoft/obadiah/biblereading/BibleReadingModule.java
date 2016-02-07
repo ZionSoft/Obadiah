@@ -24,6 +24,7 @@ import net.zionsoft.obadiah.biblereading.verse.VersePresenter;
 import net.zionsoft.obadiah.injection.scopes.ActivityScope;
 import net.zionsoft.obadiah.model.datamodel.BibleReadingModel;
 import net.zionsoft.obadiah.model.datamodel.BookmarkModel;
+import net.zionsoft.obadiah.model.datamodel.NoteModel;
 import net.zionsoft.obadiah.model.datamodel.ReadingProgressModel;
 import net.zionsoft.obadiah.model.datamodel.Settings;
 
@@ -60,7 +61,8 @@ public class BibleReadingModule {
     @Provides
     @ActivityScope
     VersePagerPresenter provideVersePagerPresenter(BibleReadingModel bibleReadingModel,
-                                                   BookmarkModel bookmarkModel, Settings settings) {
-        return new VersePagerPresenter(bibleReadingModel, bookmarkModel, settings);
+                                                   BookmarkModel bookmarkModel, NoteModel noteModel,
+                                                   Settings settings) {
+        return new VersePagerPresenter(bibleReadingModel, bookmarkModel, noteModel, settings);
     }
 }

@@ -22,6 +22,4 @@
     <dimen name="left_drawer_width">240dp</dimen>
     <dimen name="chapter_grid_width">48dp</dimen>
     <dimen name="chapter_grid_height">48dp</dimen>
-
-    <dimen name="verse_icon_size">42dp</dimen>
 </resources>

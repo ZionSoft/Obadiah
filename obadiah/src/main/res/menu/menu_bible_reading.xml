@@ -15,6 +15,10 @@
         android:title="@string/action_bookmarks"
         app:showAsAction="never" />
     <item
+        android:id="@+id/action_notes"
+        android:title="@string/action_notes"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/action_reading_progress"
         android:title="@string/action_reading_progress"
         app:showAsAction="never" />

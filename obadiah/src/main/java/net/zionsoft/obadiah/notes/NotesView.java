@@ -15,40 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.biblereading.verse;
+package net.zionsoft.obadiah.notes;
 
 import net.zionsoft.obadiah.model.domain.Note;
-import net.zionsoft.obadiah.model.domain.Bookmark;
 import net.zionsoft.obadiah.model.domain.Verse;
-import net.zionsoft.obadiah.model.domain.VerseIndex;
 import net.zionsoft.obadiah.mvp.MVPView;
 
 import java.util.List;
 
-interface VersePagerView extends MVPView {
-    void onVersesLoaded(List<Verse> verses, List<Bookmark> bookmarks, List<Note> notes);
+interface NotesView extends MVPView {
+    void onNotesLoaded(List<Note> notes, List<Verse> verses);
 
-    void onVersesLoadFailed(int book, int chapter);
-
-    void onBookmarkAdded(Bookmark bookmark);
-
-    void onBookmarkAddFailed(VerseIndex verseIndex);
-
-    void onBookmarkRemoved(VerseIndex verseIndex);
-
-    void onBookmarkRemoveFailed(VerseIndex verseIndex);
-
-    void onNoteUpdated(Note note);
-
-    void onNoteUpdateFailed(VerseIndex verseIndex, String note);
-
-    void onNoteRemoved(VerseIndex verseIndex);
-
-    void onNoteRemoveFailed(VerseIndex verseIndex);
-
-    void showNote(VerseIndex verseIndex);
-
-    void hideNote(VerseIndex verseIndex);
-
-    void onTranslationUpdated();
+    void onNotesLoadFailed();
 }

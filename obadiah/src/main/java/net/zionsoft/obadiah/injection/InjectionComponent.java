@@ -26,6 +26,8 @@ import net.zionsoft.obadiah.misc.license.OpenSourceLicenseComponent;
 import net.zionsoft.obadiah.misc.license.OpenSourceLicenseModule;
 import net.zionsoft.obadiah.misc.settings.SettingsActivity;
 import net.zionsoft.obadiah.model.notification.PushNotificationHandler;
+import net.zionsoft.obadiah.notes.NotesComponent;
+import net.zionsoft.obadiah.notes.NotesModule;
 import net.zionsoft.obadiah.readingprogress.ReadingProgressComponent;
 import net.zionsoft.obadiah.readingprogress.ReadingProgressModule;
 import net.zionsoft.obadiah.search.SearchComponent;
@@ -49,6 +51,8 @@ public interface InjectionComponent {
     BibleReadingComponent plus(BibleReadingModule bibleReadingModule);
 
     BookmarksComponent plus(BookmarksModule bookmarksModule);
+
+    NotesComponent plus(NotesModule notesModule);
 
     OpenSourceLicenseComponent plus(OpenSourceLicenseModule openSourceLicenseModule);
 

@@ -5,6 +5,7 @@
 
     <string name="activity_bookmarks">书签</string>
     <string name="activity_manage_translation">译本</string>
+    <string name="activity_notes">笔记</string>
     <string name="activity_open_source_license">开源软件协议</string>
     <string name="activity_reading_progress">读经进度</string>
     <string name="activity_settings">设置</string>
@@ -13,6 +14,7 @@
     <string name="action_copy">复制</string>
     <string name="action_clear_search_history">清空搜索历史</string>
     <string name="action_delete_translation">删除</string>
+    <string name="action_notes">笔记</string>
     <string name="action_reading_progress">读经进度</string>
     <string name="action_remove_ads">移除广告</string>
     <string name="action_search">搜索</string>
@@ -83,6 +85,8 @@
         <item>11</item>
         <item>12</item>
     </string-array>
+
+    <string name="text_note">笔记</string>
 
     <string name="toast_translation_deleted">已删除。</string>
     <string name="toast_translation_downloaded">已下载。</string>

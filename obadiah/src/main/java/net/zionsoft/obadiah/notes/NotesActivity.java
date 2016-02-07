@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.bookmarks;
+package net.zionsoft.obadiah.notes;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -24,11 +24,12 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.util.Pair;
 import android.view.View;
 
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.datamodel.Settings;
-import net.zionsoft.obadiah.model.domain.Bookmark;
+import net.zionsoft.obadiah.model.domain.Note;
 import net.zionsoft.obadiah.model.domain.Verse;
 import net.zionsoft.obadiah.ui.utils.AnimationHelper;
 import net.zionsoft.obadiah.ui.utils.BaseRecyclerViewActivity;
@@ -38,54 +39,54 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-public class BookmarksActivity extends BaseRecyclerViewActivity implements BookmarksView {
+public class NotesActivity extends BaseRecyclerViewActivity implements NotesView {
     @NonNull
     public static Intent newStartIntent(Context context) {
-        return new Intent(context, BookmarksActivity.class);
+        return new Intent(context, NotesActivity.class);
     }
 
     @Inject
-    BookmarksPresenter bookmarksPresenter;
+    NotesPresenter notesPresenter;
 
-    private BookmarksListAdapter bookmarksListAdapter;
+    private NotesListAdapter notesListAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         FragmentManager fm = getSupportFragmentManager();
-        if (fm.findFragmentByTag(BookmarksComponentFragment.FRAGMENT_TAG) == null) {
+        if (fm.findFragmentByTag(NotesComponentFragment.FRAGMENT_TAG) == null) {
             fm.beginTransaction()
-                    .add(BookmarksComponentFragment.newInstance(),
-                            BookmarksComponentFragment.FRAGMENT_TAG)
+                    .add(NotesComponentFragment.newInstance(),
+                            NotesComponentFragment.FRAGMENT_TAG)
                     .commit();
         }
 
-        toolbar.setTitle(R.string.activity_bookmarks);
+        toolbar.setTitle(R.string.activity_notes);
         initializeAdapter();
     }
 
     private void initializeAdapter() {
-        if (recyclerView == null || bookmarksPresenter == null || bookmarksListAdapter != null) {
+        if (recyclerView == null || notesPresenter == null || notesListAdapter != null) {
             // if the activity is recreated due to screen orientation change, the component fragment
             // is attached before the UI is initialized, i.e. onAttachFragment() is called inside
             // super.onCreate()
             // therefore, we try to do the initialization in both places
             return;
         }
-        bookmarksListAdapter = new BookmarksListAdapter(this, bookmarksPresenter.getSettings());
-        recyclerView.setAdapter(bookmarksListAdapter);
+        notesListAdapter = new NotesListAdapter(this, notesPresenter.getSettings());
+        recyclerView.setAdapter(notesListAdapter);
     }
 
     @Override
     public void onAttachFragment(Fragment fragment) {
         super.onAttachFragment(fragment);
 
-        if (fragment instanceof BookmarksComponentFragment) {
-            ((BookmarksComponentFragment) fragment).getComponent().inject(this);
+        if (fragment instanceof NotesComponentFragment) {
+            ((NotesComponentFragment) fragment).getComponent().inject(this);
 
             final View rootView = getWindow().getDecorView();
-            final Settings settings = bookmarksPresenter.getSettings();
+            final Settings settings = notesPresenter.getSettings();
             rootView.setKeepScreenOn(settings.keepScreenOn());
             rootView.setBackgroundColor(settings.getBackgroundColor());
 
@@ -96,44 +97,44 @@ public class BookmarksActivity extends BaseRecyclerViewActivity implements Bookm
     @Override
     protected void onResumeFragments() {
         super.onResumeFragments();
-        bookmarksPresenter.takeView(this);
-        loadBookmarks();
+        notesPresenter.takeView(this);
+        loadNotes();
     }
 
-    private void loadBookmarks() {
-        bookmarksPresenter.loadBookmarks();
+    private void loadNotes() {
+        notesPresenter.loadNotes();
     }
 
     @Override
     protected void onPause() {
-        bookmarksPresenter.dropView();
+        notesPresenter.dropView();
         super.onPause();
     }
 
     @Override
-    public void onBookmarksLoaded(List<Bookmark> bookmarks, List<Verse> verses) {
+    public void onNotesLoaded(List<Note> notes, List<Verse> verses) {
         AnimationHelper.fadeOut(loadingSpinner);
         AnimationHelper.fadeIn(recyclerView);
 
-        bookmarksListAdapter.setBookmarks(bookmarks, verses);
+        notesListAdapter.setNotes(notes, verses);
     }
 
     @Override
-    public void onBookmarksLoadFailed() {
+    public void onNotesLoadFailed() {
         DialogHelper.showDialog(this, false, R.string.error_failed_to_load,
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        loadBookmarks();
+                        loadNotes();
                     }
                 }, null);
     }
 
     @Override
     protected void onChildClicked(int position) {
-        final Verse verse = bookmarksListAdapter.getItem(position);
-        if (verse != null) {
-            bookmarksPresenter.saveReadingProgress(verse.verseIndex);
+        final Pair<Note, Verse> item = notesListAdapter.getItem(position);
+        if (item != null) {
+            notesPresenter.saveReadingProgress(item.second.verseIndex);
             finish();
         }
     }

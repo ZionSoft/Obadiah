@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="net.zionsoft.obadiah"
-    android:installLocation="auto">
+<manifest package="net.zionsoft.obadiah"
+          xmlns:android="http://schemas.android.com/apk/res/android"
+          android:installLocation="auto">
 
     <permission
         android:name="${applicationId}.permission.C2D_MESSAGE"
-        android:protectionLevel="signature" />
+        android:protectionLevel="signature"/>
 
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="com.android.vending.BILLING" />
-    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
-    <uses-permission android:name="${applicationId}.permission.C2D_MESSAGE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="com.android.vending.BILLING"/>
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE"/>
+    <uses-permission android:name="${applicationId}.permission.C2D_MESSAGE"/>
 
     <!-- Only requires permissions for Marshmallow and above -->
-    <uses-permission-sdk-23 android:name="android.permission.NFC" />
+    <uses-permission-sdk-23 android:name="android.permission.NFC"/>
 
     <application
         android:name=".App"
@@ -25,101 +25,102 @@
 
         <activity android:name=".biblereading.BibleReadingActivity">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.MAIN"/>
 
-                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
             <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <action android:name="android.nfc.action.NDEF_DISCOVERED" />
+                <action android:name="android.intent.action.VIEW"/>
+                <action android:name="android.nfc.action.NDEF_DISCOVERED"/>
 
-                <data android:scheme="http" />
-                <data android:scheme="https" />
-                <data android:host="bible.zionsoft.net" />
-                <data android:pathPrefix="/bible" />
+                <data android:scheme="http"/>
+                <data android:scheme="https"/>
+                <data android:host="bible.zionsoft.net"/>
+                <data android:pathPrefix="/bible"/>
 
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
             </intent-filter>
         </activity>
         <activity-alias
             android:name=".BookSelectionActivity"
-            android:targetActivity=".biblereading.BibleReadingActivity" />
+            android:targetActivity=".biblereading.BibleReadingActivity"/>
 
         <activity
             android:name=".search.SearchActivity"
             android:launchMode="singleTop">
             <intent-filter>
-                <action android:name="android.intent.action.SEARCH" />
+                <action android:name="android.intent.action.SEARCH"/>
             </intent-filter>
             <intent-filter>
-                <action android:name="com.google.android.gms.actions.SEARCH_ACTION" />
-                <category android:name="android.intent.category.DEFAULT" />
+                <action android:name="com.google.android.gms.actions.SEARCH_ACTION"/>
+                <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
 
             <meta-data
                 android:name="android.app.searchable"
-                android:resource="@xml/searchable" />
+                android:resource="@xml/searchable"/>
         </activity>
         <activity
             android:name=".translations.TranslationManagementActivity"
             android:parentActivityName=".biblereading.BibleReadingActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".biblereading.BibleReadingActivity" />
+                android:value=".biblereading.BibleReadingActivity"/>
         </activity>
-        <activity android:name=".bookmarks.BookmarksActivity" />
-        <activity android:name=".readingprogress.ReadingProgressActivity" />
-        <activity android:name=".misc.settings.SettingsActivity" />
-        <activity android:name=".misc.license.OpenSourceLicenseActivity" />
+        <activity android:name=".bookmarks.BookmarksActivity"/>
+        <activity android:name=".notes.NotesActivity"/>
+        <activity android:name=".readingprogress.ReadingProgressActivity"/>
+        <activity android:name=".misc.settings.SettingsActivity"/>
+        <activity android:name=".misc.license.OpenSourceLicenseActivity"/>
         <activity android:name=".misc.ShortcutActivity">
             <intent-filter>
-                <action android:name="android.intent.action.CREATE_SHORTCUT" />
+                <action android:name="android.intent.action.CREATE_SHORTCUT"/>
 
-                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
 
         <activity
             android:name="com.google.android.gms.ads.AdActivity"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize" />
+            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"/>
 
         <provider
             android:name=".search.RecentSearchProvider"
             android:authorities="${applicationId}.model.search.RecentSearchProvider"
-            android:exported="false" />
+            android:exported="false"/>
 
         <receiver
             android:name=".model.notification.PushNotificationReceiver"
             android:permission="com.google.android.c2dm.permission.SEND">
             <intent-filter>
-                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
-                <category android:name="net.zionsoft.obadiah" />
+                <action android:name="com.google.android.c2dm.intent.RECEIVE"/>
+                <category android:name="net.zionsoft.obadiah"/>
             </intent-filter>
         </receiver>
         <receiver android:name=".utils.PackageUpdateReceiver">
             <intent-filter>
-                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
             </intent-filter>
         </receiver>
 
-        <service android:name=".model.notification.PushNotificationHandler" />
-        <service android:name=".model.notification.PushNotificationRegister" />
+        <service android:name=".model.notification.PushNotificationHandler"/>
+        <service android:name=".model.notification.PushNotificationRegister"/>
         <service
             android:name=".model.notification.InstanceIDListener"
             android:exported="false">
             <intent-filter>
-                <action android:name="com.google.android.gms.iid.InstanceID" />
+                <action android:name="com.google.android.gms.iid.InstanceID"/>
             </intent-filter>
         </service>
 
         <!-- Enable background analytics dispatching for non-Google Play devices -->
         <receiver android:name="com.google.android.gms.analytics.AnalyticsReceiver">
             <intent-filter>
-                <action android:name="com.google.android.gms.analytics.ANALYTICS_DISPATCH" />
+                <action android:name="com.google.android.gms.analytics.ANALYTICS_DISPATCH"/>
             </intent-filter>
         </receiver>
-        <service android:name="com.google.android.gms.analytics.AnalyticsService" />
+        <service android:name="com.google.android.gms.analytics.AnalyticsService"/>
         <!-- End Enable background analytics dispatching for non-Google Play devices -->
 
         <!-- Enable Google Play Store Campaign Measurement-->
@@ -127,14 +128,14 @@
             android:name="com.google.android.gms.analytics.CampaignTrackingReceiver"
             android:permission="android.permission.INSTALL_PACKAGES">
             <intent-filter>
-                <action android:name="com.android.vending.INSTALL_REFERRER" />
+                <action android:name="com.android.vending.INSTALL_REFERRER"/>
             </intent-filter>
         </receiver>
-        <service android:name="com.google.android.gms.analytics.CampaignTrackingService" />
+        <service android:name="com.google.android.gms.analytics.CampaignTrackingService"/>
         <!-- End Enable Google Play Store Campaign Measurement-->
 
         <meta-data
             android:name="com.google.android.gms.version"
-            android:value="@integer/google_play_services_version" />
+            android:value="@integer/google_play_services_version"/>
     </application>
 </manifest>

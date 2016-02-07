@@ -5,6 +5,7 @@
 
     <string name="activity_bookmarks">Kirjanmerkit</string>
     <string name="activity_manage_translation">Käännökset</string>
+    <string name="activity_notes">Huomautus</string>
     <string name="activity_open_source_license">Avoimen Lähdekoodin Käyttöluv.</string>
     <string name="activity_reading_progress">Lukeminen Edistyminen</string>
     <string name="activity_settings">Asetukset</string>
@@ -13,6 +14,7 @@
     <string name="action_copy">Kopioida</string>
     <string name="action_clear_search_history">Tyhjennä Hakuhistoria</string>
     <string name="action_delete_translation">Poista</string>
+    <string name="action_notes">Huomautus</string>
     <string name="action_reading_progress">Lukeminen Edistyminen</string>
     <string name="action_remove_ads">Poista Mainokset</string>
     <string name="action_search">Hae</string>
@@ -83,6 +85,8 @@
         <item>Marras</item>
         <item>Joulu</item>
     </string-array>
+
+    <string name="text_note">Huomautus</string>
 
     <string name="toast_translation_deleted">Poistettu.</string>
     <string name="toast_translation_downloaded">Ladattu.</string>

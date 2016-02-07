@@ -18,12 +18,13 @@
 package net.zionsoft.obadiah.biblereading.verse;
 
 import android.support.annotation.NonNull;
-import android.util.Pair;
 
 import net.zionsoft.obadiah.model.datamodel.BibleReadingModel;
 import net.zionsoft.obadiah.model.datamodel.BookmarkModel;
+import net.zionsoft.obadiah.model.datamodel.NoteModel;
 import net.zionsoft.obadiah.model.datamodel.Settings;
 import net.zionsoft.obadiah.model.domain.Bookmark;
+import net.zionsoft.obadiah.model.domain.Note;
 import net.zionsoft.obadiah.model.domain.Verse;
 import net.zionsoft.obadiah.model.domain.VerseIndex;
 import net.zionsoft.obadiah.mvp.BasePresenter;
@@ -34,19 +35,22 @@ import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
-import rx.functions.Func2;
+import rx.functions.Func3;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
 public class VersePagerPresenter extends BasePresenter<VersePagerView> {
     private final BibleReadingModel bibleReadingModel;
     private final BookmarkModel bookmarkModel;
+    private final NoteModel noteModel;
     private CompositeSubscription subscription;
 
-    public VersePagerPresenter(BibleReadingModel bibleReadingModel, BookmarkModel bookmarkModel, Settings settings) {
+    public VersePagerPresenter(BibleReadingModel bibleReadingModel, BookmarkModel bookmarkModel,
+                               NoteModel noteModel, Settings settings) {
         super(settings);
         this.bibleReadingModel = bibleReadingModel;
         this.bookmarkModel = bookmarkModel;
+        this.noteModel = noteModel;
     }
 
     @Override
@@ -128,15 +132,16 @@ public class VersePagerPresenter extends BasePresenter<VersePagerView> {
         } else {
             loadVerseObservable = bibleReadingModel.loadVerses(loadCurrentTranslation(), book, chapter);
         }
-        getSubscription().add(loadVerseObservable.zipWith(bookmarkModel.loadBookmarks(book, chapter),
-                new Func2<List<Verse>, List<Bookmark>, Pair<List<Verse>, List<Bookmark>>>() {
+        getSubscription().add(Observable.zip(loadVerseObservable,
+                bookmarkModel.loadBookmarks(book, chapter), noteModel.loadNotes(book, chapter),
+                new Func3<List<Verse>, List<Bookmark>, List<Note>, VerseList>() {
                     @Override
-                    public Pair<List<Verse>, List<Bookmark>> call(List<Verse> verses, List<Bookmark> bookmarks) {
-                        return new Pair<>(verses, bookmarks);
+                    public VerseList call(List<Verse> verses, List<Bookmark> bookmarks, List<Note> notes) {
+                        return new VerseList(verses, bookmarks, notes);
                     }
                 }).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<Pair<List<Verse>, List<Bookmark>>>() {
+                .subscribe(new Subscriber<VerseList>() {
                     @Override
                     public void onCompleted() {
                         // do nothing
@@ -151,10 +156,10 @@ public class VersePagerPresenter extends BasePresenter<VersePagerView> {
                     }
 
                     @Override
-                    public void onNext(Pair<List<Verse>, List<Bookmark>> result) {
+                    public void onNext(VerseList result) {
                         final VersePagerView v = getView();
                         if (v != null) {
-                            v.onVersesLoaded(result.first, result.second);
+                            v.onVersesLoaded(result.verses, result.bookmarks, result.notes);
                         }
                     }
                 }));
@@ -214,5 +219,76 @@ public class VersePagerPresenter extends BasePresenter<VersePagerView> {
                         // should not reach here
                     }
                 }));
+    }
+
+    void updateNote(final VerseIndex verseIndex, final String note) {
+        getSubscription().add(noteModel.updateNote(verseIndex, note)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<Note>() {
+                    @Override
+                    public void onCompleted() {
+                        // do nothing
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        e.printStackTrace();
+                        final VersePagerView v = getView();
+                        if (v != null) {
+                            v.onNoteUpdateFailed(verseIndex, note);
+                        }
+                    }
+
+                    @Override
+                    public void onNext(Note note) {
+                        final VersePagerView v = getView();
+                        if (v != null) {
+                            v.onNoteUpdated(note);
+                        }
+                    }
+                }));
+    }
+
+    void removeNote(final VerseIndex verseIndex) {
+        getSubscription().add(noteModel.removeNote(verseIndex)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<Void>() {
+                    @Override
+                    public void onCompleted() {
+                        final VersePagerView v = getView();
+                        if (v != null) {
+                            v.onNoteRemoved(verseIndex);
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        final VersePagerView v = getView();
+                        if (v != null) {
+                            v.onNoteRemoveFailed(verseIndex);
+                        }
+                    }
+
+                    @Override
+                    public void onNext(Void v) {
+                        // should not reach here
+                    }
+                }));
+    }
+
+    void showNote(VerseIndex verseIndex) {
+        final VersePagerView v = getView();
+        if (v != null) {
+            v.showNote(verseIndex);
+        }
+    }
+
+    void hideNote(VerseIndex verseIndex) {
+        final VersePagerView v = getView();
+        if (v != null) {
+            v.hideNote(verseIndex);
+        }
     }
 }
