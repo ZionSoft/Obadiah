@@ -30,6 +30,7 @@ import net.zionsoft.obadiah.model.database.BookNamesTableHelper;
 import net.zionsoft.obadiah.model.database.DatabaseHelper;
 import net.zionsoft.obadiah.model.database.TranslationHelper;
 import net.zionsoft.obadiah.model.database.TranslationsTableHelper;
+import net.zionsoft.obadiah.model.datamodel.BibleReadingModel;
 import net.zionsoft.obadiah.model.domain.TranslationInfo;
 import net.zionsoft.obadiah.network.BackendChapter;
 import net.zionsoft.obadiah.network.BackendInterface;
@@ -55,12 +56,15 @@ import rx.schedulers.Schedulers;
 
 class TranslationManagementModel {
     private final DatabaseHelper databaseHelper;
+    private final BibleReadingModel bibleReadingModel;
     private final BackendInterface backendInterface;
     private final JsonAdapter<BackendTranslationInfo> translationInfoJsonAdapter;
     private final JsonAdapter<BackendChapter> chapterJsonAdapter;
 
-    TranslationManagementModel(DatabaseHelper databaseHelper, Moshi moshi, BackendInterface backendInterface) {
+    TranslationManagementModel(DatabaseHelper databaseHelper, BibleReadingModel bibleReadingModel,
+                               Moshi moshi, BackendInterface backendInterface) {
         this.databaseHelper = databaseHelper;
+        this.bibleReadingModel = bibleReadingModel;
         this.backendInterface = backendInterface;
         this.translationInfoJsonAdapter = moshi.adapter(BackendTranslationInfo.class);
         this.chapterJsonAdapter = moshi.adapter(BackendChapter.class);
@@ -187,6 +191,7 @@ class TranslationManagementModel {
                         database.beginTransaction();
                         TranslationHelper.removeTranslation(database, translation.shortName);
                         BookNamesTableHelper.removeBookNames(database, translation.shortName);
+                        bibleReadingModel.removeParallelTranslation(translation.shortName);
                         database.setTransactionSuccessful();
                     } finally {
                         if (database.inTransaction()) {

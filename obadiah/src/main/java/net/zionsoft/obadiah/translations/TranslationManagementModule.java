@@ -39,8 +39,9 @@ public class TranslationManagementModule {
 
     @Provides
     TranslationManagementModel provideTranslationManagementModel(
-            DatabaseHelper databaseHelper, Moshi moshi, BackendInterface backendInterface) {
-        return new TranslationManagementModel(databaseHelper, moshi, backendInterface);
+            DatabaseHelper databaseHelper, BibleReadingModel bibleReadingModel,
+            Moshi moshi, BackendInterface backendInterface) {
+        return new TranslationManagementModel(databaseHelper, bibleReadingModel, moshi, backendInterface);
     }
 
     @Provides
