@@ -27,7 +27,6 @@ import android.content.ServiceConnection;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.os.RemoteException;
 import android.support.annotation.IntDef;
 
 import com.android.vending.billing.IInAppBillingService;
@@ -241,7 +240,7 @@ public class InAppBilling implements ServiceConnection {
                         String.format("Manufacturer: %s, Model: %s, Reason: %d",
                                 Build.MANUFACTURER, Build.MODEL, response));
             }
-        } catch (RemoteException e) {
+        } catch (Exception e) {
             status = STATUS_UNSUPPORTED;
             Crashlytics.getInstance().core.logException(e);
         }
@@ -250,5 +249,6 @@ public class InAppBilling implements ServiceConnection {
     @Override
     public void onServiceDisconnected(ComponentName name) {
         inAppBillingService = null;
+        status = STATUS_RELEASED;
     }
 }
