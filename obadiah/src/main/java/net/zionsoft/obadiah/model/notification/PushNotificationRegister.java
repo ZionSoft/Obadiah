@@ -56,7 +56,9 @@ public class PushNotificationRegister extends IntentService {
 
             Analytics.trackEvent(Analytics.CATEGORY_NOTIFICATION, Analytics.NOTIFICATION_ACTION_DEVICE_REGISTERED);
         } catch (Exception e) {
-            Crashlytics.getInstance().core.logException(e);
+            if (!InstanceID.ERROR_SERVICE_NOT_AVAILABLE.equals(e.getMessage())) {
+                Crashlytics.getInstance().core.logException(e);
+            }
         }
     }
 }
