@@ -2,6 +2,8 @@ CHANGELOG
 ---------
 
 #### Next Release
+
+#### v1.14.0 (2016-02-07)
 - Supported NFC for M and above.
 - Allowed app to be moved to external storage.
 - Supported loading multiple translations.
