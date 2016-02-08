@@ -200,7 +200,11 @@ public class BibleReadingModel {
                             BookNamesTableHelper.getBookNames(databaseHelper.getDatabase(), translation)));
                     subscriber.onCompleted();
                 } catch (Exception e) {
-                    Crashlytics.getInstance().core.logException(e);
+                    if (!TextUtils.isEmpty(translation)) {
+                        // if the translation name is empty, it means there's current no translation
+                        // installed, no need to track the exception
+                        Crashlytics.getInstance().core.logException(e);
+                    }
                     subscriber.onError(e);
                 }
             }
