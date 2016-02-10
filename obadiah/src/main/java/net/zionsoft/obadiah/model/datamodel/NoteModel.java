@@ -17,6 +17,7 @@
 
 package net.zionsoft.obadiah.model.datamodel;
 
+import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.database.DatabaseHelper;
 import net.zionsoft.obadiah.model.database.NoteTableHelper;
 import net.zionsoft.obadiah.model.domain.Note;
@@ -46,6 +47,7 @@ public class NoteModel {
                 try {
                     final Note n = new Note(verseIndex, note, System.currentTimeMillis());
                     NoteTableHelper.saveNote(databaseHelper.getDatabase(), n);
+                    Analytics.trackEvent(Analytics.CATEGORY_NOTES, Analytics.NOTES_ACTION_ADDED);
                     subscriber.onNext(n);
                     subscriber.onCompleted();
                 } catch (Exception e) {
@@ -62,6 +64,7 @@ public class NoteModel {
             public void call(Subscriber<? super Void> subscriber) {
                 try {
                     NoteTableHelper.removeNote(databaseHelper.getDatabase(), verseIndex);
+                    Analytics.trackEvent(Analytics.CATEGORY_NOTES, Analytics.NOTES_ACTION_REMOVED);
                     subscriber.onCompleted();
                 } catch (Exception e) {
                     subscriber.onError(e);

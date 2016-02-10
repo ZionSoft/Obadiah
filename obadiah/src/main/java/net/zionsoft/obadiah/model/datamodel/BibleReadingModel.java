@@ -122,6 +122,7 @@ public class BibleReadingModel {
         if (!isParallelTranslation(translation) && !translation.equals(loadCurrentTranslation())) {
             parallelTranslations.add(translation);
             parallelTranslationUpdatesSubject.onNext(null);
+            Analytics.trackEvent(Analytics.CATEGORY_TRANSLATION, Analytics.TRANSLATION_ACTION_PARALLEL_SELECTED, translation);
         }
     }
 
