@@ -24,7 +24,7 @@ import com.crashlytics.android.Crashlytics;
 import net.zionsoft.obadiah.injection.InjectionComponent;
 import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.datamodel.BibleReadingModel;
-import net.zionsoft.obadiah.model.notification.PushNotificationRegister;
+import net.zionsoft.obadiah.notification.PushNotificationRegister;
 import net.zionsoft.obadiah.ui.utils.UiHelper;
 
 import javax.inject.Inject;

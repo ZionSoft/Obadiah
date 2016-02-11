@@ -15,32 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.model.notification;
-
-import android.support.annotation.NonNull;
+package net.zionsoft.obadiah.notification;
 
 import com.squareup.moshi.Json;
 
-import net.zionsoft.obadiah.model.domain.VerseIndex;
+public class PushAttrNewTranslation {
+    @Json(name = "translationName")
+    public final String translationName;
 
-public class PushAttrVerseIndex {
-    @Json(name = "book")
-    public final int book;
-
-    @Json(name = "chapter")
-    public final int chapter;
-
-    @Json(name = "verse")
-    public final int verse;
-
-    public PushAttrVerseIndex(int book, int chapter, int verse) {
-        this.book = book;
-        this.chapter = chapter;
-        this.verse = verse;
-    }
-
-    @NonNull
-    public VerseIndex toVerseIndex() {
-        return new VerseIndex(book, chapter, verse);
+    public PushAttrNewTranslation(String translationName) {
+        this.translationName = translationName;
     }
 }

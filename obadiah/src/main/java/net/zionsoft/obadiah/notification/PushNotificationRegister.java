@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.model.notification;
+package net.zionsoft.obadiah.notification;
 
 import android.app.IntentService;
 import android.content.Context;
@@ -41,7 +41,7 @@ public class PushNotificationRegister extends IntentService {
     }
 
     public PushNotificationRegister() {
-        super("net.zionsoft.obadiah.model.notification.PushNotificationRegister");
+        super("net.zionsoft.obadiah.notification.PushNotificationRegister");
     }
 
     @Override

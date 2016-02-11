@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.model.notification;
+package net.zionsoft.obadiah.notification;
 
 import android.app.IntentService;
 import android.app.Notification;
@@ -44,7 +44,7 @@ import net.zionsoft.obadiah.translations.TranslationManagementActivity;
 import javax.inject.Inject;
 
 public class PushNotificationHandler extends IntentService {
-    private static final String KEY_EXTRAS = "net.zionsoft.obadiah.model.notification.PushNotificationHandler.KEY_EXTRAS";
+    private static final String KEY_EXTRAS = "net.zionsoft.obadiah.notification.PushNotificationHandler.KEY_EXTRAS";
 
     public static Intent newStartIntent(Context context, Bundle extras) {
         return new Intent(context, PushNotificationHandler.class)
@@ -64,7 +64,7 @@ public class PushNotificationHandler extends IntentService {
     BibleReadingModel bibleReadingModel;
 
     public PushNotificationHandler() {
-        super("net.zionsoft.obadiah.model.notification.PushNotificationHandler");
+        super("net.zionsoft.obadiah.notification.PushNotificationHandler");
     }
 
     @Override

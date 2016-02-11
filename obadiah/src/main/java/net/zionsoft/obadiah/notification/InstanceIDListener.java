@@ -15,15 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.model.notification;
+package net.zionsoft.obadiah.notification;
 
-import com.squareup.moshi.Json;
+import com.google.android.gms.iid.InstanceIDListenerService;
 
-public class PushAttrNewTranslation {
-    @Json(name = "translationName")
-    public final String translationName;
-
-    public PushAttrNewTranslation(String translationName) {
-        this.translationName = translationName;
+public class InstanceIDListener extends InstanceIDListenerService {
+    @Override
+    public void onTokenRefresh() {
+        PushNotificationRegister.register(this);
     }
 }

@@ -15,13 +15,32 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.model.notification;
+package net.zionsoft.obadiah.notification;
 
-import com.google.android.gms.iid.InstanceIDListenerService;
+import android.support.annotation.NonNull;
 
-public class InstanceIDListener extends InstanceIDListenerService {
-    @Override
-    public void onTokenRefresh() {
-        PushNotificationRegister.register(this);
+import com.squareup.moshi.Json;
+
+import net.zionsoft.obadiah.model.domain.VerseIndex;
+
+public class PushAttrVerseIndex {
+    @Json(name = "book")
+    public final int book;
+
+    @Json(name = "chapter")
+    public final int chapter;
+
+    @Json(name = "verse")
+    public final int verse;
+
+    public PushAttrVerseIndex(int book, int chapter, int verse) {
+        this.book = book;
+        this.chapter = chapter;
+        this.verse = verse;
+    }
+
+    @NonNull
+    public VerseIndex toVerseIndex() {
+        return new VerseIndex(book, chapter, verse);
     }
 }

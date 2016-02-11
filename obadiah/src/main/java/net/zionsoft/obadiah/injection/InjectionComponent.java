@@ -25,7 +25,7 @@ import net.zionsoft.obadiah.bookmarks.BookmarksModule;
 import net.zionsoft.obadiah.misc.license.OpenSourceLicenseComponent;
 import net.zionsoft.obadiah.misc.license.OpenSourceLicenseModule;
 import net.zionsoft.obadiah.misc.settings.SettingsActivity;
-import net.zionsoft.obadiah.model.notification.PushNotificationHandler;
+import net.zionsoft.obadiah.notification.PushNotificationHandler;
 import net.zionsoft.obadiah.notes.NotesComponent;
 import net.zionsoft.obadiah.notes.NotesModule;
 import net.zionsoft.obadiah.readingprogress.ReadingProgressComponent;

@@ -15,25 +15,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.model.notification;
+package net.zionsoft.obadiah.notification;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.text.TextUtils;
 
 import net.zionsoft.obadiah.model.analytics.Analytics;
 
-public class PushDismissedReceiver extends BroadcastReceiver {
-    private static final String KEY_MESSAGE_TYPE = "net.zionsoft.obadiah.model.notification.PushDismissedReceiver.KEY_MESSAGE_TYPE";
-
-    public static Intent newStartIntent(Context context, String messageType) {
-        return new Intent(context, PushDismissedReceiver.class)
-                .putExtra(KEY_MESSAGE_TYPE, messageType);
-    }
-
+public class PushNotificationReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-        Analytics.trackEvent(Analytics.CATEGORY_NOTIFICATION, Analytics.NOTIFICATION_ACTION_DISMISSED,
-                intent.getStringExtra(KEY_MESSAGE_TYPE));
+        // should just use GcmReceiver, but it requires the WAKE_LOCK permission
+        final String messageType = intent.getStringExtra("message_type");
+        Analytics.trackEvent(Analytics.CATEGORY_NOTIFICATION, Analytics.NOTIFICATION_ACTION_RECEIVED,
+                TextUtils.isEmpty(messageType) ? "empty message type" : messageType);
+        if (TextUtils.isEmpty(messageType) || "gcm".equals(messageType)) {
+            context.startService(PushNotificationHandler.newStartIntent(context, intent.getExtras()));
+        }
     }
 }
