@@ -231,7 +231,6 @@ public class VerseViewPager extends ViewPager implements VerseView, VerseSelecti
         adapter = new VersePagerAdapter(activity, versePresenter, getOffscreenPageLimit());
         adapter.setVerseSelectionListener(this);
         setAdapter(adapter);
-        addOnPageChangeListener(onPageChangeListener);
     }
 
     public void onResume() {
@@ -241,6 +240,10 @@ public class VerseViewPager extends ViewPager implements VerseView, VerseSelecti
 
         adapter.onResume();
         setCurrentItem(currentChapter);
+
+        // should add the listener after setting current item and current book / chapter is loaded,
+        // otherwise, the callback will be triggered with wrong book / chapter
+        addOnPageChangeListener(onPageChangeListener);
     }
 
     public void onPause() {
@@ -248,6 +251,7 @@ public class VerseViewPager extends ViewPager implements VerseView, VerseSelecti
             actionMode.finish();
         }
 
+        removeOnPageChangeListener(onPageChangeListener);
         versePagerPresenter.dropView();
         adapter.onPause();
     }
