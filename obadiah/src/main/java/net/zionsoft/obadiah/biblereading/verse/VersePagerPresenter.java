@@ -132,14 +132,27 @@ public class VersePagerPresenter extends BasePresenter<VersePagerView> {
         } else {
             loadVerseObservable = bibleReadingModel.loadVerses(loadCurrentTranslation(), book, chapter);
         }
-        getSubscription().add(Observable.zip(loadVerseObservable,
-                bookmarkModel.loadBookmarks(book, chapter), noteModel.loadNotes(book, chapter),
-                new Func3<List<Verse>, List<Bookmark>, List<Note>, VerseList>() {
-                    @Override
-                    public VerseList call(List<Verse> verses, List<Bookmark> bookmarks, List<Note> notes) {
-                        return new VerseList(verses, bookmarks, notes);
-                    }
-                }).subscribeOn(Schedulers.io())
+
+        final Observable<VerseList> observable;
+        if (getSettings().isSimpleReading()) {
+            observable = loadVerseObservable.map(new Func1<List<Verse>, VerseList>() {
+                @Override
+                public VerseList call(List<Verse> verses) {
+                    return new VerseList(verses, null, null);
+                }
+            });
+        } else {
+            observable = Observable.zip(loadVerseObservable,
+                    bookmarkModel.loadBookmarks(book, chapter), noteModel.loadNotes(book, chapter),
+                    new Func3<List<Verse>, List<Bookmark>, List<Note>, VerseList>() {
+                        @Override
+                        public VerseList call(List<Verse> verses, List<Bookmark> bookmarks, List<Note> notes) {
+                            return new VerseList(verses, bookmarks, notes);
+                        }
+                    });
+        }
+
+        getSubscription().add(observable.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<VerseList>() {
                     @Override

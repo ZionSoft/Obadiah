@@ -19,6 +19,7 @@ package net.zionsoft.obadiah.biblereading.verse;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -36,12 +37,18 @@ class VerseListAdapter extends RecyclerView.Adapter<VerseItemViewHolder> {
     private final LayoutInflater inflater;
     private final Resources resources;
 
+    @Nullable
     private List<Bookmark> bookmarks;
+
+    @Nullable
     private List<Note> notes;
+
+    @Nullable
+    private boolean[] expanded;
+
     private List<Verse> verses;
     private boolean[] selected;
     private int selectedCount;
-    private boolean[] expanded;
 
     VerseListAdapter(Context context, VersePagerPresenter versePagerPresenter) {
         this.versePagerPresenter = versePagerPresenter;
@@ -61,6 +68,11 @@ class VerseListAdapter extends RecyclerView.Adapter<VerseItemViewHolder> {
 
     @Override
     public void onBindViewHolder(VerseItemViewHolder holder, int position) {
+        if (bookmarks == null || notes == null || expanded == null) {
+            holder.bind(verses.get(position), verses.size(), selected[position]);
+            return;
+        }
+
         boolean isBookmarked = false;
         final int bookmarkCount = bookmarks.size();
         for (int i = 0; i < bookmarkCount; ++i) {
@@ -91,7 +103,7 @@ class VerseListAdapter extends RecyclerView.Adapter<VerseItemViewHolder> {
         // if there are payloads, the view will be updated by VerseItemAnimator
     }
 
-    void setVerses(List<Verse> verses, List<Bookmark> bookmarks, List<Note> notes) {
+    void setVerses(List<Verse> verses, @Nullable List<Bookmark> bookmarks, @Nullable List<Note> notes) {
         this.verses = verses;
         this.bookmarks = bookmarks;
         this.notes = notes;
@@ -102,22 +114,32 @@ class VerseListAdapter extends RecyclerView.Adapter<VerseItemViewHolder> {
         }
         deselectVerses();
 
-        if (expanded == null || expanded.length < size) {
-            expanded = new boolean[size];
-        }
-        for (int i = 0; i < expanded.length; ++i) {
-            expanded[i] = false;
+        if (bookmarks != null && notes != null) {
+            if (expanded == null || expanded.length < size) {
+                expanded = new boolean[size];
+            }
+            for (int i = 0; i < expanded.length; ++i) {
+                expanded[i] = false;
+            }
         }
 
         notifyDataSetChanged();
     }
 
     void addBookmark(Bookmark bookmark) {
+        if (bookmarks == null) {
+            return;
+        }
+
         bookmarks.add(bookmark);
         notifyItemChanged(bookmark.verseIndex.verse, VerseItemAnimator.VerseItemHolderInfo.ACTION_ADD_BOOKMARK);
     }
 
     void removeBookmark(VerseIndex verseIndex) {
+        if (bookmarks == null) {
+            return;
+        }
+
         final int bookmarkCount = bookmarks.size();
         for (int i = 0; i < bookmarkCount; ++i) {
             if (bookmarks.get(i).verseIndex.equals(verseIndex)) {
@@ -129,6 +151,10 @@ class VerseListAdapter extends RecyclerView.Adapter<VerseItemViewHolder> {
     }
 
     void updateNote(Note note) {
+        if (notes == null) {
+            return;
+        }
+
         boolean updated = false;
         final int noteCount = notes.size();
         for (int i = 0; i < noteCount; ++i) {
@@ -145,6 +171,10 @@ class VerseListAdapter extends RecyclerView.Adapter<VerseItemViewHolder> {
     }
 
     void removeNote(VerseIndex verseIndex) {
+        if (notes == null) {
+            return;
+        }
+
         final int noteCount = notes.size();
         for (int i = 0; i < noteCount; ++i) {
             if (notes.get(i).verseIndex.equals(verseIndex)) {
@@ -156,11 +186,19 @@ class VerseListAdapter extends RecyclerView.Adapter<VerseItemViewHolder> {
     }
 
     void showNote(VerseIndex verseIndex) {
+        if (expanded == null) {
+            return;
+        }
+
         expanded[verseIndex.verse] = true;
         notifyItemChanged(verseIndex.verse, VerseItemAnimator.VerseItemHolderInfo.ACTION_SHOW_NOTE);
     }
 
     void hideNote(VerseIndex verseIndex) {
+        if (expanded == null) {
+            return;
+        }
+
         expanded[verseIndex.verse] = false;
         notifyItemChanged(verseIndex.verse, VerseItemAnimator.VerseItemHolderInfo.ACTION_HIDE_NOTE);
     }

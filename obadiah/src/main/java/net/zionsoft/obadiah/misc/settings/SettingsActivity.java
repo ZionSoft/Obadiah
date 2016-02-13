@@ -62,6 +62,12 @@ public class SettingsActivity extends BaseAppCompatActivity {
     @Bind(R.id.toolbar)
     Toolbar toolbar;
 
+    @Bind(R.id.reading_section_header)
+    SectionHeader readingSectionHeader;
+
+    @Bind(R.id.simple_reading_switch)
+    SettingSwitch simpleReadingSwitch;
+
     @Bind(R.id.display_section_header)
     SectionHeader displaySectionHeader;
 
@@ -110,6 +116,14 @@ public class SettingsActivity extends BaseAppCompatActivity {
         rootView.setKeepScreenOn(settings.keepScreenOn());
         updateColor();
         updateTextSize();
+
+        simpleReadingSwitch.setChecked(settings.isSimpleReading());
+        simpleReadingSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                settings.setSimpleReading(isChecked);
+            }
+        });
 
         screenOnSwitch.setChecked(settings.keepScreenOn());
         screenOnSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -225,6 +239,7 @@ public class SettingsActivity extends BaseAppCompatActivity {
     private void updateColor(int backgroundColor, int titleTextColor) {
         rootView.setBackgroundColor(backgroundColor);
 
+        simpleReadingSwitch.setTitleTextColor(titleTextColor);
         screenOnSwitch.setTitleTextColor(titleTextColor);
         nightModeSwitch.setTitleTextColor(titleTextColor);
         textSizeSettingButton.setTitleTextColor(titleTextColor);
@@ -257,11 +272,12 @@ public class SettingsActivity extends BaseAppCompatActivity {
     }
 
     private void updateTextSize(float textSize, float smallerTextSize) {
-        displaySectionHeader.setHeaderTextSize(TypedValue.COMPLEX_UNIT_PX, smallerTextSize);
+        readingSectionHeader.setHeaderTextSize(TypedValue.COMPLEX_UNIT_PX, smallerTextSize);
+        simpleReadingSwitch.setTitleTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
 
+        displaySectionHeader.setHeaderTextSize(TypedValue.COMPLEX_UNIT_PX, smallerTextSize);
         screenOnSwitch.setTitleTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
         nightModeSwitch.setTitleTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
-
         textSizeSettingButton.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize, smallerTextSize);
 
         rateMeSettingButton.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize, smallerTextSize);

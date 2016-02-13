@@ -17,6 +17,8 @@
 
 package net.zionsoft.obadiah.biblereading.verse;
 
+import android.support.annotation.Nullable;
+
 import net.zionsoft.obadiah.model.domain.Note;
 import net.zionsoft.obadiah.model.domain.Bookmark;
 import net.zionsoft.obadiah.model.domain.Verse;
@@ -26,7 +28,7 @@ import net.zionsoft.obadiah.mvp.MVPView;
 import java.util.List;
 
 interface VersePagerView extends MVPView {
-    void onVersesLoaded(List<Verse> verses, List<Bookmark> bookmarks, List<Note> notes);
+    void onVersesLoaded(List<Verse> verses, @Nullable List<Bookmark> bookmarks, @Nullable List<Note> notes);
 
     void onVersesLoadFailed(int book, int chapter);
 

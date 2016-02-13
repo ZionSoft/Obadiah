@@ -48,6 +48,9 @@ class VerseItemViewHolder extends RecyclerView.ViewHolder implements View.OnClic
     private final VersePagerPresenter versePagerPresenter;
     private final Resources resources;
 
+    @Bind(R.id.index)
+    TextView index;
+
     @Bind(R.id.text)
     TextView text;
 
@@ -59,6 +62,9 @@ class VerseItemViewHolder extends RecyclerView.ViewHolder implements View.OnClic
 
     @Bind(R.id.noteIcon)
     AppCompatImageView noteIcon;
+
+    @Bind(R.id.divider)
+    View divider;
 
     private VerseIndex verseIndex;
     private boolean isBookmarked;
@@ -76,14 +82,43 @@ class VerseItemViewHolder extends RecyclerView.ViewHolder implements View.OnClic
         noteIcon.setOnClickListener(this);
     }
 
-    void bind(Verse verse, boolean selected, boolean isBookmarked, String note, boolean expanded) {
+    void bind(Verse verse, int totalVerses, boolean selected) {
         itemView.setSelected(selected);
 
+        if (verse.parallel.size() == 0) {
+            divider.setVisibility(View.GONE);
+
+            index.setVisibility(View.VISIBLE);
+            final Settings settings = versePagerPresenter.getSettings();
+            final int textColor = settings.getTextColor();
+            final float textSize = resources.getDimension(settings.getTextSize().textSize);
+            index.setTextColor(textColor);
+            index.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+            if (totalVerses < 10) {
+                index.setText(Integer.toString(verse.verseIndex.verse + 1));
+            } else if (totalVerses < 100) {
+                index.setText(String.format("%2d", verse.verseIndex.verse + 1));
+            } else {
+                index.setText(String.format("%3d", verse.verseIndex.verse + 1));
+            }
+
+            text.setTextColor(textColor);
+            text.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+            text.setText(verse.text.text);
+        } else {
+            setVerse(verse);
+        }
+
+        bookmarkIcon.setVisibility(View.GONE);
+        noteIcon.setVisibility(View.GONE);
+        setExpanded(false);
+    }
+
+    private void setVerse(Verse verse) {
         final Settings settings = versePagerPresenter.getSettings();
-        final int textColor = settings.getTextColor();
-        final Settings.TextSize textSize = settings.getTextSize();
-        text.setTextColor(textColor);
-        text.setTextSize(TypedValue.COMPLEX_UNIT_PX, resources.getDimension(textSize.textSize));
+        text.setTextColor(settings.getTextColor());
+        text.setTextSize(TypedValue.COMPLEX_UNIT_PX,
+                resources.getDimension(settings.getTextSize().textSize));
 
         STRING_BUILDER.setLength(0);
         if (verse.parallel.size() == 0) {
@@ -103,18 +138,31 @@ class VerseItemViewHolder extends RecyclerView.ViewHolder implements View.OnClic
 
         verseIndex = verse.verseIndex;
 
-        setBookmark(isBookmarked);
-
-        this.note.setTextColor(textColor);
-        this.note.setTextSize(TypedValue.COMPLEX_UNIT_PX, resources.getDimension(textSize.smallerTextSize));
-        setNote(note, expanded);
-        setExpanded(expanded);
+        divider.setVisibility(View.VISIBLE);
+        index.setVisibility(View.GONE);
     }
 
     private static void buildVerse(StringBuilder sb, VerseIndex verseIndex, Verse.Text text) {
         sb.append(text.translation).append(' ')
                 .append(verseIndex.chapter + 1).append(':').append(verseIndex.verse + 1)
                 .append('\n').append(text.text).append('\n').append('\n');
+    }
+
+    void bind(Verse verse, boolean selected, boolean isBookmarked, String note, boolean expanded) {
+        itemView.setSelected(selected);
+
+        setVerse(verse);
+
+        bookmarkIcon.setVisibility(View.VISIBLE);
+        setBookmark(isBookmarked);
+
+        final Settings settings = versePagerPresenter.getSettings();
+        noteIcon.setVisibility(View.VISIBLE);
+        this.note.setTextColor(settings.getTextColor());
+        this.note.setTextSize(TypedValue.COMPLEX_UNIT_PX,
+                resources.getDimension(settings.getTextSize().smallerTextSize));
+        setNote(note, expanded);
+        setExpanded(expanded);
     }
 
     void setBookmark(boolean isBookmarked) {

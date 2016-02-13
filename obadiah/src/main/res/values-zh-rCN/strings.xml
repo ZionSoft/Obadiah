@@ -29,6 +29,8 @@
     <string name="error_network">读取失败，请检查网络连接并重试。</string>
     <string name="error_failed_to_remove">删除译本失败，请重试。</string>
 
+    <string name="pref_reading">阅读</string>
+    <string name="pref_simple_reading">简单阅读</string>
     <string name="pref_night_mode">夜间模式</string>
     <string name="pref_rate_me">在Google Play上给我评分</string>
     <string name="pref_screen_on">屏幕常亮</string>

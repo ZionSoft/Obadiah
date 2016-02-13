@@ -29,6 +29,8 @@
     <string name="error_network">Ei voi ladata, tarkista verkkoyhteys ja yritä uudelleen.</string>
     <string name="error_failed_to_remove">Ei voi poistaa, yritä uudelleen?</string>
 
+    <string name="pref_reading">Lukeminen</string>
+    <string name="pref_simple_reading">Perus</string>
     <string name="pref_night_mode">Yökäyttötilassa</string>
     <string name="pref_rate_me">Arvostele</string>
     <string name="pref_screen_on">Näytön Aina Päällä</string>

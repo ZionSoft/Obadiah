@@ -17,6 +17,8 @@
 
 package net.zionsoft.obadiah.biblereading.verse;
 
+import android.support.annotation.Nullable;
+
 import net.zionsoft.obadiah.model.domain.Bookmark;
 import net.zionsoft.obadiah.model.domain.Note;
 import net.zionsoft.obadiah.model.domain.Verse;
@@ -25,10 +27,14 @@ import java.util.List;
 
 class VerseList {
     final List<Verse> verses;
+
+    @Nullable
     final List<Bookmark> bookmarks;
+
+    @Nullable
     final List<Note> notes;
 
-    VerseList(List<Verse> verses, List<Bookmark> bookmarks, List<Note> notes) {
+    VerseList(List<Verse> verses, @Nullable List<Bookmark> bookmarks, @Nullable List<Note> notes) {
         this.verses = verses;
         this.bookmarks = bookmarks;
         this.notes = notes;

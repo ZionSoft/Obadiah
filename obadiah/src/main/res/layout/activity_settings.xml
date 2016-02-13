@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:obadiah="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+                                                 xmlns:app="http://schemas.android.com/apk/res-auto"
+                                                 xmlns:obadiah="http://schemas.android.com/apk/res-auto"
+                                                 android:layout_width="match_parent"
+                                                 android:layout_height="match_parent">
 
     <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -16,24 +16,37 @@
             android:orientation="vertical">
 
             <net.zionsoft.obadiah.ui.widget.SectionHeader
+                android:id="@+id/reading_section_header"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                obadiah:settingSectionHeaderText="@string/pref_reading"/>
+
+            <net.zionsoft.obadiah.misc.settings.SettingSwitch
+                android:id="@+id/simple_reading_switch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                obadiah:settingSwitchDividerVisible="false"
+                obadiah:settingSwitchTitle="@string/pref_simple_reading"/>
+
+            <net.zionsoft.obadiah.ui.widget.SectionHeader
                 android:id="@+id/display_section_header"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                obadiah:settingSectionHeaderText="@string/pref_display" />
+                obadiah:settingSectionHeaderText="@string/pref_display"/>
 
             <net.zionsoft.obadiah.misc.settings.SettingSwitch
                 android:id="@+id/screen_on_switch"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 obadiah:settingSwitchDividerVisible="true"
-                obadiah:settingSwitchTitle="@string/pref_screen_on" />
+                obadiah:settingSwitchTitle="@string/pref_screen_on"/>
 
             <net.zionsoft.obadiah.misc.settings.SettingSwitch
                 android:id="@+id/night_mode_switch"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 obadiah:settingSwitchDividerVisible="true"
-                obadiah:settingSwitchTitle="@string/pref_night_mode" />
+                obadiah:settingSwitchTitle="@string/pref_night_mode"/>
 
             <net.zionsoft.obadiah.misc.settings.SettingTitleDescriptionButton
                 android:id="@+id/text_size_setting_button"
@@ -41,13 +54,13 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/background_text"
                 obadiah:settingTitleDescriptionButtonDividerVisible="false"
-                obadiah:settingTitleDescriptionButtonTitle="@string/pref_text_size" />
+                obadiah:settingTitleDescriptionButtonTitle="@string/pref_text_size"/>
 
             <net.zionsoft.obadiah.ui.widget.SectionHeader
                 android:id="@+id/about_section_header"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                obadiah:settingSectionHeaderText="@string/pref_about" />
+                obadiah:settingSectionHeaderText="@string/pref_about"/>
 
             <net.zionsoft.obadiah.misc.settings.SettingTitleDescriptionButton
                 android:id="@+id/rate_me_setting_button"
@@ -55,7 +68,7 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/background_text"
                 obadiah:settingTitleDescriptionButtonDividerVisible="true"
-                obadiah:settingTitleDescriptionButtonTitle="@string/pref_rate_me" />
+                obadiah:settingTitleDescriptionButtonTitle="@string/pref_rate_me"/>
 
             <net.zionsoft.obadiah.misc.settings.SettingTitleDescriptionButton
                 android:id="@+id/invite_friends_setting_button"
@@ -63,7 +76,7 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/background_text"
                 obadiah:settingTitleDescriptionButtonDividerVisible="true"
-                obadiah:settingTitleDescriptionButtonTitle="@string/pref_invite_friends" />
+                obadiah:settingTitleDescriptionButtonTitle="@string/pref_invite_friends"/>
 
             <net.zionsoft.obadiah.misc.settings.SettingTitleDescriptionButton
                 android:id="@+id/version_setting_button"
@@ -72,7 +85,7 @@
                 android:background="@drawable/background_text"
                 android:clickable="true"
                 obadiah:settingTitleDescriptionButtonDividerVisible="true"
-                obadiah:settingTitleDescriptionButtonTitle="@string/pref_version" />
+                obadiah:settingTitleDescriptionButtonTitle="@string/pref_version"/>
 
             <net.zionsoft.obadiah.misc.settings.SettingTitleDescriptionButton
                 android:id="@+id/license_setting_button"
@@ -81,7 +94,7 @@
                 android:background="@drawable/background_text"
                 android:clickable="true"
                 obadiah:settingTitleDescriptionButtonDividerVisible="false"
-                obadiah:settingTitleDescriptionButtonTitle="@string/pref_license" />
+                obadiah:settingTitleDescriptionButtonTitle="@string/pref_license"/>
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
 
@@ -93,6 +106,6 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            app:layout_scrollFlags="scroll|enterAlways" />
+            app:layout_scrollFlags="scroll|enterAlways"/>
     </android.support.design.widget.AppBarLayout>
 </android.support.design.widget.CoordinatorLayout>
