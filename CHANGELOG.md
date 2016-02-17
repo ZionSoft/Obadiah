@@ -2,6 +2,8 @@ CHANGELOG
 ---------
 
 #### Next Release
+
+#### v1.14.1 (2016-02-14)
 - Supported "simple reading" mode.
 
 #### v1.14.0 (2016-02-07)
