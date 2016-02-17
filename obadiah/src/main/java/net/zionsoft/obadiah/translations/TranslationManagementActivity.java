@@ -204,7 +204,7 @@ public class TranslationManagementActivity extends BaseAppCompatActivity
         loadTranslations(true);
     }
 
-    private void loadTranslations(final boolean forceRefresh) {
+    private void loadTranslations(boolean forceRefresh) {
         translationList.setVisibility(View.GONE);
         translationManagementPresenter.loadTranslations(forceRefresh);
     }
