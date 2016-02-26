@@ -2,6 +2,13 @@ CHANGELOG
 ---------
 
 #### Next Release
+- Updated build tools and 3rd-party libraries:
+  - Updated build tool to 23.0.2.
+  - Updated Gradle to 2.12.
+  - Updated support library to 23.2.1.
+  - Updated RxJava to 1.1.2.
+  - Updated Retrofit to 2.0.0.
+  - Updated Stetho to 1.3.1.
 
 #### v1.14.1 (2016-02-14)
 - Supported "simple reading" mode.
