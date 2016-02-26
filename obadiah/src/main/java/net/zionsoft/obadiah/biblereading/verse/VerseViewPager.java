@@ -17,6 +17,8 @@
 
 package net.zionsoft.obadiah.biblereading.verse;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -28,7 +30,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
-import android.text.ClipboardManager;
 import android.util.AttributeSet;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -134,11 +135,15 @@ public class VerseViewPager extends ViewPager implements VerseView, VerseSelecti
             case R.id.action_copy:
                 Analytics.trackEvent(Analytics.CATEGORY_UI, Analytics.UI_ACTION_BUTTON_CLICK, "copy");
 
-                // noinspection deprecation
-                final ClipboardManager clipboardManager
-                        = (ClipboardManager) activity.getSystemService(Context.CLIPBOARD_SERVICE);
-                clipboardManager.setText(buildText(adapter.getSelectedVerses(getCurrentItem())));
-                Toast.makeText(activity, R.string.toast_verses_copied, Toast.LENGTH_SHORT).show();
+                final List<Verse> verses = adapter.getSelectedVerses(getCurrentItem());
+                if (verses != null && verses.size() > 0) {
+                    final ClipboardManager clipboardManager
+                            = (ClipboardManager) activity.getSystemService(Context.CLIPBOARD_SERVICE);
+                    final Verse verse = verses.get(0);
+                    clipboardManager.setPrimaryClip(ClipData.newPlainText(
+                            verse.text.translation + " " + verse.text.bookName, buildText(verses)));
+                    Toast.makeText(activity, R.string.toast_verses_copied, Toast.LENGTH_SHORT).show();
+                }
 
                 mode.finish();
                 return true;
