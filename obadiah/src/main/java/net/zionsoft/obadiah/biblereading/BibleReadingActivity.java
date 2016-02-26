@@ -46,7 +46,6 @@ import net.zionsoft.obadiah.biblereading.verse.VersePresenter;
 import net.zionsoft.obadiah.biblereading.verse.VerseViewPager;
 import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.datamodel.Settings;
-import net.zionsoft.obadiah.model.domain.Verse;
 import net.zionsoft.obadiah.model.domain.VerseIndex;
 import net.zionsoft.obadiah.translations.TranslationManagementActivity;
 import net.zionsoft.obadiah.ui.utils.BaseAppCompatActivity;
@@ -274,7 +273,6 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
     @Override
     protected void onStop() {
         appIndexingManager.onStop();
-
         super.onStop();
     }
 
