@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest package="net.zionsoft.obadiah"
-          xmlns:android="http://schemas.android.com/apk/res/android"
-          android:installLocation="auto">
+<manifest
+    package="net.zionsoft.obadiah"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:installLocation="auto">
 
     <permission
         android:name="${applicationId}.permission.C2D_MESSAGE"
