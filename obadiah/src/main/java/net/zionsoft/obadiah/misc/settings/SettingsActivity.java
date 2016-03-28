@@ -100,7 +100,7 @@ public class SettingsActivity extends BaseAppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        App.getInjectionComponent(this).inject(this);
+        App.getComponent().inject(this);
 
         initializeUi();
     }

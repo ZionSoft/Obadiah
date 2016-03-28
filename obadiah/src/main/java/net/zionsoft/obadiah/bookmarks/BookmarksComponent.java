@@ -17,7 +17,7 @@
 
 package net.zionsoft.obadiah.bookmarks;
 
-import net.zionsoft.obadiah.injection.InjectionComponent;
+import net.zionsoft.obadiah.AppComponent;
 import net.zionsoft.obadiah.injection.components.Component;
 import net.zionsoft.obadiah.injection.scopes.ActivityScope;
 
@@ -29,8 +29,8 @@ public interface BookmarksComponent extends Component {
     void inject(BookmarksActivity bookmarksActivity);
 
     final class Initializer {
-        public static BookmarksComponent init(InjectionComponent injectionComponent) {
-            return injectionComponent.plus(new BookmarksModule());
+        public static BookmarksComponent init(AppComponent appComponent) {
+            return appComponent.plus(new BookmarksModule());
         }
     }
 }

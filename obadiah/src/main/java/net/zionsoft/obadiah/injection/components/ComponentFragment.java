@@ -17,24 +17,14 @@
 
 package net.zionsoft.obadiah.injection.components;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 
 import net.zionsoft.obadiah.App;
-import net.zionsoft.obadiah.injection.InjectionComponent;
+import net.zionsoft.obadiah.AppComponent;
 
 public abstract class ComponentFragment<C extends Component> extends Fragment implements HasComponent<C> {
     private C component;
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-
-        if (component == null) {
-            component = createComponent(App.getInjectionComponent(context));
-        }
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -44,8 +34,15 @@ public abstract class ComponentFragment<C extends Component> extends Fragment im
 
     @Override
     public C getComponent() {
+        if (component == null) {
+            synchronized (this) {
+                if (component == null) {
+                    component = createComponent(App.getComponent());
+                }
+            }
+        }
         return component;
     }
 
-    protected abstract C createComponent(InjectionComponent injectionComponent);
+    protected abstract C createComponent(AppComponent appComponent);
 }

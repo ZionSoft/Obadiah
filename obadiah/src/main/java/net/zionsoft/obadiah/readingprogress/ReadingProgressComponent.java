@@ -17,7 +17,7 @@
 
 package net.zionsoft.obadiah.readingprogress;
 
-import net.zionsoft.obadiah.injection.InjectionComponent;
+import net.zionsoft.obadiah.AppComponent;
 import net.zionsoft.obadiah.injection.components.Component;
 import net.zionsoft.obadiah.injection.scopes.ActivityScope;
 
@@ -29,8 +29,8 @@ public interface ReadingProgressComponent extends Component {
     void inject(ReadingProgressActivity readingProgressActivity);
 
     final class Initializer {
-        public static ReadingProgressComponent init(InjectionComponent injectionComponent) {
-            return injectionComponent.plus(new ReadingProgressModule());
+        public static ReadingProgressComponent init(AppComponent appComponent) {
+            return appComponent.plus(new ReadingProgressModule());
         }
     }
 }

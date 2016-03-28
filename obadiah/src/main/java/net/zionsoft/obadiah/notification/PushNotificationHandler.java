@@ -69,7 +69,7 @@ public class PushNotificationHandler extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        App.getInjectionComponent(this).inject(this);
+        App.getComponent().inject(this);
 
         final Bundle extras = intent.getBundleExtra(KEY_EXTRAS);
         final String messageType = extras.getString("type");

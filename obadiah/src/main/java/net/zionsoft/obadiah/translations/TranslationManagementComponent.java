@@ -17,7 +17,7 @@
 
 package net.zionsoft.obadiah.translations;
 
-import net.zionsoft.obadiah.injection.InjectionComponent;
+import net.zionsoft.obadiah.AppComponent;
 import net.zionsoft.obadiah.injection.components.Component;
 import net.zionsoft.obadiah.injection.scopes.ActivityScope;
 
@@ -29,8 +29,8 @@ public interface TranslationManagementComponent extends Component {
     void inject(TranslationManagementActivity translationManagementActivity);
 
     final class Initializer {
-        static TranslationManagementComponent init(InjectionComponent injectionComponent) {
-            return injectionComponent.plus(new TranslationManagementModule());
+        static TranslationManagementComponent init(AppComponent appComponent) {
+            return appComponent.plus(new TranslationManagementModule());
         }
     }
 }

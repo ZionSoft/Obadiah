@@ -17,7 +17,7 @@
 
 package net.zionsoft.obadiah.misc.license;
 
-import net.zionsoft.obadiah.injection.InjectionComponent;
+import net.zionsoft.obadiah.AppComponent;
 import net.zionsoft.obadiah.injection.components.ComponentFragment;
 
 public class OpenSourceLicenseComponentFragment extends ComponentFragment<OpenSourceLicenseComponent> {
@@ -28,7 +28,7 @@ public class OpenSourceLicenseComponentFragment extends ComponentFragment<OpenSo
     }
 
     @Override
-    protected OpenSourceLicenseComponent createComponent(InjectionComponent injectionComponent) {
-        return OpenSourceLicenseComponent.Initializer.init(injectionComponent);
+    protected OpenSourceLicenseComponent createComponent(AppComponent appComponent) {
+        return OpenSourceLicenseComponent.Initializer.init(appComponent);
     }
 }

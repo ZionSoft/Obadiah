@@ -17,7 +17,7 @@
 
 package net.zionsoft.obadiah.search;
 
-import net.zionsoft.obadiah.injection.InjectionComponent;
+import net.zionsoft.obadiah.AppComponent;
 import net.zionsoft.obadiah.injection.components.Component;
 import net.zionsoft.obadiah.injection.scopes.ActivityScope;
 
@@ -29,8 +29,8 @@ public interface SearchComponent extends Component {
     void inject(SearchActivity searchActivity);
 
     final class Initializer {
-        static SearchComponent init(InjectionComponent injectionComponent) {
-            return injectionComponent.plus(new SearchModule());
+        static SearchComponent init(AppComponent appComponent) {
+            return appComponent.plus(new SearchModule());
         }
     }
 }

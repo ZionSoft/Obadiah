@@ -17,11 +17,8 @@
 
 package net.zionsoft.obadiah;
 
-import android.content.Context;
-
 import com.crashlytics.android.Crashlytics;
 
-import net.zionsoft.obadiah.injection.InjectionComponent;
 import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.datamodel.BibleReadingModel;
 import net.zionsoft.obadiah.notification.PushNotificationRegister;
@@ -35,10 +32,10 @@ public class App extends BaseApp {
     @Inject
     BibleReadingModel bibleReadingModel;
 
-    private InjectionComponent injectionComponent;
+    private static AppComponent appComponent;
 
-    public static InjectionComponent getInjectionComponent(Context context) {
-        return ((App) context.getApplicationContext()).injectionComponent;
+    public static AppComponent getComponent() {
+        return appComponent;
     }
 
     @Override
@@ -46,8 +43,8 @@ public class App extends BaseApp {
         super.onCreate();
         Fabric.with(this, new Crashlytics());
 
-        injectionComponent = InjectionComponent.Initializer.init(this);
-        injectionComponent.inject(this);
+        appComponent = AppComponent.Initializer.init(this);
+        appComponent.inject(this);
 
         Analytics.initialize(this);
         PushNotificationRegister.register(this);

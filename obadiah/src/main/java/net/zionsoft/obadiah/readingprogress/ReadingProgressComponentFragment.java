@@ -17,7 +17,7 @@
 
 package net.zionsoft.obadiah.readingprogress;
 
-import net.zionsoft.obadiah.injection.InjectionComponent;
+import net.zionsoft.obadiah.AppComponent;
 import net.zionsoft.obadiah.injection.components.ComponentFragment;
 
 public class ReadingProgressComponentFragment extends ComponentFragment<ReadingProgressComponent> {
@@ -28,7 +28,7 @@ public class ReadingProgressComponentFragment extends ComponentFragment<ReadingP
     }
 
     @Override
-    protected ReadingProgressComponent createComponent(InjectionComponent injectionComponent) {
-        return ReadingProgressComponent.Initializer.init(injectionComponent);
+    protected ReadingProgressComponent createComponent(AppComponent appComponent) {
+        return ReadingProgressComponent.Initializer.init(appComponent);
     }
 }

@@ -15,15 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.injection;
+package net.zionsoft.obadiah;
 
 import net.zionsoft.obadiah.App;
 
 import javax.inject.Singleton;
 
-
-public final class InjectionModule extends BaseInjectionModule {
-    public InjectionModule(App application) {
+public final class AppModule extends BaseAppModule {
+    public AppModule(App application) {
         super(application);
     }
 }

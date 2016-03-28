@@ -17,7 +17,7 @@
 
 package net.zionsoft.obadiah.biblereading;
 
-import net.zionsoft.obadiah.injection.InjectionComponent;
+import net.zionsoft.obadiah.AppComponent;
 import net.zionsoft.obadiah.injection.components.ComponentFragment;
 
 public class BibleReadingComponentFragment extends ComponentFragment<BibleReadingComponent> {
@@ -28,7 +28,7 @@ public class BibleReadingComponentFragment extends ComponentFragment<BibleReadin
     }
 
     @Override
-    protected BibleReadingComponent createComponent(InjectionComponent injectionComponent) {
-        return BibleReadingComponent.Initializer.init(injectionComponent);
+    protected BibleReadingComponent createComponent(AppComponent appComponent) {
+        return BibleReadingComponent.Initializer.init(appComponent);
     }
 }

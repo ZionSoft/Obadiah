@@ -17,9 +17,8 @@
 
 package net.zionsoft.obadiah.bookmarks;
 
-import net.zionsoft.obadiah.injection.InjectionComponent;
+import net.zionsoft.obadiah.AppComponent;
 import net.zionsoft.obadiah.injection.components.ComponentFragment;
-import net.zionsoft.obadiah.readingprogress.ReadingProgressComponent;
 
 public class BookmarksComponentFragment extends ComponentFragment<BookmarksComponent> {
     static final String FRAGMENT_TAG = "net.zionsoft.obadiah.BookmarksComponentFragment.FRAGMENT_TAG";
@@ -29,7 +28,7 @@ public class BookmarksComponentFragment extends ComponentFragment<BookmarksCompo
     }
 
     @Override
-    protected BookmarksComponent createComponent(InjectionComponent injectionComponent) {
-        return BookmarksComponent.Initializer.init(injectionComponent);
+    protected BookmarksComponent createComponent(AppComponent appComponent) {
+        return BookmarksComponent.Initializer.init(appComponent);
     }
 }

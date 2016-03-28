@@ -15,9 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.injection;
+package net.zionsoft.obadiah;
 
-import net.zionsoft.obadiah.App;
 import net.zionsoft.obadiah.biblereading.BibleReadingComponent;
 import net.zionsoft.obadiah.biblereading.BibleReadingModule;
 import net.zionsoft.obadiah.bookmarks.BookmarksComponent;
@@ -40,8 +39,8 @@ import javax.inject.Singleton;
 import dagger.Component;
 
 @Singleton
-@Component(modules = BaseInjectionModule.class)
-public interface InjectionComponent {
+@Component(modules = BaseAppModule.class)
+public interface AppComponent {
     void inject(App app);
 
     void inject(SettingsActivity settingsActivity);
@@ -63,9 +62,9 @@ public interface InjectionComponent {
     TranslationManagementComponent plus(TranslationManagementModule translationManagementModule);
 
     final class Initializer {
-        public static InjectionComponent init(App app) {
-            return DaggerInjectionComponent.builder()
-                    .baseInjectionModule(new InjectionModule(app))
+        public static AppComponent init(App app) {
+            return DaggerAppComponent.builder()
+                    .baseAppModule(new AppModule(app))
                     .build();
         }
     }

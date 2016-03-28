@@ -15,13 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.injection;
+package net.zionsoft.obadiah;
 
 import android.content.Context;
 
 import com.squareup.moshi.Moshi;
 
-import net.zionsoft.obadiah.App;
 import net.zionsoft.obadiah.model.database.DatabaseHelper;
 import net.zionsoft.obadiah.model.datamodel.BibleReadingModel;
 import net.zionsoft.obadiah.model.datamodel.BookmarkModel;
@@ -42,10 +41,10 @@ import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.moshi.MoshiConverterFactory;
 
 @Module
-public class BaseInjectionModule {
+public class BaseAppModule {
     private final App application;
 
-    public BaseInjectionModule(App application) {
+    public BaseAppModule(App application) {
         this.application = application;
     }
 

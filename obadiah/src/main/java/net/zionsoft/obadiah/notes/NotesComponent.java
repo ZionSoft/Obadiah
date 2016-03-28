@@ -17,7 +17,7 @@
 
 package net.zionsoft.obadiah.notes;
 
-import net.zionsoft.obadiah.injection.InjectionComponent;
+import net.zionsoft.obadiah.AppComponent;
 import net.zionsoft.obadiah.injection.components.Component;
 import net.zionsoft.obadiah.injection.scopes.ActivityScope;
 
@@ -29,8 +29,8 @@ public interface NotesComponent extends Component {
     void inject(NotesActivity notesActivity);
 
     final class Initializer {
-        public static NotesComponent init(InjectionComponent injectionComponent) {
-            return injectionComponent.plus(new NotesModule());
+        public static NotesComponent init(AppComponent appComponent) {
+            return appComponent.plus(new NotesModule());
         }
     }
 }

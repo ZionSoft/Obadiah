@@ -17,7 +17,7 @@
 
 package net.zionsoft.obadiah.notes;
 
-import net.zionsoft.obadiah.injection.InjectionComponent;
+import net.zionsoft.obadiah.AppComponent;
 import net.zionsoft.obadiah.injection.components.ComponentFragment;
 
 public class NotesComponentFragment extends ComponentFragment<NotesComponent> {
@@ -28,7 +28,7 @@ public class NotesComponentFragment extends ComponentFragment<NotesComponent> {
     }
 
     @Override
-    protected NotesComponent createComponent(InjectionComponent injectionComponent) {
-        return NotesComponent.Initializer.init(injectionComponent);
+    protected NotesComponent createComponent(AppComponent appComponent) {
+        return NotesComponent.Initializer.init(appComponent);
     }
 }

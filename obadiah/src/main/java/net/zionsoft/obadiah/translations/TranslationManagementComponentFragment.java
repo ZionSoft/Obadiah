@@ -17,7 +17,7 @@
 
 package net.zionsoft.obadiah.translations;
 
-import net.zionsoft.obadiah.injection.InjectionComponent;
+import net.zionsoft.obadiah.AppComponent;
 import net.zionsoft.obadiah.injection.components.ComponentFragment;
 
 public class TranslationManagementComponentFragment extends ComponentFragment<TranslationManagementComponent> {
@@ -28,7 +28,7 @@ public class TranslationManagementComponentFragment extends ComponentFragment<Tr
     }
 
     @Override
-    protected TranslationManagementComponent createComponent(InjectionComponent injectionComponent) {
-        return TranslationManagementComponent.Initializer.init(injectionComponent);
+    protected TranslationManagementComponent createComponent(AppComponent appComponent) {
+        return TranslationManagementComponent.Initializer.init(appComponent);
     }
 }

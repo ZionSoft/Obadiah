@@ -17,7 +17,7 @@
 
 package net.zionsoft.obadiah.biblereading;
 
-import net.zionsoft.obadiah.injection.InjectionComponent;
+import net.zionsoft.obadiah.AppComponent;
 import net.zionsoft.obadiah.injection.components.Component;
 import net.zionsoft.obadiah.injection.scopes.ActivityScope;
 
@@ -29,8 +29,8 @@ public interface BibleReadingComponent extends Component {
     void inject(BibleReadingActivity bibleReadingActivity);
 
     final class Initializer {
-        public static BibleReadingComponent init(InjectionComponent injectionComponent) {
-            return injectionComponent.plus(new BibleReadingModule());
+        public static BibleReadingComponent init(AppComponent appComponent) {
+            return appComponent.plus(new BibleReadingModule());
         }
     }
 }

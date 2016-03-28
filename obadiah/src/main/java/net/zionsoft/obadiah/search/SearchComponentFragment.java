@@ -17,7 +17,7 @@
 
 package net.zionsoft.obadiah.search;
 
-import net.zionsoft.obadiah.injection.InjectionComponent;
+import net.zionsoft.obadiah.AppComponent;
 import net.zionsoft.obadiah.injection.components.ComponentFragment;
 
 public class SearchComponentFragment extends ComponentFragment<SearchComponent> {
@@ -28,7 +28,7 @@ public class SearchComponentFragment extends ComponentFragment<SearchComponent> 
     }
 
     @Override
-    protected SearchComponent createComponent(InjectionComponent injectionComponent) {
-        return SearchComponent.Initializer.init(injectionComponent);
+    protected SearchComponent createComponent(AppComponent appComponent) {
+        return SearchComponent.Initializer.init(appComponent);
     }
 }
