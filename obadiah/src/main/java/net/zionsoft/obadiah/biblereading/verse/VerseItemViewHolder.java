@@ -36,6 +36,7 @@ import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.datamodel.Settings;
 import net.zionsoft.obadiah.model.domain.Verse;
 import net.zionsoft.obadiah.model.domain.VerseIndex;
+import net.zionsoft.obadiah.utils.TextFormatter;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -97,9 +98,9 @@ class VerseItemViewHolder extends RecyclerView.ViewHolder implements View.OnClic
             if (totalVerses < 10) {
                 index.setText(Integer.toString(verse.verseIndex.verse + 1));
             } else if (totalVerses < 100) {
-                index.setText(String.format("%2d", verse.verseIndex.verse + 1));
+                index.setText(TextFormatter.format("%2d", verse.verseIndex.verse + 1));
             } else {
-                index.setText(String.format("%3d", verse.verseIndex.verse + 1));
+                index.setText(TextFormatter.format("%3d", verse.verseIndex.verse + 1));
             }
 
             text.setTextColor(textColor);

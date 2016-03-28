@@ -36,6 +36,7 @@ import com.squareup.moshi.Moshi;
 
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.analytics.Analytics;
+import net.zionsoft.obadiah.utils.TextFormatter;
 
 import java.io.IOException;
 import java.lang.annotation.Retention;
@@ -237,7 +238,7 @@ public class InAppBilling implements ServiceConnection {
             } else {
                 status = STATUS_UNSUPPORTED;
                 Analytics.trackEvent(Analytics.CATEGORY_BILLING, Analytics.BILLING_ACTION_NOT_SUPPORTED,
-                        String.format("Manufacturer: %s, Model: %s, Reason: %d",
+                        TextFormatter.format("Manufacturer: %s, Model: %s, Reason: %d",
                                 Build.MANUFACTURER, Build.MODEL, response));
             }
         } catch (Exception e) {

@@ -24,6 +24,7 @@ import android.support.annotation.NonNull;
 import android.util.SparseArray;
 
 import net.zionsoft.obadiah.model.domain.Bible;
+import net.zionsoft.obadiah.utils.TextFormatter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +36,7 @@ public class ReadingProgressTableHelper {
     private static final String COLUMN_LAST_READING_TIMESTAMP = "COLUMN_LAST_READING_TIMESTAMP";
 
     static void createTable(SQLiteDatabase db) {
-        db.execSQL(String.format("CREATE TABLE %s (%s INTEGER NOT NULL, %s INTEGER NOT NULL, %s INTEGER NOT NULL, PRIMARY KEY (%s, %s));",
+        db.execSQL(TextFormatter.format("CREATE TABLE %s (%s INTEGER NOT NULL, %s INTEGER NOT NULL, %s INTEGER NOT NULL, PRIMARY KEY (%s, %s));",
                 TABLE_READING_PROGRESS, COLUMN_BOOK_INDEX, COLUMN_CHAPTER_INDEX, COLUMN_LAST_READING_TIMESTAMP,
                 COLUMN_BOOK_INDEX, COLUMN_CHAPTER_INDEX));
     }

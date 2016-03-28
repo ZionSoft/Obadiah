@@ -27,6 +27,7 @@ import android.text.TextUtils;
 import net.zionsoft.obadiah.model.domain.Verse;
 import net.zionsoft.obadiah.model.domain.VerseIndex;
 import net.zionsoft.obadiah.model.domain.VerseSearchResult;
+import net.zionsoft.obadiah.utils.TextFormatter;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -39,10 +40,10 @@ public class TranslationHelper {
     private static final String COLUMN_TEXT = "COLUMN_TEXT";
 
     public static void createTranslationTable(SQLiteDatabase db, String translationShortName) {
-        db.execSQL(String.format("CREATE TABLE %s (%s INTEGER NOT NULL, %s INTEGER NOT NULL, %s INTEGER NOT NULL, %s TEXT NOT NULL);",
+        db.execSQL(TextFormatter.format("CREATE TABLE %s (%s INTEGER NOT NULL, %s INTEGER NOT NULL, %s INTEGER NOT NULL, %s TEXT NOT NULL);",
                 translationShortName, COLUMN_BOOK_INDEX, COLUMN_CHAPTER_INDEX,
                 COLUMN_VERSE_INDEX, COLUMN_TEXT));
-        db.execSQL(String.format("CREATE INDEX INDEX_%s ON %s (%s, %s, %s);",
+        db.execSQL(TextFormatter.format("CREATE INDEX INDEX_%s ON %s (%s, %s, %s);",
                 translationShortName, translationShortName, COLUMN_BOOK_INDEX,
                 COLUMN_CHAPTER_INDEX, COLUMN_VERSE_INDEX));
     }
@@ -53,7 +54,7 @@ public class TranslationHelper {
         Cursor cursor = null;
         try {
             cursor = db.query(translationShortName, new String[]{COLUMN_TEXT},
-                    String.format("%s = ? AND %s = ? AND %s = ?", COLUMN_BOOK_INDEX,
+                    TextFormatter.format("%s = ? AND %s = ? AND %s = ?", COLUMN_BOOK_INDEX,
                             COLUMN_CHAPTER_INDEX, COLUMN_VERSE_INDEX),
                     new String[]{Integer.toString(book), Integer.toString(chapter), Integer.toString(verse)},
                     null, null, null);
@@ -75,9 +76,9 @@ public class TranslationHelper {
         Cursor cursor = null;
         try {
             cursor = db.query(translationShortName, new String[]{COLUMN_TEXT},
-                    String.format("%s = ? AND %s = ?", COLUMN_BOOK_INDEX, COLUMN_CHAPTER_INDEX),
+                    TextFormatter.format("%s = ? AND %s = ?", COLUMN_BOOK_INDEX, COLUMN_CHAPTER_INDEX),
                     new String[]{Integer.toString(book), Integer.toString(chapter)},
-                    null, null, String.format("%s ASC", COLUMN_VERSE_INDEX)
+                    null, null, TextFormatter.format("%s ASC", COLUMN_VERSE_INDEX)
             );
             final int verse = cursor.getColumnIndex(COLUMN_TEXT);
             final int verseCount = cursor.getCount();
@@ -116,9 +117,9 @@ public class TranslationHelper {
         Cursor cursor = null;
         try {
             cursor = db.query(translationShortName, new String[]{COLUMN_TEXT},
-                    String.format("%s = ? AND %s = ?", COLUMN_BOOK_INDEX, COLUMN_CHAPTER_INDEX),
+                    TextFormatter.format("%s = ? AND %s = ?", COLUMN_BOOK_INDEX, COLUMN_CHAPTER_INDEX),
                     new String[]{Integer.toString(book), Integer.toString(chapter)},
-                    null, null, String.format("%s ASC", COLUMN_VERSE_INDEX)
+                    null, null, TextFormatter.format("%s ASC", COLUMN_VERSE_INDEX)
             );
             final int verse = cursor.getColumnIndex(COLUMN_TEXT);
             final int verseCount = cursor.getCount();
@@ -157,9 +158,9 @@ public class TranslationHelper {
         try {
             cursor = db.query(translationShortName,
                     new String[]{COLUMN_BOOK_INDEX, COLUMN_CHAPTER_INDEX, COLUMN_VERSE_INDEX, COLUMN_TEXT},
-                    String.format("%s LIKE ?", COLUMN_TEXT),
-                    new String[]{String.format("%%%s%%", keyword.trim().replaceAll("\\s+", "%"))},
-                    null, null, String.format(" %s ASC, %s ASC, %s ASC", COLUMN_BOOK_INDEX,
+                    TextFormatter.format("%s LIKE ?", COLUMN_TEXT),
+                    new String[]{TextFormatter.format("%%%s%%", keyword.trim().replaceAll("\\s+", "%"))},
+                    null, null, TextFormatter.format(" %s ASC, %s ASC, %s ASC", COLUMN_BOOK_INDEX,
                             COLUMN_CHAPTER_INDEX, COLUMN_VERSE_INDEX));
             final int count = cursor.getCount();
             if (count == 0) {
@@ -198,6 +199,6 @@ public class TranslationHelper {
     }
 
     public static void removeTranslation(SQLiteDatabase db, String translationShortName) {
-        db.execSQL(String.format("DROP TABLE IF EXISTS %s", translationShortName));
+        db.execSQL(TextFormatter.format("DROP TABLE IF EXISTS %s", translationShortName));
     }
 }

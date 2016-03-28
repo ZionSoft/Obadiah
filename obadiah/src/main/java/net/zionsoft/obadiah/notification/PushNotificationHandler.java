@@ -40,6 +40,7 @@ import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.datamodel.BibleReadingModel;
 import net.zionsoft.obadiah.model.domain.Verse;
 import net.zionsoft.obadiah.translations.TranslationManagementActivity;
+import net.zionsoft.obadiah.utils.TextFormatter;
 
 import javax.inject.Inject;
 
@@ -133,7 +134,8 @@ public class PushNotificationHandler extends IntentService {
                     .loadVerse(translationShortName, verseIndex.book, verseIndex.chapter, verseIndex.verse)
                     .toBlocking().first();
             builder.setContentIntent(pendingIntent)
-                    .setContentTitle(String.format("%s, %d:%d", verse.text.bookName, verseIndex.chapter + 1, verseIndex.verse + 1))
+                    .setContentTitle(TextFormatter.format("%s, %d:%d",
+                            verse.text.bookName, verseIndex.chapter + 1, verseIndex.verse + 1))
                     .setContentText(verse.text.text)
                     .setStyle(new NotificationCompat.BigTextStyle().bigText(verse.text.text));
         } catch (Exception e) {

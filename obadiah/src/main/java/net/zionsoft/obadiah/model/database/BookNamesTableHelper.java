@@ -24,6 +24,7 @@ import android.support.annotation.NonNull;
 
 import net.zionsoft.obadiah.model.domain.Bible;
 import net.zionsoft.obadiah.network.BackendTranslationInfo;
+import net.zionsoft.obadiah.utils.TextFormatter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,9 +37,9 @@ public class BookNamesTableHelper {
     private static final String COLUMN_BOOK_NAME = "COLUMN_BOOK_NAME";
 
     static void createTable(SQLiteDatabase db) {
-        db.execSQL(String.format("CREATE TABLE %s (%s TEXT NOT NULL, %s INTEGER NOT NULL, %s TEXT NOT NULL);",
+        db.execSQL(TextFormatter.format("CREATE TABLE %s (%s TEXT NOT NULL, %s INTEGER NOT NULL, %s TEXT NOT NULL);",
                 TABLE_BOOK_NAMES, COLUMN_TRANSLATION_SHORT_NAME, COLUMN_BOOK_INDEX, COLUMN_BOOK_NAME));
-        db.execSQL(String.format("CREATE INDEX %s ON %s (%s);",
+        db.execSQL(TextFormatter.format("CREATE INDEX %s ON %s (%s);",
                 INDEX_TABLE_BOOK_NAMES, TABLE_BOOK_NAMES, COLUMN_TRANSLATION_SHORT_NAME));
     }
 
@@ -47,9 +48,9 @@ public class BookNamesTableHelper {
         Cursor cursor = null;
         try {
             cursor = db.query(TABLE_BOOK_NAMES, new String[]{COLUMN_BOOK_NAME},
-                    String.format("%s = ?", COLUMN_TRANSLATION_SHORT_NAME),
+                    TextFormatter.format("%s = ?", COLUMN_TRANSLATION_SHORT_NAME),
                     new String[]{translationShortName}, null, null,
-                    String.format("%s ASC", COLUMN_BOOK_INDEX));
+                    TextFormatter.format("%s ASC", COLUMN_BOOK_INDEX));
             final int bookName = cursor.getColumnIndex(COLUMN_BOOK_NAME);
             final List<String> bookNames = new ArrayList<>(Bible.getBookCount());
             while (cursor.moveToNext()) {
@@ -76,7 +77,7 @@ public class BookNamesTableHelper {
     }
 
     public static void removeBookNames(SQLiteDatabase db, String translationShortName) {
-        db.delete(TABLE_BOOK_NAMES, String.format("%s = ?", COLUMN_TRANSLATION_SHORT_NAME),
+        db.delete(TABLE_BOOK_NAMES, TextFormatter.format("%s = ?", COLUMN_TRANSLATION_SHORT_NAME),
                 new String[]{translationShortName});
     }
 }

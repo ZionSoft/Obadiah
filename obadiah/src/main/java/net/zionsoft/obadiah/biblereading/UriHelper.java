@@ -25,6 +25,7 @@ import com.crashlytics.android.Crashlytics;
 
 import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.domain.Bible;
+import net.zionsoft.obadiah.utils.TextFormatter;
 
 class UriHelper {
     // format: /bible/<translation-short-name>/<book-verseIndex>/<chapter-verseIndex>/<verse-verseIndex>
@@ -66,6 +67,6 @@ class UriHelper {
 
     @NonNull
     static String createUri(String translation, int book, int chapter, int verse) {
-        return String.format(VERSE_URI_TEMPLATE, translation, book, chapter, verse);
+        return TextFormatter.format(VERSE_URI_TEMPLATE, translation, book, chapter, verse);
     }
 }

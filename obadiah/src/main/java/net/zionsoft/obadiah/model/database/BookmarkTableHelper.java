@@ -24,6 +24,7 @@ import android.support.annotation.NonNull;
 
 import net.zionsoft.obadiah.model.domain.Bookmark;
 import net.zionsoft.obadiah.model.domain.VerseIndex;
+import net.zionsoft.obadiah.utils.TextFormatter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +37,7 @@ public class BookmarkTableHelper {
     private static final String COLUMN_VERSE_INDEX = "COLUMN_VERSE_INDEX";
 
     static void createTable(SQLiteDatabase db) {
-        db.execSQL(String.format("CREATE TABLE %s (%s INTEGER NOT NULL, %s INTEGER NOT NULL, %s INTEGER NOT NULL, %s INTEGER NOT NULL, PRIMARY KEY (%s, %s, %s));",
+        db.execSQL(TextFormatter.format("CREATE TABLE %s (%s INTEGER NOT NULL, %s INTEGER NOT NULL, %s INTEGER NOT NULL, %s INTEGER NOT NULL, PRIMARY KEY (%s, %s, %s));",
                 TABLE_BOOKMARK, COLUMN_BOOK_INDEX, COLUMN_CHAPTER_INDEX, COLUMN_VERSE_INDEX,
                 COLUMN_TIMESTAMP, COLUMN_BOOK_INDEX, COLUMN_CHAPTER_INDEX, COLUMN_VERSE_INDEX));
     }
@@ -51,7 +52,7 @@ public class BookmarkTableHelper {
     }
 
     public static void removeBookmark(SQLiteDatabase db, VerseIndex verseIndex) {
-        db.delete(TABLE_BOOKMARK, String.format("%s = ? AND %s = ? AND %s = ?",
+        db.delete(TABLE_BOOKMARK, TextFormatter.format("%s = ? AND %s = ? AND %s = ?",
                         COLUMN_BOOK_INDEX, COLUMN_CHAPTER_INDEX, COLUMN_VERSE_INDEX),
                 new String[]{Integer.toString(verseIndex.book), Integer.toString(verseIndex.chapter),
                         Integer.toString(verseIndex.verse)});
@@ -62,10 +63,9 @@ public class BookmarkTableHelper {
         Cursor cursor = null;
         try {
             cursor = db.query(TABLE_BOOKMARK, new String[]{COLUMN_TIMESTAMP, COLUMN_VERSE_INDEX},
-                    String.format("%s = ? AND %s = ?", COLUMN_BOOK_INDEX, COLUMN_CHAPTER_INDEX),
+                    TextFormatter.format("%s = ? AND %s = ?", COLUMN_BOOK_INDEX, COLUMN_CHAPTER_INDEX),
                     new String[]{Integer.toString(book), Integer.toString(chapter)},
-                    null, null, String.format("%s ASC", COLUMN_VERSE_INDEX)
-            );
+                    null, null, TextFormatter.format("%s ASC", COLUMN_VERSE_INDEX));
             final int timestamp = cursor.getColumnIndex(COLUMN_TIMESTAMP);
             final int verseIndex = cursor.getColumnIndex(COLUMN_VERSE_INDEX);
             final int bookmarkCount = cursor.getCount();
@@ -88,7 +88,7 @@ public class BookmarkTableHelper {
         try {
             cursor = db.query(TABLE_BOOKMARK, new String[]{COLUMN_TIMESTAMP, COLUMN_BOOK_INDEX,
                             COLUMN_CHAPTER_INDEX, COLUMN_VERSE_INDEX}, null, null, null, null,
-                    String.format("%s DESC", COLUMN_TIMESTAMP));
+                    TextFormatter.format("%s DESC", COLUMN_TIMESTAMP));
             final int timestamp = cursor.getColumnIndex(COLUMN_TIMESTAMP);
             final int bookIndex = cursor.getColumnIndex(COLUMN_BOOK_INDEX);
             final int chapterIndex = cursor.getColumnIndex(COLUMN_CHAPTER_INDEX);

@@ -23,6 +23,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.NonNull;
 
 import net.zionsoft.obadiah.model.domain.TranslationInfo;
+import net.zionsoft.obadiah.utils.TextFormatter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +37,7 @@ public class TranslationsTableHelper {
     private static final String COLUMN_TRANSLATION_SIZE = "COLUMN_TRANSLATION_SIZE";
 
     static void createTable(SQLiteDatabase db) {
-        db.execSQL(String.format("CREATE TABLE %s (%s TEXT PRIMARY KEY, %s TEXT NOT NULL, %s TEXT NOT NULL, %s TEXT NOT NULL, %s INTEGER NOT NULL);",
+        db.execSQL(TextFormatter.format("CREATE TABLE %s (%s TEXT PRIMARY KEY, %s TEXT NOT NULL, %s TEXT NOT NULL, %s TEXT NOT NULL, %s INTEGER NOT NULL);",
                 TABLE_TRANSLATIONS, COLUMN_TRANSLATION_NAME, COLUMN_TRANSLATION_SHORT_NAME,
                 COLUMN_TRANSLATION_LANGUAGE, COLUMN_TRANSLATION_BLOB_KEY, COLUMN_TRANSLATION_SIZE));
     }
