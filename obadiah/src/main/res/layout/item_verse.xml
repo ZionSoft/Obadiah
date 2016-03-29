@@ -36,7 +36,7 @@
         android:layout_marginTop="@dimen/padding"
         android:theme="@style/AppEditTextStyle">
 
-        <android.support.v7.widget.AppCompatEditText
+        <android.support.design.widget.TextInputEditText
             android:id="@+id/note"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
