@@ -133,7 +133,7 @@ class BibleReadingPresenter extends BasePresenter<BibleReadingView> {
     }
 
     void saveReadingProgress(int book, int chapter, int verse) {
-        bibleReadingModel.saveReadingProgress(new VerseIndex(book, chapter, verse));
+        bibleReadingModel.saveReadingProgress(VerseIndex.create(book, chapter, verse));
     }
 
     void trackReadingProgress(int book, int chapter) {

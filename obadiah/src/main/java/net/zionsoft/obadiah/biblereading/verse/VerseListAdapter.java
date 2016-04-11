@@ -76,7 +76,7 @@ class VerseListAdapter extends RecyclerView.Adapter<VerseItemViewHolder> {
         boolean isBookmarked = false;
         final int bookmarkCount = bookmarks.size();
         for (int i = 0; i < bookmarkCount; ++i) {
-            if (bookmarks.get(i).verseIndex.verse == position) {
+            if (bookmarks.get(i).verseIndex.verse() == position) {
                 isBookmarked = true;
                 break;
             }
@@ -86,7 +86,7 @@ class VerseListAdapter extends RecyclerView.Adapter<VerseItemViewHolder> {
         final int noteCount = notes.size();
         for (int i = 0; i < noteCount; ++i) {
             final Note n = notes.get(i);
-            if (n.verseIndex.verse == position) {
+            if (n.verseIndex.verse() == position) {
                 note = n.note;
                 break;
             }
@@ -132,7 +132,8 @@ class VerseListAdapter extends RecyclerView.Adapter<VerseItemViewHolder> {
         }
 
         bookmarks.add(bookmark);
-        notifyItemChanged(bookmark.verseIndex.verse, VerseItemAnimator.VerseItemHolderInfo.ACTION_ADD_BOOKMARK);
+        notifyItemChanged(bookmark.verseIndex.verse(),
+                VerseItemAnimator.VerseItemHolderInfo.ACTION_ADD_BOOKMARK);
     }
 
     void removeBookmark(VerseIndex verseIndex) {
@@ -144,7 +145,8 @@ class VerseListAdapter extends RecyclerView.Adapter<VerseItemViewHolder> {
         for (int i = 0; i < bookmarkCount; ++i) {
             if (bookmarks.get(i).verseIndex.equals(verseIndex)) {
                 bookmarks.remove(i);
-                notifyItemChanged(verseIndex.verse, VerseItemAnimator.VerseItemHolderInfo.ACTION_REMOVE_BOOKMARK);
+                notifyItemChanged(verseIndex.verse(),
+                        VerseItemAnimator.VerseItemHolderInfo.ACTION_REMOVE_BOOKMARK);
                 return;
             }
         }
@@ -167,7 +169,8 @@ class VerseListAdapter extends RecyclerView.Adapter<VerseItemViewHolder> {
         if (!updated) {
             notes.add(note);
         }
-        notifyItemChanged(note.verseIndex.verse, VerseItemAnimator.VerseItemHolderInfo.ACTION_UPDATE_NOTE);
+        notifyItemChanged(note.verseIndex.verse(),
+                VerseItemAnimator.VerseItemHolderInfo.ACTION_UPDATE_NOTE);
     }
 
     void removeNote(VerseIndex verseIndex) {
@@ -182,7 +185,7 @@ class VerseListAdapter extends RecyclerView.Adapter<VerseItemViewHolder> {
                 break;
             }
         }
-        notifyItemChanged(verseIndex.verse, VerseItemAnimator.VerseItemHolderInfo.ACTION_REMOVE_NOTE);
+        notifyItemChanged(verseIndex.verse(), VerseItemAnimator.VerseItemHolderInfo.ACTION_REMOVE_NOTE);
     }
 
     void showNote(VerseIndex verseIndex) {
@@ -190,8 +193,8 @@ class VerseListAdapter extends RecyclerView.Adapter<VerseItemViewHolder> {
             return;
         }
 
-        expanded[verseIndex.verse] = true;
-        notifyItemChanged(verseIndex.verse, VerseItemAnimator.VerseItemHolderInfo.ACTION_SHOW_NOTE);
+        expanded[verseIndex.verse()] = true;
+        notifyItemChanged(verseIndex.verse(), VerseItemAnimator.VerseItemHolderInfo.ACTION_SHOW_NOTE);
     }
 
     void hideNote(VerseIndex verseIndex) {
@@ -199,8 +202,8 @@ class VerseListAdapter extends RecyclerView.Adapter<VerseItemViewHolder> {
             return;
         }
 
-        expanded[verseIndex.verse] = false;
-        notifyItemChanged(verseIndex.verse, VerseItemAnimator.VerseItemHolderInfo.ACTION_HIDE_NOTE);
+        expanded[verseIndex.verse()] = false;
+        notifyItemChanged(verseIndex.verse(), VerseItemAnimator.VerseItemHolderInfo.ACTION_HIDE_NOTE);
     }
 
     void select(int position) {

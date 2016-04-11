@@ -17,53 +17,19 @@
 
 package net.zionsoft.obadiah.model.domain;
 
-import android.os.Parcel;
 import android.os.Parcelable;
 
-public class VerseIndex implements Parcelable {
-    public final int book;
-    public final int chapter;
-    public final int verse;
+import com.google.auto.value.AutoValue;
 
-    public VerseIndex(int book, int chapter, int verse) {
-        this.book = book;
-        this.chapter = chapter;
-        this.verse = verse;
+@AutoValue
+public abstract class VerseIndex implements Parcelable {
+    public abstract int book();
+
+    public abstract int chapter();
+
+    public abstract int verse();
+
+    public static VerseIndex create(int book, int chapter, int verse) {
+        return new AutoValue_VerseIndex(book, chapter, verse);
     }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof VerseIndex)) {
-            return false;
-        }
-        final VerseIndex other = (VerseIndex) o;
-        return book == other.book && chapter == other.chapter && verse == other.verse;
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dst, int flags) {
-        dst.writeInt(book);
-        dst.writeInt(chapter);
-        dst.writeInt(verse);
-    }
-
-    public static final Parcelable.Creator<VerseIndex> CREATOR = new Parcelable.Creator<VerseIndex>() {
-        @Override
-        public VerseIndex createFromParcel(Parcel in) {
-            return new VerseIndex(in.readInt(), in.readInt(), in.readInt());
-        }
-
-        @Override
-        public VerseIndex[] newArray(int size) {
-            return new VerseIndex[size];
-        }
-    };
 }

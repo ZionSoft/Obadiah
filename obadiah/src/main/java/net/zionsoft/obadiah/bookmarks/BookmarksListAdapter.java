@@ -61,7 +61,7 @@ class BookmarksListAdapter extends BaseSectionAdapter<Verse> {
         private void bind(Verse verse) {
             STRING_BUILDER.setLength(0);
             STRING_BUILDER.append(verse.text.bookName).append(' ')
-                    .append(verse.verseIndex.chapter + 1).append(':').append(verse.verseIndex.verse + 1);
+                    .append(verse.verseIndex.chapter() + 1).append(':').append(verse.verseIndex.verse() + 1);
             title.setText(STRING_BUILDER.toString());
             text.setText(verse.text.text);
 

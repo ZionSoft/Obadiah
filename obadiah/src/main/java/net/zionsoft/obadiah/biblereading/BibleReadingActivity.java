@@ -188,7 +188,8 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
                 return;
             }
             final VerseIndex verseIndex = startIntent.getParcelableExtra(KEY_VERSE_INDEX);
-            if (verseIndex == null || verseIndex.book < 0 || verseIndex.chapter < 0 || verseIndex.verse < 0) {
+            if (verseIndex == null || verseIndex.book() < 0
+                    || verseIndex.chapter() < 0 || verseIndex.verse() < 0) {
                 // should not happen, but just in case
                 return;
             }
@@ -318,12 +319,12 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
 
     @Override
     public void onReadingProgressUpdated(VerseIndex index) {
-        if (currentBook == index.book && currentChapter == index.chapter) {
+        if (currentBook == index.book() && currentChapter == index.chapter()) {
             return;
         }
-        currentBook = index.book;
-        currentChapter = index.chapter;
-        currentVerse = index.verse;
+        currentBook = index.book();
+        currentChapter = index.chapter();
+        currentVerse = index.verse();
 
         drawerLayout.closeDrawer(GravityCompat.START);
 

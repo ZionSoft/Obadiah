@@ -44,9 +44,9 @@ public class BookmarkTableHelper {
 
     public static void saveBookmark(SQLiteDatabase db, Bookmark bookmark) {
         final ContentValues bookmarkValues = new ContentValues(4);
-        bookmarkValues.put(COLUMN_BOOK_INDEX, bookmark.verseIndex.book);
-        bookmarkValues.put(COLUMN_CHAPTER_INDEX, bookmark.verseIndex.chapter);
-        bookmarkValues.put(COLUMN_VERSE_INDEX, bookmark.verseIndex.verse);
+        bookmarkValues.put(COLUMN_BOOK_INDEX, bookmark.verseIndex.book());
+        bookmarkValues.put(COLUMN_CHAPTER_INDEX, bookmark.verseIndex.chapter());
+        bookmarkValues.put(COLUMN_VERSE_INDEX, bookmark.verseIndex.verse());
         bookmarkValues.put(COLUMN_TIMESTAMP, bookmark.timestamp);
         db.insertWithOnConflict(TABLE_BOOKMARK, null, bookmarkValues, SQLiteDatabase.CONFLICT_REPLACE);
     }
@@ -54,8 +54,8 @@ public class BookmarkTableHelper {
     public static void removeBookmark(SQLiteDatabase db, VerseIndex verseIndex) {
         db.delete(TABLE_BOOKMARK, TextFormatter.format("%s = ? AND %s = ? AND %s = ?",
                         COLUMN_BOOK_INDEX, COLUMN_CHAPTER_INDEX, COLUMN_VERSE_INDEX),
-                new String[]{Integer.toString(verseIndex.book), Integer.toString(verseIndex.chapter),
-                        Integer.toString(verseIndex.verse)});
+                new String[]{Integer.toString(verseIndex.book()), Integer.toString(verseIndex.chapter()),
+                        Integer.toString(verseIndex.verse())});
     }
 
     @NonNull
@@ -71,7 +71,7 @@ public class BookmarkTableHelper {
             final int bookmarkCount = cursor.getCount();
             final List<Bookmark> bookmarks = new ArrayList<>(bookmarkCount);
             while (cursor.moveToNext()) {
-                bookmarks.add(new Bookmark(new VerseIndex(book, chapter, cursor.getInt(verseIndex)),
+                bookmarks.add(new Bookmark(VerseIndex.create(book, chapter, cursor.getInt(verseIndex)),
                         cursor.getLong(timestamp)));
             }
             return bookmarks;
@@ -96,7 +96,7 @@ public class BookmarkTableHelper {
             final int bookmarkCount = cursor.getCount();
             final List<Bookmark> bookmarks = new ArrayList<>(bookmarkCount);
             while (cursor.moveToNext()) {
-                bookmarks.add(new Bookmark(new VerseIndex(cursor.getInt(bookIndex),
+                bookmarks.add(new Bookmark(VerseIndex.create(cursor.getInt(bookIndex),
                         cursor.getInt(chapterIndex), cursor.getInt(verseIndex)), cursor.getLong(timestamp)));
             }
             return bookmarks;

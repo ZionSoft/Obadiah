@@ -46,9 +46,9 @@ public class NoteTableHelper {
 
     public static void saveNote(SQLiteDatabase db, Note note) {
         final ContentValues bookmarkValues = new ContentValues(5);
-        bookmarkValues.put(COLUMN_BOOK_INDEX, note.verseIndex.book);
-        bookmarkValues.put(COLUMN_CHAPTER_INDEX, note.verseIndex.chapter);
-        bookmarkValues.put(COLUMN_VERSE_INDEX, note.verseIndex.verse);
+        bookmarkValues.put(COLUMN_BOOK_INDEX, note.verseIndex.book());
+        bookmarkValues.put(COLUMN_CHAPTER_INDEX, note.verseIndex.chapter());
+        bookmarkValues.put(COLUMN_VERSE_INDEX, note.verseIndex.verse());
         bookmarkValues.put(COLUMN_NOTE, note.note);
         bookmarkValues.put(COLUMN_TIMESTAMP, note.timestamp);
         db.insertWithOnConflict(TABLE_NOTE, null, bookmarkValues, SQLiteDatabase.CONFLICT_REPLACE);
@@ -57,15 +57,15 @@ public class NoteTableHelper {
     public static void removeNote(SQLiteDatabase db, VerseIndex verseIndex) {
         db.delete(TABLE_NOTE, TextFormatter.format("%s = ? AND %s = ? AND %s = ?",
                         COLUMN_BOOK_INDEX, COLUMN_CHAPTER_INDEX, COLUMN_VERSE_INDEX),
-                new String[]{Integer.toString(verseIndex.book), Integer.toString(verseIndex.chapter),
-                        Integer.toString(verseIndex.verse)});
+                new String[]{Integer.toString(verseIndex.book()), Integer.toString(verseIndex.chapter()),
+                        Integer.toString(verseIndex.verse())});
     }
 
     public static boolean hasNote(SQLiteDatabase db, VerseIndex verseIndex) {
         return DatabaseUtils.queryNumEntries(db, TABLE_NOTE, TextFormatter.format("%s = ? AND %s = ? AND %s = ?",
                         COLUMN_BOOK_INDEX, COLUMN_CHAPTER_INDEX, COLUMN_VERSE_INDEX),
-                new String[]{Integer.toString(verseIndex.book), Integer.toString(verseIndex.chapter),
-                        Integer.toString(verseIndex.verse)}) > 0L;
+                new String[]{Integer.toString(verseIndex.book()), Integer.toString(verseIndex.chapter()),
+                        Integer.toString(verseIndex.verse())}) > 0L;
     }
 
     @NonNull
@@ -82,7 +82,7 @@ public class NoteTableHelper {
             final int noteCount = cursor.getCount();
             final List<Note> notes = new ArrayList<>(noteCount);
             while (cursor.moveToNext()) {
-                notes.add(new Note(new VerseIndex(book, chapter, cursor.getInt(verseIndex)),
+                notes.add(new Note(VerseIndex.create(book, chapter, cursor.getInt(verseIndex)),
                         cursor.getString(note), cursor.getLong(timestamp)));
             }
             return notes;
@@ -108,7 +108,7 @@ public class NoteTableHelper {
             final int notesCount = cursor.getCount();
             final List<Note> notes = new ArrayList<>(notesCount);
             while (cursor.moveToNext()) {
-                notes.add(new Note(new VerseIndex(cursor.getInt(bookIndex),
+                notes.add(new Note(VerseIndex.create(cursor.getInt(bookIndex),
                         cursor.getInt(chapterIndex), cursor.getInt(verseIndex)),
                         cursor.getString(note), cursor.getLong(timestamp)));
             }

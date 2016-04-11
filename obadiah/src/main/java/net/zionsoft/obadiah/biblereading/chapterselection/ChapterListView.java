@@ -83,11 +83,11 @@ public class ChapterListView extends ExpandableListView implements ChapterView,
 
     @Override
     public void onReadingProgressUpdated(VerseIndex index) {
-        if (currentBook == index.book && currentChapter == index.chapter) {
+        if (currentBook == index.book() && currentChapter == index.chapter()) {
             return;
         }
-        currentBook = index.book;
-        currentChapter = index.chapter;
+        currentBook = index.book();
+        currentChapter = index.chapter();
 
         refresh();
     }

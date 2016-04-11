@@ -59,7 +59,7 @@ public class TranslationHelper {
                     new String[]{Integer.toString(book), Integer.toString(chapter), Integer.toString(verse)},
                     null, null, null);
             if (cursor.moveToFirst()) {
-                return new Verse(new VerseIndex(book, chapter, verse),
+                return new Verse(VerseIndex.create(book, chapter, verse),
                         new Verse.Text(translationShortName, bookName, cursor.getString(0)), null);
             } else {
                 return null;
@@ -89,7 +89,7 @@ public class TranslationHelper {
                 // ignores empty verses at the beginning
                 final String text = cursor.getString(verse);
                 if (hasNonEmptyVerseInTheBeginning || !TextUtils.isEmpty(text)) {
-                    verses.add(new Verse(new VerseIndex(book, chapter, verseIndex++),
+                    verses.add(new Verse(VerseIndex.create(book, chapter, verseIndex++),
                             new Verse.Text(translationShortName, bookName, text), null));
                     hasNonEmptyVerseInTheBeginning = true;
                 }
@@ -174,7 +174,7 @@ public class TranslationHelper {
             final List<VerseSearchResult> verses = new ArrayList<>(count);
             while (cursor.moveToNext()) {
                 final int book = cursor.getInt(bookIndex);
-                final VerseIndex index = new VerseIndex(
+                final VerseIndex index = VerseIndex.create(
                         book, cursor.getInt(chapterIndex), cursor.getInt(verseIndex));
                 verses.add(new VerseSearchResult(index, bookNames.get(book), cursor.getString(verseText)));
             }

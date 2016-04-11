@@ -79,6 +79,6 @@ public class VersePresenter extends MVPPresenter<VerseView> {
     }
 
     void saveReadingProgress(int book, int chapter, int verse) {
-        bibleReadingModel.saveReadingProgress(new VerseIndex(book, chapter, verse));
+        bibleReadingModel.saveReadingProgress(VerseIndex.create(book, chapter, verse));
     }
 }

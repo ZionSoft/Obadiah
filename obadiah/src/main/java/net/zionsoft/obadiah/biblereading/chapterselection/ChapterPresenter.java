@@ -142,6 +142,6 @@ public class ChapterPresenter extends MVPPresenter<ChapterView> {
     }
 
     void saveReadingProgress(int book, int chapter, int verse) {
-        bibleReadingModel.saveReadingProgress(new VerseIndex(book, chapter, verse));
+        bibleReadingModel.saveReadingProgress(VerseIndex.create(book, chapter, verse));
     }
 }

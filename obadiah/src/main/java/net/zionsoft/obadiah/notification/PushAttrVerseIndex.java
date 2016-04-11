@@ -41,6 +41,6 @@ public class PushAttrVerseIndex {
 
     @NonNull
     public VerseIndex toVerseIndex() {
-        return new VerseIndex(book, chapter, verse);
+        return VerseIndex.create(book, chapter, verse);
     }
 }

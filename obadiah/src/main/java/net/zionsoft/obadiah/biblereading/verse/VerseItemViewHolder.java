@@ -96,11 +96,11 @@ class VerseItemViewHolder extends RecyclerView.ViewHolder implements View.OnClic
             index.setTextColor(textColor);
             index.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
             if (totalVerses < 10) {
-                index.setText(Integer.toString(verse.verseIndex.verse + 1));
+                index.setText(Integer.toString(verse.verseIndex.verse() + 1));
             } else if (totalVerses < 100) {
-                index.setText(TextFormatter.format("%2d", verse.verseIndex.verse + 1));
+                index.setText(TextFormatter.format("%2d", verse.verseIndex.verse() + 1));
             } else {
-                index.setText(TextFormatter.format("%3d", verse.verseIndex.verse + 1));
+                index.setText(TextFormatter.format("%3d", verse.verseIndex.verse() + 1));
             }
 
             text.setTextColor(textColor);
@@ -124,7 +124,7 @@ class VerseItemViewHolder extends RecyclerView.ViewHolder implements View.OnClic
         STRING_BUILDER.setLength(0);
         if (verse.parallel.size() == 0) {
             STRING_BUILDER.append(verse.text.bookName).append(' ')
-                    .append(verse.verseIndex.chapter + 1).append(':').append(verse.verseIndex.verse + 1).append('\n')
+                    .append(verse.verseIndex.chapter() + 1).append(':').append(verse.verseIndex.verse() + 1).append('\n')
                     .append(verse.text.text);
             text.setText(STRING_BUILDER.toString());
         } else {
@@ -145,7 +145,7 @@ class VerseItemViewHolder extends RecyclerView.ViewHolder implements View.OnClic
 
     private static void buildVerse(StringBuilder sb, VerseIndex verseIndex, Verse.Text text) {
         sb.append(text.translation).append(' ')
-                .append(verseIndex.chapter + 1).append(':').append(verseIndex.verse + 1)
+                .append(verseIndex.chapter() + 1).append(':').append(verseIndex.verse() + 1)
                 .append('\n').append(text.text).append('\n').append('\n');
     }
 

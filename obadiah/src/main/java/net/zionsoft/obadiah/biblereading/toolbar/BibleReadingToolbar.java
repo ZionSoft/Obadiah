@@ -114,7 +114,7 @@ public class BibleReadingToolbar extends Toolbar implements ToolbarView,
 
     @Override
     public void onReadingProgressUpdated(VerseIndex index) {
-        refresh(index.book, index.chapter);
+        refresh(index.book(), index.chapter());
     }
 
     @Override

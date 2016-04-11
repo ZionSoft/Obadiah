@@ -34,6 +34,8 @@ ext {
     rxJavaVersion = '1.1.3'
     rxJavaProguardRulesVersion = '1.1.2.0'
     retrofitVersion = '2.0.1'
+    autoDroidVersion = '6047d63fa1'
+    autoValueVersion = '1.2'
 
     stethoVersion = '1.3.1'
 }

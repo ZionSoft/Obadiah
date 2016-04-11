@@ -76,14 +76,14 @@ public class VerseViewPager extends ViewPager implements VerseView, VerseSelecti
     @Override
     public void onReadingProgressUpdated(VerseIndex index) {
         boolean chapterChanged = false;
-        if (currentChapter != index.chapter) {
-            currentChapter = index.chapter;
+        if (currentChapter != index.chapter()) {
+            currentChapter = index.chapter();
             chapterChanged = true;
         }
 
         boolean bookChanged = false;
-        if (currentBook != index.book) {
-            currentBook = index.book;
+        if (currentBook != index.book()) {
+            currentBook = index.book();
             adapter.setReadingProgress(index);
             bookChanged = true;
         }
@@ -181,8 +181,8 @@ public class VerseViewPager extends ViewPager implements VerseView, VerseSelecti
         final StringBuilder text = new StringBuilder();
         for (int i = 0; i < versesCount; ++i) {
             final Verse verse = verses.get(i);
-            text.append(verse.text.bookName).append(' ').append(verse.verseIndex.chapter + 1).append(':')
-                    .append(verse.verseIndex.verse + 1).append(' ').append(verse.text.text).append('\n');
+            text.append(verse.text.bookName).append(' ').append(verse.verseIndex.chapter() + 1).append(':')
+                    .append(verse.verseIndex.verse() + 1).append(' ').append(verse.text.text).append('\n');
         }
         return text.toString();
     }

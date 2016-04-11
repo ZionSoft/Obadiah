@@ -69,7 +69,7 @@ public class NotesListAdapter extends BaseSectionAdapter<Pair<Note, Verse>> {
 
             STRING_BUILDER.setLength(0);
             STRING_BUILDER.append(verse.text.bookName).append(' ')
-                    .append(verse.verseIndex.chapter + 1).append(':').append(verse.verseIndex.verse + 1);
+                    .append(verse.verseIndex.chapter() + 1).append(':').append(verse.verseIndex.verse() + 1);
             title.setText(STRING_BUILDER.toString());
             this.verse.setText(verse.text.text);
         }

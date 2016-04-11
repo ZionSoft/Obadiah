@@ -68,8 +68,8 @@ class BookmarksPresenter extends BasePresenter<BookmarksView> {
                         final String translation = bibleReadingModel.loadCurrentTranslation();
                         for (int i = 0; i < count; ++i) {
                             final VerseIndex verseIndex = bookmarks.get(i).verseIndex;
-                            verses.add(bibleReadingModel.loadVerse(translation, verseIndex.book,
-                                    verseIndex.chapter, verseIndex.verse).toBlocking().first());
+                            verses.add(bibleReadingModel.loadVerse(translation, verseIndex.book(),
+                                    verseIndex.chapter(), verseIndex.verse()).toBlocking().first());
                         }
                         return new Pair<>(bookmarks, verses);
                     }

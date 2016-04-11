@@ -150,9 +150,9 @@ public class BibleReadingModel {
 
     public void saveReadingProgress(VerseIndex index) {
         preferences.edit()
-                .putInt(Constants.PREF_KEY_LAST_READ_BOOK, index.book)
-                .putInt(Constants.PREF_KEY_LAST_READ_CHAPTER, index.chapter)
-                .putInt(Constants.PREF_KEY_LAST_READ_VERSE, index.verse)
+                .putInt(Constants.PREF_KEY_LAST_READ_BOOK, index.book())
+                .putInt(Constants.PREF_KEY_LAST_READ_CHAPTER, index.chapter())
+                .putInt(Constants.PREF_KEY_LAST_READ_VERSE, index.verse())
                 .apply();
         currentReadingProgressUpdatesSubject.onNext(index);
     }

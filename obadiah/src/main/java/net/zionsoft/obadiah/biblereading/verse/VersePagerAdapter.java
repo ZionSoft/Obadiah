@@ -194,7 +194,7 @@ class VersePagerAdapter extends PagerAdapter implements VersePagerView {
 
     @Override
     public void onVersesLoaded(List<Verse> verses, @Nullable List<Bookmark> bookmarks, @Nullable List<Note> notes) {
-        final int chapter = verses.get(0).verseIndex.chapter;
+        final int chapter = verses.get(0).verseIndex.chapter();
         final int pageCount = pages.size();
         for (int i = 0; i < pageCount; ++i) {
             final Page page = pages.get(i);
@@ -236,7 +236,7 @@ class VersePagerAdapter extends PagerAdapter implements VersePagerView {
         final int pageCount = pages.size();
         for (int i = 0; i < pageCount; ++i) {
             final Page page = pages.get(i);
-            if (page.chapter == bookmark.verseIndex.chapter) {
+            if (page.chapter == bookmark.verseIndex.chapter()) {
                 page.verseListAdapter.addBookmark(bookmark);
                 return;
             }
@@ -259,7 +259,7 @@ class VersePagerAdapter extends PagerAdapter implements VersePagerView {
         final int pageCount = pages.size();
         for (int i = 0; i < pageCount; ++i) {
             final Page page = pages.get(i);
-            if (page.chapter == verseIndex.chapter) {
+            if (page.chapter == verseIndex.chapter()) {
                 page.verseListAdapter.removeBookmark(verseIndex);
                 return;
             }
@@ -282,7 +282,7 @@ class VersePagerAdapter extends PagerAdapter implements VersePagerView {
         final int pageCount = pages.size();
         for (int i = 0; i < pageCount; ++i) {
             final Page page = pages.get(i);
-            if (page.chapter == note.verseIndex.chapter) {
+            if (page.chapter == note.verseIndex.chapter()) {
                 page.verseListAdapter.updateNote(note);
                 return;
             }
@@ -305,7 +305,7 @@ class VersePagerAdapter extends PagerAdapter implements VersePagerView {
         final int pageCount = pages.size();
         for (int i = 0; i < pageCount; ++i) {
             final Page page = pages.get(i);
-            if (page.chapter == verseIndex.chapter) {
+            if (page.chapter == verseIndex.chapter()) {
                 page.verseListAdapter.removeNote(verseIndex);
                 return;
             }
@@ -328,7 +328,7 @@ class VersePagerAdapter extends PagerAdapter implements VersePagerView {
         final int pageCount = pages.size();
         for (int i = 0; i < pageCount; ++i) {
             final Page page = pages.get(i);
-            if (page.chapter == verseIndex.chapter) {
+            if (page.chapter == verseIndex.chapter()) {
                 page.verseListAdapter.showNote(verseIndex);
                 return;
             }
@@ -340,7 +340,7 @@ class VersePagerAdapter extends PagerAdapter implements VersePagerView {
         final int pageCount = pages.size();
         for (int i = 0; i < pageCount; ++i) {
             final Page page = pages.get(i);
-            if (page.chapter == verseIndex.chapter) {
+            if (page.chapter == verseIndex.chapter()) {
                 page.verseListAdapter.hideNote(verseIndex);
                 return;
             }
@@ -366,9 +366,9 @@ class VersePagerAdapter extends PagerAdapter implements VersePagerView {
     }
 
     void setReadingProgress(VerseIndex index) {
-        currentBook = index.book;
-        currentChapter = index.chapter;
-        currentVerse = index.verse;
+        currentBook = index.book();
+        currentChapter = index.chapter();
+        currentVerse = index.verse();
     }
 
     void setVerseSelectionListener(VerseSelectionListener listener) {
