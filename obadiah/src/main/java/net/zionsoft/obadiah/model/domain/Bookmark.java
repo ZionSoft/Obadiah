@@ -17,12 +17,33 @@
 
 package net.zionsoft.obadiah.model.domain;
 
-public class Bookmark {
-    public final VerseIndex verseIndex;
-    public final long timestamp;
+import android.content.ContentValues;
+import android.database.Cursor;
 
-    public Bookmark(VerseIndex verseIndex, long timestamp) {
-        this.verseIndex = verseIndex;
-        this.timestamp = timestamp;
+import com.google.auto.value.AutoValue;
+
+import net.zionsoft.auto.droid.ColumnAdapter;
+import net.zionsoft.auto.droid.ColumnName;
+
+@AutoValue
+public abstract class Bookmark {
+    public static class ColumnNames {
+        public static final String TIMESTAMP = "COLUMN_TIMESTAMP";
+    }
+
+    @ColumnAdapter(VerseIndex.class)
+    public abstract VerseIndex verseIndex();
+
+    @ColumnName(ColumnNames.TIMESTAMP)
+    public abstract long timestamp();
+
+    public abstract ContentValues toContentValues(ContentValues contentValues);
+
+    public static Bookmark create(VerseIndex verseIndex, long timestamp) {
+        return new AutoValue_Bookmark(verseIndex, timestamp);
+    }
+
+    public static Bookmark create(Cursor cursor) {
+        return AutoValue_Bookmark.createFromCursor(cursor);
     }
 }

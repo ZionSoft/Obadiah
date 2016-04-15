@@ -33,9 +33,11 @@ import net.zionsoft.obadiah.model.datamodel.BibleReadingModel;
 import net.zionsoft.obadiah.model.domain.TranslationInfo;
 import net.zionsoft.obadiah.network.BackendChapter;
 import net.zionsoft.obadiah.network.BackendInterface;
+import net.zionsoft.obadiah.network.BackendBooks;
 import net.zionsoft.obadiah.network.BackendTranslationInfo;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -58,7 +60,7 @@ class TranslationManagementModel {
     private final DatabaseHelper databaseHelper;
     private final BibleReadingModel bibleReadingModel;
     private final BackendInterface backendInterface;
-    private final JsonAdapter<BackendTranslationInfo> translationInfoJsonAdapter;
+    private final JsonAdapter<BackendBooks> translationInfoJsonAdapter;
     private final JsonAdapter<BackendChapter> chapterJsonAdapter;
 
     TranslationManagementModel(DatabaseHelper databaseHelper, BibleReadingModel bibleReadingModel,
@@ -66,7 +68,7 @@ class TranslationManagementModel {
         this.databaseHelper = databaseHelper;
         this.bibleReadingModel = bibleReadingModel;
         this.backendInterface = backendInterface;
-        this.translationInfoJsonAdapter = moshi.adapter(BackendTranslationInfo.class);
+        this.translationInfoJsonAdapter = moshi.adapter(BackendBooks.class);
         this.chapterJsonAdapter = moshi.adapter(BackendChapter.class);
     }
 
@@ -117,6 +119,17 @@ class TranslationManagementModel {
     private Observable<List<TranslationInfo>> loadFromNetwork() {
         final long timestamp = SystemClock.elapsedRealtime();
         return backendInterface.fetchTranslations()
+                .map(new Func1<List<BackendTranslationInfo>, List<TranslationInfo>>() {
+                    @Override
+                    public List<TranslationInfo> call(List<BackendTranslationInfo> backendTranslations) {
+                        final int count = backendTranslations.size();
+                        final List<TranslationInfo> translations = new ArrayList<>(count);
+                        for (int i = 0; i < count; ++i) {
+                            translations.add(backendTranslations.get(i).toTranslationInfo());
+                        }
+                        return translations;
+                    }
+                })
                 .doOnNext(new Action1<List<TranslationInfo>>() {
                     @Override
                     public void call(List<TranslationInfo> translations) {
@@ -136,9 +149,9 @@ class TranslationManagementModel {
                                 SystemClock.elapsedRealtime() - timestamp);
                     }
                 })
-                        // workaround for Retrofit / okhttp issue (of sorts)
-                        // https://github.com/square/retrofit/issues/1046
-                        // https://github.com/square/okhttp/issues/1592
+                // workaround for Retrofit / okhttp issue (of sorts)
+                // https://github.com/square/retrofit/issues/1046
+                // https://github.com/square/okhttp/issues/1592
                 .unsubscribeOn(Schedulers.io());
     }
 
@@ -164,8 +177,8 @@ class TranslationManagementModel {
             public int compare(TranslationInfo translation1, TranslationInfo translation2) {
                 // first compares with user's default locale
                 final String userLanguage = Locale.getDefault().getLanguage().toLowerCase();
-                final String targetLanguage1 = translation1.language.split("_")[0];
-                final String targetLanguage2 = translation2.language.split("_")[0];
+                final String targetLanguage1 = translation1.language().split("_")[0];
+                final String targetLanguage2 = translation2.language().split("_")[0];
                 final int score1 = userLanguage.equals(targetLanguage1) ? 1 : 0;
                 final int score2 = userLanguage.equals(targetLanguage2) ? 1 : 0;
                 int r = score2 - score1;
@@ -174,8 +187,8 @@ class TranslationManagementModel {
                 }
 
                 // then sorts by language & name
-                r = translation1.language.compareTo(translation2.language);
-                return r == 0 ? translation1.name.compareTo(translation2.name) : r;
+                r = translation1.language().compareTo(translation2.language());
+                return r == 0 ? translation1.name().compareTo(translation2.name()) : r;
             }
         });
         return translations;
@@ -189,9 +202,9 @@ class TranslationManagementModel {
                     final SQLiteDatabase database = databaseHelper.getDatabase();
                     try {
                         database.beginTransaction();
-                        TranslationHelper.removeTranslation(database, translation.shortName);
-                        BookNamesTableHelper.removeBookNames(database, translation.shortName);
-                        bibleReadingModel.removeParallelTranslation(translation.shortName);
+                        TranslationHelper.removeTranslation(database, translation.shortName());
+                        BookNamesTableHelper.removeBookNames(database, translation.shortName());
+                        bibleReadingModel.removeParallelTranslation(translation.shortName());
                         database.setTransactionSuccessful();
                     } finally {
                         if (database.inTransaction()) {
@@ -199,7 +212,7 @@ class TranslationManagementModel {
                         }
                     }
                     Analytics.trackEvent(Analytics.CATEGORY_TRANSLATION,
-                            Analytics.TRANSLATION_ACTION_REMOVED, translation.shortName);
+                            Analytics.TRANSLATION_ACTION_REMOVED, translation.shortName());
                     subscriber.onCompleted();
                 } catch (Exception e) {
                     Crashlytics.getInstance().core.logException(e);
@@ -218,13 +231,13 @@ class TranslationManagementModel {
                 ZipInputStream is = null;
                 try {
                     final Response<ResponseBody> response
-                            = backendInterface.fetchTranslation(translation.blobKey).execute();
+                            = backendInterface.fetchTranslation(translation.blobKey()).execute();
                     if (response.code() != 200) {
                         throw new IOException("Unsupported HTTP status code - " + response.code());
                     }
 
                     database.beginTransaction();
-                    TranslationHelper.createTranslationTable(database, translation.shortName);
+                    TranslationHelper.createTranslationTable(database, translation.shortName());
 
                     is = new ZipInputStream(response.body().byteStream());
                     ZipEntry entry;
@@ -240,8 +253,8 @@ class TranslationManagementModel {
                             final String[] parts = entryName.substring(0, entryName.length() - 5).split("-");
                             final int book = Integer.parseInt(parts[0]);
                             final int chapter = Integer.parseInt(parts[1]);
-                            TranslationHelper.saveVerses(database, translation.shortName, book, chapter,
-                                    chapterJsonAdapter.fromJson(bufferedSource).verses);
+                            TranslationHelper.saveVerses(database, translation.shortName(),
+                                    book, chapter, chapterJsonAdapter.fromJson(bufferedSource).verses);
                         }
 
                         // only emits if the progress is actually changed
@@ -258,7 +271,7 @@ class TranslationManagementModel {
                     database.setTransactionSuccessful();
 
                     Analytics.trackEvent(Analytics.CATEGORY_TRANSLATION,
-                            Analytics.TRANSLATION_ACTION_DOWNLOADED, translation.shortName,
+                            Analytics.TRANSLATION_ACTION_DOWNLOADED, translation.shortName(),
                             SystemClock.elapsedRealtime() - timestamp);
                     subscriber.onCompleted();
                 } catch (Exception e) {

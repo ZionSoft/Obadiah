@@ -67,7 +67,7 @@ class NotesPresenter extends BasePresenter<NotesView> {
                         final List<Verse> verses = new ArrayList<>(count);
                         final String translation = bibleReadingModel.loadCurrentTranslation();
                         for (int i = 0; i < count; ++i) {
-                            final VerseIndex verseIndex = notes.get(i).verseIndex;
+                            final VerseIndex verseIndex = notes.get(i).verseIndex();
                             verses.add(bibleReadingModel.loadVerse(translation, verseIndex.book(),
                                     verseIndex.chapter(), verseIndex.verse()).toBlocking().first());
                         }

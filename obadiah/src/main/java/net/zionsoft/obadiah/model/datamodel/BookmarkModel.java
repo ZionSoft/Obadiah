@@ -45,7 +45,7 @@ public class BookmarkModel {
             @Override
             public void call(Subscriber<? super Bookmark> subscriber) {
                 try {
-                    final Bookmark bookmark = new Bookmark(verseIndex, System.currentTimeMillis());
+                    final Bookmark bookmark = Bookmark.create(verseIndex, System.currentTimeMillis());
                     BookmarkTableHelper.saveBookmark(databaseHelper.getDatabase(), bookmark);
                     Analytics.trackEvent(Analytics.CATEGORY_BOOKMARKS, Analytics.BOOKMARKS_ACTION_ADDED);
                     subscriber.onNext(bookmark);

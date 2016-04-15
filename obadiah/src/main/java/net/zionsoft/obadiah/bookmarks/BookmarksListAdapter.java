@@ -97,7 +97,7 @@ class BookmarksListAdapter extends BaseSectionAdapter<Verse> {
         ArrayList<Verse> versesOfSameDay = null;
         final int bookmarksCount = bookmarks.size();
         for (int i = 0; i < bookmarksCount; ++i) {
-            final long timestamp = bookmarks.get(i).timestamp;
+            final long timestamp = bookmarks.get(i).timestamp();
             calendar.setTimeInMillis(timestamp);
             final int currentYear = calendar.get(Calendar.YEAR);
             final int currentDayOfYear = calendar.get(Calendar.DAY_OF_YEAR);

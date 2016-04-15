@@ -90,7 +90,7 @@ class TranslationListAdapter extends BaseSectionAdapter<TranslationListAdapter.T
         final TextView textView = ((TextView) holder.itemView);
         textView.setText(item.title);
         textView.setCompoundDrawablesWithIntrinsicBounds(0, 0,
-                item.translationInfo.shortName.equals(currentTranslation) ? R.drawable.ic_check : 0, 0);
+                item.translationInfo.shortName().equals(currentTranslation) ? R.drawable.ic_check : 0, 0);
 
         final TranslationViewHolder viewHolder = (TranslationViewHolder) holder;
         viewHolder.translationInfo = item.translationInfo;
@@ -108,8 +108,8 @@ class TranslationListAdapter extends BaseSectionAdapter<TranslationListAdapter.T
             final ArrayList<TranslationInfoHolder> downloadedTranslations = new ArrayList<>(downloaded);
             for (int i = 0; i < downloaded; ++i) {
                 final TranslationInfo translationInfo = translations.downloaded.get(i);
-                final SpannableStringBuilder text = new SpannableStringBuilder(translationInfo.name);
-                text.setSpan(mediumSizeSpan, 0, translationInfo.name.length(), 0);
+                final SpannableStringBuilder text = new SpannableStringBuilder(translationInfo.name());
+                text.setSpan(mediumSizeSpan, 0, translationInfo.name().length(), 0);
                 downloadedTranslations.add(new TranslationInfoHolder(translationInfo, text, true));
             }
 
@@ -123,7 +123,7 @@ class TranslationListAdapter extends BaseSectionAdapter<TranslationListAdapter.T
             final TranslationInfo translationInfo = translations.available.get(i);
 
             ArrayList<TranslationInfoHolder> availableTranslations = null;
-            final String language = new Locale(translationInfo.language.split("_")[0]).getDisplayLanguage();
+            final String language = new Locale(translationInfo.language().split("_")[0]).getDisplayLanguage();
             final int sections = headers.size();
             for (int j = 0; j < sections; ++j) {
                 if (headers.get(j).equals(language)) {
@@ -140,10 +140,10 @@ class TranslationListAdapter extends BaseSectionAdapter<TranslationListAdapter.T
 
             final SpannableStringBuilder text = new SpannableStringBuilder(
                     resources.getString(R.string.text_available_translation_info,
-                            translationInfo.name, translationInfo.size / 1024)
+                            translationInfo.name(), translationInfo.size() / 1024)
             );
-            text.setSpan(mediumSizeSpan, 0, translationInfo.name.length(), 0);
-            text.setSpan(smallSizeSpan, translationInfo.name.length(), text.length(), 0);
+            text.setSpan(mediumSizeSpan, 0, translationInfo.name().length(), 0);
+            text.setSpan(smallSizeSpan, translationInfo.name().length(), text.length(), 0);
 
             availableTranslations.add(new TranslationInfoHolder(translationInfo, text, false));
             ++count;

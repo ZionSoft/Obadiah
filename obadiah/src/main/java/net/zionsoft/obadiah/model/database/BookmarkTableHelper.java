@@ -17,7 +17,6 @@
 
 package net.zionsoft.obadiah.model.database;
 
-import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.NonNull;
@@ -31,29 +30,24 @@ import java.util.List;
 
 public class BookmarkTableHelper {
     private static final String TABLE_BOOKMARK = "TABLE_BOOKMARK";
-    private static final String COLUMN_TIMESTAMP = "COLUMN_TIMESTAMP";
-    private static final String COLUMN_BOOK_INDEX = "COLUMN_BOOK_INDEX";
-    private static final String COLUMN_CHAPTER_INDEX = "COLUMN_CHAPTER_INDEX";
-    private static final String COLUMN_VERSE_INDEX = "COLUMN_VERSE_INDEX";
 
     static void createTable(SQLiteDatabase db) {
         db.execSQL(TextFormatter.format("CREATE TABLE %s (%s INTEGER NOT NULL, %s INTEGER NOT NULL, %s INTEGER NOT NULL, %s INTEGER NOT NULL, PRIMARY KEY (%s, %s, %s));",
-                TABLE_BOOKMARK, COLUMN_BOOK_INDEX, COLUMN_CHAPTER_INDEX, COLUMN_VERSE_INDEX,
-                COLUMN_TIMESTAMP, COLUMN_BOOK_INDEX, COLUMN_CHAPTER_INDEX, COLUMN_VERSE_INDEX));
+                TABLE_BOOKMARK, VerseIndex.ColumnNames.BOOK_INDEX,
+                VerseIndex.ColumnNames.CHAPTER_INDEX, VerseIndex.ColumnNames.VERSE_INDEX,
+                Bookmark.ColumnNames.TIMESTAMP, VerseIndex.ColumnNames.BOOK_INDEX,
+                VerseIndex.ColumnNames.CHAPTER_INDEX, VerseIndex.ColumnNames.VERSE_INDEX));
     }
 
     public static void saveBookmark(SQLiteDatabase db, Bookmark bookmark) {
-        final ContentValues bookmarkValues = new ContentValues(4);
-        bookmarkValues.put(COLUMN_BOOK_INDEX, bookmark.verseIndex.book());
-        bookmarkValues.put(COLUMN_CHAPTER_INDEX, bookmark.verseIndex.chapter());
-        bookmarkValues.put(COLUMN_VERSE_INDEX, bookmark.verseIndex.verse());
-        bookmarkValues.put(COLUMN_TIMESTAMP, bookmark.timestamp);
-        db.insertWithOnConflict(TABLE_BOOKMARK, null, bookmarkValues, SQLiteDatabase.CONFLICT_REPLACE);
+        db.insertWithOnConflict(TABLE_BOOKMARK, null,
+                bookmark.toContentValues(null), SQLiteDatabase.CONFLICT_REPLACE);
     }
 
     public static void removeBookmark(SQLiteDatabase db, VerseIndex verseIndex) {
         db.delete(TABLE_BOOKMARK, TextFormatter.format("%s = ? AND %s = ? AND %s = ?",
-                        COLUMN_BOOK_INDEX, COLUMN_CHAPTER_INDEX, COLUMN_VERSE_INDEX),
+                VerseIndex.ColumnNames.BOOK_INDEX, VerseIndex.ColumnNames.CHAPTER_INDEX,
+                VerseIndex.ColumnNames.VERSE_INDEX),
                 new String[]{Integer.toString(verseIndex.book()), Integer.toString(verseIndex.chapter()),
                         Integer.toString(verseIndex.verse())});
     }
@@ -62,17 +56,13 @@ public class BookmarkTableHelper {
     public static List<Bookmark> getBookmarks(SQLiteDatabase db, int book, int chapter) {
         Cursor cursor = null;
         try {
-            cursor = db.query(TABLE_BOOKMARK, new String[]{COLUMN_TIMESTAMP, COLUMN_VERSE_INDEX},
-                    TextFormatter.format("%s = ? AND %s = ?", COLUMN_BOOK_INDEX, COLUMN_CHAPTER_INDEX),
+            cursor = db.query(TABLE_BOOKMARK, null, TextFormatter.format("%s = ? AND %s = ?",
+                    VerseIndex.ColumnNames.BOOK_INDEX, VerseIndex.ColumnNames.CHAPTER_INDEX),
                     new String[]{Integer.toString(book), Integer.toString(chapter)},
-                    null, null, TextFormatter.format("%s ASC", COLUMN_VERSE_INDEX));
-            final int timestamp = cursor.getColumnIndex(COLUMN_TIMESTAMP);
-            final int verseIndex = cursor.getColumnIndex(COLUMN_VERSE_INDEX);
-            final int bookmarkCount = cursor.getCount();
-            final List<Bookmark> bookmarks = new ArrayList<>(bookmarkCount);
+                    null, null, TextFormatter.format("%s ASC", VerseIndex.ColumnNames.VERSE_INDEX));
+            final List<Bookmark> bookmarks = new ArrayList<>(cursor.getCount());
             while (cursor.moveToNext()) {
-                bookmarks.add(new Bookmark(VerseIndex.create(book, chapter, cursor.getInt(verseIndex)),
-                        cursor.getLong(timestamp)));
+                bookmarks.add(Bookmark.create(cursor));
             }
             return bookmarks;
         } finally {
@@ -86,18 +76,11 @@ public class BookmarkTableHelper {
     public static List<Bookmark> getBookmarks(SQLiteDatabase db) {
         Cursor cursor = null;
         try {
-            cursor = db.query(TABLE_BOOKMARK, new String[]{COLUMN_TIMESTAMP, COLUMN_BOOK_INDEX,
-                            COLUMN_CHAPTER_INDEX, COLUMN_VERSE_INDEX}, null, null, null, null,
-                    TextFormatter.format("%s DESC", COLUMN_TIMESTAMP));
-            final int timestamp = cursor.getColumnIndex(COLUMN_TIMESTAMP);
-            final int bookIndex = cursor.getColumnIndex(COLUMN_BOOK_INDEX);
-            final int chapterIndex = cursor.getColumnIndex(COLUMN_CHAPTER_INDEX);
-            final int verseIndex = cursor.getColumnIndex(COLUMN_VERSE_INDEX);
-            final int bookmarkCount = cursor.getCount();
-            final List<Bookmark> bookmarks = new ArrayList<>(bookmarkCount);
+            cursor = db.query(TABLE_BOOKMARK, null, null, null, null, null,
+                    TextFormatter.format("%s DESC", Bookmark.ColumnNames.TIMESTAMP));
+            final List<Bookmark> bookmarks = new ArrayList<>(cursor.getCount());
             while (cursor.moveToNext()) {
-                bookmarks.add(new Bookmark(VerseIndex.create(cursor.getInt(bookIndex),
-                        cursor.getInt(chapterIndex), cursor.getInt(verseIndex)), cursor.getLong(timestamp)));
+                bookmarks.add(Bookmark.create(cursor));
             }
             return bookmarks;
         } finally {

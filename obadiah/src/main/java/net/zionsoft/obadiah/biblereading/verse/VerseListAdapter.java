@@ -76,7 +76,7 @@ class VerseListAdapter extends RecyclerView.Adapter<VerseItemViewHolder> {
         boolean isBookmarked = false;
         final int bookmarkCount = bookmarks.size();
         for (int i = 0; i < bookmarkCount; ++i) {
-            if (bookmarks.get(i).verseIndex.verse() == position) {
+            if (bookmarks.get(i).verseIndex().verse() == position) {
                 isBookmarked = true;
                 break;
             }
@@ -86,8 +86,8 @@ class VerseListAdapter extends RecyclerView.Adapter<VerseItemViewHolder> {
         final int noteCount = notes.size();
         for (int i = 0; i < noteCount; ++i) {
             final Note n = notes.get(i);
-            if (n.verseIndex.verse() == position) {
-                note = n.note;
+            if (n.verseIndex().verse() == position) {
+                note = n.note();
                 break;
             }
         }
@@ -132,7 +132,7 @@ class VerseListAdapter extends RecyclerView.Adapter<VerseItemViewHolder> {
         }
 
         bookmarks.add(bookmark);
-        notifyItemChanged(bookmark.verseIndex.verse(),
+        notifyItemChanged(bookmark.verseIndex().verse(),
                 VerseItemAnimator.VerseItemHolderInfo.ACTION_ADD_BOOKMARK);
     }
 
@@ -143,7 +143,7 @@ class VerseListAdapter extends RecyclerView.Adapter<VerseItemViewHolder> {
 
         final int bookmarkCount = bookmarks.size();
         for (int i = 0; i < bookmarkCount; ++i) {
-            if (bookmarks.get(i).verseIndex.equals(verseIndex)) {
+            if (bookmarks.get(i).verseIndex().equals(verseIndex)) {
                 bookmarks.remove(i);
                 notifyItemChanged(verseIndex.verse(),
                         VerseItemAnimator.VerseItemHolderInfo.ACTION_REMOVE_BOOKMARK);
@@ -160,7 +160,7 @@ class VerseListAdapter extends RecyclerView.Adapter<VerseItemViewHolder> {
         boolean updated = false;
         final int noteCount = notes.size();
         for (int i = 0; i < noteCount; ++i) {
-            if (notes.get(i).verseIndex.equals(note.verseIndex)) {
+            if (notes.get(i).verseIndex().equals(note.verseIndex())) {
                 notes.set(i, note);
                 updated = true;
                 break;
@@ -169,7 +169,7 @@ class VerseListAdapter extends RecyclerView.Adapter<VerseItemViewHolder> {
         if (!updated) {
             notes.add(note);
         }
-        notifyItemChanged(note.verseIndex.verse(),
+        notifyItemChanged(note.verseIndex().verse(),
                 VerseItemAnimator.VerseItemHolderInfo.ACTION_UPDATE_NOTE);
     }
 
@@ -180,7 +180,7 @@ class VerseListAdapter extends RecyclerView.Adapter<VerseItemViewHolder> {
 
         final int noteCount = notes.size();
         for (int i = 0; i < noteCount; ++i) {
-            if (notes.get(i).verseIndex.equals(verseIndex)) {
+            if (notes.get(i).verseIndex().equals(verseIndex)) {
                 notes.remove(i);
                 break;
             }

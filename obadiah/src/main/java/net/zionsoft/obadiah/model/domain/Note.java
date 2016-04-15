@@ -17,14 +17,37 @@
 
 package net.zionsoft.obadiah.model.domain;
 
-public class Note {
-    public final VerseIndex verseIndex;
-    public final String note;
-    public final long timestamp;
+import android.content.ContentValues;
+import android.database.Cursor;
 
-    public Note(VerseIndex verseIndex, String note, long timestamp) {
-        this.verseIndex = verseIndex;
-        this.note = note;
-        this.timestamp = timestamp;
+import com.google.auto.value.AutoValue;
+
+import net.zionsoft.auto.droid.ColumnAdapter;
+import net.zionsoft.auto.droid.ColumnName;
+
+@AutoValue
+public abstract class Note {
+    public static class ColumnNames {
+        public static final String NOTE = "COLUMN_NOTE";
+        public static final String TIMESTAMP = "COLUMN_TIMESTAMP";
+    }
+
+    @ColumnAdapter(VerseIndex.class)
+    public abstract VerseIndex verseIndex();
+
+    @ColumnName(ColumnNames.NOTE)
+    public abstract String note();
+
+    @ColumnName(ColumnNames.TIMESTAMP)
+    public abstract long timestamp();
+
+    public abstract ContentValues toContentValues(ContentValues contentValues);
+
+    public static Note create(VerseIndex verseIndex, String note, long timestamp) {
+        return new AutoValue_Note(verseIndex, note, timestamp);
+    }
+
+    public static Note create(Cursor cursor) {
+        return AutoValue_Note.createFromCursor(cursor);
     }
 }

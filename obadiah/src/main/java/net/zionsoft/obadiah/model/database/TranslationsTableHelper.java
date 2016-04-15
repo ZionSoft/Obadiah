@@ -30,29 +30,20 @@ import java.util.List;
 
 public class TranslationsTableHelper {
     private static final String TABLE_TRANSLATIONS = "TABLE_TRANSLATIONS";
-    private static final String COLUMN_TRANSLATION_NAME = "COLUMN_TRANSLATION_NAME";
-    private static final String COLUMN_TRANSLATION_SHORT_NAME = "COLUMN_TRANSLATION_SHORTNAME";
-    private static final String COLUMN_TRANSLATION_LANGUAGE = "COLUMN_TRANSLATION_LANGUAGE";
-    private static final String COLUMN_TRANSLATION_BLOB_KEY = "COLUMN_TRANSLATION_BLOB_KEY";
-    private static final String COLUMN_TRANSLATION_SIZE = "COLUMN_TRANSLATION_SIZE";
 
     static void createTable(SQLiteDatabase db) {
         db.execSQL(TextFormatter.format("CREATE TABLE %s (%s TEXT PRIMARY KEY, %s TEXT NOT NULL, %s TEXT NOT NULL, %s TEXT NOT NULL, %s INTEGER NOT NULL);",
-                TABLE_TRANSLATIONS, COLUMN_TRANSLATION_NAME, COLUMN_TRANSLATION_SHORT_NAME,
-                COLUMN_TRANSLATION_LANGUAGE, COLUMN_TRANSLATION_BLOB_KEY, COLUMN_TRANSLATION_SIZE));
+                TABLE_TRANSLATIONS, TranslationInfo.ColumnNames.NAME, TranslationInfo.ColumnNames.SHORT_NAME,
+                TranslationInfo.ColumnNames.LANGUAGE, TranslationInfo.ColumnNames.BLOB_KEY,
+                TranslationInfo.ColumnNames.SIZE));
     }
 
     public static void saveTranslations(SQLiteDatabase db, List<TranslationInfo> translations) {
         final ContentValues values = new ContentValues(5);
         final int size = translations.size();
         for (int i = 0; i < size; ++i) {
-            final TranslationInfo translation = translations.get(i);
-            values.put(COLUMN_TRANSLATION_NAME, translation.name);
-            values.put(COLUMN_TRANSLATION_SHORT_NAME, translation.shortName);
-            values.put(COLUMN_TRANSLATION_LANGUAGE, translation.language);
-            values.put(COLUMN_TRANSLATION_BLOB_KEY, translation.blobKey);
-            values.put(COLUMN_TRANSLATION_SIZE, translation.size);
-            db.insertWithOnConflict(TABLE_TRANSLATIONS, null, values, SQLiteDatabase.CONFLICT_REPLACE);
+            db.insertWithOnConflict(TABLE_TRANSLATIONS, null,
+                    translations.get(i).toContentValues(values), SQLiteDatabase.CONFLICT_REPLACE);
         }
     }
 
@@ -60,19 +51,10 @@ public class TranslationsTableHelper {
     public static List<TranslationInfo> getTranslations(SQLiteDatabase db) {
         Cursor cursor = null;
         try {
-            cursor = db.query(TABLE_TRANSLATIONS,
-                    new String[]{COLUMN_TRANSLATION_NAME, COLUMN_TRANSLATION_SHORT_NAME,
-                            COLUMN_TRANSLATION_LANGUAGE, COLUMN_TRANSLATION_BLOB_KEY,
-                            COLUMN_TRANSLATION_SIZE}, null, null, null, null, null, null);
-            final int name = cursor.getColumnIndex(COLUMN_TRANSLATION_NAME);
-            final int shortName = cursor.getColumnIndex(COLUMN_TRANSLATION_SHORT_NAME);
-            final int language = cursor.getColumnIndex(COLUMN_TRANSLATION_LANGUAGE);
-            final int blobKey = cursor.getColumnIndex(COLUMN_TRANSLATION_BLOB_KEY);
-            final int size = cursor.getColumnIndex(COLUMN_TRANSLATION_SIZE);
+            cursor = db.query(TABLE_TRANSLATIONS, null, null, null, null, null, null, null);
             final List<TranslationInfo> translations = new ArrayList<>(cursor.getCount());
             while (cursor.moveToNext()) {
-                translations.add(new TranslationInfo(cursor.getString(name), cursor.getString(shortName),
-                        cursor.getString(language), cursor.getString(blobKey), cursor.getInt(size)));
+                translations.add(TranslationInfo.create(cursor));
             }
             return translations;
         } finally {

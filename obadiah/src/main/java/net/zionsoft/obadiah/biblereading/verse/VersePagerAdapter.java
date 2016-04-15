@@ -236,7 +236,7 @@ class VersePagerAdapter extends PagerAdapter implements VersePagerView {
         final int pageCount = pages.size();
         for (int i = 0; i < pageCount; ++i) {
             final Page page = pages.get(i);
-            if (page.chapter == bookmark.verseIndex.chapter()) {
+            if (page.chapter == bookmark.verseIndex().chapter()) {
                 page.verseListAdapter.addBookmark(bookmark);
                 return;
             }
@@ -282,7 +282,7 @@ class VersePagerAdapter extends PagerAdapter implements VersePagerView {
         final int pageCount = pages.size();
         for (int i = 0; i < pageCount; ++i) {
             final Page page = pages.get(i);
-            if (page.chapter == note.verseIndex.chapter()) {
+            if (page.chapter == note.verseIndex().chapter()) {
                 page.verseListAdapter.updateNote(note);
                 return;
             }

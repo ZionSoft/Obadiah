@@ -19,11 +19,8 @@ package net.zionsoft.obadiah.network;
 
 import com.squareup.moshi.Json;
 
-import java.util.List;
+import net.zionsoft.obadiah.model.domain.TranslationInfo;
 
-/**
- * Used to parse the books.json file.
- */
 public class BackendTranslationInfo {
     @Json(name = "name")
     public final String name;
@@ -34,13 +31,23 @@ public class BackendTranslationInfo {
     @Json(name = "language")
     public final String language;
 
-    @Json(name = "books")
-    public final List<String> books;
+    @Json(name = "blobKey")
+    public final String blobKey;
 
-    public BackendTranslationInfo(String name, String shortName, String language, List<String> books) {
+    @Json(name = "size")
+    public final int size;
+
+    public BackendTranslationInfo(String name, String shortName, String language, String blobKey, int size) {
+        super();
+
         this.name = name;
         this.shortName = shortName;
         this.language = language;
-        this.books = books;
+        this.blobKey = blobKey;
+        this.size = size;
+    }
+
+    public TranslationInfo toTranslationInfo() {
+        return TranslationInfo.create(name, shortName, language, blobKey, size);
     }
 }

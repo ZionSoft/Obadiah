@@ -65,7 +65,7 @@ public class NotesListAdapter extends BaseSectionAdapter<Pair<Note, Verse>> {
         }
 
         private void bind(Note note, Verse verse) {
-            this.note.setText(note.note);
+            this.note.setText(note.note());
 
             STRING_BUILDER.setLength(0);
             STRING_BUILDER.append(verse.text.bookName).append(' ')
@@ -105,7 +105,7 @@ public class NotesListAdapter extends BaseSectionAdapter<Pair<Note, Verse>> {
         final int notesCount = notes.size();
         for (int i = 0; i < notesCount; ++i) {
             final Note note = notes.get(i);
-            final long timestamp = note.timestamp;
+            final long timestamp = note.timestamp();
             calendar.setTimeInMillis(timestamp);
             final int currentYear = calendar.get(Calendar.YEAR);
             final int currentDayOfYear = calendar.get(Calendar.DAY_OF_YEAR);

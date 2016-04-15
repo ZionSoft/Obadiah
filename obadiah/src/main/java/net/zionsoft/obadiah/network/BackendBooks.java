@@ -17,22 +17,30 @@
 
 package net.zionsoft.obadiah.network;
 
+import com.squareup.moshi.Json;
+
 import java.util.List;
 
-import okhttp3.ResponseBody;
-import retrofit2.Call;
-import retrofit2.http.GET;
-import retrofit2.http.Query;
-import retrofit2.http.Streaming;
-import rx.Observable;
+/**
+ * Used to parse the books.json file.
+ */
+public class BackendBooks {
+    @Json(name = "name")
+    public final String name;
 
-public interface BackendInterface {
-    String BASE_URL = "https://z-bible.appspot.com/v1/";
+    @Json(name = "shortName")
+    public final String shortName;
 
-    @GET("translations")
-    Observable<List<BackendTranslationInfo>> fetchTranslations();
+    @Json(name = "language")
+    public final String language;
 
-    @GET("translation")
-    @Streaming
-    Call<ResponseBody> fetchTranslation(@Query("blobKey") String blobKey);
+    @Json(name = "books")
+    public final List<String> books;
+
+    public BackendBooks(String name, String shortName, String language, List<String> books) {
+        this.name = name;
+        this.shortName = shortName;
+        this.language = language;
+        this.books = books;
+    }
 }

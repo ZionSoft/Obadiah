@@ -166,7 +166,7 @@ class TranslationManagementPresenter extends BasePresenter<TranslationManagement
                     @Override
                     public void onCompleted() {
                         if (TextUtils.isEmpty(bibleReadingModel.loadCurrentTranslation())) {
-                            bibleReadingModel.saveCurrentTranslation(translation.shortName);
+                            bibleReadingModel.saveCurrentTranslation(translation.shortName());
                         }
 
                         final TranslationManagementView v = getView();

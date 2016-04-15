@@ -23,7 +23,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.NonNull;
 
 import net.zionsoft.obadiah.model.domain.Bible;
-import net.zionsoft.obadiah.network.BackendTranslationInfo;
+import net.zionsoft.obadiah.network.BackendBooks;
 import net.zionsoft.obadiah.utils.TextFormatter;
 
 import java.util.ArrayList;
@@ -64,7 +64,7 @@ public class BookNamesTableHelper {
         }
     }
 
-    public static void saveBookNames(SQLiteDatabase db, BackendTranslationInfo translation) {
+    public static void saveBookNames(SQLiteDatabase db, BackendBooks translation) {
         final ContentValues bookNamesValues = new ContentValues(3);
         bookNamesValues.put(COLUMN_TRANSLATION_SHORT_NAME, translation.shortName);
         final List<String> books = translation.books;

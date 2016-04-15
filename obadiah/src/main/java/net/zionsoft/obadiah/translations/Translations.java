@@ -60,7 +60,7 @@ class Translations {
                 final TranslationInfo translation = translations.get(i);
                 boolean isDownloaded = false;
                 for (int j = 0; j < downloadedCount; ++j) {
-                    if (translation.shortName.equals(downloaded.get(j))) {
+                    if (translation.shortName().equals(downloaded.get(j))) {
                         isDownloaded = true;
                         break;
                     }

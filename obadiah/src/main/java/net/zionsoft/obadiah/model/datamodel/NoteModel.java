@@ -50,7 +50,7 @@ public class NoteModel {
                     final SQLiteDatabase db = databaseHelper.getDatabase();
                     final boolean newNote = !NoteTableHelper.hasNote(db, verseIndex);
 
-                    final Note n = new Note(verseIndex, note, System.currentTimeMillis());
+                    final Note n = Note.create(verseIndex, note, System.currentTimeMillis());
                     NoteTableHelper.saveNote(db, n);
 
                     if (newNote) {
