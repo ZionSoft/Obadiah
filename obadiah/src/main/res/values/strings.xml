@@ -61,7 +61,7 @@
     <string name="text_share_with">Share with&#8230;</string>
 
     <string name="text_continuous_reading">Consecutive Reading</string>
-    <string name="text_continuous_reading_count">%1$d days</string>
+    <string name="text_continuous_reading_count">%1$d day(s)</string>
     <string name="text_chapters_read">Chapters Read</string>
     <string name="text_finished_books">Books Finished</string>
     <string name="text_finished_old_testament">Old Testament</string>
