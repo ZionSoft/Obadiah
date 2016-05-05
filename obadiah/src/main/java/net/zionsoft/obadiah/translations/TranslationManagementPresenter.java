@@ -110,7 +110,7 @@ class TranslationManagementPresenter extends BasePresenter<TranslationManagement
         }
 
         removeTranslationSubscription = translationManagementModel.removeTranslation(translation)
-                .finallyDo(new Action0() {
+                .doOnTerminate(new Action0() {
                     @Override
                     public void call() {
                         removeTranslationSubscription = null;
@@ -153,7 +153,7 @@ class TranslationManagementPresenter extends BasePresenter<TranslationManagement
         }
 
         fetchTranslationSubscription = translationManagementModel.fetchTranslation(translation)
-                .finallyDo(new Action0() {
+                .doOnTerminate(new Action0() {
                     @Override
                     public void call() {
                         fetchTranslationSubscription = null;
