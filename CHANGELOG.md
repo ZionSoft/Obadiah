@@ -4,12 +4,13 @@ CHANGELOG
 #### Next Release
 - Updated build tools and 3rd-party libraries:
   - Updated build tool to 23.0.3.
-  - Updated Gradle to 2.12.
-  - Updated Android Gradle plugin to 2.0.0.
+  - Updated Gradle to 2.13.
+  - Updated Android Gradle plugin to 2.1.0.
   - Updated support library to 23.3.0.
-  - Updated Dagger to 2.2.
-  - Updated RxJava to 1.1.3.
-  - Updated Retrofit to 2.0.1.
+  - Updated Dagger to 2.4.
+  - Updated RxJava to 1.1.4.
+  - Updated RxAndroid to 1.2.0.
+  - Updated Retrofit to 2.0.2.
   - Updated Stetho to 1.3.1.
 
 #### v1.14.1 (2016-02-14)

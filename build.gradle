@@ -3,12 +3,12 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.0.0'
+        classpath 'com.android.tools.build:gradle:2.1.0'
     }
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.12'
+    gradleVersion = '2.13'
 }
 
 ext {
@@ -27,13 +27,13 @@ ext {
     supportLibVersion = '23.3.0'
     playServicesVersion = '8.4.0'
 
-    daggerVersion = '2.2'
+    daggerVersion = '2.4'
     javaxAnnotationApiVersion = '1.2'
     butterKnifeVersion = '7.0.1'
-    rxAndroidVersion = '1.1.0'
-    rxJavaVersion = '1.1.3'
-    rxJavaProguardRulesVersion = '1.1.2.0'
-    retrofitVersion = '2.0.1'
+    rxAndroidVersion = '1.2.0'
+    rxJavaVersion = '1.1.4'
+    rxJavaProguardRulesVersion = '1.1.3.0'
+    retrofitVersion = '2.0.2'
     autoDroidVersion = '0.2'
     autoValueVersion = '1.2'
 
