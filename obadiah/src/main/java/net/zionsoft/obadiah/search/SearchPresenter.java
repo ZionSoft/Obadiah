@@ -24,12 +24,12 @@ import net.zionsoft.obadiah.model.datamodel.Settings;
 import net.zionsoft.obadiah.model.domain.VerseIndex;
 import net.zionsoft.obadiah.model.domain.VerseSearchResult;
 import net.zionsoft.obadiah.mvp.BasePresenter;
+import net.zionsoft.obadiah.utils.RxHelper;
 
 import java.util.List;
 
 import rx.Subscriber;
 import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
 class SearchPresenter extends BasePresenter<SearchView> {
@@ -56,8 +56,7 @@ class SearchPresenter extends BasePresenter<SearchView> {
 
     void search(String translation, String query) {
         subscription = searchModel.search(translation, query)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .compose(RxHelper.<List<VerseSearchResult>>applySchedulers())
                 .subscribe(new Subscriber<List<VerseSearchResult>>() {
                     @Override
                     public void onCompleted() {

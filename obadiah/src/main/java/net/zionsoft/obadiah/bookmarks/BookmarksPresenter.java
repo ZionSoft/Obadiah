@@ -26,15 +26,14 @@ import net.zionsoft.obadiah.model.domain.Bookmark;
 import net.zionsoft.obadiah.model.domain.Verse;
 import net.zionsoft.obadiah.model.domain.VerseIndex;
 import net.zionsoft.obadiah.mvp.BasePresenter;
+import net.zionsoft.obadiah.utils.RxHelper;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import rx.Subscriber;
 import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
-import rx.schedulers.Schedulers;
 
 class BookmarksPresenter extends BasePresenter<BookmarksView> {
     private final BibleReadingModel bibleReadingModel;
@@ -73,8 +72,7 @@ class BookmarksPresenter extends BasePresenter<BookmarksView> {
                         }
                         return new Pair<>(bookmarks, verses);
                     }
-                }).subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                }).compose(RxHelper.<Pair<List<Bookmark>, List<Verse>>>applySchedulers())
                 .subscribe(new Subscriber<Pair<List<Bookmark>, List<Verse>>>() {
                     @Override
                     public void onCompleted() {

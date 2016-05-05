@@ -26,15 +26,14 @@ import net.zionsoft.obadiah.model.domain.Note;
 import net.zionsoft.obadiah.model.domain.Verse;
 import net.zionsoft.obadiah.model.domain.VerseIndex;
 import net.zionsoft.obadiah.mvp.BasePresenter;
+import net.zionsoft.obadiah.utils.RxHelper;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import rx.Subscriber;
 import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
-import rx.schedulers.Schedulers;
 
 class NotesPresenter extends BasePresenter<NotesView> {
     private final BibleReadingModel bibleReadingModel;
@@ -73,8 +72,7 @@ class NotesPresenter extends BasePresenter<NotesView> {
                         }
                         return new Pair<>(notes, verses);
                     }
-                }).subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                }).compose(RxHelper.<Pair<List<Note>, List<Verse>>>applySchedulers())
                 .subscribe(new Subscriber<Pair<List<Note>, List<Verse>>>() {
                     @Override
                     public void onCompleted() {

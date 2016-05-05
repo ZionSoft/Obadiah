@@ -25,12 +25,12 @@ import net.zionsoft.obadiah.model.datamodel.ReadingProgressModel;
 import net.zionsoft.obadiah.model.datamodel.Settings;
 import net.zionsoft.obadiah.model.domain.VerseIndex;
 import net.zionsoft.obadiah.mvp.BasePresenter;
+import net.zionsoft.obadiah.utils.RxHelper;
 
 import java.util.List;
 
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
 class BibleReadingPresenter extends BasePresenter<BibleReadingView> {
@@ -138,8 +138,7 @@ class BibleReadingPresenter extends BasePresenter<BibleReadingView> {
 
     void trackReadingProgress(int book, int chapter) {
         readingProgressModel.trackReadingProgress(book, chapter)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .compose(RxHelper.<Void>applySchedulers())
                 .subscribe();
     }
 
@@ -149,8 +148,7 @@ class BibleReadingPresenter extends BasePresenter<BibleReadingView> {
 
     private void loadBookNames(String translation) {
         getSubscription().add(bibleReadingModel.loadBookNames(translation)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .compose(RxHelper.<List<String>>applySchedulers())
                 .subscribe(new Subscriber<List<String>>() {
                     @Override
                     public void onCompleted() {

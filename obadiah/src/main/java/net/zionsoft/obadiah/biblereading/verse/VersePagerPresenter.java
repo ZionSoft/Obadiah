@@ -28,15 +28,14 @@ import net.zionsoft.obadiah.model.domain.Note;
 import net.zionsoft.obadiah.model.domain.Verse;
 import net.zionsoft.obadiah.model.domain.VerseIndex;
 import net.zionsoft.obadiah.mvp.BasePresenter;
+import net.zionsoft.obadiah.utils.RxHelper;
 
 import java.util.List;
 
 import rx.Observable;
 import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
 import rx.functions.Func3;
-import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
 public class VersePagerPresenter extends BasePresenter<VersePagerView> {
@@ -152,8 +151,7 @@ public class VersePagerPresenter extends BasePresenter<VersePagerView> {
                     });
         }
 
-        getSubscription().add(observable.subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+        getSubscription().add(observable.compose(RxHelper.<VerseList>applySchedulers())
                 .subscribe(new Subscriber<VerseList>() {
                     @Override
                     public void onCompleted() {
@@ -180,8 +178,7 @@ public class VersePagerPresenter extends BasePresenter<VersePagerView> {
 
     void addBookmark(final VerseIndex verseIndex) {
         getSubscription().add(bookmarkModel.addBookmark(verseIndex)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .compose(RxHelper.<Bookmark>applySchedulers())
                 .subscribe(new Subscriber<Bookmark>() {
                     @Override
                     public void onCompleted() {
@@ -208,8 +205,7 @@ public class VersePagerPresenter extends BasePresenter<VersePagerView> {
 
     void removeBookmark(final VerseIndex verseIndex) {
         getSubscription().add(bookmarkModel.removeBookmark(verseIndex)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .compose(RxHelper.<Void>applySchedulers())
                 .subscribe(new Subscriber<Void>() {
                     @Override
                     public void onCompleted() {
@@ -236,8 +232,7 @@ public class VersePagerPresenter extends BasePresenter<VersePagerView> {
 
     void updateNote(final VerseIndex verseIndex, final String note) {
         getSubscription().add(noteModel.updateNote(verseIndex, note)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .compose(RxHelper.<Note>applySchedulers())
                 .subscribe(new Subscriber<Note>() {
                     @Override
                     public void onCompleted() {
@@ -265,8 +260,7 @@ public class VersePagerPresenter extends BasePresenter<VersePagerView> {
 
     void removeNote(final VerseIndex verseIndex) {
         getSubscription().add(noteModel.removeNote(verseIndex)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .compose(RxHelper.<Void>applySchedulers())
                 .subscribe(new Subscriber<Void>() {
                     @Override
                     public void onCompleted() {

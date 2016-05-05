@@ -25,12 +25,12 @@ import net.zionsoft.obadiah.model.datamodel.BibleReadingModel;
 import net.zionsoft.obadiah.model.datamodel.Settings;
 import net.zionsoft.obadiah.model.domain.TranslationInfo;
 import net.zionsoft.obadiah.mvp.BasePresenter;
+import net.zionsoft.obadiah.utils.RxHelper;
 
 import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action0;
-import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
 class TranslationManagementPresenter extends BasePresenter<TranslationManagementView>
@@ -79,8 +79,7 @@ class TranslationManagementPresenter extends BasePresenter<TranslationManagement
 
     void loadTranslations(boolean forceRefresh) {
         subscription.add(translationManagementModel.loadTranslations(forceRefresh)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .compose(RxHelper.<Translations>applySchedulers())
                 .subscribe(new Subscriber<Translations>() {
                     @Override
                     public void onCompleted() {
@@ -116,8 +115,7 @@ class TranslationManagementPresenter extends BasePresenter<TranslationManagement
                     public void call() {
                         removeTranslationSubscription = null;
                     }
-                }).subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                }).compose(RxHelper.<Void>applySchedulers())
                 .subscribe(new Subscriber<Void>() {
                     @Override
                     public void onCompleted() {
@@ -160,8 +158,7 @@ class TranslationManagementPresenter extends BasePresenter<TranslationManagement
                     public void call() {
                         fetchTranslationSubscription = null;
                     }
-                }).subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                }).compose(RxHelper.<Integer>applySchedulers())
                 .subscribe(new Subscriber<Integer>() {
                     @Override
                     public void onCompleted() {

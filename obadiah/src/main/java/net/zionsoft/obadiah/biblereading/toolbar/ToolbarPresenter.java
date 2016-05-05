@@ -23,12 +23,12 @@ import android.support.annotation.Nullable;
 import net.zionsoft.obadiah.model.datamodel.BibleReadingModel;
 import net.zionsoft.obadiah.model.domain.VerseIndex;
 import net.zionsoft.obadiah.mvp.MVPPresenter;
+import net.zionsoft.obadiah.utils.RxHelper;
 
 import java.util.List;
 
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
 public class ToolbarPresenter extends MVPPresenter<ToolbarView> {
@@ -93,8 +93,7 @@ public class ToolbarPresenter extends MVPPresenter<ToolbarView> {
 
     private void loadBookNames(String translation) {
         getSubscription().add(bibleReadingModel.loadBookNames(translation)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .compose(RxHelper.<List<String>>applySchedulers())
                 .subscribe(new Subscriber<List<String>>() {
                     @Override
                     public void onCompleted() {
@@ -149,8 +148,7 @@ public class ToolbarPresenter extends MVPPresenter<ToolbarView> {
 
     void loadTranslations() {
         getSubscription().add(bibleReadingModel.loadTranslations()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .compose(RxHelper.<List<String>>applySchedulers())
                 .subscribe(new Subscriber<List<String>>() {
                     @Override
                     public void onCompleted() {

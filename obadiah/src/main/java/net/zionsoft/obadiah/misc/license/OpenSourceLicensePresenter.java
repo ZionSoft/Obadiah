@@ -19,13 +19,12 @@ package net.zionsoft.obadiah.misc.license;
 
 import net.zionsoft.obadiah.model.datamodel.Settings;
 import net.zionsoft.obadiah.mvp.BasePresenter;
+import net.zionsoft.obadiah.utils.RxHelper;
 
 import java.util.List;
 
 import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
-import rx.schedulers.Schedulers;
 
 class OpenSourceLicensePresenter extends BasePresenter<OpenSourceLicenseView> {
     private final OpenSourceLicenseModel openSourceLicenseModel;
@@ -49,8 +48,7 @@ class OpenSourceLicensePresenter extends BasePresenter<OpenSourceLicenseView> {
 
     void loadLicense() {
         subscription = openSourceLicenseModel.loadLicense()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .compose(RxHelper.<List<String>>applySchedulers())
                 .subscribe(new Action1<List<String>>() {
                     @Override
                     public void call(List<String> licenses) {
