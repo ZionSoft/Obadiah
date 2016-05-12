@@ -201,7 +201,7 @@ public class TranslationManagementActivity extends BaseAppCompatActivity
         super.onResumeFragments();
         translationManagementPresenter.takeView(this);
         translationManagementPresenter.loadAdsStatus();
-        loadTranslations(true);
+        loadTranslations(false);
     }
 
     private void loadTranslations(boolean forceRefresh) {
