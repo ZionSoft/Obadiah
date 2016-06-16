@@ -95,8 +95,8 @@ public class BookmarksActivity extends BaseRecyclerViewActivity implements Bookm
     }
 
     @Override
-    protected void onResumeFragments() {
-        super.onResumeFragments();
+    protected void onStart() {
+        super.onStart();
         bookmarksPresenter.takeView(this);
         loadBookmarks();
     }
@@ -106,9 +106,9 @@ public class BookmarksActivity extends BaseRecyclerViewActivity implements Bookm
     }
 
     @Override
-    protected void onPause() {
+    protected void onStop() {
         bookmarksPresenter.dropView();
-        super.onPause();
+        super.onStop();
     }
 
     @Override

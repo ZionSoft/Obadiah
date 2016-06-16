@@ -96,8 +96,8 @@ public class NotesActivity extends BaseRecyclerViewActivity implements NotesView
     }
 
     @Override
-    protected void onResumeFragments() {
-        super.onResumeFragments();
+    protected void onStart() {
+        super.onStart();
         notesPresenter.takeView(this);
         loadNotes();
     }
@@ -107,9 +107,9 @@ public class NotesActivity extends BaseRecyclerViewActivity implements NotesView
     }
 
     @Override
-    protected void onPause() {
+    protected void onStop() {
         notesPresenter.dropView();
-        super.onPause();
+        super.onStop();
     }
 
     @Override

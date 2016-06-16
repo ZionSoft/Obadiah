@@ -88,16 +88,16 @@ public class OpenSourceLicenseActivity extends BaseAppCompatActivity implements 
     }
 
     @Override
-    protected void onResumeFragments() {
-        super.onResumeFragments();
+    protected void onStart() {
+        super.onStart();
         openSourceLicensePresenter.takeView(this);
         openSourceLicensePresenter.loadLicense();
     }
 
     @Override
-    protected void onPause() {
+    protected void onStop() {
         openSourceLicensePresenter.dropView();
-        super.onPause();
+        super.onStop();
     }
 
     @Override

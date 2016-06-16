@@ -190,15 +190,11 @@ public class TranslationManagementActivity extends BaseAppCompatActivity
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
+    protected void onStart() {
+        super.onStart();
 
         adView.resume();
-    }
 
-    @Override
-    protected void onResumeFragments() {
-        super.onResumeFragments();
         translationManagementPresenter.takeView(this);
         translationManagementPresenter.loadAdsStatus();
         loadTranslations(false);
@@ -210,10 +206,10 @@ public class TranslationManagementActivity extends BaseAppCompatActivity
     }
 
     @Override
-    protected void onPause() {
+    protected void onStop() {
         adView.pause();
         translationManagementPresenter.dropView();
-        super.onPause();
+        super.onStop();
     }
 
     @Override

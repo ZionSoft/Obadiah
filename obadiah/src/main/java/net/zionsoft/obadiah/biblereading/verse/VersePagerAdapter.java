@@ -352,7 +352,7 @@ class VersePagerAdapter extends PagerAdapter implements VersePagerView {
         notifyDataSetChanged();
     }
 
-    void onResume() {
+    void onStart() {
         versePagerPresenter.takeView(this);
 
         currentBook = versePagerPresenter.loadCurrentBook();
@@ -361,7 +361,7 @@ class VersePagerAdapter extends PagerAdapter implements VersePagerView {
         notifyDataSetChanged();
     }
 
-    void onPause() {
+    void onStop() {
         versePagerPresenter.dropView();
     }
 

@@ -226,16 +226,11 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
         currentTranslation = bibleReadingPresenter.loadCurrentTranslation();
         currentBook = bibleReadingPresenter.loadCurrentBook();
         currentChapter = bibleReadingPresenter.loadCurrentChapter();
-    }
-
-    @Override
-    protected void onResumeFragments() {
-        super.onResumeFragments();
 
         bibleReadingPresenter.takeView(this);
-        toolbar.onResume();
-        chapterList.onResume();
-        versePager.onResume();
+        toolbar.onStart();
+        chapterList.onStart();
+        versePager.onStart();
 
         if (TextUtils.isEmpty(bibleReadingPresenter.loadCurrentTranslation())) {
             DialogHelper.showDialog(this, false, R.string.error_no_translation,
@@ -262,17 +257,11 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
     }
 
     @Override
-    protected void onPause() {
-        bibleReadingPresenter.dropView();
-        toolbar.onPause();
-        chapterList.onPause();
-        versePager.onPause();
-
-        super.onPause();
-    }
-
-    @Override
     protected void onStop() {
+        bibleReadingPresenter.dropView();
+        toolbar.onStop();
+        chapterList.onStop();
+        versePager.onStop();
         appIndexingManager.onStop();
         super.onStop();
     }

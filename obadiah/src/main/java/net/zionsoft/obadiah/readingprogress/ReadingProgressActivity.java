@@ -91,8 +91,8 @@ public class ReadingProgressActivity extends BaseAppCompatActivity implements Re
     }
 
     @Override
-    protected void onResumeFragments() {
-        super.onResumeFragments();
+    protected void onStart() {
+        super.onStart();
         readingProgressPresenter.takeView(this);
         loadReadingProgress();
     }
@@ -102,9 +102,9 @@ public class ReadingProgressActivity extends BaseAppCompatActivity implements Re
     }
 
     @Override
-    protected void onPause() {
+    protected void onStop() {
         readingProgressPresenter.dropView();
-        super.onPause();
+        super.onStop();
     }
 
     @Override

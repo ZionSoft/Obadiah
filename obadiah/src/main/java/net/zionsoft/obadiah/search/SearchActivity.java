@@ -197,18 +197,14 @@ public class SearchActivity extends BaseAppCompatActivity
             searchResultAdapter.setVerses(null);
         }
         searchResultAdapter.notifyDataSetChanged();
-    }
 
-    @Override
-    protected void onResumeFragments() {
-        super.onResumeFragments();
         searchPresenter.takeView(this);
     }
 
     @Override
-    protected void onPause() {
+    protected void onStop() {
         searchPresenter.dropView();
-        super.onPause();
+        super.onStop();
     }
 
     @Override

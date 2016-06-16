@@ -130,7 +130,7 @@ public class ChapterListView extends ExpandableListView implements ChapterView,
         this.chapterPresenter = chapterPresenter;
     }
 
-    public void onResume() {
+    public void onStart() {
         chapterPresenter.takeView(this);
         chapterPresenter.loadBookNamesForCurrentTranslation();
 
@@ -139,7 +139,7 @@ public class ChapterListView extends ExpandableListView implements ChapterView,
         refresh();
     }
 
-    public void onPause() {
+    public void onStop() {
         chapterPresenter.dropView();
     }
 }

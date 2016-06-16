@@ -179,13 +179,13 @@ public class BibleReadingToolbar extends Toolbar implements ToolbarView,
         this.toolbarPresenter = toolbarPresenter;
     }
 
-    public void onResume() {
+    public void onStart() {
         toolbarPresenter.takeView(this);
         toolbarPresenter.loadTranslations();
         toolbarPresenter.loadBookNamesForCurrentTranslation();
     }
 
-    public void onPause() {
+    public void onStop() {
         toolbarPresenter.dropView();
     }
 }

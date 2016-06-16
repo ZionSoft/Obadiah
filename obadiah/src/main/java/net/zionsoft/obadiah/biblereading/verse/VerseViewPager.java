@@ -238,12 +238,12 @@ public class VerseViewPager extends ViewPager implements VerseView, VerseSelecti
         setAdapter(adapter);
     }
 
-    public void onResume() {
+    public void onStart() {
         versePagerPresenter.takeView(this);
         currentBook = versePagerPresenter.loadCurrentBook();
         currentChapter = versePagerPresenter.loadCurrentChapter();
 
-        adapter.onResume();
+        adapter.onStart();
         setCurrentItem(currentChapter);
 
         // should add the listener after setting current item and current book / chapter is loaded,
@@ -251,13 +251,13 @@ public class VerseViewPager extends ViewPager implements VerseView, VerseSelecti
         addOnPageChangeListener(onPageChangeListener);
     }
 
-    public void onPause() {
+    public void onStop() {
         if (actionMode != null) {
             actionMode.finish();
         }
 
         removeOnPageChangeListener(onPageChangeListener);
         versePagerPresenter.dropView();
-        adapter.onPause();
+        adapter.onStop();
     }
 }
