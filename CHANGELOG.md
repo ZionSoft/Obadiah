@@ -14,6 +14,7 @@ CHANGELOG
   - Updated RxJava to 1.1.6.
   - Updated RxAndroid to 1.2.0.
   - Updated Retrofit to 2.1.0.
+  - Updated ButterKnife to 8.1.0.
   - Updated Stetho to 1.3.1.
 
 #### v1.14.1 (2016-02-14)

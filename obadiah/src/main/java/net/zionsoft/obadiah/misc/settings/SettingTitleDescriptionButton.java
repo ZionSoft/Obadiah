@@ -32,17 +32,17 @@ import android.widget.TextView;
 
 import net.zionsoft.obadiah.R;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class SettingTitleDescriptionButton extends FrameLayout {
-    @Bind(R.id.title_text_view)
+    @BindView(R.id.title_text_view)
     TextView titleTextView;
 
-    @Bind(R.id.description_text_view)
+    @BindView(R.id.description_text_view)
     TextView descriptionTextView;
 
-    @Bind(R.id.divider_view)
+    @BindView(R.id.divider_view)
     View dividerView;
 
     public SettingTitleDescriptionButton(Context context) {

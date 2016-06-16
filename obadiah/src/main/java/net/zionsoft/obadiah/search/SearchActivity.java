@@ -50,7 +50,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import butterknife.Bind;
+import butterknife.BindView;
 
 public class SearchActivity extends BaseAppCompatActivity
         implements SearchView.OnQueryTextListener, Toolbar.OnMenuItemClickListener,
@@ -70,13 +70,13 @@ public class SearchActivity extends BaseAppCompatActivity
     @Inject
     SearchPresenter searchPresenter;
 
-    @Bind(R.id.toolbar)
+    @BindView(R.id.toolbar)
     Toolbar toolbar;
 
-    @Bind(R.id.search_result_list)
+    @BindView(R.id.search_result_list)
     RecyclerView searchResultList;
 
-    @Bind(R.id.loading_spinner)
+    @BindView(R.id.loading_spinner)
     View loadingSpinner;
 
     private String currentTranslation;

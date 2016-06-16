@@ -55,7 +55,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import butterknife.Bind;
+import butterknife.BindView;
 
 public class BibleReadingActivity extends BaseAppCompatActivity implements BibleReadingView,
         NfcAdapter.CreateNdefMessageCallback {
@@ -97,16 +97,16 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
     @Inject
     VersePagerPresenter versePagerPresenter;
 
-    @Bind(R.id.drawer_layout)
+    @BindView(R.id.drawer_layout)
     DrawerLayout drawerLayout;
 
-    @Bind(R.id.toolbar)
+    @BindView(R.id.toolbar)
     BibleReadingToolbar toolbar;
 
-    @Bind(R.id.chapter_list)
+    @BindView(R.id.chapter_list)
     ChapterListView chapterList;
 
-    @Bind(R.id.verse_pager)
+    @BindView(R.id.verse_pager)
     VerseViewPager versePager;
 
     private AppIndexingManager appIndexingManager;

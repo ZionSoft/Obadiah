@@ -36,7 +36,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import butterknife.Bind;
+import butterknife.BindView;
 
 public class OpenSourceLicenseActivity extends BaseAppCompatActivity implements OpenSourceLicenseView {
     public static Intent newStartIntent(Context context) {
@@ -46,13 +46,13 @@ public class OpenSourceLicenseActivity extends BaseAppCompatActivity implements 
     @Inject
     OpenSourceLicensePresenter openSourceLicensePresenter;
 
-    @Bind(R.id.toolbar)
+    @BindView(R.id.toolbar)
     Toolbar toolbar;
 
-    @Bind(R.id.license_list)
+    @BindView(R.id.license_list)
     RecyclerView licenseList;
 
-    @Bind(R.id.loading_spinner)
+    @BindView(R.id.loading_spinner)
     ProgressBar loadingSpinner;
 
     @Override

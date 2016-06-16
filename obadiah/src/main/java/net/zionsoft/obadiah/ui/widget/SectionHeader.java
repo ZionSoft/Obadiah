@@ -30,11 +30,11 @@ import android.widget.TextView;
 
 import net.zionsoft.obadiah.R;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class SectionHeader extends FrameLayout {
-    @Bind(R.id.header_text_view)
+    @BindView(R.id.header_text_view)
     TextView headerTextView;
 
     public SectionHeader(Context context) {

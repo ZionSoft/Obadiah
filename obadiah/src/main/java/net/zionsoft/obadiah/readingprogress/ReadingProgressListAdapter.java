@@ -35,41 +35,41 @@ import net.zionsoft.obadiah.ui.widget.ProgressBar;
 
 import java.util.List;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 
 class ReadingProgressListAdapter extends RecyclerView.Adapter {
     static class HeaderViewHolder extends RecyclerView.ViewHolder {
         private final Resources resources;
 
-        @Bind(R.id.continuous_reading_text_view)
+        @BindView(R.id.continuous_reading_text_view)
         TextView continuousReading;
 
-        @Bind(R.id.continuous_reading_count_text_view)
+        @BindView(R.id.continuous_reading_count_text_view)
         TextView continuousReadingCount;
 
-        @Bind(R.id.chapter_read_text_view)
+        @BindView(R.id.chapter_read_text_view)
         TextView chapterRead;
 
-        @Bind(R.id.chapter_read_count_text_view)
+        @BindView(R.id.chapter_read_count_text_view)
         TextView chapterReadCount;
 
-        @Bind(R.id.finished_books_text_view)
+        @BindView(R.id.finished_books_text_view)
         TextView finishedBooks;
 
-        @Bind(R.id.finished_books_count_text_view)
+        @BindView(R.id.finished_books_count_text_view)
         TextView finishedBooksCount;
 
-        @Bind(R.id.finished_old_testament_text_view)
+        @BindView(R.id.finished_old_testament_text_view)
         TextView finishedOldTestament;
 
-        @Bind(R.id.finished_old_testament_count_text_view)
+        @BindView(R.id.finished_old_testament_count_text_view)
         TextView finishedOldTestamentCount;
 
-        @Bind(R.id.finished_new_testament_text_view)
+        @BindView(R.id.finished_new_testament_text_view)
         TextView finishedNewTestament;
 
-        @Bind(R.id.finished_new_testament_count_text_view)
+        @BindView(R.id.finished_new_testament_count_text_view)
         TextView finishedNewTestamentCount;
 
         HeaderViewHolder(View itemView, Settings settings, Resources resources) {
@@ -131,13 +131,13 @@ class ReadingProgressListAdapter extends RecyclerView.Adapter {
     static class ItemViewHolder extends RecyclerView.ViewHolder {
         private static final StringBuilder STRING_BUILDER = new StringBuilder(9);
 
-        @Bind(R.id.book_name_text_view)
+        @BindView(R.id.book_name_text_view)
         TextView bookName;
 
-        @Bind(R.id.reading_progress_bar)
+        @BindView(R.id.reading_progress_bar)
         ProgressBar readingProgress;
 
-        @Bind(R.id.last_read_chapter_text_view)
+        @BindView(R.id.last_read_chapter_text_view)
         TextView lastReadChapter;
 
         private final Resources resources;

@@ -39,7 +39,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import butterknife.Bind;
+import butterknife.BindView;
 
 public class ReadingProgressActivity extends BaseAppCompatActivity implements ReadingProgressView {
     public static Intent newStartIntent(Context context) {
@@ -49,13 +49,13 @@ public class ReadingProgressActivity extends BaseAppCompatActivity implements Re
     @Inject
     ReadingProgressPresenter readingProgressPresenter;
 
-    @Bind(R.id.toolbar)
+    @BindView(R.id.toolbar)
     Toolbar toolbar;
 
-    @Bind(R.id.reading_progress_list)
+    @BindView(R.id.reading_progress_list)
     RecyclerView readingProgressList;
 
-    @Bind(R.id.loading_spinner)
+    @BindView(R.id.loading_spinner)
     View loadingSpinner;
 
     @Override

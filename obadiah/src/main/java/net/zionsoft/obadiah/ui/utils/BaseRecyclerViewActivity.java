@@ -26,17 +26,17 @@ import android.view.View;
 
 import net.zionsoft.obadiah.R;
 
-import butterknife.Bind;
+import butterknife.BindView;
 
 public abstract class BaseRecyclerViewActivity extends BaseAppCompatActivity
         implements RecyclerView.OnChildAttachStateChangeListener, View.OnClickListener {
-    @Bind(R.id.toolbar)
+    @BindView(R.id.toolbar)
     protected Toolbar toolbar;
 
-    @Bind(R.id.recycler_view)
+    @BindView(R.id.recycler_view)
     protected RecyclerView recyclerView;
 
-    @Bind(R.id.loading_spinner)
+    @BindView(R.id.loading_spinner)
     protected View loadingSpinner;
 
     @CallSuper

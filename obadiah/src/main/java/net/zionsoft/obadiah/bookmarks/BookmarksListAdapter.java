@@ -35,17 +35,17 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 
 class BookmarksListAdapter extends BaseSectionAdapter<Verse> {
     static class ViewHolder extends RecyclerView.ViewHolder {
         private static final StringBuilder STRING_BUILDER = new StringBuilder();
 
-        @Bind(R.id.title)
+        @BindView(R.id.title)
         TextView title;
 
-        @Bind(R.id.text)
+        @BindView(R.id.text)
         TextView text;
 
         private ViewHolder(View itemView, int textColor, float textSize, float smallerTextSize) {
