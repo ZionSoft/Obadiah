@@ -142,7 +142,7 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
         setContentView(R.layout.activity_bible_reading);
 
         drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, 0, 0);
-        drawerLayout.setDrawerListener(drawerToggle);
+        drawerLayout.addDrawerListener(drawerToggle);
     }
 
     private void updatePresenters() {
