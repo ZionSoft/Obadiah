@@ -24,7 +24,7 @@ ext {
     versionName = '1.14.1'
     versionCode = 11401
 
-    supportLibVersion = '23.3.0'
+    supportLibVersion = '24.0.0'
     playServicesVersion = '9.0.2'
 
     daggerVersion = '2.5'

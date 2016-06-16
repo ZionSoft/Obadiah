@@ -8,7 +8,7 @@ CHANGELOG
   - Updated Android Gradle plugin to 2.1.2.
   - Updated Fabric Gradle plugin to 1.21.5.
   - Updated Crashlytics to 2.5.7.
-  - Updated support library to 23.3.0.
+  - Updated support library to 24.0.0.
   - Updated Google Play Services to 9.0.2.
   - Updated Dagger to 2.5.
   - Updated RxJava to 1.1.6.
