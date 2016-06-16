@@ -176,7 +176,7 @@ class TranslationManagementModel {
             @Override
             public int compare(TranslationInfo translation1, TranslationInfo translation2) {
                 // first compares with user's default locale
-                final String userLanguage = Locale.getDefault().getLanguage().toLowerCase();
+                final String userLanguage = Locale.getDefault().getLanguage().toLowerCase(Locale.getDefault());
                 final String targetLanguage1 = translation1.language().split("_")[0];
                 final String targetLanguage2 = translation2.language().split("_")[0];
                 final int score1 = userLanguage.equals(targetLanguage1) ? 1 : 0;
