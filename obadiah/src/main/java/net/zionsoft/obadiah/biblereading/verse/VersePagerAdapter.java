@@ -40,7 +40,7 @@ import net.zionsoft.obadiah.ui.utils.DialogHelper;
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 
 class VersePagerAdapter extends PagerAdapter implements VersePagerView {
@@ -54,10 +54,10 @@ class VersePagerAdapter extends PagerAdapter implements VersePagerView {
 
         private final View rootView;
 
-        @Bind(R.id.loading_spinner)
+        @BindView(R.id.loading_spinner)
         View loadingSpinner;
 
-        @Bind(R.id.verse_list)
+        @BindView(R.id.verse_list)
         RecyclerView verseList;
 
         private Page(Context context, final VersePagerPresenter versePagerPresenter,

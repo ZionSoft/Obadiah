@@ -46,7 +46,7 @@ import net.zionsoft.obadiah.ui.widget.SectionHeader;
 
 import javax.inject.Inject;
 
-import butterknife.Bind;
+import butterknife.BindView;
 
 public class SettingsActivity extends BaseAppCompatActivity {
     public static Intent newStartIntent(Context context) {
@@ -59,40 +59,40 @@ public class SettingsActivity extends BaseAppCompatActivity {
     @Inject
     Settings settings;
 
-    @Bind(R.id.toolbar)
+    @BindView(R.id.toolbar)
     Toolbar toolbar;
 
-    @Bind(R.id.reading_section_header)
+    @BindView(R.id.reading_section_header)
     SectionHeader readingSectionHeader;
 
-    @Bind(R.id.simple_reading_switch)
+    @BindView(R.id.simple_reading_switch)
     SettingSwitch simpleReadingSwitch;
 
-    @Bind(R.id.display_section_header)
+    @BindView(R.id.display_section_header)
     SectionHeader displaySectionHeader;
 
-    @Bind(R.id.screen_on_switch)
+    @BindView(R.id.screen_on_switch)
     SettingSwitch screenOnSwitch;
 
-    @Bind(R.id.night_mode_switch)
+    @BindView(R.id.night_mode_switch)
     SettingSwitch nightModeSwitch;
 
-    @Bind(R.id.text_size_setting_button)
+    @BindView(R.id.text_size_setting_button)
     SettingTitleDescriptionButton textSizeSettingButton;
 
-    @Bind(R.id.about_section_header)
+    @BindView(R.id.about_section_header)
     SectionHeader aboutSectionHeader;
 
-    @Bind(R.id.rate_me_setting_button)
+    @BindView(R.id.rate_me_setting_button)
     SettingTitleDescriptionButton rateMeSettingButton;
 
-    @Bind(R.id.invite_friends_setting_button)
+    @BindView(R.id.invite_friends_setting_button)
     SettingTitleDescriptionButton inviteFriendsSettingButton;
 
-    @Bind(R.id.version_setting_button)
+    @BindView(R.id.version_setting_button)
     SettingTitleDescriptionButton versionSettingButton;
 
-    @Bind(R.id.license_setting_button)
+    @BindView(R.id.license_setting_button)
     SettingTitleDescriptionButton licenseSettingButton;
 
     private View rootView;

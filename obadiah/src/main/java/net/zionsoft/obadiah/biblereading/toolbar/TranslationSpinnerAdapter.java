@@ -31,15 +31,15 @@ import net.zionsoft.obadiah.R;
 
 import java.util.List;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class TranslationSpinnerAdapter extends BaseAdapter implements CompoundButton.OnCheckedChangeListener {
     static class DropDownViewHolder {
-        @Bind(R.id.checkbox)
+        @BindView(R.id.checkbox)
         AppCompatCheckBox checkbox;
 
-        @Bind(R.id.title)
+        @BindView(R.id.title)
         TextView title;
 
         private DropDownViewHolder(View root) {

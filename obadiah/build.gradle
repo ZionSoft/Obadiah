@@ -5,7 +5,7 @@ buildscript {
     }
     dependencies {
         classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
-        classpath 'io.fabric.tools:gradle:1.21.2'
+        classpath 'io.fabric.tools:gradle:1.21.5'
     }
 }
 
@@ -23,6 +23,11 @@ apply plugin: 'io.fabric'
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
+
+    compileOptions {
+        sourceCompatibility rootProject.ext.sourceJavaVersion
+        targetCompatibility rootProject.ext.targetJavaVersion
+    }
 
     defaultConfig {
         versionName rootProject.ext.versionName
@@ -80,12 +85,13 @@ dependencies {
     compile 'com.artemzin.rxjava:proguard-rules:' + rootProject.ext.rxJavaProguardRulesVersion
 
     compile 'com.jakewharton:butterknife:' + rootProject.ext.butterKnifeVersion
+    apt 'com.jakewharton:butterknife-compiler:' + rootProject.ext.butterKnifeVersion
 
     compile 'com.squareup.retrofit2:retrofit:' + rootProject.ext.retrofitVersion
     compile 'com.squareup.retrofit2:converter-moshi:' + rootProject.ext.retrofitVersion
     compile 'com.squareup.retrofit2:adapter-rxjava:' + rootProject.ext.retrofitVersion
 
-    compile('com.crashlytics.sdk.android:crashlytics:2.3.2@aar') {
+    compile('com.crashlytics.sdk.android:crashlytics:2.5.7@aar') {
         transitive = true;
     }
 

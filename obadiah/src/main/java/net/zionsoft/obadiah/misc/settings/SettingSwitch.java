@@ -32,14 +32,14 @@ import android.widget.FrameLayout;
 
 import net.zionsoft.obadiah.R;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class SettingSwitch extends FrameLayout {
-    @Bind(R.id.switch_button)
+    @BindView(R.id.switch_button)
     SwitchCompat switchButton;
 
-    @Bind(R.id.divider_view)
+    @BindView(R.id.divider_view)
     View dividerView;
 
     public SettingSwitch(Context context) {

@@ -36,20 +36,20 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class NotesListAdapter extends BaseSectionAdapter<Pair<Note, Verse>> {
     static class ViewHolder extends RecyclerView.ViewHolder {
         private static final StringBuilder STRING_BUILDER = new StringBuilder();
 
-        @Bind(R.id.title)
+        @BindView(R.id.title)
         TextView title;
 
-        @Bind(R.id.verse)
+        @BindView(R.id.verse)
         TextView verse;
 
-        @Bind(R.id.note)
+        @BindView(R.id.note)
         TextView note;
 
         private ViewHolder(View itemView, int textColor, float textSize, float smallerTextSize) {

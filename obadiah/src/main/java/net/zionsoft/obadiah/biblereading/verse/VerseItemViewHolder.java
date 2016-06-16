@@ -38,7 +38,7 @@ import net.zionsoft.obadiah.model.domain.Verse;
 import net.zionsoft.obadiah.model.domain.VerseIndex;
 import net.zionsoft.obadiah.utils.TextFormatter;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 
 class VerseItemViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, TextWatcher {
@@ -49,22 +49,22 @@ class VerseItemViewHolder extends RecyclerView.ViewHolder implements View.OnClic
     private final VersePagerPresenter versePagerPresenter;
     private final Resources resources;
 
-    @Bind(R.id.index)
+    @BindView(R.id.index)
     TextView index;
 
-    @Bind(R.id.text)
+    @BindView(R.id.text)
     TextView text;
 
-    @Bind(R.id.note)
+    @BindView(R.id.note)
     TextView note;
 
-    @Bind(R.id.bookmarkIcon)
+    @BindView(R.id.bookmarkIcon)
     AppCompatImageView bookmarkIcon;
 
-    @Bind(R.id.noteIcon)
+    @BindView(R.id.noteIcon)
     AppCompatImageView noteIcon;
 
-    @Bind(R.id.divider)
+    @BindView(R.id.divider)
     View divider;
 
     private VerseIndex verseIndex;

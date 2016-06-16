@@ -53,7 +53,7 @@ import net.zionsoft.obadiah.ui.widget.ProgressDialog;
 
 import javax.inject.Inject;
 
-import butterknife.Bind;
+import butterknife.BindView;
 
 public class TranslationManagementActivity extends BaseAppCompatActivity
         implements TranslationManagementView, SwipeRefreshLayout.OnRefreshListener,
@@ -80,16 +80,16 @@ public class TranslationManagementActivity extends BaseAppCompatActivity
     @Inject
     TranslationManagementPresenter translationManagementPresenter;
 
-    @Bind(R.id.toolbar)
+    @BindView(R.id.toolbar)
     Toolbar toolbar;
 
-    @Bind(R.id.swipe_container)
+    @BindView(R.id.swipe_container)
     SwipeRefreshLayout swipeContainer;
 
-    @Bind(R.id.translation_list)
+    @BindView(R.id.translation_list)
     RecyclerView translationList;
 
-    @Bind(R.id.ad_view)
+    @BindView(R.id.ad_view)
     AdView adView;
 
     private MenuItem removeAdsMenuItem;
