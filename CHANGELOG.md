@@ -3,6 +3,7 @@ CHANGELOG
 
 #### Next Release
 - Updated build tools and 3rd-party libraries:
+  - Updated target API level to 24.
   - Updated build tool to 23.0.3.
   - Updated Gradle to 2.14.
   - Updated Android Gradle plugin to 2.1.2.

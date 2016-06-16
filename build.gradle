@@ -16,7 +16,7 @@ ext {
     buildToolsVersion = '23.0.3'
 
     minSdkVersion = 15
-    targetSdkVersion = 23
+    targetSdkVersion = 24
 
     sourceJavaVersion = JavaVersion.VERSION_1_7
     targetJavaVersion = JavaVersion.VERSION_1_7
