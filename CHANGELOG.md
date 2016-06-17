@@ -2,6 +2,8 @@ CHANGELOG
 ---------
 
 #### Next Release
+
+#### v1.14.2 (2016-06-17)
 - Updated build tools and 3rd-party libraries:
   - Updated target API level to 24.
   - Updated build tool to 23.0.3.
@@ -13,7 +15,7 @@ CHANGELOG
   - Updated Google Play Services to 9.0.2.
   - Updated Dagger to 2.5.
   - Updated RxJava to 1.1.6.
-  - Updated RxAndroid to 1.2.0.
+  - Updated RxAndroid to 1.2.1.
   - Updated Retrofit to 2.1.0.
   - Updated ButterKnife to 8.1.0.
   - Updated Stetho to 1.3.1.

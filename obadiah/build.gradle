@@ -35,6 +35,8 @@ android {
 
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
+
+        applicationId 'net.zionsoft.obadiah'
     }
 
     signingConfigs {
@@ -97,7 +99,7 @@ dependencies {
 
     compile 'com.github.xizzhu.auto-droid:auto-droid-annotations:' + rootProject.ext.autoDroidVersion
     apt 'com.github.xizzhu.auto-droid:auto-droid-processors:' + rootProject.ext.autoDroidVersion
-    compile 'com.google.auto.value:auto-value:' + rootProject.ext.autoValueVersion
+    provided 'com.google.auto.value:auto-value:' + rootProject.ext.autoValueVersion
 
     debugCompile 'com.facebook.stetho:stetho:' + rootProject.ext.stethoVersion
     debugCompile 'com.facebook.stetho:stetho-okhttp3:' + rootProject.ext.stethoVersion

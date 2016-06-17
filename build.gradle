@@ -21,8 +21,8 @@ ext {
     sourceJavaVersion = JavaVersion.VERSION_1_7
     targetJavaVersion = JavaVersion.VERSION_1_7
 
-    versionName = '1.14.1'
-    versionCode = 11401
+    versionName = '1.14.2'
+    versionCode = 11402
 
     supportLibVersion = '24.0.0'
     playServicesVersion = '9.0.2'
@@ -30,7 +30,7 @@ ext {
     daggerVersion = '2.5'
     javaxAnnotationApiVersion = '1.2'
     butterKnifeVersion = '8.1.0'
-    rxAndroidVersion = '1.2.0'
+    rxAndroidVersion = '1.2.1'
     rxJavaVersion = '1.1.6'
     rxJavaProguardRulesVersion = '1.1.6.0'
     retrofitVersion = '2.1.0'
