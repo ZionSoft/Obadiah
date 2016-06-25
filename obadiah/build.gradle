@@ -73,7 +73,7 @@ dependencies {
     compile 'com.android.support:design:' + rootProject.ext.supportLibVersion
 
     compile 'com.google.firebase:firebase-core:' + rootProject.ext.firebaseVersion
-    compile 'com.google.android.gms:play-services-ads:' + rootProject.ext.playServicesVersion
+    compile 'com.google.firebase:firebase-ads:'  + rootProject.ext.firebaseVersion
     compile 'com.google.android.gms:play-services-analytics:' + rootProject.ext.playServicesVersion
     compile 'com.google.android.gms:play-services-appindexing:' + rootProject.ext.playServicesVersion
     compile 'com.google.android.gms:play-services-appinvite:' + rootProject.ext.playServicesVersion
