@@ -28,6 +28,9 @@ libs
 # Google In-App Billing
 IInAppBillingService.aidl
 
+# Google Services
+google-services.json
+
 # Crashlytics
 crashlytics.properties
 crashlytics-build.properties
