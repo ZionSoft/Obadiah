@@ -4,15 +4,9 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:installLocation="auto">
 
-    <permission
-        android:name="${applicationId}.permission.C2D_MESSAGE"
-        android:protectionLevel="signature"/>
-
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="com.android.vending.BILLING"/>
-    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE"/>
-    <uses-permission android:name="${applicationId}.permission.C2D_MESSAGE"/>
 
     <!-- Only requires permissions for Marshmallow and above -->
     <uses-permission-sdk-23 android:name="android.permission.NFC"/>
@@ -91,27 +85,25 @@
             android:authorities="${applicationId}.model.search.RecentSearchProvider"
             android:exported="false"/>
 
-        <receiver
-            android:name=".notification.PushNotificationReceiver"
-            android:permission="com.google.android.c2dm.permission.SEND">
-            <intent-filter>
-                <action android:name="com.google.android.c2dm.intent.RECEIVE"/>
-                <category android:name="net.zionsoft.obadiah"/>
-            </intent-filter>
-        </receiver>
+        <receiver android:name=".notification.PushDismissedReceiver"/>
         <receiver android:name=".utils.PackageUpdateReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
             </intent-filter>
         </receiver>
 
-        <service android:name=".notification.PushNotificationHandler"/>
         <service android:name=".notification.PushNotificationRegister"/>
         <service
             android:name=".notification.InstanceIDListener"
-            android:exported="false">
+            android:exported="true">
             <intent-filter>
-                <action android:name="com.google.android.gms.iid.InstanceID"/>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
+            </intent-filter>
+        </service>
+        <service
+            android:name=".notification.PushNotificationReceiver">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
             </intent-filter>
         </service>
 

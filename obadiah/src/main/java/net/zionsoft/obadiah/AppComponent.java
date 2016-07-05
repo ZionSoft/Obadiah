@@ -24,9 +24,9 @@ import net.zionsoft.obadiah.bookmarks.BookmarksModule;
 import net.zionsoft.obadiah.misc.license.OpenSourceLicenseComponent;
 import net.zionsoft.obadiah.misc.license.OpenSourceLicenseModule;
 import net.zionsoft.obadiah.misc.settings.SettingsActivity;
-import net.zionsoft.obadiah.notification.PushNotificationHandler;
 import net.zionsoft.obadiah.notes.NotesComponent;
 import net.zionsoft.obadiah.notes.NotesModule;
+import net.zionsoft.obadiah.notification.PushNotificationReceiver;
 import net.zionsoft.obadiah.readingprogress.ReadingProgressComponent;
 import net.zionsoft.obadiah.readingprogress.ReadingProgressModule;
 import net.zionsoft.obadiah.search.SearchComponent;
@@ -45,7 +45,7 @@ public interface AppComponent {
 
     void inject(SettingsActivity settingsActivity);
 
-    void inject(PushNotificationHandler pushNotificationHandler);
+    void inject(PushNotificationReceiver pushNotificationReceiver);
 
     BibleReadingComponent plus(BibleReadingModule bibleReadingModule);
 
