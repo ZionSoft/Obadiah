@@ -74,10 +74,10 @@ dependencies {
 
     compile 'com.google.firebase:firebase-core:' + rootProject.ext.firebaseVersion
     compile 'com.google.firebase:firebase-ads:' + rootProject.ext.firebaseVersion
+    compile 'com.google.firebase:firebase-invites:' + rootProject.ext.firebaseVersion
     compile 'com.google.firebase:firebase-messaging:' + rootProject.ext.firebaseVersion
     compile 'com.google.android.gms:play-services-analytics:' + rootProject.ext.playServicesVersion
     compile 'com.google.android.gms:play-services-appindexing:' + rootProject.ext.playServicesVersion
-    compile 'com.google.android.gms:play-services-appinvite:' + rootProject.ext.playServicesVersion
 
     compile 'com.google.dagger:dagger:' + rootProject.ext.daggerVersion
     apt 'com.google.dagger:dagger-compiler:' + rootProject.ext.daggerVersion
