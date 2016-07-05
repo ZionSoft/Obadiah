@@ -5,6 +5,8 @@ CHANGELOG
 - Updated build tools:
   - Updated Android Gradle plugin to 2.2.0-alpha4.
   - Updated build tool to 24.
+  - Updated Google Play Services and Firebase to 9.2.0.
+- Added basic usage for Firebase analytics, and switched to Firebase Cloud Messaging, Ads, and Invites.
 
 #### v1.14.2 (2016-06-17)
 - Updated build tools and 3rd-party libraries:

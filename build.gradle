@@ -5,6 +5,7 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:2.2.0-alpha4'
+        classpath 'com.google.gms:google-services:3.0.0'
     }
 }
 
@@ -26,7 +27,8 @@ ext {
     versionCode = 11402
 
     supportLibVersion = '24.0.0'
-    playServicesVersion = '9.0.2'
+    firebaseVersion = '9.2.0'
+    playServicesVersion = '9.2.0'
 
     daggerVersion = '2.5'
     javaxAnnotationApiVersion = '1.2'

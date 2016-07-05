@@ -17,9 +17,9 @@
 
 package net.zionsoft.obadiah.notification;
 
-import com.google.android.gms.iid.InstanceIDListenerService;
+import com.google.firebase.iid.FirebaseInstanceIdService;
 
-public class InstanceIDListener extends InstanceIDListenerService {
+public class InstanceIDListener extends FirebaseInstanceIdService {
     @Override
     public void onTokenRefresh() {
         PushNotificationRegister.register(this);

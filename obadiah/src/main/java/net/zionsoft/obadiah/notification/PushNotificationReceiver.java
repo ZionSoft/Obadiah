@@ -17,22 +17,148 @@
 
 package net.zionsoft.obadiah.notification;
 
-import android.content.BroadcastReceiver;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
+import android.os.Build;
+import android.support.annotation.NonNull;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 
-import net.zionsoft.obadiah.model.analytics.Analytics;
+import com.crashlytics.android.Crashlytics;
+import com.google.firebase.messaging.FirebaseMessagingService;
+import com.google.firebase.messaging.RemoteMessage;
+import com.squareup.moshi.Moshi;
 
-public class PushNotificationReceiver extends BroadcastReceiver {
+import net.zionsoft.obadiah.App;
+import net.zionsoft.obadiah.R;
+import net.zionsoft.obadiah.biblereading.BibleReadingActivity;
+import net.zionsoft.obadiah.model.analytics.Analytics;
+import net.zionsoft.obadiah.model.datamodel.BibleReadingModel;
+import net.zionsoft.obadiah.model.domain.Verse;
+import net.zionsoft.obadiah.translations.TranslationManagementActivity;
+import net.zionsoft.obadiah.utils.TextFormatter;
+
+import java.util.Map;
+
+import javax.inject.Inject;
+
+public class PushNotificationReceiver extends FirebaseMessagingService {
+    private static final int NOTIFICATION_ID_VERSE = 1;
+    private static final int NOTIFICATION_ID_NEW_TRANSLATION = 2;
+
+    private static final String MESSAGE_TYPE_VERSE = "verse";
+    private static final String MESSAGE_TYPE_NEW_TRANSLATION = "newTranslation";
+
+    @Inject
+    Moshi moshi;
+
+    @Inject
+    BibleReadingModel bibleReadingModel;
+
     @Override
-    public void onReceive(Context context, Intent intent) {
-        // should just use GcmReceiver, but it requires the WAKE_LOCK permission
-        final String messageType = intent.getStringExtra("message_type");
-        Analytics.trackEvent(Analytics.CATEGORY_NOTIFICATION, Analytics.NOTIFICATION_ACTION_RECEIVED,
-                TextUtils.isEmpty(messageType) ? "empty message type" : messageType);
-        if (TextUtils.isEmpty(messageType) || "gcm".equals(messageType)) {
-            context.startService(PushNotificationHandler.newStartIntent(context, intent.getExtras()));
+    public void onMessageReceived(RemoteMessage message) {
+        App.getComponent().inject(this);
+
+        final Map<String, String> data = message.getData();
+        if (data == null || data.size() == 0) {
+            return;
         }
+
+        final String messageType = data.get("type");
+        final String messageAttrs = data.get("attrs");
+
+        final NotificationCompat.Builder builder = buildBasicNotificationBuilder(this, messageType);
+        final int notificationId;
+        if (MESSAGE_TYPE_VERSE.equals(messageType)) {
+            notificationId = NOTIFICATION_ID_VERSE;
+            if (!prepareForVerse(builder, messageType, messageAttrs)) {
+                return;
+            }
+        } else if (MESSAGE_TYPE_NEW_TRANSLATION.equals(messageType)) {
+            notificationId = NOTIFICATION_ID_NEW_TRANSLATION;
+            if (!prepareForNewTranslation(this, builder, messageType, messageAttrs)) {
+                return;
+            }
+        } else {
+            return;
+        }
+
+        final NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        nm.notify(notificationId, builder.build());
+
+        Analytics.trackEvent(Analytics.CATEGORY_NOTIFICATION, Analytics.NOTIFICATION_ACTION_SHOWN, messageType);
+    }
+
+    @NonNull
+    private static NotificationCompat.Builder buildBasicNotificationBuilder(Context context, String messageType) {
+        final NotificationCompat.Builder builder = new NotificationCompat.Builder(context)
+                .setAutoCancel(true)
+                .setDefaults(Notification.DEFAULT_LIGHTS)
+                .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
+                .setDeleteIntent(PendingIntent.getBroadcast(context, 0,
+                        PushDismissedReceiver.newStartIntent(context, messageType),
+                        PendingIntent.FLAG_UPDATE_CURRENT));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            builder.setSmallIcon(R.drawable.ic_notification)
+                    .setColor(ContextCompat.getColor(context, R.color.blue));
+        } else {
+            builder.setSmallIcon(R.drawable.ic_launcher);
+        }
+        return builder;
+    }
+
+    private boolean prepareForVerse(NotificationCompat.Builder builder,
+                                    String messageType, String messageAttrs) {
+        final String translationShortName = bibleReadingModel.loadCurrentTranslation();
+        if (TextUtils.isEmpty(translationShortName)) {
+            return false;
+        }
+
+        try {
+            final PushAttrVerseIndex verseIndex = moshi.adapter(PushAttrVerseIndex.class).fromJson(messageAttrs);
+            final PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,
+                    BibleReadingActivity.newStartReorderToTopIntent(this, messageType, verseIndex.toVerseIndex()),
+                    PendingIntent.FLAG_UPDATE_CURRENT);
+            final Verse verse = bibleReadingModel
+                    .loadVerse(translationShortName, verseIndex.book, verseIndex.chapter, verseIndex.verse)
+                    .toBlocking().first();
+            builder.setContentIntent(pendingIntent)
+                    .setContentTitle(TextFormatter.format("%s, %d:%d",
+                            verse.text.bookName, verseIndex.chapter + 1, verseIndex.verse + 1))
+                    .setContentText(verse.text.text)
+                    .setStyle(new NotificationCompat.BigTextStyle().bigText(verse.text.text));
+        } catch (Exception e) {
+            Crashlytics.getInstance().core.logException(e);
+            return false;
+        }
+        return true;
+    }
+
+    private boolean prepareForNewTranslation(Context context, NotificationCompat.Builder builder,
+                                             String messageType, String messageAttrs) {
+        try {
+            final String translationName = moshi.adapter(PushAttrNewTranslation.class)
+                    .fromJson(messageAttrs).translationName;
+            if (TextUtils.isEmpty(translationName)) {
+                return false;
+            }
+
+            final String contentText = context.getString(R.string.text_new_translation_available,
+                    translationName);
+            builder.setContentIntent(PendingIntent.getActivity(context, 0,
+                    TranslationManagementActivity.newStartReorderToTopIntent(context, messageType),
+                    PendingIntent.FLAG_UPDATE_CURRENT))
+                    .setContentTitle(context.getString(R.string.text_new_translation))
+                    .setContentText(contentText)
+                    .setStyle(new NotificationCompat.BigTextStyle().bigText(contentText));
+        } catch (Exception e) {
+            Crashlytics.getInstance().core.logException(e);
+            return false;
+        }
+
+        return true;
     }
 }

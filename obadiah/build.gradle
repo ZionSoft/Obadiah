@@ -72,11 +72,12 @@ dependencies {
     compile 'com.android.support:recyclerview-v7:' + rootProject.ext.supportLibVersion
     compile 'com.android.support:design:' + rootProject.ext.supportLibVersion
 
-    compile 'com.google.android.gms:play-services-ads:' + rootProject.ext.playServicesVersion
+    compile 'com.google.firebase:firebase-core:' + rootProject.ext.firebaseVersion
+    compile 'com.google.firebase:firebase-ads:' + rootProject.ext.firebaseVersion
+    compile 'com.google.firebase:firebase-invites:' + rootProject.ext.firebaseVersion
+    compile 'com.google.firebase:firebase-messaging:' + rootProject.ext.firebaseVersion
     compile 'com.google.android.gms:play-services-analytics:' + rootProject.ext.playServicesVersion
     compile 'com.google.android.gms:play-services-appindexing:' + rootProject.ext.playServicesVersion
-    compile 'com.google.android.gms:play-services-appinvite:' + rootProject.ext.playServicesVersion
-    compile 'com.google.android.gms:play-services-gcm:' + rootProject.ext.playServicesVersion
 
     compile 'com.google.dagger:dagger:' + rootProject.ext.daggerVersion
     apt 'com.google.dagger:dagger-compiler:' + rootProject.ext.daggerVersion
@@ -104,3 +105,5 @@ dependencies {
     debugCompile 'com.facebook.stetho:stetho:' + rootProject.ext.stethoVersion
     debugCompile 'com.facebook.stetho:stetho-okhttp3:' + rootProject.ext.stethoVersion
 }
+
+apply plugin: 'com.google.gms.google-services'
