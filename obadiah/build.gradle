@@ -37,6 +37,8 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
 
         applicationId 'net.zionsoft.obadiah'
+
+        resConfigs "en", "fi", "zh", "zh-rCN"
     }
 
     signingConfigs {
