@@ -20,7 +20,6 @@ package net.zionsoft.obadiah.misc.license;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -59,32 +58,27 @@ public class OpenSourceLicenseActivity extends BaseAppCompatActivity implements 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        FragmentManager fm = getSupportFragmentManager();
-        if (fm.findFragmentByTag(OpenSourceLicenseComponentFragment.FRAGMENT_TAG) == null) {
+        final FragmentManager fm = getSupportFragmentManager();
+        OpenSourceLicenseComponentFragment componentFragment = (OpenSourceLicenseComponentFragment)
+                fm.findFragmentByTag(OpenSourceLicenseComponentFragment.FRAGMENT_TAG);
+        if (componentFragment == null) {
+            componentFragment = OpenSourceLicenseComponentFragment.newInstance();
             fm.beginTransaction()
-                    .add(OpenSourceLicenseComponentFragment.newInstance(),
-                            OpenSourceLicenseComponentFragment.FRAGMENT_TAG)
-                    .commit();
+                    .add(componentFragment, OpenSourceLicenseComponentFragment.FRAGMENT_TAG)
+                    .commitNow();
         }
+        componentFragment.getComponent().inject(this);
 
         setContentView(R.layout.activity_open_source_license);
+
+        final View rootView = getWindow().getDecorView();
+        final Settings settings = openSourceLicensePresenter.getSettings();
+        rootView.setKeepScreenOn(settings.keepScreenOn());
+        rootView.setBackgroundColor(settings.getBackgroundColor());
+
         toolbar.setLogo(R.drawable.ic_action_bar);
         toolbar.setTitle(R.string.activity_open_source_license);
         licenseList.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-    }
-
-    @Override
-    public void onAttachFragment(Fragment fragment) {
-        super.onAttachFragment(fragment);
-
-        if (fragment instanceof OpenSourceLicenseComponentFragment) {
-            ((OpenSourceLicenseComponentFragment) fragment).getComponent().inject(this);
-
-            final View rootView = getWindow().getDecorView();
-            final Settings settings = openSourceLicensePresenter.getSettings();
-            rootView.setKeepScreenOn(settings.keepScreenOn());
-            rootView.setBackgroundColor(settings.getBackgroundColor());
-        }
     }
 
     @Override

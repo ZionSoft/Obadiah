@@ -23,7 +23,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.LinearLayoutManager;
@@ -89,23 +88,29 @@ public class SearchActivity extends BaseAppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        FragmentManager fm = getSupportFragmentManager();
-        if (fm.findFragmentByTag(SearchComponentFragment.FRAGMENT_TAG) == null) {
+        final FragmentManager fm = getSupportFragmentManager();
+        SearchComponentFragment componentFragment = (SearchComponentFragment)
+                fm.findFragmentByTag(SearchComponentFragment.FRAGMENT_TAG);
+        if (componentFragment == null) {
+            componentFragment = SearchComponentFragment.newInstance();
             fm.beginTransaction()
-                    .add(SearchComponentFragment.newInstance(),
-                            SearchComponentFragment.FRAGMENT_TAG)
+                    .add(componentFragment, SearchComponentFragment.FRAGMENT_TAG)
                     .commit();
         }
+        componentFragment.getComponent().inject(this);
 
         if (savedInstanceState != null) {
             query = savedInstanceState.getString(KEY_QUERY);
         }
+        currentTranslation = searchPresenter.loadCurrentTranslation();
 
         setContentView(R.layout.activity_search);
         initializeToolbar();
         searchResultList.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-        initializeAdapter();
+        searchResultAdapter = new SearchResultListAdapter(this, searchPresenter);
+        searchResultList.setAdapter(searchResultAdapter);
 
+        search();
         handleStartIntent(getIntent());
     }
 
@@ -130,20 +135,6 @@ public class SearchActivity extends BaseAppCompatActivity
         }
     }
 
-    private void initializeAdapter() {
-        if (searchResultList == null || searchPresenter == null || searchResultAdapter != null) {
-            // if the activity is recreated due to screen orientation change, the component fragment
-            // is attached before the UI is initialized, i.e. onAttachFragment() is called inside
-            // super.onCreate()
-            // therefore, we try to do the initialization in both places
-            return;
-        }
-        searchResultAdapter = new SearchResultListAdapter(this, searchPresenter);
-        searchResultList.setAdapter(searchResultAdapter);
-
-        search();
-    }
-
     private void handleStartIntent(Intent intent) {
         final String action = intent.getAction();
         if (searchView != null
@@ -152,17 +143,6 @@ public class SearchActivity extends BaseAppCompatActivity
             if (!TextUtils.isEmpty(query)) {
                 searchView.setQuery(query, true);
             }
-        }
-    }
-
-    @Override
-    public void onAttachFragment(Fragment fragment) {
-        super.onAttachFragment(fragment);
-
-        if (fragment instanceof SearchComponentFragment) {
-            ((SearchComponentFragment) fragment).getComponent().inject(this);
-            currentTranslation = searchPresenter.loadCurrentTranslation();
-            initializeAdapter();
         }
     }
 

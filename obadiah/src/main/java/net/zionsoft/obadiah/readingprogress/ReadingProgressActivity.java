@@ -21,7 +21,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -62,32 +61,27 @@ public class ReadingProgressActivity extends BaseAppCompatActivity implements Re
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        FragmentManager fm = getSupportFragmentManager();
-        if (fm.findFragmentByTag(ReadingProgressComponentFragment.FRAGMENT_TAG) == null) {
+        final FragmentManager fm = getSupportFragmentManager();
+        ReadingProgressComponentFragment componentFragment = (ReadingProgressComponentFragment)
+                fm.findFragmentByTag(ReadingProgressComponentFragment.FRAGMENT_TAG);
+        if (componentFragment == null) {
+            componentFragment = ReadingProgressComponentFragment.newInstance();
             fm.beginTransaction()
-                    .add(ReadingProgressComponentFragment.newInstance(),
-                            ReadingProgressComponentFragment.FRAGMENT_TAG)
-                    .commit();
+                    .add(componentFragment, ReadingProgressComponentFragment.FRAGMENT_TAG)
+                    .commitNow();
         }
+        componentFragment.getComponent().inject(this);
 
         setContentView(R.layout.activity_reading_progress);
+
+        final View rootView = getWindow().getDecorView();
+        final Settings settings = readingProgressPresenter.getSettings();
+        rootView.setKeepScreenOn(settings.keepScreenOn());
+        rootView.setBackgroundColor(settings.getBackgroundColor());
+
         toolbar.setLogo(R.drawable.ic_action_bar);
         toolbar.setTitle(R.string.activity_reading_progress);
         readingProgressList.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-    }
-
-    @Override
-    public void onAttachFragment(Fragment fragment) {
-        super.onAttachFragment(fragment);
-
-        if (fragment instanceof ReadingProgressComponentFragment) {
-            ((ReadingProgressComponentFragment) fragment).getComponent().inject(this);
-
-            final View rootView = getWindow().getDecorView();
-            final Settings settings = readingProgressPresenter.getSettings();
-            rootView.setKeepScreenOn(settings.keepScreenOn());
-            rootView.setBackgroundColor(settings.getBackgroundColor());
-        }
     }
 
     @Override

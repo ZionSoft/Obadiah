@@ -28,7 +28,6 @@ import android.nfc.NfcEvent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -123,19 +122,23 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        FragmentManager fm = getSupportFragmentManager();
-        if (fm.findFragmentByTag(BibleReadingComponentFragment.FRAGMENT_TAG) == null) {
+        final FragmentManager fm = getSupportFragmentManager();
+        BibleReadingComponentFragment componentFragment = (BibleReadingComponentFragment)
+                fm.findFragmentByTag(BibleReadingComponentFragment.FRAGMENT_TAG);
+        if (componentFragment == null) {
+            componentFragment = BibleReadingComponentFragment.newInstance();
             fm.beginTransaction()
-                    .add(BibleReadingComponentFragment.newInstance(),
-                            BibleReadingComponentFragment.FRAGMENT_TAG)
-                    .commit();
+                    .add(componentFragment, BibleReadingComponentFragment.FRAGMENT_TAG)
+                    .commitNow();
         }
+        componentFragment.getComponent().inject(this);
 
         NfcHelper.registerNdefMessageCallback(this, this);
         appIndexingManager = new AppIndexingManager(this);
 
         initializeUi();
         updatePresenters();
+        checkDeepLink();
     }
 
     private void initializeUi() {
@@ -146,34 +149,9 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
     }
 
     private void updatePresenters() {
-        // if the activity is recreated due to screen orientation change, the component fragment
-        // is attached before the UI is initialized, i.e. onAttachFragment() is called inside
-        // super.onCreate()
-        // therefore, we try to do the initialization in both places
-
-        if (toolbar != null && toolbarPresenter != null) {
-            toolbar.setPresenter(toolbarPresenter);
-        }
-
-        if (chapterList != null && chapterPresenter != null) {
-            chapterList.setPresenter(chapterPresenter);
-        }
-
-        if (versePager != null && versePresenter != null && versePagerPresenter != null) {
-            versePager.initialize(this, versePresenter, versePagerPresenter);
-        }
-    }
-
-    @Override
-    public void onAttachFragment(Fragment fragment) {
-        super.onAttachFragment(fragment);
-
-        if (fragment instanceof BibleReadingComponentFragment) {
-            ((BibleReadingComponentFragment) fragment).getComponent().inject(this);
-            updatePresenters();
-
-            checkDeepLink();
-        }
+        toolbar.setPresenter(toolbarPresenter);
+        chapterList.setPresenter(chapterPresenter);
+        versePager.initialize(this, versePresenter, versePagerPresenter);
     }
 
     private void checkDeepLink() {

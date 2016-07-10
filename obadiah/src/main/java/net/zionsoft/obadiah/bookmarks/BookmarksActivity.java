@@ -22,7 +22,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.view.View;
 
@@ -54,44 +53,26 @@ public class BookmarksActivity extends BaseRecyclerViewActivity implements Bookm
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        FragmentManager fm = getSupportFragmentManager();
-        if (fm.findFragmentByTag(BookmarksComponentFragment.FRAGMENT_TAG) == null) {
+        final FragmentManager fm = getSupportFragmentManager();
+        BookmarksComponentFragment componentFragment = (BookmarksComponentFragment)
+                fm.findFragmentByTag(BookmarksComponentFragment.FRAGMENT_TAG);
+        if (componentFragment == null) {
+            componentFragment = BookmarksComponentFragment.newInstance();
             fm.beginTransaction()
-                    .add(BookmarksComponentFragment.newInstance(),
-                            BookmarksComponentFragment.FRAGMENT_TAG)
-                    .commit();
+                    .add(componentFragment, BookmarksComponentFragment.FRAGMENT_TAG)
+                    .commitNow();
         }
+        componentFragment.getComponent().inject(this);
+
+        final View rootView = getWindow().getDecorView();
+        final Settings settings = bookmarksPresenter.getSettings();
+        rootView.setKeepScreenOn(settings.keepScreenOn());
+        rootView.setBackgroundColor(settings.getBackgroundColor());
 
         toolbar.setTitle(R.string.activity_bookmarks);
-        initializeAdapter();
-    }
 
-    private void initializeAdapter() {
-        if (recyclerView == null || bookmarksPresenter == null || bookmarksListAdapter != null) {
-            // if the activity is recreated due to screen orientation change, the component fragment
-            // is attached before the UI is initialized, i.e. onAttachFragment() is called inside
-            // super.onCreate()
-            // therefore, we try to do the initialization in both places
-            return;
-        }
         bookmarksListAdapter = new BookmarksListAdapter(this, bookmarksPresenter.getSettings());
         recyclerView.setAdapter(bookmarksListAdapter);
-    }
-
-    @Override
-    public void onAttachFragment(Fragment fragment) {
-        super.onAttachFragment(fragment);
-
-        if (fragment instanceof BookmarksComponentFragment) {
-            ((BookmarksComponentFragment) fragment).getComponent().inject(this);
-
-            final View rootView = getWindow().getDecorView();
-            final Settings settings = bookmarksPresenter.getSettings();
-            rootView.setKeepScreenOn(settings.keepScreenOn());
-            rootView.setBackgroundColor(settings.getBackgroundColor());
-
-            initializeAdapter();
-        }
     }
 
     @Override

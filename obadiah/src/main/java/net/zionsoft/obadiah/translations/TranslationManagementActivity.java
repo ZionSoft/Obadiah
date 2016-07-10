@@ -24,7 +24,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.NavUtils;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -43,11 +42,11 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 
 import net.zionsoft.obadiah.R;
-import net.zionsoft.obadiah.model.datamodel.Settings;
 import net.zionsoft.obadiah.model.analytics.Analytics;
+import net.zionsoft.obadiah.model.datamodel.Settings;
 import net.zionsoft.obadiah.model.domain.TranslationInfo;
-import net.zionsoft.obadiah.ui.utils.BaseAppCompatActivity;
 import net.zionsoft.obadiah.ui.utils.AnimationHelper;
+import net.zionsoft.obadiah.ui.utils.BaseAppCompatActivity;
 import net.zionsoft.obadiah.ui.utils.DialogHelper;
 import net.zionsoft.obadiah.ui.widget.ProgressDialog;
 
@@ -104,12 +103,15 @@ public class TranslationManagementActivity extends BaseAppCompatActivity
         super.onCreate(savedInstanceState);
 
         final FragmentManager fm = getSupportFragmentManager();
-        if (fm.findFragmentByTag(TranslationManagementComponentFragment.FRAGMENT_TAG) == null) {
+        TranslationManagementComponentFragment componentFragment = (TranslationManagementComponentFragment)
+                fm.findFragmentByTag(TranslationManagementComponentFragment.FRAGMENT_TAG);
+        if (componentFragment == null) {
+            componentFragment = TranslationManagementComponentFragment.newInstance();
             fm.beginTransaction()
-                    .add(TranslationManagementComponentFragment.newInstance(),
-                            TranslationManagementComponentFragment.FRAGMENT_TAG)
-                    .commit();
+                    .add(componentFragment, TranslationManagementComponentFragment.FRAGMENT_TAG)
+                    .commitNow();
         }
+        componentFragment.getComponent().inject(this);
 
         initializeUi();
         checkDeepLink();
@@ -126,6 +128,11 @@ public class TranslationManagementActivity extends BaseAppCompatActivity
 
     private void initializeUi() {
         setContentView(R.layout.activity_translation_management);
+
+        final View rootView = getWindow().getDecorView();
+        final Settings settings = translationManagementPresenter.getSettings();
+        rootView.setBackgroundColor(settings.getBackgroundColor());
+        rootView.setKeepScreenOn(settings.keepScreenOn());
 
         toolbar.setTitle(R.string.activity_manage_translation);
         toolbar.setNavigationIcon(R.drawable.ic_action_back);
@@ -150,7 +157,8 @@ public class TranslationManagementActivity extends BaseAppCompatActivity
 
         translationList.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         translationList.addOnChildAttachStateChangeListener(this);
-        initializeAdapter();
+        translationListAdapter = new TranslationListAdapter(this, settings);
+        translationList.setAdapter(translationListAdapter);
     }
 
     private void finishAndOpenParentActivity() {
@@ -158,35 +166,6 @@ public class TranslationManagementActivity extends BaseAppCompatActivity
                 .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP));
         finish();
         overridePendingTransition(R.anim.fade_in, R.anim.slide_out_left_to_right);
-    }
-
-    @Override
-    public void onAttachFragment(Fragment fragment) {
-        super.onAttachFragment(fragment);
-
-        if (fragment instanceof TranslationManagementComponentFragment) {
-            ((TranslationManagementComponentFragment) fragment).getComponent().inject(this);
-
-            final View rootView = getWindow().getDecorView();
-            final Settings settings = translationManagementPresenter.getSettings();
-            rootView.setBackgroundColor(settings.getBackgroundColor());
-            rootView.setKeepScreenOn(settings.keepScreenOn());
-
-            initializeAdapter();
-        }
-    }
-
-    private void initializeAdapter() {
-        if (translationList == null || translationListAdapter != null || translationManagementPresenter == null) {
-            // if the activity is recreated due to screen orientation change, the component fragment
-            // is attached before the UI is initialized, i.e. onAttachFragment() is called inside
-            // super.onCreate()
-            // therefore, we try to do the initialization in both places
-            return;
-        }
-
-        translationListAdapter = new TranslationListAdapter(this, translationManagementPresenter.getSettings());
-        translationList.setAdapter(translationListAdapter);
     }
 
     @Override
