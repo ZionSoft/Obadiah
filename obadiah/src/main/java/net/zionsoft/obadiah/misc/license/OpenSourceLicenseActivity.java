@@ -21,38 +21,23 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.widget.ProgressBar;
 
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.datamodel.Settings;
-import net.zionsoft.obadiah.ui.utils.BaseAppCompatActivity;
+import net.zionsoft.obadiah.ui.utils.BaseRecyclerViewActivity;
 
 import java.util.List;
 
 import javax.inject.Inject;
 
-import butterknife.BindView;
-
-public class OpenSourceLicenseActivity extends BaseAppCompatActivity implements OpenSourceLicenseView {
+public class OpenSourceLicenseActivity extends BaseRecyclerViewActivity implements OpenSourceLicenseView {
     public static Intent newStartIntent(Context context) {
         return new Intent(context, OpenSourceLicenseActivity.class);
     }
 
     @Inject
     OpenSourceLicensePresenter openSourceLicensePresenter;
-
-    @BindView(R.id.toolbar)
-    Toolbar toolbar;
-
-    @BindView(R.id.license_list)
-    RecyclerView licenseList;
-
-    @BindView(R.id.loading_spinner)
-    ProgressBar loadingSpinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,16 +54,12 @@ public class OpenSourceLicenseActivity extends BaseAppCompatActivity implements 
         }
         componentFragment.getComponent().inject(this);
 
-        setContentView(R.layout.activity_open_source_license);
-
         final View rootView = getWindow().getDecorView();
         final Settings settings = openSourceLicensePresenter.getSettings();
         rootView.setKeepScreenOn(settings.keepScreenOn());
         rootView.setBackgroundColor(settings.getBackgroundColor());
 
-        toolbar.setLogo(R.drawable.ic_action_bar);
         toolbar.setTitle(R.string.activity_open_source_license);
-        licenseList.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
     }
 
     @Override
@@ -96,8 +77,13 @@ public class OpenSourceLicenseActivity extends BaseAppCompatActivity implements 
 
     @Override
     public void onLicensesLoaded(List<String> licenses) {
-        licenseList.setAdapter(new OpenSourceLicenseListAdapter(
+        recyclerView.setAdapter(new OpenSourceLicenseListAdapter(
                 this, openSourceLicensePresenter.getSettings(), licenses));
         loadingSpinner.setVisibility(View.GONE);
+    }
+
+    @Override
+    protected void onChildClicked(int position) {
+        // do nothing
     }
 }
