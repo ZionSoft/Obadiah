@@ -43,8 +43,8 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import rx.AsyncEmitter;
 import rx.Observable;
-import rx.Subscriber;
 import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.subjects.PublishSubject;
@@ -162,19 +162,19 @@ public class BibleReadingModel {
     }
 
     public Observable<List<String>> loadTranslations() {
-        return Observable.create(new Observable.OnSubscribe<List<String>>() {
+        return Observable.fromAsync(new Action1<AsyncEmitter<List<String>>>() {
             @Override
-            public void call(Subscriber<? super List<String>> subscriber) {
+            public void call(AsyncEmitter<List<String>> emitter) {
                 try {
-                    subscriber.onNext(TranslationsTableHelper
+                    emitter.onNext(TranslationsTableHelper
                             .getDownloadedTranslations(databaseHelper.getDatabase()));
-                    subscriber.onCompleted();
+                    emitter.onCompleted();
                 } catch (Exception e) {
                     Crashlytics.getInstance().core.logException(e);
-                    subscriber.onError(e);
+                    emitter.onError(e);
                 }
             }
-        });
+        }, AsyncEmitter.BackpressureMode.ERROR);
     }
 
     public Observable<List<String>> loadBookNames(String translation) {
@@ -193,28 +193,29 @@ public class BibleReadingModel {
     }
 
     private Observable<List<String>> loadBookNamesFromDatabase(final String translation) {
-        return Observable.create(new Observable.OnSubscribe<List<String>>() {
+        return Observable.fromAsync(new Action1<AsyncEmitter<List<String>>>() {
             @Override
-            public void call(Subscriber<? super List<String>> subscriber) {
+            public void call(AsyncEmitter<List<String>> emitter) {
                 try {
-                    subscriber.onNext(Collections.unmodifiableList(
+                    emitter.onNext(Collections.unmodifiableList(
                             BookNamesTableHelper.getBookNames(databaseHelper.getDatabase(), translation)));
-                    subscriber.onCompleted();
+                    emitter.onCompleted();
                 } catch (Exception e) {
                     if (!TextUtils.isEmpty(translation)) {
                         // if the translation name is empty, it means there's current no translation
                         // installed, no need to track the exception
                         Crashlytics.getInstance().core.logException(e);
                     }
-                    subscriber.onError(e);
+                    emitter.onError(e);
                 }
             }
-        }).doOnNext(new Action1<List<String>>() {
-            @Override
-            public void call(List<String> bookNames) {
-                bookNameCache.put(translation, bookNames);
-            }
-        });
+        }, AsyncEmitter.BackpressureMode.ERROR)
+                .doOnNext(new Action1<List<String>>() {
+                    @Override
+                    public void call(List<String> bookNames) {
+                        bookNameCache.put(translation, bookNames);
+                    }
+                });
     }
 
     public Observable<List<Verse>> loadVersesWithParallelTranslations(final int book, final int chapter) {

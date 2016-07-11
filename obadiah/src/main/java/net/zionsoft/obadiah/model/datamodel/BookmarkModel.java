@@ -28,8 +28,9 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import rx.AsyncEmitter;
 import rx.Observable;
-import rx.Subscriber;
+import rx.functions.Action1;
 
 @Singleton
 public class BookmarkModel {
@@ -41,63 +42,65 @@ public class BookmarkModel {
     }
 
     public Observable<Bookmark> addBookmark(final VerseIndex verseIndex) {
-        return Observable.create(new Observable.OnSubscribe<Bookmark>() {
+        return Observable.fromAsync(new Action1<AsyncEmitter<Bookmark>>() {
             @Override
-            public void call(Subscriber<? super Bookmark> subscriber) {
+            public void call(AsyncEmitter<Bookmark> emitter) {
                 try {
                     final Bookmark bookmark = Bookmark.create(verseIndex, System.currentTimeMillis());
                     BookmarkTableHelper.saveBookmark(databaseHelper.getDatabase(), bookmark);
                     Analytics.trackEvent(Analytics.CATEGORY_BOOKMARKS, Analytics.BOOKMARKS_ACTION_ADDED);
-                    subscriber.onNext(bookmark);
-                    subscriber.onCompleted();
+                    emitter.onNext(bookmark);
+                    emitter.onCompleted();
                 } catch (Exception e) {
-                    subscriber.onError(e);
+                    emitter.onError(e);
                 }
             }
-        });
+        }, AsyncEmitter.BackpressureMode.ERROR);
     }
 
     public Observable<Void> removeBookmark(final VerseIndex verseIndex) {
-        return Observable.create(new Observable.OnSubscribe<Void>() {
+        return Observable.fromAsync(new Action1<AsyncEmitter<Void>>() {
             @Override
-            public void call(Subscriber<? super Void> subscriber) {
+            public void call(AsyncEmitter<Void> emitter) {
                 try {
                     BookmarkTableHelper.removeBookmark(databaseHelper.getDatabase(), verseIndex);
                     Analytics.trackEvent(Analytics.CATEGORY_BOOKMARKS, Analytics.BOOKMARKS_ACTION_REMOVED);
-                    subscriber.onCompleted();
+                    emitter.onCompleted();
                 } catch (Exception e) {
-                    subscriber.onError(e);
+                    emitter.onError(e);
                 }
             }
-        });
+        }, AsyncEmitter.BackpressureMode.ERROR);
     }
 
     public Observable<List<Bookmark>> loadBookmarks(final int book, final int chapter) {
-        return Observable.create(new Observable.OnSubscribe<List<Bookmark>>() {
+        return Observable.fromAsync(new Action1<AsyncEmitter<List<Bookmark>>>() {
             @Override
-            public void call(Subscriber<? super List<Bookmark>> subscriber) {
+            public void call(AsyncEmitter<List<Bookmark>> emitter) {
+
                 try {
-                    subscriber.onNext(BookmarkTableHelper.getBookmarks(
+                    emitter.onNext(BookmarkTableHelper.getBookmarks(
                             databaseHelper.getDatabase(), book, chapter));
-                    subscriber.onCompleted();
+                    emitter.onCompleted();
                 } catch (Exception e) {
-                    subscriber.onError(e);
+                    emitter.onError(e);
                 }
             }
-        });
+        }, AsyncEmitter.BackpressureMode.ERROR);
     }
 
     public Observable<List<Bookmark>> loadBookmarks() {
-        return Observable.create(new Observable.OnSubscribe<List<Bookmark>>() {
+        return Observable.fromAsync(new Action1<AsyncEmitter<List<Bookmark>>>() {
             @Override
-            public void call(Subscriber<? super List<Bookmark>> subscriber) {
+            public void call(AsyncEmitter<List<Bookmark>> emitter) {
+
                 try {
-                    subscriber.onNext(BookmarkTableHelper.getBookmarks(databaseHelper.getDatabase()));
-                    subscriber.onCompleted();
+                    emitter.onNext(BookmarkTableHelper.getBookmarks(databaseHelper.getDatabase()));
+                    emitter.onCompleted();
                 } catch (Exception e) {
-                    subscriber.onError(e);
+                    emitter.onError(e);
                 }
             }
-        });
+        }, AsyncEmitter.BackpressureMode.ERROR);
     }
 }

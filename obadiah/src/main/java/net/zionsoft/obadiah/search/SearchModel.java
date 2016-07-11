@@ -25,8 +25,9 @@ import net.zionsoft.obadiah.model.domain.VerseSearchResult;
 
 import java.util.List;
 
+import rx.AsyncEmitter;
 import rx.Observable;
-import rx.Subscriber;
+import rx.functions.Action1;
 
 class SearchModel {
     private final BibleReadingModel bibleReadingModel;
@@ -44,12 +45,12 @@ class SearchModel {
     }
 
     Observable<Void> clearSearchHistory() {
-        return Observable.create(new Observable.OnSubscribe<Void>() {
+        return Observable.fromAsync(new Action1<AsyncEmitter<Void>>() {
             @Override
-            public void call(Subscriber<? super Void> subscriber) {
+            public void call(AsyncEmitter<Void> emitter) {
                 recentSearches.clearHistory();
-                subscriber.onCompleted();
+                emitter.onCompleted();
             }
-        });
+        }, AsyncEmitter.BackpressureMode.ERROR);
     }
 }

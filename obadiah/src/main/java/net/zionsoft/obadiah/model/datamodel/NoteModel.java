@@ -30,8 +30,9 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import rx.AsyncEmitter;
 import rx.Observable;
-import rx.Subscriber;
+import rx.functions.Action1;
 
 @Singleton
 public class NoteModel {
@@ -43,9 +44,9 @@ public class NoteModel {
     }
 
     public Observable<Note> updateNote(final VerseIndex verseIndex, final String note) {
-        return Observable.create(new Observable.OnSubscribe<Note>() {
+        return Observable.fromAsync(new Action1<AsyncEmitter<Note>>() {
             @Override
-            public void call(Subscriber<? super Note> subscriber) {
+            public void call(AsyncEmitter<Note> emitter) {
                 try {
                     final SQLiteDatabase db = databaseHelper.getDatabase();
                     final boolean newNote = !NoteTableHelper.hasNote(db, verseIndex);
@@ -57,55 +58,55 @@ public class NoteModel {
                         Analytics.trackEvent(Analytics.CATEGORY_NOTES, Analytics.NOTES_ACTION_ADDED);
                     }
 
-                    subscriber.onNext(n);
-                    subscriber.onCompleted();
+                    emitter.onNext(n);
+                    emitter.onCompleted();
                 } catch (Exception e) {
-                    subscriber.onError(e);
+                    emitter.onError(e);
                 }
             }
-        });
+        }, AsyncEmitter.BackpressureMode.ERROR);
     }
 
     public Observable<Void> removeNote(final VerseIndex verseIndex) {
-        return Observable.create(new Observable.OnSubscribe<Void>() {
+        return Observable.fromAsync(new Action1<AsyncEmitter<Void>>() {
             @Override
-            public void call(Subscriber<? super Void> subscriber) {
+            public void call(AsyncEmitter<Void> emitter) {
                 try {
                     NoteTableHelper.removeNote(databaseHelper.getDatabase(), verseIndex);
                     Analytics.trackEvent(Analytics.CATEGORY_NOTES, Analytics.NOTES_ACTION_REMOVED);
-                    subscriber.onCompleted();
+                    emitter.onCompleted();
                 } catch (Exception e) {
-                    subscriber.onError(e);
+                    emitter.onError(e);
                 }
             }
-        });
+        }, AsyncEmitter.BackpressureMode.ERROR);
     }
 
     public Observable<List<Note>> loadNotes(final int book, final int chapter) {
-        return Observable.create(new Observable.OnSubscribe<List<Note>>() {
+        return Observable.fromAsync(new Action1<AsyncEmitter<List<Note>>>() {
             @Override
-            public void call(Subscriber<? super List<Note>> subscriber) {
+            public void call(AsyncEmitter<List<Note>> emitter) {
                 try {
-                    subscriber.onNext(NoteTableHelper.getNotes(databaseHelper.getDatabase(), book, chapter));
-                    subscriber.onCompleted();
+                    emitter.onNext(NoteTableHelper.getNotes(databaseHelper.getDatabase(), book, chapter));
+                    emitter.onCompleted();
                 } catch (Exception e) {
-                    subscriber.onError(e);
+                    emitter.onError(e);
                 }
             }
-        });
+        }, AsyncEmitter.BackpressureMode.ERROR);
     }
 
     public Observable<List<Note>> loadNotes() {
-        return Observable.create(new Observable.OnSubscribe<List<Note>>() {
+        return Observable.fromAsync(new Action1<AsyncEmitter<List<Note>>>() {
             @Override
-            public void call(Subscriber<? super List<Note>> subscriber) {
+            public void call(AsyncEmitter<List<Note>> emitter) {
                 try {
-                    subscriber.onNext(NoteTableHelper.getNotes(databaseHelper.getDatabase()));
-                    subscriber.onCompleted();
+                    emitter.onNext(NoteTableHelper.getNotes(databaseHelper.getDatabase()));
+                    emitter.onCompleted();
                 } catch (Exception e) {
-                    subscriber.onError(e);
+                    emitter.onError(e);
                 }
             }
-        });
+        }, AsyncEmitter.BackpressureMode.ERROR);
     }
 }

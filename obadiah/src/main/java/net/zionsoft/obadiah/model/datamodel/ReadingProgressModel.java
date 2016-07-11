@@ -33,8 +33,9 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import rx.AsyncEmitter;
 import rx.Observable;
-import rx.Subscriber;
+import rx.functions.Action1;
 
 @Singleton
 public class ReadingProgressModel {
@@ -46,9 +47,9 @@ public class ReadingProgressModel {
     }
 
     public Observable<ReadingProgress> loadReadingProgress() {
-        return Observable.create(new Observable.OnSubscribe<ReadingProgress>() {
+        return Observable.fromAsync(new Action1<AsyncEmitter<ReadingProgress>>() {
             @Override
-            public void call(Subscriber<? super ReadingProgress> subscriber) {
+            public void call(AsyncEmitter<ReadingProgress> emitter) {
                 final SQLiteDatabase database = databaseHelper.getDatabase();
                 try {
                     database.beginTransaction();
@@ -58,24 +59,24 @@ public class ReadingProgressModel {
                             database, MetadataTableHelper.KEY_CONTINUOUS_READING_DAYS, "1"));
                     database.setTransactionSuccessful();
 
-                    subscriber.onNext(new ReadingProgress(chaptersReadPerBook, continuousReadingDays));
-                    subscriber.onCompleted();
+                    emitter.onNext(new ReadingProgress(chaptersReadPerBook, continuousReadingDays));
+                    emitter.onCompleted();
                 } catch (Exception e) {
                     Crashlytics.getInstance().core.logException(e);
-                    subscriber.onError(e);
+                    emitter.onError(e);
                 } finally {
                     if (database.inTransaction()) {
                         database.endTransaction();
                     }
                 }
             }
-        });
+        }, AsyncEmitter.BackpressureMode.ERROR);
     }
 
     public Observable<Void> trackReadingProgress(final int book, final int chapter) {
-        return Observable.create(new Observable.OnSubscribe<Void>() {
+        return Observable.fromAsync(new Action1<AsyncEmitter<Void>>() {
             @Override
-            public void call(Subscriber<? super Void> subscriber) {
+            public void call(AsyncEmitter<Void> emitter) {
                 final SQLiteDatabase database = databaseHelper.getDatabase();
                 try {
                     database.beginTransaction();
@@ -106,10 +107,10 @@ public class ReadingProgressModel {
                     if (database.inTransaction()) {
                         database.endTransaction();
                     }
-                }
 
-                subscriber.onCompleted();
+                    emitter.onCompleted();
+                }
             }
-        });
+        }, AsyncEmitter.BackpressureMode.ERROR);
     }
 }

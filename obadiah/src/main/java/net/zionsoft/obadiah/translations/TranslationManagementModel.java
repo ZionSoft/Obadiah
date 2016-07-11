@@ -31,9 +31,9 @@ import net.zionsoft.obadiah.model.database.TranslationHelper;
 import net.zionsoft.obadiah.model.database.TranslationsTableHelper;
 import net.zionsoft.obadiah.model.datamodel.BibleReadingModel;
 import net.zionsoft.obadiah.model.domain.TranslationInfo;
+import net.zionsoft.obadiah.network.BackendBooks;
 import net.zionsoft.obadiah.network.BackendChapter;
 import net.zionsoft.obadiah.network.BackendInterface;
-import net.zionsoft.obadiah.network.BackendBooks;
 import net.zionsoft.obadiah.network.BackendTranslationInfo;
 
 import java.io.IOException;
@@ -49,8 +49,8 @@ import okhttp3.ResponseBody;
 import okio.BufferedSource;
 import okio.Okio;
 import retrofit2.Response;
+import rx.AsyncEmitter;
 import rx.Observable;
-import rx.Subscriber;
 import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.functions.Func2;
@@ -91,20 +91,19 @@ class TranslationManagementModel {
                 return sortByLocale(translations);
             }
         });
-        final Observable<List<String>> downloaded = Observable.create(
-                new Observable.OnSubscribe<List<String>>() {
-                    @Override
-                    public void call(Subscriber<? super List<String>> subscriber) {
-                        try {
-                            subscriber.onNext(TranslationsTableHelper
-                                    .getDownloadedTranslations(databaseHelper.getDatabase()));
-                            subscriber.onCompleted();
-                        } catch (Exception e) {
-                            Crashlytics.getInstance().core.logException(e);
-                            subscriber.onError(e);
-                        }
-                    }
-                });
+        final Observable<List<String>> downloaded = Observable.fromAsync(new Action1<AsyncEmitter<List<String>>>() {
+            @Override
+            public void call(AsyncEmitter<List<String>> emitter) {
+                try {
+                    emitter.onNext(TranslationsTableHelper
+                            .getDownloadedTranslations(databaseHelper.getDatabase()));
+                    emitter.onCompleted();
+                } catch (Exception e) {
+                    Crashlytics.getInstance().core.logException(e);
+                    emitter.onError(e);
+                }
+            }
+        }, AsyncEmitter.BackpressureMode.ERROR);
         return Observable.zip(translations, downloaded, new Func2<List<TranslationInfo>, List<String>, Translations>() {
             @Override
             public Translations call(List<TranslationInfo> translations, List<String> downloaded) {
@@ -156,19 +155,19 @@ class TranslationManagementModel {
     }
 
     private Observable<List<TranslationInfo>> loadFromLocal() {
-        return Observable.create(new Observable.OnSubscribe<List<TranslationInfo>>() {
+        return Observable.fromAsync(new Action1<AsyncEmitter<List<TranslationInfo>>>() {
             @Override
-            public void call(Subscriber<? super List<TranslationInfo>> subscriber) {
+            public void call(AsyncEmitter<List<TranslationInfo>> emitter) {
                 try {
-                    subscriber.onNext(TranslationsTableHelper
+                    emitter.onNext(TranslationsTableHelper
                             .getTranslations(databaseHelper.getDatabase()));
-                    subscriber.onCompleted();
+                    emitter.onCompleted();
                 } catch (Exception e) {
                     Crashlytics.getInstance().core.logException(e);
-                    subscriber.onError(e);
+                    emitter.onError(e);
                 }
             }
-        });
+        }, AsyncEmitter.BackpressureMode.ERROR);
     }
 
     private static List<TranslationInfo> sortByLocale(List<TranslationInfo> translations) {
@@ -195,9 +194,9 @@ class TranslationManagementModel {
     }
 
     Observable<Void> removeTranslation(final TranslationInfo translation) {
-        return Observable.create(new Observable.OnSubscribe<Void>() {
+        return Observable.fromAsync(new Action1<AsyncEmitter<Void>>() {
             @Override
-            public void call(Subscriber<? super Void> subscriber) {
+            public void call(AsyncEmitter<Void> emitter) {
                 try {
                     final SQLiteDatabase database = databaseHelper.getDatabase();
                     try {
@@ -213,19 +212,19 @@ class TranslationManagementModel {
                     }
                     Analytics.trackEvent(Analytics.CATEGORY_TRANSLATION,
                             Analytics.TRANSLATION_ACTION_REMOVED, translation.shortName());
-                    subscriber.onCompleted();
+                    emitter.onCompleted();
                 } catch (Exception e) {
                     Crashlytics.getInstance().core.logException(e);
-                    subscriber.onError(e);
+                    emitter.onError(e);
                 }
             }
-        });
+        }, AsyncEmitter.BackpressureMode.ERROR);
     }
 
     Observable<Integer> fetchTranslation(final TranslationInfo translation) {
-        return Observable.create(new Observable.OnSubscribe<Integer>() {
+        return Observable.fromAsync(new Action1<AsyncEmitter<Integer>>() {
             @Override
-            public void call(Subscriber<? super Integer> subscriber) {
+            public void call(AsyncEmitter<Integer> emitter) {
                 final long timestamp = SystemClock.elapsedRealtime();
                 final SQLiteDatabase database = databaseHelper.getDatabase();
                 ZipInputStream is = null;
@@ -265,7 +264,7 @@ class TranslationManagementModel {
                             // the progress should be less or equal than 100
                             // in this case, with Integer.valueOf() no small object will be created
                             //noinspection UnnecessaryBoxing
-                            subscriber.onNext(Integer.valueOf(progress));
+                            emitter.onNext(Integer.valueOf(progress));
                         }
                     }
                     database.setTransactionSuccessful();
@@ -273,10 +272,10 @@ class TranslationManagementModel {
                     Analytics.trackEvent(Analytics.CATEGORY_TRANSLATION,
                             Analytics.TRANSLATION_ACTION_DOWNLOADED, translation.shortName(),
                             SystemClock.elapsedRealtime() - timestamp);
-                    subscriber.onCompleted();
+                    emitter.onCompleted();
                 } catch (Exception e) {
                     Crashlytics.getInstance().core.logException(e);
-                    subscriber.onError(e);
+                    emitter.onError(e);
                 } finally {
                     if (database.inTransaction()) {
                         database.endTransaction();
@@ -291,6 +290,6 @@ class TranslationManagementModel {
                     }
                 }
             }
-        });
+        }, AsyncEmitter.BackpressureMode.BUFFER);
     }
 }

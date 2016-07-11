@@ -19,7 +19,7 @@ package net.zionsoft.obadiah.misc.license;
 
 import android.content.Context;
 
-import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.common.GoogleApiAvailability;
 
 import net.zionsoft.obadiah.R;
 
@@ -27,8 +27,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import rx.AsyncEmitter;
 import rx.Observable;
-import rx.Subscriber;
+import rx.functions.Action1;
 
 class OpenSourceLicenseModel {
     private final Context applicationContext;
@@ -38,15 +39,16 @@ class OpenSourceLicenseModel {
     }
 
     Observable<List<String>> loadLicense() {
-        return Observable.create(new Observable.OnSubscribe<List<String>>() {
+        return Observable.fromAsync(new Action1<AsyncEmitter<List<String>>>() {
             @Override
-            public void call(Subscriber<? super List<String>> subscriber) {
+            public void call(AsyncEmitter<List<String>> emitter) {
                 final List<String> licenses = new ArrayList<>();
-                licenses.add(GooglePlayServicesUtil.getOpenSourceSoftwareLicenseInfo(applicationContext));
+                licenses.add(GoogleApiAvailability.getInstance()
+                        .getOpenSourceSoftwareLicenseInfo(applicationContext));
                 licenses.addAll(Arrays.asList(applicationContext.getResources().getStringArray(R.array.licenses)));
-                subscriber.onNext(licenses);
-                subscriber.onCompleted();
+                emitter.onNext(licenses);
+                emitter.onCompleted();
             }
-        });
+        }, AsyncEmitter.BackpressureMode.ERROR);
     }
 }
