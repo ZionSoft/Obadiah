@@ -2,6 +2,8 @@ CHANGELOG
 ---------
 
 #### Next Release
+
+#### v1.14.3 (2016-07-13)
 - Updated build tools and 3rd-party libs:
   - Updated Android Gradle plugin to 2.2.0-alpha5.
   - Updated build tool to 24.
