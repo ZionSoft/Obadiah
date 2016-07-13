@@ -135,6 +135,7 @@ class TranslationManagementModel {
                         final SQLiteDatabase database = databaseHelper.getDatabase();
                         try {
                             database.beginTransaction();
+                            TranslationsTableHelper.removeAllTranslations(database);
                             TranslationsTableHelper.saveTranslations(database, translations);
                             database.setTransactionSuccessful();
                         } finally {

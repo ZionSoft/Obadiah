@@ -38,6 +38,10 @@ public class TranslationsTableHelper {
                 TranslationInfo.ColumnNames.SIZE));
     }
 
+    public static void removeAllTranslations(SQLiteDatabase db) {
+        db.delete(TABLE_TRANSLATIONS, null, null);
+    }
+
     public static void saveTranslations(SQLiteDatabase db, List<TranslationInfo> translations) {
         final ContentValues values = new ContentValues(5);
         final int size = translations.size();
