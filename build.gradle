@@ -35,7 +35,7 @@ ext {
     butterKnifeVersion = '8.2.0'
     rxAndroidVersion = '1.2.1'
     rxJavaVersion = '1.1.7'
-    rxJavaProguardRulesVersion = '1.1.6.0'
+    rxJavaProguardRulesVersion = '1.1.7.0'
     retrofitVersion = '2.1.0'
     autoDroidVersion = '0.2'
     autoValueVersion = '1.2'
