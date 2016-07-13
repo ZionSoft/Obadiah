@@ -31,6 +31,7 @@ import java.util.List;
 
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
 class BibleReadingPresenter extends BasePresenter<BibleReadingView> {
@@ -138,7 +139,7 @@ class BibleReadingPresenter extends BasePresenter<BibleReadingView> {
 
     void trackReadingProgress(int book, int chapter) {
         readingProgressModel.trackReadingProgress(book, chapter)
-                .compose(RxHelper.<Void>applySchedulers())
+                .subscribeOn(Schedulers.io())
                 .subscribe();
     }
 

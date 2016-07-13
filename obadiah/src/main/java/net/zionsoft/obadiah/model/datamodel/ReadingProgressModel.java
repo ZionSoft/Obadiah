@@ -104,8 +104,14 @@ public class ReadingProgressModel {
                 } catch (Exception e) {
                     Crashlytics.getInstance().core.logException(e);
                 } finally {
-                    if (database.inTransaction()) {
-                        database.endTransaction();
+                    // yep, we can crash here, ref.
+                    // https://fabric.io/zionsoft/android/apps/net.zionsoft.obadiah/issues/5785af31ffcdc042509c9d00
+                    try {
+                        if (database.inTransaction()) {
+                            database.endTransaction();
+                        }
+                    } catch (Exception e) {
+                        Crashlytics.getInstance().core.logException(e);
                     }
 
                     emitter.onCompleted();
