@@ -38,7 +38,6 @@ public class Analytics {
     public static final String DEEP_LINK_ACTION_OPENED = "opened";
 
     public static final String CATEGORY_NOTIFICATION = "notification";
-    public static final String NOTIFICATION_ACTION_REGISTERED = "device_registered";
     public static final String NOTIFICATION_ACTION_SHOWN = "shown";
     public static final String NOTIFICATION_ACTION_OPENED = "opened";
     public static final String NOTIFICATION_ACTION_DISMISSED = "dismissed";

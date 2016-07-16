@@ -25,8 +25,6 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.firebase.messaging.FirebaseMessaging;
 
-import net.zionsoft.obadiah.model.analytics.Analytics;
-
 public class PushNotificationRegister extends IntentService {
     public static void register(Context context) {
         if (GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(context) != ConnectionResult.SUCCESS) {
@@ -46,8 +44,6 @@ public class PushNotificationRegister extends IntentService {
             final FirebaseMessaging firebaseMessaging = FirebaseMessaging.getInstance();
             firebaseMessaging.subscribeToTopic("verses");
             firebaseMessaging.subscribeToTopic("newTranslation");
-
-            Analytics.trackEvent(Analytics.CATEGORY_NOTIFICATION, Analytics.NOTIFICATION_ACTION_REGISTERED);
         } catch (Exception ignored) {
         }
     }
