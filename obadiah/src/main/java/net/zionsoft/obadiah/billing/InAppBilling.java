@@ -204,9 +204,6 @@ public class InAppBilling implements ServiceConnection {
             final boolean isPurchased =
                     inAppPurchaseData.productId.equals(applicationContext.getString(R.string.in_app_product_no_ads))
                             && inAppPurchaseData.purchaseState == InAppPurchaseData.STATUS_PURCHASED;
-            if (isPurchased) {
-                Analytics.trackEvent(Analytics.CATEGORY_BILLING, Analytics.BILLING_ACTION_PURCHASED, "remove_ads");
-            }
             informAdsRemovalPurchased(isPurchased);
         } catch (IOException e) {
             Crashlytics.getInstance().core.logException(e);
