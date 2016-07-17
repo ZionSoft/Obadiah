@@ -50,7 +50,7 @@ public class InAppBilling implements ServiceConnection {
 
     @IntDef({STATUS_UNKNOWN, STATUS_INITIALIZING, STATUS_READY, STATUS_RELEASED, STATUS_UNSUPPORTED})
     @Retention(RetentionPolicy.SOURCE)
-    public @interface Status {
+    @interface Status {
     }
 
     private static final int STATUS_UNKNOWN = 0;
