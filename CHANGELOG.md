@@ -2,6 +2,9 @@ CHANGELOG
 ---------
 
 #### Next Release
+- Updated build tools and 3rd-party libs:
+  - Updated build tool to 24.0.1
+  - Updated support library to 24.1.0.
 
 #### v1.14.3 (2016-07-13)
 - Updated build tools and 3rd-party libs:
