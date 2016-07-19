@@ -70,42 +70,42 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:appcompat-v7:' + rootProject.ext.supportLibVersion
-    compile 'com.android.support:recyclerview-v7:' + rootProject.ext.supportLibVersion
-    compile 'com.android.support:design:' + rootProject.ext.supportLibVersion
+    compile "com.android.support:appcompat-v7:$rootProject.ext.supportLibVersion"
+    compile "com.android.support:recyclerview-v7:$rootProject.ext.supportLibVersion"
+    compile "com.android.support:design:$rootProject.ext.supportLibVersion"
 
-    compile 'com.google.firebase:firebase-core:' + rootProject.ext.firebaseVersion
-    compile 'com.google.firebase:firebase-ads:' + rootProject.ext.firebaseVersion
-    compile 'com.google.firebase:firebase-invites:' + rootProject.ext.firebaseVersion
-    compile 'com.google.firebase:firebase-messaging:' + rootProject.ext.firebaseVersion
-    compile 'com.google.android.gms:play-services-analytics:' + rootProject.ext.playServicesVersion
-    compile 'com.google.android.gms:play-services-appindexing:' + rootProject.ext.playServicesVersion
+    compile "com.google.firebase:firebase-core:$rootProject.ext.firebaseVersion"
+    compile "com.google.firebase:firebase-ads:$rootProject.ext.firebaseVersion"
+    compile "com.google.firebase:firebase-invites:$rootProject.ext.firebaseVersion"
+    compile "com.google.firebase:firebase-messaging:$rootProject.ext.firebaseVersion"
+    compile "com.google.android.gms:play-services-analytics:$rootProject.ext.playServicesVersion"
+    compile "com.google.android.gms:play-services-appindexing:$rootProject.ext.playServicesVersion"
 
-    compile 'com.google.dagger:dagger:' + rootProject.ext.daggerVersion
-    apt 'com.google.dagger:dagger-compiler:' + rootProject.ext.daggerVersion
-    provided 'javax.annotation:javax.annotation-api:' + rootProject.ext.javaxAnnotationApiVersion
+    compile "com.google.dagger:dagger:$rootProject.ext.daggerVersion"
+    apt "com.google.dagger:dagger-compiler:$rootProject.ext.daggerVersion"
+    provided "javax.annotation:javax.annotation-api:$rootProject.ext.javaxAnnotationApiVersion"
 
-    compile 'io.reactivex:rxandroid:' + rootProject.ext.rxAndroidVersion
-    compile 'io.reactivex:rxjava:' + rootProject.ext.rxJavaVersion
-    compile 'com.artemzin.rxjava:proguard-rules:' + rootProject.ext.rxJavaProguardRulesVersion
+    compile "io.reactivex:rxandroid:$rootProject.ext.rxAndroidVersion"
+    compile "io.reactivex:rxjava:$rootProject.ext.rxJavaVersion"
+    compile "com.artemzin.rxjava:proguard-rules:$rootProject.ext.rxJavaProguardRulesVersion"
 
-    compile 'com.jakewharton:butterknife:' + rootProject.ext.butterKnifeVersion
-    apt 'com.jakewharton:butterknife-compiler:' + rootProject.ext.butterKnifeVersion
+    compile "com.jakewharton:butterknife:$rootProject.ext.butterKnifeVersion"
+    apt "com.jakewharton:butterknife-compiler:$rootProject.ext.butterKnifeVersion"
 
-    compile 'com.squareup.retrofit2:retrofit:' + rootProject.ext.retrofitVersion
-    compile 'com.squareup.retrofit2:converter-moshi:' + rootProject.ext.retrofitVersion
-    compile 'com.squareup.retrofit2:adapter-rxjava:' + rootProject.ext.retrofitVersion
+    compile "com.squareup.retrofit2:retrofit:$rootProject.ext.retrofitVersion"
+    compile "com.squareup.retrofit2:converter-moshi:$rootProject.ext.retrofitVersion"
+    compile "com.squareup.retrofit2:adapter-rxjava:$rootProject.ext.retrofitVersion"
 
     compile('com.crashlytics.sdk.android:crashlytics:2.5.7@aar') {
         transitive = true;
     }
 
-    compile 'com.github.xizzhu.auto-droid:auto-droid-annotations:' + rootProject.ext.autoDroidVersion
-    apt 'com.github.xizzhu.auto-droid:auto-droid-processors:' + rootProject.ext.autoDroidVersion
-    provided 'com.google.auto.value:auto-value:' + rootProject.ext.autoValueVersion
+    compile "com.github.xizzhu.auto-droid:auto-droid-annotations:$rootProject.ext.autoDroidVersion"
+    apt "com.github.xizzhu.auto-droid:auto-droid-processors:$rootProject.ext.autoDroidVersion"
+    provided "com.google.auto.value:auto-value:$rootProject.ext.autoValueVersion"
 
-    debugCompile 'com.facebook.stetho:stetho:' + rootProject.ext.stethoVersion
-    debugCompile 'com.facebook.stetho:stetho-okhttp3:' + rootProject.ext.stethoVersion
+    debugCompile "com.facebook.stetho:stetho:$rootProject.ext.stethoVersion"
+    debugCompile "com.facebook.stetho:stetho-okhttp3:$rootProject.ext.stethoVersion"
 }
 
 apply plugin: 'com.google.gms.google-services'
