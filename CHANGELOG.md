@@ -3,6 +3,7 @@ CHANGELOG
 
 #### Next Release
 - Updated build tools and 3rd-party libs:
+  - Updated Android Gradle plugin to 2.2.0-alpha6.
   - Updated build tool to 24.0.1
   - Updated support library to 24.1.0.
 
