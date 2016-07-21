@@ -22,11 +22,6 @@ import android.content.Context;
 import com.squareup.moshi.Moshi;
 
 import net.zionsoft.obadiah.model.database.DatabaseHelper;
-import net.zionsoft.obadiah.model.datamodel.BibleReadingModel;
-import net.zionsoft.obadiah.model.datamodel.BookmarkModel;
-import net.zionsoft.obadiah.model.datamodel.NoteModel;
-import net.zionsoft.obadiah.model.datamodel.ReadingProgressModel;
-import net.zionsoft.obadiah.model.datamodel.Settings;
 import net.zionsoft.obadiah.network.BackendInterface;
 
 import java.util.concurrent.TimeUnit;
@@ -58,36 +53,6 @@ public class BaseAppModule {
     @Singleton
     public DatabaseHelper provideDatabaseHelper() {
         return new DatabaseHelper(application);
-    }
-
-    @Provides
-    @Singleton
-    public BibleReadingModel provideBibleReadingModel(Context context, DatabaseHelper databaseHelper) {
-        return new BibleReadingModel(context, databaseHelper);
-    }
-
-    @Provides
-    @Singleton
-    public BookmarkModel provideBookmarkModel(DatabaseHelper databaseHelper) {
-        return new BookmarkModel(databaseHelper);
-    }
-
-    @Provides
-    @Singleton
-    public NoteModel provideNoteModel(DatabaseHelper databaseHelper) {
-        return new NoteModel(databaseHelper);
-    }
-
-    @Provides
-    @Singleton
-    public ReadingProgressModel provideReadingProgressModel(DatabaseHelper databaseHelper) {
-        return new ReadingProgressModel(databaseHelper);
-    }
-
-    @Provides
-    @Singleton
-    public Settings provideSettings() {
-        return new Settings(application);
     }
 
     @Provides

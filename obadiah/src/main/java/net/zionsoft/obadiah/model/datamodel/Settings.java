@@ -91,8 +91,6 @@ public class Settings {
 
     @Inject
     public Settings(Context context) {
-        super();
-
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 
         simpleReading = sharedPreferences.getBoolean(SETTING_KEY_SIMPLE_READING, false);
