@@ -28,7 +28,6 @@
     </LinearLayout>
 
     <android.support.design.widget.TextInputLayout
-        android:id="@+id/usernameWrapper"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/padding"
@@ -52,7 +51,7 @@
         android:orientation="horizontal">
 
         <android.support.v7.widget.AppCompatImageView
-            android:id="@+id/noteIcon"
+            android:id="@+id/note_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="48dp"
@@ -61,7 +60,7 @@
             tools:src="@drawable/ic_note"/>
 
         <android.support.v7.widget.AppCompatImageView
-            android:id="@+id/bookmarkIcon"
+            android:id="@+id/bookmark_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/background_touchable_round"

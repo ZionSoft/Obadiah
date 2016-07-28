@@ -58,10 +58,10 @@ class VerseItemViewHolder extends RecyclerView.ViewHolder implements View.OnClic
     @BindView(R.id.note)
     TextView note;
 
-    @BindView(R.id.bookmarkIcon)
+    @BindView(R.id.bookmark_icon)
     AppCompatImageView bookmarkIcon;
 
-    @BindView(R.id.noteIcon)
+    @BindView(R.id.note_icon)
     AppCompatImageView noteIcon;
 
     @BindView(R.id.divider)
