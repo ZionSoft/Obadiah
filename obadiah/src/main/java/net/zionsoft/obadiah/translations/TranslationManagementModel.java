@@ -291,6 +291,6 @@ class TranslationManagementModel {
                     }
                 }
             }
-        }, AsyncEmitter.BackpressureMode.BUFFER);
+        }, AsyncEmitter.BackpressureMode.LATEST);
     }
 }
