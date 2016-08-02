@@ -26,13 +26,13 @@ import net.zionsoft.obadiah.model.domain.Note;
 import net.zionsoft.obadiah.model.domain.VerseIndex;
 
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import rx.AsyncEmitter;
 import rx.Observable;
-import rx.functions.Action1;
+import rx.functions.Func0;
 
 @Singleton
 public class NoteModel {
@@ -44,69 +44,54 @@ public class NoteModel {
     }
 
     public Observable<Note> updateNote(final VerseIndex verseIndex, final String note) {
-        return Observable.fromAsync(new Action1<AsyncEmitter<Note>>() {
+        return Observable.fromCallable(new Callable<Note>() {
             @Override
-            public void call(AsyncEmitter<Note> emitter) {
-                try {
-                    final SQLiteDatabase db = databaseHelper.getDatabase();
-                    final boolean newNote = !NoteTableHelper.hasNote(db, verseIndex);
+            public Note call() throws Exception {
+                final SQLiteDatabase db = databaseHelper.getDatabase();
+                final boolean newNote = !NoteTableHelper.hasNote(db, verseIndex);
 
-                    final Note n = Note.create(verseIndex, note, System.currentTimeMillis());
-                    NoteTableHelper.saveNote(db, n);
+                final Note n = Note.create(verseIndex, note, System.currentTimeMillis());
+                NoteTableHelper.saveNote(db, n);
 
-                    if (newNote) {
-                        Analytics.trackEvent(Analytics.CATEGORY_NOTES, Analytics.NOTES_ACTION_ADDED);
-                    }
-
-                    emitter.onNext(n);
-                    emitter.onCompleted();
-                } catch (Exception e) {
-                    emitter.onError(e);
+                if (newNote) {
+                    Analytics.trackEvent(Analytics.CATEGORY_NOTES, Analytics.NOTES_ACTION_ADDED);
                 }
+
+                return n;
             }
-        }, AsyncEmitter.BackpressureMode.ERROR);
+        });
     }
 
     public Observable<Void> removeNote(final VerseIndex verseIndex) {
-        return Observable.fromAsync(new Action1<AsyncEmitter<Void>>() {
+        return Observable.defer(new Func0<Observable<Void>>() {
             @Override
-            public void call(AsyncEmitter<Void> emitter) {
+            public Observable<Void> call() {
                 try {
                     NoteTableHelper.removeNote(databaseHelper.getDatabase(), verseIndex);
                     Analytics.trackEvent(Analytics.CATEGORY_NOTES, Analytics.NOTES_ACTION_REMOVED);
-                    emitter.onCompleted();
+                    return Observable.empty();
                 } catch (Exception e) {
-                    emitter.onError(e);
+                    return Observable.error(e);
                 }
             }
-        }, AsyncEmitter.BackpressureMode.ERROR);
+        });
     }
 
     public Observable<List<Note>> loadNotes(final int book, final int chapter) {
-        return Observable.fromAsync(new Action1<AsyncEmitter<List<Note>>>() {
+        return Observable.fromCallable(new Callable<List<Note>>() {
             @Override
-            public void call(AsyncEmitter<List<Note>> emitter) {
-                try {
-                    emitter.onNext(NoteTableHelper.getNotes(databaseHelper.getDatabase(), book, chapter));
-                    emitter.onCompleted();
-                } catch (Exception e) {
-                    emitter.onError(e);
-                }
+            public List<Note> call() throws Exception {
+                return NoteTableHelper.getNotes(databaseHelper.getDatabase(), book, chapter);
             }
-        }, AsyncEmitter.BackpressureMode.ERROR);
+        });
     }
 
     public Observable<List<Note>> loadNotes() {
-        return Observable.fromAsync(new Action1<AsyncEmitter<List<Note>>>() {
+        return Observable.fromCallable(new Callable<List<Note>>() {
             @Override
-            public void call(AsyncEmitter<List<Note>> emitter) {
-                try {
-                    emitter.onNext(NoteTableHelper.getNotes(databaseHelper.getDatabase()));
-                    emitter.onCompleted();
-                } catch (Exception e) {
-                    emitter.onError(e);
-                }
+            public List<Note> call() throws Exception {
+                return NoteTableHelper.getNotes(databaseHelper.getDatabase());
             }
-        }, AsyncEmitter.BackpressureMode.ERROR);
+        });
     }
 }

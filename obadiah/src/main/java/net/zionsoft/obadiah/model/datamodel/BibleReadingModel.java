@@ -39,13 +39,14 @@ import net.zionsoft.obadiah.model.domain.VerseSearchResult;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import rx.AsyncEmitter;
 import rx.Observable;
 import rx.functions.Action1;
+import rx.functions.Func0;
 import rx.functions.Func1;
 import rx.subjects.PublishSubject;
 import rx.subjects.SerializedSubject;
@@ -162,19 +163,12 @@ public class BibleReadingModel {
     }
 
     public Observable<List<String>> loadTranslations() {
-        return Observable.fromAsync(new Action1<AsyncEmitter<List<String>>>() {
+        return Observable.fromCallable(new Callable<List<String>>() {
             @Override
-            public void call(AsyncEmitter<List<String>> emitter) {
-                try {
-                    emitter.onNext(TranslationsTableHelper
-                            .getDownloadedTranslations(databaseHelper.getDatabase()));
-                    emitter.onCompleted();
-                } catch (Exception e) {
-                    Crashlytics.getInstance().core.logException(e);
-                    emitter.onError(e);
-                }
+            public List<String> call() throws Exception {
+                return TranslationsTableHelper.getDownloadedTranslations(databaseHelper.getDatabase());
             }
-        }, AsyncEmitter.BackpressureMode.ERROR);
+        });
     }
 
     public Observable<List<String>> loadBookNames(String translation) {
@@ -193,29 +187,27 @@ public class BibleReadingModel {
     }
 
     private Observable<List<String>> loadBookNamesFromDatabase(final String translation) {
-        return Observable.fromAsync(new Action1<AsyncEmitter<List<String>>>() {
+        return Observable.defer(new Func0<Observable<List<String>>>() {
             @Override
-            public void call(AsyncEmitter<List<String>> emitter) {
+            public Observable<List<String>> call() {
                 try {
-                    emitter.onNext(Collections.unmodifiableList(
-                            BookNamesTableHelper.getBookNames(databaseHelper.getDatabase(), translation)));
-                    emitter.onCompleted();
+                    return Observable.just(BookNamesTableHelper.getBookNames(
+                            databaseHelper.getDatabase(), translation));
                 } catch (Exception e) {
                     if (!TextUtils.isEmpty(translation)) {
                         // if the translation name is empty, it means there's current no translation
                         // installed, no need to track the exception
                         Crashlytics.getInstance().core.logException(e);
                     }
-                    emitter.onError(e);
+                    return Observable.error(e);
                 }
             }
-        }, AsyncEmitter.BackpressureMode.ERROR)
-                .doOnNext(new Action1<List<String>>() {
-                    @Override
-                    public void call(List<String> bookNames) {
-                        bookNameCache.put(translation, bookNames);
-                    }
-                });
+        }).doOnNext(new Action1<List<String>>() {
+            @Override
+            public void call(List<String> bookNames) {
+                bookNameCache.put(translation, bookNames);
+            }
+        });
     }
 
     public Observable<List<Verse>> loadVersesWithParallelTranslations(final int book, final int chapter) {

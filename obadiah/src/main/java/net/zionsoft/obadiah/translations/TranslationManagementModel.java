@@ -42,6 +42,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.Callable;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -52,6 +53,7 @@ import retrofit2.Response;
 import rx.AsyncEmitter;
 import rx.Observable;
 import rx.functions.Action1;
+import rx.functions.Func0;
 import rx.functions.Func1;
 import rx.functions.Func2;
 import rx.schedulers.Schedulers;
@@ -91,19 +93,12 @@ class TranslationManagementModel {
                 return sortByLocale(translations);
             }
         });
-        final Observable<List<String>> downloaded = Observable.fromAsync(new Action1<AsyncEmitter<List<String>>>() {
+        final Observable<List<String>> downloaded = Observable.fromCallable(new Callable<List<String>>() {
             @Override
-            public void call(AsyncEmitter<List<String>> emitter) {
-                try {
-                    emitter.onNext(TranslationsTableHelper
-                            .getDownloadedTranslations(databaseHelper.getDatabase()));
-                    emitter.onCompleted();
-                } catch (Exception e) {
-                    Crashlytics.getInstance().core.logException(e);
-                    emitter.onError(e);
-                }
+            public List<String> call() throws Exception {
+                return TranslationsTableHelper.getDownloadedTranslations(databaseHelper.getDatabase());
             }
-        }, AsyncEmitter.BackpressureMode.ERROR);
+        });
         return Observable.zip(translations, downloaded, new Func2<List<TranslationInfo>, List<String>, Translations>() {
             @Override
             public Translations call(List<TranslationInfo> translations, List<String> downloaded) {
@@ -156,19 +151,12 @@ class TranslationManagementModel {
     }
 
     private Observable<List<TranslationInfo>> loadFromLocal() {
-        return Observable.fromAsync(new Action1<AsyncEmitter<List<TranslationInfo>>>() {
+        return Observable.fromCallable(new Callable<List<TranslationInfo>>() {
             @Override
-            public void call(AsyncEmitter<List<TranslationInfo>> emitter) {
-                try {
-                    emitter.onNext(TranslationsTableHelper
-                            .getTranslations(databaseHelper.getDatabase()));
-                    emitter.onCompleted();
-                } catch (Exception e) {
-                    Crashlytics.getInstance().core.logException(e);
-                    emitter.onError(e);
-                }
+            public List<TranslationInfo> call() throws Exception {
+                return TranslationsTableHelper.getTranslations(databaseHelper.getDatabase());
             }
-        }, AsyncEmitter.BackpressureMode.ERROR);
+        });
     }
 
     private static List<TranslationInfo> sortByLocale(List<TranslationInfo> translations) {
@@ -195,9 +183,9 @@ class TranslationManagementModel {
     }
 
     Observable<Void> removeTranslation(final TranslationInfo translation) {
-        return Observable.fromAsync(new Action1<AsyncEmitter<Void>>() {
+        return Observable.defer(new Func0<Observable<Void>>() {
             @Override
-            public void call(AsyncEmitter<Void> emitter) {
+            public Observable<Void> call() {
                 try {
                     final SQLiteDatabase database = databaseHelper.getDatabase();
                     try {
@@ -213,13 +201,13 @@ class TranslationManagementModel {
                     }
                     Analytics.trackEvent(Analytics.CATEGORY_TRANSLATION,
                             Analytics.TRANSLATION_ACTION_REMOVED, translation.shortName());
-                    emitter.onCompleted();
+                    return Observable.empty();
                 } catch (Exception e) {
                     Crashlytics.getInstance().core.logException(e);
-                    emitter.onError(e);
+                    return Observable.error(e);
                 }
             }
-        }, AsyncEmitter.BackpressureMode.ERROR);
+        });
     }
 
     Observable<Integer> fetchTranslation(final TranslationInfo translation) {

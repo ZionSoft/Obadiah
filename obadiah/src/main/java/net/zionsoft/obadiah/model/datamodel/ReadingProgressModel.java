@@ -29,13 +29,13 @@ import net.zionsoft.obadiah.model.database.ReadingProgressTableHelper;
 import net.zionsoft.obadiah.model.domain.ReadingProgress;
 
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import rx.AsyncEmitter;
 import rx.Observable;
-import rx.functions.Action1;
+import rx.functions.Func0;
 
 @Singleton
 public class ReadingProgressModel {
@@ -47,9 +47,9 @@ public class ReadingProgressModel {
     }
 
     public Observable<ReadingProgress> loadReadingProgress() {
-        return Observable.fromAsync(new Action1<AsyncEmitter<ReadingProgress>>() {
+        return Observable.fromCallable(new Callable<ReadingProgress>() {
             @Override
-            public void call(AsyncEmitter<ReadingProgress> emitter) {
+            public ReadingProgress call() throws Exception {
                 final SQLiteDatabase database = databaseHelper.getDatabase();
                 try {
                     database.beginTransaction();
@@ -59,24 +59,20 @@ public class ReadingProgressModel {
                             database, MetadataTableHelper.KEY_CONTINUOUS_READING_DAYS, "1"));
                     database.setTransactionSuccessful();
 
-                    emitter.onNext(new ReadingProgress(chaptersReadPerBook, continuousReadingDays));
-                    emitter.onCompleted();
-                } catch (Exception e) {
-                    Crashlytics.getInstance().core.logException(e);
-                    emitter.onError(e);
+                    return new ReadingProgress(chaptersReadPerBook, continuousReadingDays);
                 } finally {
                     if (database.inTransaction()) {
                         database.endTransaction();
                     }
                 }
             }
-        }, AsyncEmitter.BackpressureMode.ERROR);
+        });
     }
 
     public Observable<Void> trackReadingProgress(final int book, final int chapter) {
-        return Observable.fromAsync(new Action1<AsyncEmitter<Void>>() {
+        return Observable.defer(new Func0<Observable<Void>>() {
             @Override
-            public void call(AsyncEmitter<Void> emitter) {
+            public Observable<Void> call() {
                 final SQLiteDatabase database = databaseHelper.getDatabase();
                 try {
                     database.beginTransaction();
@@ -113,10 +109,9 @@ public class ReadingProgressModel {
                     } catch (Exception e) {
                         Crashlytics.getInstance().core.logException(e);
                     }
-
-                    emitter.onCompleted();
                 }
+                return Observable.empty();
             }
-        }, AsyncEmitter.BackpressureMode.ERROR);
+        });
     }
 }

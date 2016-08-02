@@ -26,10 +26,9 @@ import net.zionsoft.obadiah.R;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Callable;
 
-import rx.AsyncEmitter;
 import rx.Observable;
-import rx.functions.Action1;
 
 class OpenSourceLicenseModel {
     private final Context applicationContext;
@@ -39,16 +38,16 @@ class OpenSourceLicenseModel {
     }
 
     Observable<List<String>> loadLicense() {
-        return Observable.fromAsync(new Action1<AsyncEmitter<List<String>>>() {
+        return Observable.fromCallable(new Callable<List<String>>() {
             @Override
-            public void call(AsyncEmitter<List<String>> emitter) {
+            public List<String> call() throws Exception {
                 final List<String> licenses = new ArrayList<>();
                 licenses.add(GoogleApiAvailability.getInstance()
                         .getOpenSourceSoftwareLicenseInfo(applicationContext));
-                licenses.addAll(Arrays.asList(applicationContext.getResources().getStringArray(R.array.licenses)));
-                emitter.onNext(licenses);
-                emitter.onCompleted();
+                licenses.addAll(Arrays.asList(applicationContext
+                        .getResources().getStringArray(R.array.licenses)));
+                return licenses;
             }
-        }, AsyncEmitter.BackpressureMode.ERROR);
+        });
     }
 }

@@ -24,13 +24,13 @@ import net.zionsoft.obadiah.model.domain.Bookmark;
 import net.zionsoft.obadiah.model.domain.VerseIndex;
 
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import rx.AsyncEmitter;
 import rx.Observable;
-import rx.functions.Action1;
+import rx.functions.Func0;
 
 @Singleton
 public class BookmarkModel {
@@ -42,65 +42,47 @@ public class BookmarkModel {
     }
 
     public Observable<Bookmark> addBookmark(final VerseIndex verseIndex) {
-        return Observable.fromAsync(new Action1<AsyncEmitter<Bookmark>>() {
+        return Observable.fromCallable(new Callable<Bookmark>() {
             @Override
-            public void call(AsyncEmitter<Bookmark> emitter) {
-                try {
-                    final Bookmark bookmark = Bookmark.create(verseIndex, System.currentTimeMillis());
-                    BookmarkTableHelper.saveBookmark(databaseHelper.getDatabase(), bookmark);
-                    Analytics.trackEvent(Analytics.CATEGORY_BOOKMARKS, Analytics.BOOKMARKS_ACTION_ADDED);
-                    emitter.onNext(bookmark);
-                    emitter.onCompleted();
-                } catch (Exception e) {
-                    emitter.onError(e);
-                }
+            public Bookmark call() throws Exception {
+                final Bookmark bookmark = Bookmark.create(verseIndex, System.currentTimeMillis());
+                BookmarkTableHelper.saveBookmark(databaseHelper.getDatabase(), bookmark);
+                Analytics.trackEvent(Analytics.CATEGORY_BOOKMARKS, Analytics.BOOKMARKS_ACTION_ADDED);
+                return bookmark;
             }
-        }, AsyncEmitter.BackpressureMode.ERROR);
+        });
     }
 
     public Observable<Void> removeBookmark(final VerseIndex verseIndex) {
-        return Observable.fromAsync(new Action1<AsyncEmitter<Void>>() {
+        return Observable.defer(new Func0<Observable<Void>>() {
             @Override
-            public void call(AsyncEmitter<Void> emitter) {
+            public Observable<Void> call() {
                 try {
                     BookmarkTableHelper.removeBookmark(databaseHelper.getDatabase(), verseIndex);
                     Analytics.trackEvent(Analytics.CATEGORY_BOOKMARKS, Analytics.BOOKMARKS_ACTION_REMOVED);
-                    emitter.onCompleted();
+                    return Observable.empty();
                 } catch (Exception e) {
-                    emitter.onError(e);
+                    return Observable.error(e);
                 }
             }
-        }, AsyncEmitter.BackpressureMode.ERROR);
+        });
     }
 
     public Observable<List<Bookmark>> loadBookmarks(final int book, final int chapter) {
-        return Observable.fromAsync(new Action1<AsyncEmitter<List<Bookmark>>>() {
+        return Observable.fromCallable(new Callable<List<Bookmark>>() {
             @Override
-            public void call(AsyncEmitter<List<Bookmark>> emitter) {
-
-                try {
-                    emitter.onNext(BookmarkTableHelper.getBookmarks(
-                            databaseHelper.getDatabase(), book, chapter));
-                    emitter.onCompleted();
-                } catch (Exception e) {
-                    emitter.onError(e);
-                }
+            public List<Bookmark> call() throws Exception {
+                return BookmarkTableHelper.getBookmarks(databaseHelper.getDatabase(), book, chapter);
             }
-        }, AsyncEmitter.BackpressureMode.ERROR);
+        });
     }
 
     public Observable<List<Bookmark>> loadBookmarks() {
-        return Observable.fromAsync(new Action1<AsyncEmitter<List<Bookmark>>>() {
+        return Observable.fromCallable(new Callable<List<Bookmark>>() {
             @Override
-            public void call(AsyncEmitter<List<Bookmark>> emitter) {
-
-                try {
-                    emitter.onNext(BookmarkTableHelper.getBookmarks(databaseHelper.getDatabase()));
-                    emitter.onCompleted();
-                } catch (Exception e) {
-                    emitter.onError(e);
-                }
+            public List<Bookmark> call() throws Exception {
+                return BookmarkTableHelper.getBookmarks(databaseHelper.getDatabase());
             }
-        }, AsyncEmitter.BackpressureMode.ERROR);
+        });
     }
 }
