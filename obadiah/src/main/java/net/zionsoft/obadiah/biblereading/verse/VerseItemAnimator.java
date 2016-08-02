@@ -50,7 +50,7 @@ class VerseItemAnimator extends DefaultItemAnimator {
     private final OvershootInterpolator overshootInterpolator = new OvershootInterpolator(4);
 
     @Override
-    public boolean canReuseUpdatedViewHolder(RecyclerView.ViewHolder viewHolder) {
+    public boolean canReuseUpdatedViewHolder(@NonNull RecyclerView.ViewHolder viewHolder) {
         return true;
     }
 
