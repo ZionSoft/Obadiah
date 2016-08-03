@@ -26,11 +26,12 @@ import net.zionsoft.obadiah.ui.utils.UiHelper;
 
 import javax.inject.Inject;
 
+import dagger.Lazy;
 import io.fabric.sdk.android.Fabric;
 
 public class App extends BaseApp {
     @Inject
-    BibleReadingModel bibleReadingModel;
+    Lazy<BibleReadingModel> bibleReadingModel;
 
     private static AppComponent appComponent;
 
@@ -54,7 +55,7 @@ public class App extends BaseApp {
 
     @Override
     public void onLowMemory() {
-        bibleReadingModel.clearCache();
+        bibleReadingModel.get().clearCache();
 
         super.onLowMemory();
     }
