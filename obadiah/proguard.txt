@@ -44,5 +44,4 @@
 -keep class net.zionsoft.obadiah.billing.InAppPurchaseData { *; }
 -keep class net.zionsoft.obadiah.model.domain.TranslationInfo { *; }
 -keep class net.zionsoft.obadiah.network.** { *; }
--keep class net.zionsoft.obadiah.notification.PushAttrNewTranslation { *; }
 -keep class net.zionsoft.obadiah.notification.PushAttrVerseIndex { *; }
