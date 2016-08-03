@@ -62,6 +62,10 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".biblereading.BibleReadingActivity"/>
+            <intent-filter>
+                <action android:name="OPEN_TRANSLATION_MANAGEMENT_ACTIVITY"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
         </activity>
         <activity android:name=".bookmarks.BookmarksActivity"/>
         <activity android:name=".notes.NotesActivity"/>

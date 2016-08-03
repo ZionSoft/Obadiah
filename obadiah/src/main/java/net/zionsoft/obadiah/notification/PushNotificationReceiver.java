@@ -38,7 +38,6 @@ import net.zionsoft.obadiah.biblereading.BibleReadingActivity;
 import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.datamodel.BibleReadingModel;
 import net.zionsoft.obadiah.model.domain.Verse;
-import net.zionsoft.obadiah.translations.TranslationManagementActivity;
 import net.zionsoft.obadiah.utils.TextFormatter;
 
 import java.util.Map;
@@ -47,10 +46,8 @@ import javax.inject.Inject;
 
 public class PushNotificationReceiver extends FirebaseMessagingService {
     private static final int NOTIFICATION_ID_VERSE = 1;
-    private static final int NOTIFICATION_ID_NEW_TRANSLATION = 2;
 
     private static final String MESSAGE_TYPE_VERSE = "verse";
-    private static final String MESSAGE_TYPE_NEW_TRANSLATION = "newTranslation";
 
     @Inject
     Moshi moshi;
@@ -75,11 +72,6 @@ public class PushNotificationReceiver extends FirebaseMessagingService {
         if (MESSAGE_TYPE_VERSE.equals(messageType)) {
             notificationId = NOTIFICATION_ID_VERSE;
             if (!prepareForVerse(builder, messageType, messageAttrs)) {
-                return;
-            }
-        } else if (MESSAGE_TYPE_NEW_TRANSLATION.equals(messageType)) {
-            notificationId = NOTIFICATION_ID_NEW_TRANSLATION;
-            if (!prepareForNewTranslation(this, builder, messageType, messageAttrs)) {
                 return;
             }
         } else {
@@ -134,31 +126,6 @@ public class PushNotificationReceiver extends FirebaseMessagingService {
             Crashlytics.getInstance().core.logException(e);
             return false;
         }
-        return true;
-    }
-
-    private boolean prepareForNewTranslation(Context context, NotificationCompat.Builder builder,
-                                             String messageType, String messageAttrs) {
-        try {
-            final String translationName = moshi.adapter(PushAttrNewTranslation.class)
-                    .fromJson(messageAttrs).translationName;
-            if (TextUtils.isEmpty(translationName)) {
-                return false;
-            }
-
-            final String contentText = context.getString(R.string.text_new_translation_available,
-                    translationName);
-            builder.setContentIntent(PendingIntent.getActivity(context, 0,
-                    TranslationManagementActivity.newStartReorderToTopIntent(context, messageType),
-                    PendingIntent.FLAG_UPDATE_CURRENT))
-                    .setContentTitle(context.getString(R.string.text_new_translation))
-                    .setContentText(contentText)
-                    .setStyle(new NotificationCompat.BigTextStyle().bigText(contentText));
-        } catch (Exception e) {
-            Crashlytics.getInstance().core.logException(e);
-            return false;
-        }
-
         return true;
     }
 }

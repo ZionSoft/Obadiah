@@ -20,7 +20,6 @@ package net.zionsoft.obadiah.translations;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -30,7 +29,6 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.ContextMenu;
 import android.view.Menu;
@@ -58,18 +56,6 @@ public class TranslationManagementActivity extends BaseAppCompatActivity
         implements TranslationManagementView, SwipeRefreshLayout.OnRefreshListener,
         RecyclerView.OnChildAttachStateChangeListener, View.OnClickListener,
         View.OnCreateContextMenuListener, Toolbar.OnMenuItemClickListener {
-    private static final String KEY_MESSAGE_TYPE = "net.zionsoft.obadiah.KEY_MESSAGE_TYPE";
-
-    public static Intent newStartReorderToTopIntent(Context context, String messageType) {
-        final Intent startIntent = newStartIntent(context).putExtra(KEY_MESSAGE_TYPE, messageType);
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
-            // there's some horrible issue with FLAG_ACTIVITY_REORDER_TO_FRONT for KitKat and above
-            // ref. https://code.google.com/p/android/issues/detail?id=63570
-            startIntent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-        }
-        return startIntent;
-    }
-
     public static Intent newStartIntent(Context context) {
         return new Intent(context, TranslationManagementActivity.class);
     }
@@ -114,16 +100,6 @@ public class TranslationManagementActivity extends BaseAppCompatActivity
         componentFragment.getComponent().inject(this);
 
         initializeUi();
-        checkDeepLink();
-    }
-
-    private void checkDeepLink() {
-        final Intent startIntent = getIntent();
-        final String messageType = startIntent.getStringExtra(KEY_MESSAGE_TYPE);
-        if (TextUtils.isEmpty(messageType)) {
-            return;
-        }
-        Analytics.trackEvent(Analytics.CATEGORY_NOTIFICATION, Analytics.NOTIFICATION_ACTION_OPENED, messageType);
     }
 
     private void initializeUi() {
