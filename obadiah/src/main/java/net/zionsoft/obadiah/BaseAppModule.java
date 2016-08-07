@@ -39,31 +39,31 @@ import retrofit2.converter.moshi.MoshiConverterFactory;
 public class BaseAppModule {
     private final App application;
 
-    public BaseAppModule(App application) {
+    BaseAppModule(App application) {
         this.application = application;
     }
 
     @Provides
     @Singleton
-    public Context provideContext() {
+    Context provideContext() {
         return application;
     }
 
     @Provides
     @Singleton
-    public DatabaseHelper provideDatabaseHelper() {
+    DatabaseHelper provideDatabaseHelper() {
         return new DatabaseHelper(application);
     }
 
     @Provides
     @Singleton
-    public Moshi provideMoshi() {
+    Moshi provideMoshi() {
         return new Moshi.Builder().build();
     }
 
     @Provides
     @Singleton
-    public OkHttpClient provideOkHttpClient() {
+    OkHttpClient provideOkHttpClient() {
         return new OkHttpClient.Builder()
                 .connectTimeout(30L, TimeUnit.SECONDS)
                 .readTimeout(30L, TimeUnit.SECONDS)
@@ -73,7 +73,7 @@ public class BaseAppModule {
 
     @Provides
     @Singleton
-    public Retrofit provideRetrofit(Moshi moshi, OkHttpClient okHttpClient) {
+    Retrofit provideRetrofit(Moshi moshi, OkHttpClient okHttpClient) {
         return new Retrofit.Builder()
                 .baseUrl(BackendInterface.BASE_URL)
                 .client(okHttpClient)
@@ -84,7 +84,7 @@ public class BaseAppModule {
 
     @Provides
     @Singleton
-    public BackendInterface provideBackendInterface(Retrofit retrofit) {
+    BackendInterface provideBackendInterface(Retrofit retrofit) {
         return retrofit.create(BackendInterface.class);
     }
 }

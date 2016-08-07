@@ -23,13 +23,13 @@ import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
 
-public final class AppModule extends BaseAppModule {
-    public AppModule(App application) {
+final class AppModule extends BaseAppModule {
+    AppModule(App application) {
         super(application);
     }
 
     @Override
-    public OkHttpClient provideOkHttpClient() {
+    OkHttpClient provideOkHttpClient() {
         return new OkHttpClient.Builder()
                 .connectTimeout(30L, TimeUnit.SECONDS)
                 .readTimeout(30L, TimeUnit.SECONDS)

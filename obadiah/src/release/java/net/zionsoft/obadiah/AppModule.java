@@ -21,8 +21,8 @@ import net.zionsoft.obadiah.App;
 
 import javax.inject.Singleton;
 
-public final class AppModule extends BaseAppModule {
-    public AppModule(App application) {
+final class AppModule extends BaseAppModule {
+    AppModule(App application) {
         super(application);
     }
 }
