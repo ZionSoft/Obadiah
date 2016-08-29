@@ -95,7 +95,7 @@ public class SearchActivity extends BaseAppCompatActivity
             componentFragment = SearchComponentFragment.newInstance();
             fm.beginTransaction()
                     .add(componentFragment, SearchComponentFragment.FRAGMENT_TAG)
-                    .commit();
+                    .commitNow();
         }
         componentFragment.getComponent().inject(this);
 
