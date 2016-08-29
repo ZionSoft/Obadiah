@@ -96,6 +96,10 @@ dependencies {
     compile "com.squareup.retrofit2:converter-moshi:$rootProject.ext.retrofitVersion"
     compile "com.squareup.retrofit2:adapter-rxjava:$rootProject.ext.retrofitVersion"
 
+    compile "com.squareup.okhttp3:okhttp:$rootProject.ext.okhttpVersion"
+    compile "com.squareup.moshi:moshi:$rootProject.ext.moshiVersion"
+    compile "com.squareup.okio:okio:$rootProject.ext.okioVersion"
+
     compile('com.crashlytics.sdk.android:crashlytics:2.5.7@aar') {
         transitive = true;
     }

@@ -4,18 +4,18 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.0-beta1'
+        classpath 'com.android.tools.build:gradle:2.2.0-beta3'
         classpath 'com.google.gms:google-services:3.0.0'
     }
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.14.1'
+    gradleVersion = '3.0'
 }
 
 ext {
     compileSdkVersion = 24
-    buildToolsVersion = '24.0.1'
+    buildToolsVersion = '24.0.2'
 
     minSdkVersion = 15
     targetSdkVersion = 24
@@ -30,13 +30,16 @@ ext {
     firebaseVersion = '9.4.0'
     playServicesVersion = '9.4.0'
 
-    daggerVersion = '2.6'
+    daggerVersion = '2.6.1'
     javaxAnnotationApiVersion = '1.2'
-    butterKnifeVersion = '8.2.1'
+    butterKnifeVersion = '8.4.0'
     rxAndroidVersion = '1.2.1'
-    rxJavaVersion = '1.1.8'
-    rxJavaProguardRulesVersion = '1.1.8.0'
+    rxJavaVersion = '1.1.9'
+    rxJavaProguardRulesVersion = '1.1.9.0'
     retrofitVersion = '2.1.0'
+    okhttpVersion = '3.4.1'
+    moshiVersion = '1.2.0'
+    okioVersion = '1.10.0'
     autoDroidVersion = '0.2'
     autoValueVersion = '1.2'
 

@@ -3,13 +3,17 @@ CHANGELOG
 
 #### Next Release
 - Updated build tools and 3rd-party libs:
-  - Updated Android Gradle plugin to 2.2.0-beta1.
-  - Updated build tool to 24.0.1
+  - Updated Gradle to 3.0.
+  - Updated Android Gradle plugin to 2.2.0-beta3.
+  - Updated build tool to 24.0.2
   - Updated support library to 24.1.1.
   - Updated Play Services and Firebase to 9.4.0.
-  - Updated Dagger to 2.6.
-  - Updated RxJava to 1.1.8.
-  - Updated ButterKnife to 8.2.1.
+  - Updated Dagger to 2.6.1.
+  - Updated RxJava to 1.1.9.
+  - Updated ButterKnife to 8.4.0.
+  - Updated okio to 1.10.0.
+  - Updated okhttp to 3.4.1.
+  - Updated Moshi to 1.2.0.
 
 #### v1.14.3 (2016-07-13)
 - Updated build tools and 3rd-party libs:
