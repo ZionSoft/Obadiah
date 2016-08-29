@@ -41,6 +41,7 @@ import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.biblereading.BibleReadingActivity;
 import net.zionsoft.obadiah.model.datamodel.Settings;
 import net.zionsoft.obadiah.model.domain.VerseSearchResult;
+import net.zionsoft.obadiah.translations.TranslationManagementActivity;
 import net.zionsoft.obadiah.ui.utils.AnimationHelper;
 import net.zionsoft.obadiah.ui.utils.BaseAppCompatActivity;
 import net.zionsoft.obadiah.ui.utils.DialogHelper;
@@ -169,7 +170,22 @@ public class SearchActivity extends BaseAppCompatActivity
 
         final String selected = searchPresenter.loadCurrentTranslation();
         if (TextUtils.isEmpty(selected)) {
-            throw new IllegalStateException("No translation selected.");
+            // I don't know how, but some users end up here
+            // https://fabric.io/zionsoft/android/apps/net.zionsoft.obadiah/issues/578cc3bbffcdc04250ebc8b0
+            DialogHelper.showDialog(this, false, R.string.error_no_translation,
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            startActivity(TranslationManagementActivity.newStartIntent(SearchActivity.this));
+                        }
+                    }, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            finish();
+                        }
+                    }
+            );
+            return;
         }
         setTitle(selected);
         if (!selected.equals(currentTranslation)) {
