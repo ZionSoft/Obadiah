@@ -221,7 +221,7 @@ public class SearchActivity extends BaseAppCompatActivity
         return true;
     }
 
-    private void search() {
+    void search() {
         if (TextUtils.isEmpty(query)) {
             return;
         }

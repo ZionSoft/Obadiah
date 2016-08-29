@@ -39,7 +39,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class NotesListAdapter extends BaseSectionAdapter<Pair<Note, Verse>> {
+class NotesListAdapter extends BaseSectionAdapter<Pair<Note, Verse>> {
     static class ViewHolder extends RecyclerView.ViewHolder {
         private static final StringBuilder STRING_BUILDER = new StringBuilder();
 
@@ -52,7 +52,7 @@ public class NotesListAdapter extends BaseSectionAdapter<Pair<Note, Verse>> {
         @BindView(R.id.note)
         TextView note;
 
-        private ViewHolder(View itemView, int textColor, float textSize, float smallerTextSize) {
+        ViewHolder(View itemView, int textColor, float textSize, float smallerTextSize) {
             super(itemView);
 
             ButterKnife.bind(this, itemView);
@@ -64,7 +64,7 @@ public class NotesListAdapter extends BaseSectionAdapter<Pair<Note, Verse>> {
             note.setTextSize(TypedValue.COMPLEX_UNIT_PX, smallerTextSize);
         }
 
-        private void bind(Note note, Verse verse) {
+        void bind(Note note, Verse verse) {
             this.note.setText(note.note());
 
             STRING_BUILDER.setLength(0);

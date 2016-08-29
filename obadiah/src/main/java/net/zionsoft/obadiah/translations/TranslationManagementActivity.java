@@ -137,7 +137,7 @@ public class TranslationManagementActivity extends BaseAppCompatActivity
         translationList.setAdapter(translationListAdapter);
     }
 
-    private void finishAndOpenParentActivity() {
+    void finishAndOpenParentActivity() {
         startActivity(NavUtils.getParentActivityIntent(this)
                 .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP));
         finish();
@@ -155,7 +155,7 @@ public class TranslationManagementActivity extends BaseAppCompatActivity
         loadTranslations(false);
     }
 
-    private void loadTranslations(boolean forceRefresh) {
+    void loadTranslations(boolean forceRefresh) {
         translationList.setVisibility(View.GONE);
         translationManagementPresenter.loadTranslations(forceRefresh);
     }
@@ -249,7 +249,7 @@ public class TranslationManagementActivity extends BaseAppCompatActivity
                 }, null);
     }
 
-    private void removeTranslation(TranslationInfo translation) {
+    void removeTranslation(TranslationInfo translation) {
         removeTranslationProgressDialog = ProgressDialog.showIndeterminateProgressDialog(
                 this, R.string.progress_dialog_translation_deleting);
 
@@ -290,7 +290,7 @@ public class TranslationManagementActivity extends BaseAppCompatActivity
                 }, null);
     }
 
-    private void downloadTranslation(TranslationInfo translationInfo) {
+    void downloadTranslation(TranslationInfo translationInfo) {
         getOrCreateDownloadDialog();
         translationManagementPresenter.fetchTranslation(translationInfo);
     }

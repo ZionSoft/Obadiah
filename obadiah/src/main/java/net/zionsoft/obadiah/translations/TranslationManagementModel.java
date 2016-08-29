@@ -59,11 +59,11 @@ import rx.functions.Func2;
 import rx.schedulers.Schedulers;
 
 class TranslationManagementModel {
-    private final DatabaseHelper databaseHelper;
-    private final BibleReadingModel bibleReadingModel;
-    private final BackendInterface backendInterface;
-    private final JsonAdapter<BackendBooks> translationInfoJsonAdapter;
-    private final JsonAdapter<BackendChapter> chapterJsonAdapter;
+    final DatabaseHelper databaseHelper;
+    final BibleReadingModel bibleReadingModel;
+    final BackendInterface backendInterface;
+    final JsonAdapter<BackendBooks> translationInfoJsonAdapter;
+    final JsonAdapter<BackendChapter> chapterJsonAdapter;
 
     TranslationManagementModel(DatabaseHelper databaseHelper, BibleReadingModel bibleReadingModel,
                                Moshi moshi, BackendInterface backendInterface) {
@@ -159,7 +159,7 @@ class TranslationManagementModel {
         });
     }
 
-    private static List<TranslationInfo> sortByLocale(List<TranslationInfo> translations) {
+    static List<TranslationInfo> sortByLocale(List<TranslationInfo> translations) {
         Collections.sort(translations, new Comparator<TranslationInfo>() {
             @Override
             public int compare(TranslationInfo translation1, TranslationInfo translation2) {

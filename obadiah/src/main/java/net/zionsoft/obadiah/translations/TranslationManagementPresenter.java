@@ -36,12 +36,12 @@ import rx.subscriptions.CompositeSubscription;
 class TranslationManagementPresenter extends BasePresenter<TranslationManagementView>
         implements AdsModel.OnAdsRemovalPurchasedListener {
     private final AdsModel adsModel;
-    private final BibleReadingModel bibleReadingModel;
+    final BibleReadingModel bibleReadingModel;
     private final TranslationManagementModel translationManagementModel;
 
     private CompositeSubscription subscription = new CompositeSubscription();
-    private Subscription removeTranslationSubscription;
-    private Subscription fetchTranslationSubscription;
+    Subscription removeTranslationSubscription;
+    Subscription fetchTranslationSubscription;
 
     TranslationManagementPresenter(AdsModel adsModel, BibleReadingModel bibleReadingModel,
                                    TranslationManagementModel translationManagementModel, Settings settings) {

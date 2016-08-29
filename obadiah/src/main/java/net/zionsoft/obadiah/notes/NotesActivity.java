@@ -83,7 +83,7 @@ public class NotesActivity extends BaseRecyclerViewActivity implements NotesView
         loadNotes();
     }
 
-    private void loadNotes() {
+    void loadNotes() {
         notesPresenter.loadNotes();
     }
 

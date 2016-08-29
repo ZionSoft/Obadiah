@@ -34,7 +34,7 @@ import rx.functions.Func0;
 
 @Singleton
 public class BookmarkModel {
-    private final DatabaseHelper databaseHelper;
+    final DatabaseHelper databaseHelper;
 
     @Inject
     public BookmarkModel(DatabaseHelper databaseHelper) {

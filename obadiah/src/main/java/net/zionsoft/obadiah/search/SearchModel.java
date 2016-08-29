@@ -30,7 +30,7 @@ import rx.functions.Func0;
 
 class SearchModel {
     private final BibleReadingModel bibleReadingModel;
-    private final SearchRecentSuggestions recentSearches;
+    final SearchRecentSuggestions recentSearches;
 
     SearchModel(Context context, BibleReadingModel bibleReadingModel) {
         this.bibleReadingModel = bibleReadingModel;

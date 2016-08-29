@@ -36,7 +36,7 @@ class AdsModel implements InAppBilling.OnAdsRemovalPurchasedListener {
         void onAdsRemovalPurchased(boolean purchased);
     }
 
-    private final InAppBilling inAppBilling;
+    final InAppBilling inAppBilling;
     private OnAdsRemovalPurchasedListener onAdsRemovalPurchasedListener;
 
     AdsModel(Context context, Moshi moshi) {

@@ -34,7 +34,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class TranslationSpinnerAdapter extends BaseAdapter implements CompoundButton.OnCheckedChangeListener {
+class TranslationSpinnerAdapter extends BaseAdapter implements CompoundButton.OnCheckedChangeListener {
     static class DropDownViewHolder {
         @BindView(R.id.checkbox)
         AppCompatCheckBox checkbox;
@@ -42,7 +42,7 @@ public class TranslationSpinnerAdapter extends BaseAdapter implements CompoundBu
         @BindView(R.id.title)
         TextView title;
 
-        private DropDownViewHolder(View root) {
+        DropDownViewHolder(View root) {
             ButterKnife.bind(this, root);
         }
     }

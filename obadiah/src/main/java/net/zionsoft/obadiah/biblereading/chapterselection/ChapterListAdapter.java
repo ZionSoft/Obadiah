@@ -37,11 +37,17 @@ class ChapterListAdapter extends BaseExpandableListAdapter implements View.OnCli
 
     private static class ViewTag {
         TextView[] textViews;
+
+        ViewTag() {
+        }
     }
 
     private static class ChapterTag {
         int book;
         int chapter;
+
+        ChapterTag() {
+        }
     }
 
     private static final int ROW_CHILD_COUNT = 5;

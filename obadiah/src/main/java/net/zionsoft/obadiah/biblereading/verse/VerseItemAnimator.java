@@ -39,15 +39,15 @@ class VerseItemAnimator extends DefaultItemAnimator {
         static final Integer ACTION_UPDATE_NOTE = 5;
         static final Integer ACTION_REMOVE_NOTE = 6;
 
-        private final Integer action;
+        final Integer action;
 
         VerseItemHolderInfo(Integer action) {
             this.action = action;
         }
     }
 
-    private final DecelerateInterpolator decelerateInterpolator = new DecelerateInterpolator();
-    private final OvershootInterpolator overshootInterpolator = new OvershootInterpolator(4);
+    final DecelerateInterpolator decelerateInterpolator = new DecelerateInterpolator();
+    final OvershootInterpolator overshootInterpolator = new OvershootInterpolator(4);
 
     @Override
     public boolean canReuseUpdatedViewHolder(@NonNull RecyclerView.ViewHolder viewHolder) {

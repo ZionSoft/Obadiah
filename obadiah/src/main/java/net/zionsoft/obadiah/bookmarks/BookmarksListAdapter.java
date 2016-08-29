@@ -48,7 +48,7 @@ class BookmarksListAdapter extends BaseSectionAdapter<Verse> {
         @BindView(R.id.text)
         TextView text;
 
-        private ViewHolder(View itemView, int textColor, float textSize, float smallerTextSize) {
+        ViewHolder(View itemView, int textColor, float textSize, float smallerTextSize) {
             super(itemView);
 
             ButterKnife.bind(this, itemView);
@@ -58,7 +58,7 @@ class BookmarksListAdapter extends BaseSectionAdapter<Verse> {
             text.setTextSize(TypedValue.COMPLEX_UNIT_PX, smallerTextSize);
         }
 
-        private void bind(Verse verse) {
+        void bind(Verse verse) {
             STRING_BUILDER.setLength(0);
             STRING_BUILDER.append(verse.text.bookName).append(' ')
                     .append(verse.verseIndex.chapter() + 1).append(':').append(verse.verseIndex.verse() + 1);

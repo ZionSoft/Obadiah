@@ -36,7 +36,7 @@ import rx.Subscription;
 import rx.functions.Func1;
 
 class BookmarksPresenter extends BasePresenter<BookmarksView> {
-    private final BibleReadingModel bibleReadingModel;
+    final BibleReadingModel bibleReadingModel;
     private final BookmarkModel bookmarkModel;
 
     private Subscription subscription;

@@ -45,7 +45,7 @@ public class Settings {
         VERY_LARGE("very_large", R.string.pref_text_size_very_large,
                 R.dimen.text_size_very_large, R.dimen.smaller_text_size_very_large);
 
-        private final String settingKey;
+        final String settingKey;
 
         @StringRes
         public final int title;
@@ -66,7 +66,7 @@ public class Settings {
 
         private static final TextSize DEFAULT = MEDIUM;
 
-        private static TextSize fromSettingKey(@Nullable String settingKey) {
+        static TextSize fromSettingKey(@Nullable String settingKey) {
             for (TextSize textSize : TextSize.values()) {
                 if (textSize.settingKey.equals(settingKey)) {
                     return textSize;

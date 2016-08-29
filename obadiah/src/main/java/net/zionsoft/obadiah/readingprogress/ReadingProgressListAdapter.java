@@ -112,7 +112,7 @@ class ReadingProgressListAdapter extends RecyclerView.Adapter {
             finishedNewTestamentCount.setTextSize(TypedValue.COMPLEX_UNIT_PX, smallerTextSize);
         }
 
-        private void bind(ReadingProgress readingProgress) {
+        void bind(ReadingProgress readingProgress) {
             continuousReadingCount.setText(resources.getString(
                     R.string.text_continuous_reading_count, readingProgress.getContinuousReadingDays()));
 
@@ -161,7 +161,7 @@ class ReadingProgressListAdapter extends RecyclerView.Adapter {
             lastReadChapter.setTextSize(TypedValue.COMPLEX_UNIT_PX, smallerTextSize);
         }
 
-        private void bind(ReadingProgress readingProgress, int book) {
+        void bind(ReadingProgress readingProgress, int book) {
             bookName.setText(bookNames.get(book));
             final int chaptersRead = readingProgress.getChapterRead(book);
             final int chaptersCount = readingProgress.getChapterCount(book);

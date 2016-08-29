@@ -147,7 +147,7 @@ class BibleReadingPresenter extends BasePresenter<BibleReadingView> {
         loadBookNames(bibleReadingModel.loadCurrentTranslation());
     }
 
-    private void loadBookNames(String translation) {
+    void loadBookNames(String translation) {
         getSubscription().add(bibleReadingModel.loadBookNames(translation)
                 .compose(RxHelper.<List<String>>applySchedulers())
                 .subscribe(new Subscriber<List<String>>() {

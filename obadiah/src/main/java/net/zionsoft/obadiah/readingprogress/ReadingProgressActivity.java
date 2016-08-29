@@ -91,7 +91,7 @@ public class ReadingProgressActivity extends BaseAppCompatActivity implements Re
         loadReadingProgress();
     }
 
-    private void loadReadingProgress() {
+    void loadReadingProgress() {
         readingProgressPresenter.loadReadingProgress();
     }
 

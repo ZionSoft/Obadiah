@@ -59,11 +59,11 @@ public class VerseViewPager extends ViewPager implements VerseView, VerseSelecti
     private AppCompatActivity activity;
     private ActionMode actionMode;
 
-    private VersePresenter versePagerPresenter;
+    VersePresenter versePagerPresenter;
 
     private VersePagerAdapter adapter;
-    private int currentBook;
-    private int currentChapter;
+    int currentBook;
+    int currentChapter;
 
     public VerseViewPager(Context context) {
         super(context);

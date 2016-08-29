@@ -39,7 +39,7 @@ import rx.functions.Func0;
 
 @Singleton
 public class ReadingProgressModel {
-    private final DatabaseHelper databaseHelper;
+    final DatabaseHelper databaseHelper;
 
     @Inject
     public ReadingProgressModel(DatabaseHelper databaseHelper) {

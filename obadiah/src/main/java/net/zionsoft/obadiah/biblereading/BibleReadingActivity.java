@@ -230,7 +230,7 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
         loadBookNames();
     }
 
-    private void loadBookNames() {
+    void loadBookNames() {
         bibleReadingPresenter.loadBookNamesForCurrentTranslation();
     }
 

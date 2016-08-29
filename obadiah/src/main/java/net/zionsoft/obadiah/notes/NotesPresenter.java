@@ -36,7 +36,7 @@ import rx.Subscription;
 import rx.functions.Func1;
 
 class NotesPresenter extends BasePresenter<NotesView> {
-    private final BibleReadingModel bibleReadingModel;
+    final BibleReadingModel bibleReadingModel;
     private final NoteModel noteModel;
 
     private Subscription subscription;

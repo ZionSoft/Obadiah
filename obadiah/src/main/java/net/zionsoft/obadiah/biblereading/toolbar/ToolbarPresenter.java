@@ -91,7 +91,7 @@ public class ToolbarPresenter extends MVPPresenter<ToolbarView> {
         return subscription;
     }
 
-    private void loadBookNames(String translation) {
+    void loadBookNames(String translation) {
         getSubscription().add(bibleReadingModel.loadBookNames(translation)
                 .compose(RxHelper.<List<String>>applySchedulers())
                 .subscribe(new Subscriber<List<String>>() {

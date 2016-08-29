@@ -53,10 +53,10 @@ import rx.subjects.SerializedSubject;
 
 @Singleton
 public class BibleReadingModel {
-    private final DatabaseHelper databaseHelper;
+    final DatabaseHelper databaseHelper;
     private final SharedPreferences preferences;
 
-    private final LruCache<String, List<String>> bookNameCache
+    final LruCache<String, List<String>> bookNameCache
             = new LruCache<String, List<String>>((int) (Runtime.getRuntime().maxMemory() / 16L)) {
         @Override
         protected int sizeOf(String key, List<String> texts) {
@@ -67,7 +67,7 @@ public class BibleReadingModel {
             return length;
         }
     };
-    private final LruCache<String, List<Verse>> verseCache
+    final LruCache<String, List<Verse>> verseCache
             = new LruCache<String, List<Verse>>((int) (Runtime.getRuntime().maxMemory() / 8L)) {
         @Override
         protected int sizeOf(String key, List<Verse> verses) {
@@ -87,7 +87,7 @@ public class BibleReadingModel {
     private final SerializedSubject<VerseIndex, VerseIndex> currentReadingProgressUpdatesSubject
             = PublishSubject.<VerseIndex>create().toSerialized();
 
-    private final List<String> parallelTranslations = new ArrayList<>();
+    final List<String> parallelTranslations = new ArrayList<>();
 
     @Inject
     public BibleReadingModel(Context context, DatabaseHelper databaseHelper) {
@@ -267,7 +267,7 @@ public class BibleReadingModel {
 
     private static final StringBuilder STRING_BUILDER = new StringBuilder(32);
 
-    private static String buildVersesCacheKey(String translation, int book, int chapter) {
+    static String buildVersesCacheKey(String translation, int book, int chapter) {
         synchronized (STRING_BUILDER) {
             STRING_BUILDER.setLength(0);
             STRING_BUILDER.append(translation).append('-').append(book).append('-').append(chapter);

@@ -45,14 +45,14 @@ import butterknife.ButterKnife;
 
 class VersePagerAdapter extends PagerAdapter implements VersePagerView {
     static class Page implements RecyclerView.OnChildAttachStateChangeListener, View.OnClickListener {
-        private final VerseSelectionListener listener;
-        private final VerseListAdapter verseListAdapter;
+        final VerseSelectionListener listener;
+        final VerseListAdapter verseListAdapter;
 
-        private boolean inUse;
-        private int book;
-        private int chapter;
+        boolean inUse;
+        int book;
+        int chapter;
 
-        private final View rootView;
+        final View rootView;
 
         @BindView(R.id.loading_spinner)
         View loadingSpinner;
@@ -60,8 +60,8 @@ class VersePagerAdapter extends PagerAdapter implements VersePagerView {
         @BindView(R.id.verse_list)
         RecyclerView verseList;
 
-        private Page(Context context, final VersePagerPresenter versePagerPresenter,
-                     VerseSelectionListener listener, View rootView) {
+        Page(Context context, final VersePagerPresenter versePagerPresenter,
+             VerseSelectionListener listener, View rootView) {
             this.listener = listener;
             this.rootView = rootView;
             ButterKnife.bind(this, rootView);
@@ -112,7 +112,7 @@ class VersePagerAdapter extends PagerAdapter implements VersePagerView {
     }
 
     private final Context context;
-    private final VersePagerPresenter versePagerPresenter;
+    final VersePagerPresenter versePagerPresenter;
     private final LayoutInflater inflater;
     private final ArrayList<Page> pages;
 
@@ -120,7 +120,7 @@ class VersePagerAdapter extends PagerAdapter implements VersePagerView {
 
     private int currentBook;
     private int currentChapter;
-    private int currentVerse;
+    int currentVerse;
 
     VersePagerAdapter(Context context, VersePagerPresenter versePagerPresenter, int offScreenPageLimit) {
         this.context = context;
@@ -165,7 +165,7 @@ class VersePagerAdapter extends PagerAdapter implements VersePagerView {
         return page;
     }
 
-    private void loadVerses(int chapter) {
+    void loadVerses(int chapter) {
         versePagerPresenter.loadVerses(currentBook, chapter);
     }
 

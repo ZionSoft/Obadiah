@@ -82,7 +82,7 @@ public class BookmarksActivity extends BaseRecyclerViewActivity implements Bookm
         loadBookmarks();
     }
 
-    private void loadBookmarks() {
+    void loadBookmarks() {
         bookmarksPresenter.loadBookmarks();
     }
 

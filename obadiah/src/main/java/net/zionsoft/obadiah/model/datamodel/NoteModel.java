@@ -36,7 +36,7 @@ import rx.functions.Func0;
 
 @Singleton
 public class NoteModel {
-    private final DatabaseHelper databaseHelper;
+    final DatabaseHelper databaseHelper;
 
     @Inject
     public NoteModel(DatabaseHelper databaseHelper) {

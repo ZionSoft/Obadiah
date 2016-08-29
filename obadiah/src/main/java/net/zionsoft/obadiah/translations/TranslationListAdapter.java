@@ -35,12 +35,12 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 class TranslationListAdapter extends BaseSectionAdapter<TranslationListAdapter.TranslationInfoHolder> {
-    public static class TranslationInfoHolder {
-        private final TranslationInfo translationInfo;
-        private final SpannableStringBuilder title;
-        private final boolean downloaded;
+    static class TranslationInfoHolder {
+        final TranslationInfo translationInfo;
+        final SpannableStringBuilder title;
+        final boolean downloaded;
 
-        private TranslationInfoHolder(TranslationInfo translationInfo, SpannableStringBuilder title, boolean downloaded) {
+        TranslationInfoHolder(TranslationInfo translationInfo, SpannableStringBuilder title, boolean downloaded) {
             this.translationInfo = translationInfo;
             this.title = title;
             this.downloaded = downloaded;
@@ -48,10 +48,10 @@ class TranslationListAdapter extends BaseSectionAdapter<TranslationListAdapter.T
     }
 
     static class TranslationViewHolder extends RecyclerView.ViewHolder {
-        private TranslationInfo translationInfo;
-        private boolean downloaded;
+        TranslationInfo translationInfo;
+        boolean downloaded;
 
-        private TranslationViewHolder(View itemView) {
+        TranslationViewHolder(View itemView) {
             super(itemView);
         }
 

@@ -90,7 +90,7 @@ public class ChapterPresenter extends MVPPresenter<ChapterView> {
         return subscription;
     }
 
-    private void loadBookNames(String translation) {
+    void loadBookNames(String translation) {
         getSubscription().add(bibleReadingModel.loadBookNames(translation)
                 .compose(RxHelper.<List<String>>applySchedulers())
                 .subscribe(new Subscriber<List<String>>() {

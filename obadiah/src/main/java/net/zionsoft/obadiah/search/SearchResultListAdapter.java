@@ -42,7 +42,7 @@ class SearchResultListAdapter extends RecyclerView.Adapter {
 
         private VerseSearchResult verse;
 
-        private ViewHolder(View itemView, SearchPresenter searchPresenter, Resources resources) {
+        ViewHolder(View itemView, SearchPresenter searchPresenter, Resources resources) {
             super(itemView);
             this.searchPresenter = searchPresenter;
             this.resources = resources;
@@ -50,7 +50,7 @@ class SearchResultListAdapter extends RecyclerView.Adapter {
             itemView.setOnClickListener(this);
         }
 
-        private void bind(VerseSearchResult verse) {
+        void bind(VerseSearchResult verse) {
             final Settings settings = searchPresenter.getSettings();
             textView.setTextColor(settings.getTextColor());
             textView.setTextSize(TypedValue.COMPLEX_UNIT_PX,
