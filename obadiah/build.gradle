@@ -56,6 +56,8 @@ android {
         debug {
             applicationIdSuffix ".debug"
             versionNameSuffix " debug"
+
+            ext.enableCrashlytics = false
         }
         release {
             minifyEnabled true

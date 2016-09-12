@@ -17,17 +17,12 @@
 
 package net.zionsoft.obadiah;
 
-import com.crashlytics.android.Crashlytics;
-
+import dagger.Lazy;
+import javax.inject.Inject;
 import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.datamodel.BibleReadingModel;
 import net.zionsoft.obadiah.notification.PushNotificationRegister;
 import net.zionsoft.obadiah.ui.utils.UiHelper;
-
-import javax.inject.Inject;
-
-import dagger.Lazy;
-import io.fabric.sdk.android.Fabric;
 
 public class App extends BaseApp {
     @Inject
@@ -42,7 +37,6 @@ public class App extends BaseApp {
     @Override
     public void onCreate() {
         super.onCreate();
-        Fabric.with(this, new Crashlytics());
 
         appComponent = AppComponent.Initializer.init(this);
         appComponent.inject(this);
