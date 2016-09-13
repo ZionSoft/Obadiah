@@ -115,6 +115,8 @@ class TranslationSpinnerAdapter extends BaseAdapter implements CompoundButton.On
             }
             viewHolder.checkbox.setVisibility(View.VISIBLE);
         } else {
+            // last item ("More"), hide the checkbox
+            viewHolder.checkbox.setTag(null);
             viewHolder.checkbox.setVisibility(View.INVISIBLE);
         }
 

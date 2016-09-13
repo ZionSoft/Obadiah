@@ -1,24 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:background="@drawable/background_item_drop_down"
-              android:gravity="center_vertical"
-              android:minHeight="@dimen/header_height"
-              android:orientation="horizontal"
-              android:paddingRight="@dimen/padding">
+    android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/background_item_drop_down"
+    android:gravity="center_vertical"
+    android:minHeight="@dimen/header_height"
+    android:orientation="horizontal"
+    android:paddingLeft="@dimen/padding"
+    android:paddingRight="@dimen/paddingRight">
 
     <android.support.v7.widget.AppCompatCheckBox
         android:id="@+id/checkbox"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="40dp"
+        android:layout_height="48dp"
         android:focusable="false"
-        android:theme="@style/AppCheckBoxStyle"/>
+        android:theme="@style/AppCheckBoxStyle" />
 
     <TextView
         android:id="@+id/title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textColor="@android:color/black"
-        android:textSize="@dimen/text_size_medium"/>
+        android:textSize="@dimen/text_size_medium" />
 </LinearLayout>
