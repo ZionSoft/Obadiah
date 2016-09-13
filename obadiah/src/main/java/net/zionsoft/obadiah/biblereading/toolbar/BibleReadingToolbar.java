@@ -20,12 +20,8 @@ package net.zionsoft.obadiah.biblereading.toolbar;
 import android.content.Context;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Adapter;
-import android.widget.AdapterView;
 import android.widget.Spinner;
 
 import net.zionsoft.obadiah.R;
@@ -35,13 +31,11 @@ import net.zionsoft.obadiah.model.domain.VerseIndex;
 import net.zionsoft.obadiah.notes.NotesActivity;
 import net.zionsoft.obadiah.readingprogress.ReadingProgressActivity;
 import net.zionsoft.obadiah.search.SearchActivity;
-import net.zionsoft.obadiah.translations.TranslationManagementActivity;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class BibleReadingToolbar extends Toolbar implements ToolbarView,
-        Toolbar.OnMenuItemClickListener, AdapterView.OnItemSelectedListener {
+public class BibleReadingToolbar extends Toolbar implements ToolbarView, Toolbar.OnMenuItemClickListener {
     private static final StringBuilder STRING_BUILDER = new StringBuilder();
 
     private ToolbarPresenter toolbarPresenter;
@@ -93,9 +87,11 @@ public class BibleReadingToolbar extends Toolbar implements ToolbarView,
 
         final Spinner translationsSpinner = (Spinner) MenuItemCompat.getActionView(
                 getMenu().findItem(R.id.action_translations));
-        translationsSpinner.setAdapter(new TranslationSpinnerAdapter(getContext(), toolbarPresenter, names));
+        final TranslationSpinnerAdapter adapter
+                = new TranslationSpinnerAdapter(getContext(), toolbarPresenter, names);
+        translationsSpinner.setAdapter(adapter);
         translationsSpinner.setSelection(selected);
-        translationsSpinner.setOnItemSelectedListener(this);
+        translationsSpinner.setOnItemSelectedListener(adapter);
     }
 
     @Override
@@ -148,31 +144,6 @@ public class BibleReadingToolbar extends Toolbar implements ToolbarView,
             default:
                 return false;
         }
-    }
-
-    @Override
-    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        final Adapter adapter = parent.getAdapter();
-        if (position == adapter.getCount() - 1) {
-            // last item ("More") selected, opens the translation management activity
-            final Context context = getContext();
-            context.startActivity(TranslationManagementActivity.newStartIntent(context));
-            return;
-        }
-
-        String currentTranslation = toolbarPresenter.loadCurrentTranslation();
-        final String selected = (String) adapter.getItem(position);
-        if (TextUtils.isEmpty(selected) || selected.equals(currentTranslation)) {
-            return;
-        }
-
-        currentTranslation = selected;
-        toolbarPresenter.saveCurrentTranslation(currentTranslation);
-    }
-
-    @Override
-    public void onNothingSelected(AdapterView<?> parent) {
-        // do nothing
     }
 
     public void setPresenter(ToolbarPresenter toolbarPresenter) {

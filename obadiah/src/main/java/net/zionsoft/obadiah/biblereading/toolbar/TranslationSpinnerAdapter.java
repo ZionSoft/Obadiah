@@ -23,18 +23,21 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import net.zionsoft.obadiah.R;
+import net.zionsoft.obadiah.translations.TranslationManagementActivity;
 
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-class TranslationSpinnerAdapter extends BaseAdapter implements CompoundButton.OnCheckedChangeListener {
+class TranslationSpinnerAdapter extends BaseAdapter implements CompoundButton.OnCheckedChangeListener,
+        AdapterView.OnItemSelectedListener {
     static class DropDownViewHolder {
         @BindView(R.id.checkbox)
         AppCompatCheckBox checkbox;
@@ -131,5 +134,29 @@ class TranslationSpinnerAdapter extends BaseAdapter implements CompoundButton.On
         } else {
             toolbarPresenter.removeParallelTranslation(translation);
         }
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        if (position == getCount() - 1) {
+            // last item ("More") selected, opens the translation management activity
+            final Context context = parent.getContext();
+            context.startActivity(TranslationManagementActivity.newStartIntent(context));
+            return;
+        }
+
+        String currentTranslation = toolbarPresenter.loadCurrentTranslation();
+        final String selected = getItem(position);
+        if (TextUtils.isEmpty(selected) || selected.equals(currentTranslation)) {
+            return;
+        }
+
+        currentTranslation = selected;
+        toolbarPresenter.saveCurrentTranslation(currentTranslation);
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+        // do nothing
     }
 }
