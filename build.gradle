@@ -4,7 +4,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.0-rc1'
+        classpath 'com.android.tools.build:gradle:2.2.0-rc2'
         classpath 'com.google.gms:google-services:3.0.0'
     }
 }
@@ -26,15 +26,15 @@ ext {
     versionName = '1.14.3'
     versionCode = 11403
 
-    supportLibVersion = '24.2.0'
+    supportLibVersion = '24.2.1'
     firebaseVersion = '9.4.0'
     playServicesVersion = '9.4.0'
 
-    daggerVersion = '2.6.1'
+    daggerVersion = '2.7'
     javaxAnnotationApiVersion = '1.2'
     butterKnifeVersion = '8.4.0'
     rxAndroidVersion = '1.2.1'
-    rxJavaVersion = '1.1.10'
+    rxJavaVersion = '1.2.0'
     rxJavaProguardRulesVersion = '1.1.10.0'
     retrofitVersion = '2.1.0'
     okhttpVersion = '3.4.1'
