@@ -14,6 +14,8 @@ CHANGELOG
   - Updated okio to 1.10.0.
   - Updated okhttp to 3.4.1.
   - Updated Moshi to 1.2.0.
+- Updated analytics tracking.
+- Used Firebase messaging for "new translation" notification.
 
 #### v1.14.3 (2016-07-13)
 - Updated build tools and 3rd-party libs:
