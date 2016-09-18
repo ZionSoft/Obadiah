@@ -29,7 +29,6 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.TypedValue;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -125,10 +124,6 @@ public class TranslationManagementActivity extends BaseAppCompatActivity
 
         swipeContainer.setColorSchemeResources(R.color.dark_cyan, R.color.dark_lime, R.color.blue, R.color.dark_blue);
         swipeContainer.setOnRefreshListener(this);
-
-        // workaround for https://code.google.com/p/android/issues/detail?id=77712
-        swipeContainer.setProgressViewOffset(false, 0,
-                (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24, getResources().getDisplayMetrics()));
         swipeContainer.setRefreshing(true);
 
         translationList.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
