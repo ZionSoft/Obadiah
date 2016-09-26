@@ -32,6 +32,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import rx.Observable;
+import rx.Single;
 import rx.functions.Func0;
 
 @Singleton
@@ -43,8 +44,8 @@ public class NoteModel {
         this.databaseHelper = databaseHelper;
     }
 
-    public Observable<Note> updateNote(final VerseIndex verseIndex, final String note) {
-        return Observable.fromCallable(new Callable<Note>() {
+    public Single<Note> updateNote(final VerseIndex verseIndex, final String note) {
+        return Single.fromCallable(new Callable<Note>() {
             @Override
             public Note call() throws Exception {
                 final SQLiteDatabase db = databaseHelper.getDatabase();
@@ -86,8 +87,8 @@ public class NoteModel {
         });
     }
 
-    public Observable<List<Note>> loadNotes() {
-        return Observable.fromCallable(new Callable<List<Note>>() {
+    public Single<List<Note>> loadNotes() {
+        return Single.fromCallable(new Callable<List<Note>>() {
             @Override
             public List<Note> call() throws Exception {
                 return NoteTableHelper.getNotes(databaseHelper.getDatabase());

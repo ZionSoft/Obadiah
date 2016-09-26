@@ -33,6 +33,7 @@ import net.zionsoft.obadiah.utils.RxHelper;
 import java.util.List;
 
 import rx.Observable;
+import rx.SingleSubscriber;
 import rx.Subscriber;
 import rx.functions.Func1;
 import rx.functions.Func3;
@@ -178,11 +179,14 @@ public class VersePagerPresenter extends BasePresenter<VersePagerView> {
 
     void addBookmark(final VerseIndex verseIndex) {
         getSubscription().add(bookmarkModel.addBookmark(verseIndex)
-                .compose(RxHelper.<Bookmark>applySchedulers())
-                .subscribe(new Subscriber<Bookmark>() {
+                .compose(RxHelper.<Bookmark>applySchedulersForSingle())
+                .subscribe(new SingleSubscriber<Bookmark>() {
                     @Override
-                    public void onCompleted() {
-                        // do nothing
+                    public void onSuccess(Bookmark bookmark) {
+                        final VersePagerView v = getView();
+                        if (v != null) {
+                            v.onBookmarkAdded(bookmark);
+                        }
                     }
 
                     @Override
@@ -190,14 +194,6 @@ public class VersePagerPresenter extends BasePresenter<VersePagerView> {
                         final VersePagerView v = getView();
                         if (v != null) {
                             v.onBookmarkAddFailed(verseIndex);
-                        }
-                    }
-
-                    @Override
-                    public void onNext(Bookmark bookmark) {
-                        final VersePagerView v = getView();
-                        if (v != null) {
-                            v.onBookmarkAdded(bookmark);
                         }
                     }
                 }));
@@ -224,19 +220,22 @@ public class VersePagerPresenter extends BasePresenter<VersePagerView> {
                     }
 
                     @Override
-                    public void onNext(Void v) {
-                        // should not reach here
+                    public void onNext(Void o) {
+                        // do nothing
                     }
                 }));
     }
 
     void updateNote(final VerseIndex verseIndex, final String note) {
         getSubscription().add(noteModel.updateNote(verseIndex, note)
-                .compose(RxHelper.<Note>applySchedulers())
-                .subscribe(new Subscriber<Note>() {
+                .compose(RxHelper.<Note>applySchedulersForSingle())
+                .subscribe(new SingleSubscriber<Note>() {
                     @Override
-                    public void onCompleted() {
-                        // do nothing
+                    public void onSuccess(Note note) {
+                        final VersePagerView v = getView();
+                        if (v != null) {
+                            v.onNoteUpdated(note);
+                        }
                     }
 
                     @Override
@@ -245,14 +244,6 @@ public class VersePagerPresenter extends BasePresenter<VersePagerView> {
                         final VersePagerView v = getView();
                         if (v != null) {
                             v.onNoteUpdateFailed(verseIndex, note);
-                        }
-                    }
-
-                    @Override
-                    public void onNext(Note note) {
-                        final VersePagerView v = getView();
-                        if (v != null) {
-                            v.onNoteUpdated(note);
                         }
                     }
                 }));

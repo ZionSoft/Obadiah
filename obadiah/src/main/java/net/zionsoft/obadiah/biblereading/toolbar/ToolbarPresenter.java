@@ -27,6 +27,7 @@ import net.zionsoft.obadiah.utils.RxHelper;
 
 import java.util.List;
 
+import rx.SingleSubscriber;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.subscriptions.CompositeSubscription;
@@ -148,26 +149,21 @@ public class ToolbarPresenter extends MVPPresenter<ToolbarView> {
 
     void loadTranslations() {
         getSubscription().add(bibleReadingModel.loadTranslations()
-                .compose(RxHelper.<List<String>>applySchedulers())
-                .subscribe(new Subscriber<List<String>>() {
+                .compose(RxHelper.<List<String>>applySchedulersForSingle())
+                .subscribe(new SingleSubscriber<List<String>>() {
                     @Override
-                    public void onCompleted() {
-                        // do nothing
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        // do nothing
-                    }
-
-                    @Override
-                    public void onNext(List<String> translations) {
+                    public void onSuccess(List<String> translations) {
                         final ToolbarView v = getView();
                         if (v != null) {
                             if (translations.size() > 0) {
                                 v.onTranslationsLoaded(translations);
                             }
                         }
+                    }
+
+                    @Override
+                    public void onError(Throwable error) {
+                        // do nothing
                     }
                 }));
     }

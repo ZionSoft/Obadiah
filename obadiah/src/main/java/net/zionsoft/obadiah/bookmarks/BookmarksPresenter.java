@@ -31,7 +31,7 @@ import net.zionsoft.obadiah.utils.RxHelper;
 import java.util.ArrayList;
 import java.util.List;
 
-import rx.Subscriber;
+import rx.SingleSubscriber;
 import rx.Subscription;
 import rx.functions.Func1;
 
@@ -72,26 +72,21 @@ class BookmarksPresenter extends BasePresenter<BookmarksView> {
                         }
                         return new Pair<>(bookmarks, verses);
                     }
-                }).compose(RxHelper.<Pair<List<Bookmark>, List<Verse>>>applySchedulers())
-                .subscribe(new Subscriber<Pair<List<Bookmark>, List<Verse>>>() {
+                }).compose(RxHelper.<Pair<List<Bookmark>, List<Verse>>>applySchedulersForSingle())
+                .subscribe(new SingleSubscriber<Pair<List<Bookmark>, List<Verse>>>() {
                     @Override
-                    public void onCompleted() {
-                        // do nothing
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
+                    public void onSuccess(Pair<List<Bookmark>, List<Verse>> bookmarks) {
                         final BookmarksView v = getView();
                         if (v != null) {
-                            v.onBookmarksLoadFailed();
+                            v.onBookmarksLoaded(bookmarks.first, bookmarks.second);
                         }
                     }
 
                     @Override
-                    public void onNext(Pair<List<Bookmark>, List<Verse>> bookmarks) {
+                    public void onError(Throwable error) {
                         final BookmarksView v = getView();
                         if (v != null) {
-                            v.onBookmarksLoaded(bookmarks.first, bookmarks.second);
+                            v.onBookmarksLoadFailed();
                         }
                     }
                 });

@@ -45,6 +45,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import rx.Observable;
+import rx.Single;
 import rx.functions.Action1;
 import rx.functions.Func0;
 import rx.functions.Func1;
@@ -162,8 +163,8 @@ public class BibleReadingModel {
         return currentReadingProgressUpdatesSubject.asObservable();
     }
 
-    public Observable<List<String>> loadTranslations() {
-        return Observable.fromCallable(new Callable<List<String>>() {
+    public Single<List<String>> loadTranslations() {
+        return Single.fromCallable(new Callable<List<String>>() {
             @Override
             public List<String> call() throws Exception {
                 return TranslationsTableHelper.getDownloadedTranslations(databaseHelper.getDatabase());

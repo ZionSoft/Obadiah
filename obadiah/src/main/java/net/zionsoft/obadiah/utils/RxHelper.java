@@ -18,11 +18,12 @@
 package net.zionsoft.obadiah.utils;
 
 import rx.Observable;
+import rx.Single;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
 public class RxHelper {
-    private static final Observable.Transformer APPLY_SCHEDULERS_TRANSFORMER
+    private static final Observable.Transformer SCHEDULERS_TRANSFORMER_FOR_OBSERVABLE
             = new Observable.Transformer<Object, Object>() {
         @Override
         public Observable<Object> call(Observable<Object> observable) {
@@ -30,9 +31,22 @@ public class RxHelper {
         }
     };
 
+    private static final Single.Transformer SCHEDULERS_TRANSFORMER_FOR_SINGLE
+            = new Single.Transformer<Object, Object>() {
+        @Override
+        public Single<Object> call(Single<Object> single) {
+            return single.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+        }
+    };
+
     // idea stolen from http://blog.danlew.net/2015/03/02/dont-break-the-chain/
     public static <T> Observable.Transformer<T, T> applySchedulers() {
         //noinspection unchecked
-        return (Observable.Transformer<T, T>) APPLY_SCHEDULERS_TRANSFORMER;
+        return (Observable.Transformer<T, T>) SCHEDULERS_TRANSFORMER_FOR_OBSERVABLE;
+    }
+
+    public static <T> Single.Transformer<T, T> applySchedulersForSingle() {
+        //noinspection unchecked
+        return (Single.Transformer<T, T>) SCHEDULERS_TRANSFORMER_FOR_SINGLE;
     }
 }

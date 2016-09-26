@@ -30,6 +30,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import rx.Observable;
+import rx.Single;
 import rx.functions.Func0;
 
 @Singleton
@@ -41,8 +42,8 @@ public class BookmarkModel {
         this.databaseHelper = databaseHelper;
     }
 
-    public Observable<Bookmark> addBookmark(final VerseIndex verseIndex) {
-        return Observable.fromCallable(new Callable<Bookmark>() {
+    public Single<Bookmark> addBookmark(final VerseIndex verseIndex) {
+        return Single.fromCallable(new Callable<Bookmark>() {
             @Override
             public Bookmark call() throws Exception {
                 final Bookmark bookmark = Bookmark.create(verseIndex, System.currentTimeMillis());
@@ -77,8 +78,8 @@ public class BookmarkModel {
         });
     }
 
-    public Observable<List<Bookmark>> loadBookmarks() {
-        return Observable.fromCallable(new Callable<List<Bookmark>>() {
+    public Single<List<Bookmark>> loadBookmarks() {
+        return Single.fromCallable(new Callable<List<Bookmark>>() {
             @Override
             public List<Bookmark> call() throws Exception {
                 return BookmarkTableHelper.getBookmarks(databaseHelper.getDatabase());

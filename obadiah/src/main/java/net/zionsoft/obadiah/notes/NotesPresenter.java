@@ -31,7 +31,7 @@ import net.zionsoft.obadiah.utils.RxHelper;
 import java.util.ArrayList;
 import java.util.List;
 
-import rx.Subscriber;
+import rx.SingleSubscriber;
 import rx.Subscription;
 import rx.functions.Func1;
 
@@ -72,26 +72,21 @@ class NotesPresenter extends BasePresenter<NotesView> {
                         }
                         return new Pair<>(notes, verses);
                     }
-                }).compose(RxHelper.<Pair<List<Note>, List<Verse>>>applySchedulers())
-                .subscribe(new Subscriber<Pair<List<Note>, List<Verse>>>() {
+                }).compose(RxHelper.<Pair<List<Note>, List<Verse>>>applySchedulersForSingle())
+                .subscribe(new SingleSubscriber<Pair<List<Note>, List<Verse>>>() {
                     @Override
-                    public void onCompleted() {
-                        // do nothing
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
+                    public void onSuccess(Pair<List<Note>, List<Verse>> notes) {
                         final NotesView v = getView();
                         if (v != null) {
-                            v.onNotesLoadFailed();
+                            v.onNotesLoaded(notes.first, notes.second);
                         }
                     }
 
                     @Override
-                    public void onNext(Pair<List<Note>, List<Verse>> notes) {
+                    public void onError(Throwable error) {
                         final NotesView v = getView();
                         if (v != null) {
-                            v.onNotesLoaded(notes.first, notes.second);
+                            v.onNotesLoadFailed();
                         }
                     }
                 });
