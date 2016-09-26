@@ -4,13 +4,13 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.0-rc2'
+        classpath 'com.android.tools.build:gradle:2.2.0'
         classpath 'com.google.gms:google-services:3.0.0'
     }
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '3.0'
+    gradleVersion = '3.1'
 }
 
 ext {
@@ -27,15 +27,15 @@ ext {
     versionCode = 11403
 
     supportLibVersion = '24.2.1'
-    firebaseVersion = '9.4.0'
-    playServicesVersion = '9.4.0'
+    firebaseVersion = '9.6.0'
+    playServicesVersion = '9.6.0'
 
     daggerVersion = '2.7'
     javaxAnnotationApiVersion = '1.2'
     butterKnifeVersion = '8.4.0'
     rxAndroidVersion = '1.2.1'
     rxJavaVersion = '1.2.0'
-    rxJavaProguardRulesVersion = '1.1.10.0'
+    rxJavaProguardRulesVersion = '1.2.0.0'
     retrofitVersion = '2.1.0'
     okhttpVersion = '3.4.1'
     moshiVersion = '1.2.0'
