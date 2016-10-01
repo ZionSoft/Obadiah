@@ -176,13 +176,27 @@ public class VerseViewPager extends ViewPager implements VerseView, VerseSelecti
             return null;
         }
 
-        // TODO supports selection for verses with parallel translations
-        // format: <book name> <chapter verseIndex>:<verse verseIndex> <verse text>
         final StringBuilder text = new StringBuilder();
         for (int i = 0; i < versesCount; ++i) {
             final Verse verse = verses.get(i);
-            text.append(verse.text.bookName).append(' ').append(verse.verseIndex.chapter() + 1).append(':')
-                    .append(verse.verseIndex.verse() + 1).append(' ').append(verse.text.text).append('\n');
+            final List<Verse.Text> parallel = verse.parallel;
+            final int parallelCount = parallel.size();
+            if (parallelCount == 0) {
+                // format: <book name> <chapter verseIndex>:<verse verseIndex> <verse text>
+                text.append(verse.text.bookName).append(' ').append(verse.verseIndex.chapter() + 1).append(':')
+                        .append(verse.verseIndex.verse() + 1).append(' ').append(verse.text.text).append('\n');
+            } else {
+                // format:
+                // <book name> <chapter verseIndex>:<verse verseIndex>
+                // <translation name>: <verse text>
+                text.append(verse.text.bookName).append(' ').append(verse.verseIndex.chapter() + 1).append(':')
+                        .append(verse.verseIndex.verse() + 1).append('\n');
+                text.append(verse.text.translation).append(": ").append(verse.text.text).append('\n');
+                for (int j = 0; j < parallelCount; ++j) {
+                    final Verse.Text parallelText = parallel.get(j);
+                    text.append(parallelText.translation).append(": ").append(parallelText.text).append('\n');
+                }
+            }
         }
         return text.toString();
     }

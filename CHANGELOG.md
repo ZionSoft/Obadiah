@@ -16,6 +16,7 @@ CHANGELOG
   - Updated Moshi to 1.2.0.
 - Updated analytics tracking.
 - Used Firebase messaging for "new translation" notification.
+- Supported parallel translations when copying / sharing verses.
 
 #### v1.14.3 (2016-07-13)
 - Updated build tools and 3rd-party libs:
