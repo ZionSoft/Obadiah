@@ -5,7 +5,7 @@ CHANGELOG
 - Updated build tools and 3rd-party libs:
   - Updated Gradle to 3.1.
   - Updated Android Gradle plugin to 2.2.0.
-  - Updated build tool to 24.0.2
+  - Updated build tool to 24.0.3.
   - Updated support library to 24.2.1.
   - Updated Play Services and Firebase to 9.6.0.
   - Updated Dagger to 2.7.
