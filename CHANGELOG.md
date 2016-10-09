@@ -17,6 +17,7 @@ CHANGELOG
 - Updated analytics tracking.
 - Used Firebase messaging for "new translation" notification.
 - Supported parallel translations when copying / sharing verses.
+- Fixed "continuous reading" calculation.
 
 #### v1.14.3 (2016-07-13)
 - Updated build tools and 3rd-party libs:

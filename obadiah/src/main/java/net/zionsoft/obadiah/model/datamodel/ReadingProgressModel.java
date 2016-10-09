@@ -79,18 +79,22 @@ public class ReadingProgressModel {
 
                     final long now = System.currentTimeMillis();
                     ReadingProgressTableHelper.saveChapterReading(database, book, chapter, now);
-                    MetadataTableHelper.saveMetadata(database,
-                            MetadataTableHelper.KEY_LAST_READING_TIMESTAMP, Long.toString(now));
 
                     final long lastReadingDay = Long.parseLong(MetadataTableHelper.getMetadata(
                             database, MetadataTableHelper.KEY_LAST_READING_TIMESTAMP, "0")) / DateUtils.DAY_IN_MILLIS;
                     final long today = now / DateUtils.DAY_IN_MILLIS;
                     final long diff = today - lastReadingDay;
                     int continuousReadingDays = 1;
-                    if (diff == 1) {
+                    if (diff == 1L) {
                         continuousReadingDays = 1 + Integer.parseInt(
                                 MetadataTableHelper.getMetadata(database,
                                         MetadataTableHelper.KEY_CONTINUOUS_READING_DAYS, "0"));
+                    }
+                    if (diff >= 1L) {
+                        // only updates last reading timestamp if it's at least one day later
+                        // otherwise, we can't get the counter moving
+                        MetadataTableHelper.saveMetadata(database,
+                                MetadataTableHelper.KEY_LAST_READING_TIMESTAMP, Long.toString(now));
                     }
                     MetadataTableHelper.saveMetadata(database,
                             MetadataTableHelper.KEY_CONTINUOUS_READING_DAYS,
