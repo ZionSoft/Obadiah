@@ -50,7 +50,7 @@ import okhttp3.ResponseBody;
 import okio.BufferedSource;
 import okio.Okio;
 import retrofit2.Response;
-import rx.AsyncEmitter;
+import rx.Emitter;
 import rx.Observable;
 import rx.functions.Action1;
 import rx.functions.Func0;
@@ -211,9 +211,9 @@ class TranslationManagementModel {
     }
 
     Observable<Integer> fetchTranslation(final TranslationInfo translation) {
-        return Observable.fromEmitter(new Action1<AsyncEmitter<Integer>>() {
+        return Observable.fromEmitter(new Action1<Emitter<Integer>>() {
             @Override
-            public void call(AsyncEmitter<Integer> emitter) {
+            public void call(Emitter<Integer> emitter) {
                 final long timestamp = SystemClock.elapsedRealtime();
                 final SQLiteDatabase database = databaseHelper.getDatabase();
                 ZipInputStream is = null;
@@ -279,6 +279,6 @@ class TranslationManagementModel {
                     }
                 }
             }
-        }, AsyncEmitter.BackpressureMode.LATEST);
+        }, Emitter.BackpressureMode.LATEST);
     }
 }
