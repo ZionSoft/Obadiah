@@ -2,6 +2,7 @@ CHANGELOG
 ---------
 
 #### Next Release
+- Updated Moshi to 1.3.0.
 
 #### v1.14.4 (2016-10-12)
 - Updated build tools and 3rd-party libs:
