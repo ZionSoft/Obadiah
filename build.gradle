@@ -23,12 +23,12 @@ ext {
     sourceJavaVersion = JavaVersion.VERSION_1_7
     targetJavaVersion = JavaVersion.VERSION_1_7
 
-    versionName = '1.14.4'
-    versionCode = 11404
+    versionName = '1.14.5'
+    versionCode = 11405
 
     supportLibVersion = '24.2.1'
-    firebaseVersion = '9.6.1'
-    playServicesVersion = '9.6.1'
+    firebaseVersion = '9.4.0'
+    playServicesVersion = '9.4.0'
 
     daggerVersion = '2.7'
     javaxAnnotationApiVersion = '1.2'

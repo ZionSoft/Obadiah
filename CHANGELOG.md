@@ -2,7 +2,10 @@ CHANGELOG
 ---------
 
 #### Next Release
+
+#### v1.14.5 (2016-10-16)
 - Updated Moshi to 1.3.0.
+- Reverted Play Services and Firebase to 9.4.0.
 
 #### v1.14.4 (2016-10-12)
 - Updated build tools and 3rd-party libs:
