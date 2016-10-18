@@ -190,7 +190,7 @@ public class SearchActivity extends BaseAppCompatActivity
         setTitle(selected);
         if (!selected.equals(currentTranslation)) {
             currentTranslation = selected;
-            searchResultAdapter.setVerses(null);
+            searchResultAdapter.setVerses(null, null);
         }
         searchResultAdapter.notifyDataSetChanged();
 
@@ -254,7 +254,7 @@ public class SearchActivity extends BaseAppCompatActivity
         AnimationHelper.fadeOut(loadingSpinner);
         AnimationHelper.fadeIn(searchResultList);
 
-        searchResultAdapter.setVerses(verses);
+        searchResultAdapter.setVerses(query, verses);
         searchResultAdapter.notifyDataSetChanged();
         searchResultList.scrollToPosition(0);
 
