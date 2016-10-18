@@ -263,6 +263,7 @@ class TranslationManagementModel {
                             SystemClock.elapsedRealtime() - timestamp);
                     emitter.onCompleted();
                 } catch (Exception e) {
+                    Crashlytics.getInstance().core.log("Failed to download translation: " + translation.shortName());
                     Crashlytics.getInstance().core.logException(e);
                     emitter.onError(e);
                 } finally {

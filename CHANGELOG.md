@@ -2,6 +2,7 @@ CHANGELOG
 ---------
 
 #### Next Release
+- Improved analytics for failed download.
 
 #### v1.14.5 (2016-10-16)
 - Updated Moshi to 1.3.0.
