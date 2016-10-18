@@ -47,6 +47,7 @@ public class Analytics {
     public static final String CATEGORY_TRANSLATION = "translation";
     public static final String TRANSLATION_ACTION_LIST_DOWNLOADED = "list_downloaded";
     public static final String TRANSLATION_ACTION_DOWNLOADED = "downloaded";
+    public static final String TRANSLATION_ACTION_DOWNLOAD_FAILED = "download_failed";
     public static final String TRANSLATION_ACTION_SELECTED = "selected";
     public static final String TRANSLATION_ACTION_REMOVED = "removed";
     public static final String TRANSLATION_ACTION_PARALLEL_SELECTED = "parallel_selected";

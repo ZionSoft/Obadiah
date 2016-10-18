@@ -22,6 +22,7 @@ import android.os.SystemClock;
 
 import com.crashlytics.android.Crashlytics;
 import com.squareup.moshi.JsonAdapter;
+import com.squareup.moshi.JsonEncodingException;
 import com.squareup.moshi.Moshi;
 
 import net.zionsoft.obadiah.model.analytics.Analytics;
@@ -263,6 +264,10 @@ class TranslationManagementModel {
                             SystemClock.elapsedRealtime() - timestamp);
                     emitter.onCompleted();
                 } catch (Exception e) {
+                    if (e instanceof JsonEncodingException) {
+                        Analytics.trackEvent(Analytics.CATEGORY_TRANSLATION,
+                                Analytics.TRANSLATION_ACTION_DOWNLOAD_FAILED, translation.shortName());
+                    }
                     Crashlytics.getInstance().core.log("Failed to download translation: " + translation.shortName());
                     Crashlytics.getInstance().core.logException(e);
                     emitter.onError(e);
