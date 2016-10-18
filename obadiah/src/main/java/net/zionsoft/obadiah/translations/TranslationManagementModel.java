@@ -71,7 +71,7 @@ class TranslationManagementModel {
         this.bibleReadingModel = bibleReadingModel;
         this.backendInterface = backendInterface;
         this.translationInfoJsonAdapter = moshi.adapter(BackendBooks.class);
-        this.chapterJsonAdapter = moshi.adapter(BackendChapter.class);
+        this.chapterJsonAdapter = moshi.adapter(BackendChapter.class).lenient(); // we have some characters to escape illegally
     }
 
     Observable<Translations> loadTranslations(boolean forceRefresh) {
