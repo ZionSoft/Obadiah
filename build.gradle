@@ -23,8 +23,8 @@ ext {
     sourceJavaVersion = JavaVersion.VERSION_1_7
     targetJavaVersion = JavaVersion.VERSION_1_7
 
-    versionName = '1.14.5'
-    versionCode = 11405
+    versionName = '1.14.6'
+    versionCode = 11406
 
     supportLibVersion = '24.2.1'
     firebaseVersion = '9.4.0'
