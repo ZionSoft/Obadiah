@@ -374,11 +374,11 @@ class VersePagerAdapter extends PagerAdapter implements VersePagerView {
     }
 
     @Nullable
-    List<Verse> getSelectedVerses(int chapter) {
+    List<Verse> getSelectedVerses(int book, int chapter) {
         final int pageCount = pages.size();
         for (int i = 0; i < pageCount; ++i) {
             final Page page = pages.get(i);
-            if (page.chapter == chapter) {
+            if (page.book == book && page.chapter == chapter) {
                 return page.verseListAdapter.getSelectedVerses();
             }
         }

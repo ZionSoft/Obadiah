@@ -123,11 +123,14 @@ public class VerseViewPager extends ViewPager implements VerseView, VerseSelecti
 
     @Override
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+        final int position = getCurrentItem();
+        final int book = VerseHelper.positionToBookIndex(position);
+        final int chapter = VerseHelper.positionToChapterIndex(position);
         switch (item.getItemId()) {
             case R.id.action_copy:
                 Analytics.trackEvent(Analytics.CATEGORY_UI, Analytics.UI_ACTION_BUTTON_CLICK, "copy");
 
-                final List<Verse> verses = adapter.getSelectedVerses(getCurrentItem());
+                final List<Verse> verses = adapter.getSelectedVerses(book, chapter);
                 if (verses != null && verses.size() > 0) {
                     final ClipboardManager clipboardManager
                             = (ClipboardManager) activity.getSystemService(Context.CLIPBOARD_SERVICE);
@@ -147,7 +150,7 @@ public class VerseViewPager extends ViewPager implements VerseView, VerseSelecti
                 // it's a horrible way to force developers to use their SDK
                 // ref. https://developers.facebook.com/bugs/332619626816423
                 final Intent chooseIntent = createChooserExcludingPackage(activity,
-                        "com.facebook.katana", buildText(adapter.getSelectedVerses(getCurrentItem())));
+                        "com.facebook.katana", buildText(adapter.getSelectedVerses(book, chapter)));
                 if (chooseIntent == null) {
                     Toast.makeText(activity, R.string.error_unknown_error, Toast.LENGTH_SHORT).show();
                 } else {
