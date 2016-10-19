@@ -53,4 +53,21 @@ class VerseHelper {
 
         throw new IllegalArgumentException("Invalid position: " + position);
     }
+
+    static int indexToPosition(int bookIndex, int chapterIndex) throws IllegalArgumentException {
+        final int bookCount = Bible.getBookCount();
+        if (bookIndex < 0 || bookIndex >= bookCount) {
+            throw new IllegalArgumentException("Invalid book index: " + bookIndex);
+        }
+        final int chapterCount = Bible.getChapterCount(bookIndex);
+        if (chapterIndex < 0 || chapterIndex >= chapterCount) {
+            throw new IllegalArgumentException("Invalid chapter index: " + chapterIndex);
+        }
+
+        int position = 0;
+        for (int i = 0; i < bookIndex; ++i) {
+            position += Bible.getChapterCount(i);
+        }
+        return position + chapterIndex;
+    }
 }

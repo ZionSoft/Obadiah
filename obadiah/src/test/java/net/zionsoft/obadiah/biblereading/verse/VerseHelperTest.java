@@ -42,4 +42,15 @@ public class VerseHelperTest {
 
         Assert.assertEquals(21, VerseHelper.positionToChapterIndex(1188));
     }
+
+    @Test
+    public void testIndexToPosition() {
+        Assert.assertEquals(0, VerseHelper.indexToPosition(0, 0));
+        Assert.assertEquals(49, VerseHelper.indexToPosition(0, 49));
+
+        Assert.assertEquals(50, VerseHelper.indexToPosition(1, 0));
+        Assert.assertEquals(55, VerseHelper.indexToPosition(1, 5));
+
+        Assert.assertEquals(1188, VerseHelper.indexToPosition(65, 21));
+    }
 }
