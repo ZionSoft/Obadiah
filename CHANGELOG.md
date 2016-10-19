@@ -5,6 +5,7 @@ CHANGELOG
 - Updated Moshi to 1.3.0.
 - Highlighted query in search results.
 - Fixed "consecutive reading days", for real.
+- Enabled navigate to prev / next book.
 
 #### v1.14.6 (2016-10-18)
 - Downgraded Moshi to 1.2.0.

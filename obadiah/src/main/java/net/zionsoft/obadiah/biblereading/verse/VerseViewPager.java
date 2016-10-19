@@ -49,10 +49,12 @@ public class VerseViewPager extends ViewPager implements VerseView, VerseSelecti
             = new ViewPager.SimpleOnPageChangeListener() {
         @Override
         public void onPageSelected(int position) {
-            if (currentChapter == position) {
+            final int book = VerseHelper.positionToBookIndex(position);
+            final int chapter = VerseHelper.positionToChapterIndex(position);
+            if (currentBook == book && currentChapter == chapter) {
                 return;
             }
-            versePagerPresenter.saveReadingProgress(currentBook, position, 0);
+            versePagerPresenter.saveReadingProgress(book, chapter, 0);
         }
     };
 
@@ -75,31 +77,21 @@ public class VerseViewPager extends ViewPager implements VerseView, VerseSelecti
 
     @Override
     public void onReadingProgressUpdated(VerseIndex index) {
-        boolean chapterChanged = false;
-        if (currentChapter != index.chapter()) {
-            currentChapter = index.chapter();
-            chapterChanged = true;
+        final int bookIndex = index.book();
+        final int chapterIndex = index.chapter();
+        if (currentBook == bookIndex && currentChapter == chapterIndex) {
+            return;
         }
-
-        boolean bookChanged = false;
-        if (currentBook != index.book()) {
-            currentBook = index.book();
-            adapter.setReadingProgress(index);
-            bookChanged = true;
-        }
+        currentBook = bookIndex;
+        currentChapter = chapterIndex;
 
         // removes the listener here, otherwise the callback will be invoked and update reading
         // progress unexpectedly
         removeOnPageChangeListener(onPageChangeListener);
-        if (bookChanged) {
-            adapter.notifyDataSetChanged();
-        }
-        if (chapterChanged) {
-            setCurrentItem(currentChapter, true);
-        }
+        setCurrentItem(VerseHelper.indexToPosition(bookIndex, chapterIndex), true);
         addOnPageChangeListener(onPageChangeListener);
 
-        if ((bookChanged || chapterChanged) && actionMode != null) {
+        if (actionMode != null) {
             actionMode.finish();
         }
     }
@@ -131,11 +123,14 @@ public class VerseViewPager extends ViewPager implements VerseView, VerseSelecti
 
     @Override
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+        final int position = getCurrentItem();
+        final int book = VerseHelper.positionToBookIndex(position);
+        final int chapter = VerseHelper.positionToChapterIndex(position);
         switch (item.getItemId()) {
             case R.id.action_copy:
                 Analytics.trackEvent(Analytics.CATEGORY_UI, Analytics.UI_ACTION_BUTTON_CLICK, "copy");
 
-                final List<Verse> verses = adapter.getSelectedVerses(getCurrentItem());
+                final List<Verse> verses = adapter.getSelectedVerses(book, chapter);
                 if (verses != null && verses.size() > 0) {
                     final ClipboardManager clipboardManager
                             = (ClipboardManager) activity.getSystemService(Context.CLIPBOARD_SERVICE);
@@ -155,7 +150,7 @@ public class VerseViewPager extends ViewPager implements VerseView, VerseSelecti
                 // it's a horrible way to force developers to use their SDK
                 // ref. https://developers.facebook.com/bugs/332619626816423
                 final Intent chooseIntent = createChooserExcludingPackage(activity,
-                        "com.facebook.katana", buildText(adapter.getSelectedVerses(getCurrentItem())));
+                        "com.facebook.katana", buildText(adapter.getSelectedVerses(book, chapter)));
                 if (chooseIntent == null) {
                     Toast.makeText(activity, R.string.error_unknown_error, Toast.LENGTH_SHORT).show();
                 } else {
@@ -258,7 +253,7 @@ public class VerseViewPager extends ViewPager implements VerseView, VerseSelecti
         currentChapter = versePagerPresenter.loadCurrentChapter();
 
         adapter.onStart();
-        setCurrentItem(currentChapter);
+        setCurrentItem(VerseHelper.indexToPosition(currentBook, currentChapter));
 
         // should add the listener after setting current item and current book / chapter is loaded,
         // otherwise, the callback will be triggered with wrong book / chapter
