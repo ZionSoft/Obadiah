@@ -91,14 +91,12 @@ public class ReadingProgressModel {
                                         MetadataTableHelper.KEY_CONTINUOUS_READING_DAYS, "0"));
                     }
                     if (diff >= 1L) {
-                        // only updates last reading timestamp if it's at least one day later
-                        // otherwise, we can't get the counter moving
                         MetadataTableHelper.saveMetadata(database,
                                 MetadataTableHelper.KEY_LAST_READING_TIMESTAMP, Long.toString(now));
+                        MetadataTableHelper.saveMetadata(database,
+                                MetadataTableHelper.KEY_CONTINUOUS_READING_DAYS,
+                                Integer.toString(continuousReadingDays));
                     }
-                    MetadataTableHelper.saveMetadata(database,
-                            MetadataTableHelper.KEY_CONTINUOUS_READING_DAYS,
-                            Integer.toString(continuousReadingDays));
 
                     database.setTransactionSuccessful();
                 } catch (Exception e) {
