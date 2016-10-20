@@ -2,7 +2,12 @@ CHANGELOG
 ---------
 
 #### Next Release
-- Updated Moshi to 1.3.0.
+- Updated deps:
+  - Updated Android Gradle plugin to 2.2.2.
+  - Updated build tool to 25.
+  - Updated target SDK version to 25.
+  - Updated support library to 25.0.0.
+  - Updated Moshi to 1.3.0.
 - Highlighted query in search results.
 - Fixed "consecutive reading days", for real.
 - Enabled navigate to prev / next book.

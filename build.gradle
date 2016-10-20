@@ -4,7 +4,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.1'
+        classpath 'com.android.tools.build:gradle:2.2.2'
         classpath 'com.google.gms:google-services:3.0.0'
     }
 }
@@ -15,10 +15,10 @@ task wrapper(type: Wrapper) {
 
 ext {
     compileSdkVersion = 24
-    buildToolsVersion = '24.0.3'
+    buildToolsVersion = '25'
 
     minSdkVersion = 15
-    targetSdkVersion = 24
+    targetSdkVersion = 25
 
     sourceJavaVersion = JavaVersion.VERSION_1_7
     targetJavaVersion = JavaVersion.VERSION_1_7
@@ -26,7 +26,7 @@ ext {
     versionName = '1.14.6'
     versionCode = 11406
 
-    supportLibVersion = '24.2.1'
+    supportLibVersion = '25.0.0'
     firebaseVersion = '9.4.0'
     playServicesVersion = '9.4.0'
 
