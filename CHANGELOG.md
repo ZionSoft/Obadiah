@@ -7,7 +7,8 @@ CHANGELOG
   - Updated build tool to 25.
   - Updated target SDK version to 25.
   - Updated support library to 25.0.0.
-  - Updated Moshi to 1.3.0.
+  - Updated Play Services and Firebase to 9.8.0.
+  - Updated Moshi to 1.3.1.
 - Highlighted query in search results.
 - Fixed "consecutive reading days", for real.
 - Enabled navigate to prev / next book.
