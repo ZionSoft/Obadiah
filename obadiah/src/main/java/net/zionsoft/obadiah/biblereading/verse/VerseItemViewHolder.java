@@ -21,6 +21,7 @@ import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
+import android.support.design.widget.TextInputLayout;
 import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
@@ -54,6 +55,9 @@ class VerseItemViewHolder extends RecyclerView.ViewHolder implements View.OnClic
 
     @BindView(R.id.text)
     TextView text;
+
+    @BindView(R.id.note_holder)
+    TextInputLayout noteHolder;
 
     @BindView(R.id.note)
     TextView note;
@@ -182,7 +186,7 @@ class VerseItemViewHolder extends RecyclerView.ViewHolder implements View.OnClic
 
     private void setExpanded(boolean expanded) {
         isExpanded = expanded;
-        note.setVisibility(expanded ? View.VISIBLE : View.GONE);
+        noteHolder.setVisibility(expanded ? View.VISIBLE : View.GONE);
     }
 
     @Override

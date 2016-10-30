@@ -102,7 +102,7 @@ class VerseItemAnimator extends DefaultItemAnimator {
                 holder.setBookmark(false);
                 dispatchAnimationFinished(holder);
             } else if (VerseItemHolderInfo.ACTION_SHOW_NOTE.equals(action)) {
-                AnimationHelper.fadeIn(holder.note);
+                AnimationHelper.fadeIn(holder.noteHolder);
                 holder.noteIcon.animate().rotationX(90.0F)
                         .setDuration(150L)
                         .setInterpolator(decelerateInterpolator)
