@@ -27,8 +27,8 @@ ext {
     versionCode = 11500
 
     supportLibVersion = '25.0.0'
-    firebaseVersion = '9.8.0'
-    playServicesVersion = '9.8.0'
+    firebaseVersion = '9.4.0'
+    playServicesVersion = '9.4.0'
 
     daggerVersion = '2.7'
     javaxAnnotationApiVersion = '1.2'
