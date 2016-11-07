@@ -2,6 +2,8 @@ CHANGELOG
 ---------
 
 #### Next Release
+
+#### v1.15.1 (2016-11-07)
 - Updated deps:
   - Reverted Play Services and Firebase to 9.4.0.
   - Updated RxJava to 1.2.2.
