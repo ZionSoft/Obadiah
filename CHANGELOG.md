@@ -4,6 +4,7 @@ CHANGELOG
 #### Next Release
 - Updated deps:
   - Reverted Play Services and Firebase to 9.4.0.
+  - Updated RxJava to 1.2.2.
 - Fixed scrolling when selecting parallel translations.
 
 #### v1.15.0 (2016-11-02)
