@@ -19,8 +19,8 @@ package net.zionsoft.obadiah.biblereading.verse;
 
 import android.support.annotation.Nullable;
 
-import net.zionsoft.obadiah.model.domain.Note;
 import net.zionsoft.obadiah.model.domain.Bookmark;
+import net.zionsoft.obadiah.model.domain.Note;
 import net.zionsoft.obadiah.model.domain.Verse;
 import net.zionsoft.obadiah.model.domain.VerseIndex;
 import net.zionsoft.obadiah.mvp.MVPView;
@@ -53,4 +53,6 @@ interface VersePagerView extends MVPView {
     void hideNote(VerseIndex verseIndex);
 
     void onTranslationUpdated();
+
+    void onReadingProgressChanged(VerseIndex verseIndex);
 }

@@ -35,6 +35,7 @@ import java.util.List;
 import rx.Observable;
 import rx.SingleSubscriber;
 import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
 import rx.functions.Func3;
 import rx.subscriptions.CompositeSubscription;
@@ -66,6 +67,7 @@ public class VersePagerPresenter extends BasePresenter<VersePagerView> {
                             }
                         }),
                 bibleReadingModel.observeParallelTranslation())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<Void>() {
                     @Override
                     public void onCompleted() {
@@ -82,6 +84,27 @@ public class VersePagerPresenter extends BasePresenter<VersePagerView> {
                         final VersePagerView v = getView();
                         if (v != null) {
                             v.onTranslationUpdated();
+                        }
+                    }
+                }));
+        getSubscription().add(bibleReadingModel.observeCurrentReadingProgress()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<VerseIndex>() {
+                    @Override
+                    public void onCompleted() {
+                        // do nothing
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        // do nothing
+                    }
+
+                    @Override
+                    public void onNext(VerseIndex verseIndex) {
+                        final VersePagerView v = getView();
+                        if (v != null) {
+                            v.onReadingProgressChanged(verseIndex);
                         }
                     }
                 }));

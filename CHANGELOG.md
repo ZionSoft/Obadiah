@@ -2,6 +2,7 @@ CHANGELOG
 ---------
 
 #### Next Release
+- Fixed scrolling when selecting parallel translations.
 
 #### v1.15.0 (2016-11-02)
 - Updated deps:
