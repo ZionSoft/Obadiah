@@ -26,10 +26,12 @@ import net.zionsoft.obadiah.model.domain.VerseSearchResult;
 import net.zionsoft.obadiah.mvp.BasePresenter;
 import net.zionsoft.obadiah.utils.RxHelper;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import rx.Subscriber;
 import rx.Subscription;
+import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
 class SearchPresenter extends BasePresenter<SearchView> {
@@ -54,10 +56,21 @@ class SearchPresenter extends BasePresenter<SearchView> {
         super.onViewDropped();
     }
 
-    void search(String translation, String query) {
+    void search(String translation, final String query) {
         subscription = searchModel.search(translation, query)
-                .compose(RxHelper.<List<VerseSearchResult>>applySchedulers())
-                .subscribe(new Subscriber<List<VerseSearchResult>>() {
+                .map(new Func1<List<VerseSearchResult>, List<SearchedVerse>>() {
+                    @Override
+                    public List<SearchedVerse> call(List<VerseSearchResult> searchResults) {
+                        final int count = searchResults.size();
+                        final List<SearchedVerse> verses = new ArrayList<>(count);
+                        for (int i = 0; i < count; ++i) {
+                            verses.add(new SearchedVerse(searchResults.get(i), query));
+                        }
+                        return verses;
+                    }
+                })
+                .compose(RxHelper.<List<SearchedVerse>>applySchedulers())
+                .subscribe(new Subscriber<List<SearchedVerse>>() {
                     @Override
                     public void onCompleted() {
                         // do nothing
@@ -72,7 +85,7 @@ class SearchPresenter extends BasePresenter<SearchView> {
                     }
 
                     @Override
-                    public void onNext(List<VerseSearchResult> verses) {
+                    public void onNext(List<SearchedVerse> verses) {
                         SearchView v = getView();
                         if (v != null) {
                             v.onVersesSearched(verses);

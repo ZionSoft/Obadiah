@@ -40,7 +40,6 @@ import com.google.android.gms.actions.SearchIntents;
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.biblereading.BibleReadingActivity;
 import net.zionsoft.obadiah.model.datamodel.Settings;
-import net.zionsoft.obadiah.model.domain.VerseSearchResult;
 import net.zionsoft.obadiah.translations.TranslationManagementActivity;
 import net.zionsoft.obadiah.ui.utils.AnimationHelper;
 import net.zionsoft.obadiah.ui.utils.BaseAppCompatActivity;
@@ -190,7 +189,7 @@ public class SearchActivity extends BaseAppCompatActivity
         setTitle(selected);
         if (!selected.equals(currentTranslation)) {
             currentTranslation = selected;
-            searchResultAdapter.setVerses(null, null);
+            searchResultAdapter.setVerses(null);
         }
         searchResultAdapter.notifyDataSetChanged();
 
@@ -250,11 +249,11 @@ public class SearchActivity extends BaseAppCompatActivity
     }
 
     @Override
-    public void onVersesSearched(List<VerseSearchResult> verses) {
+    public void onVersesSearched(List<SearchedVerse> verses) {
         AnimationHelper.fadeOut(loadingSpinner);
         AnimationHelper.fadeIn(searchResultList);
 
-        searchResultAdapter.setVerses(query, verses);
+        searchResultAdapter.setVerses(verses);
         searchResultAdapter.notifyDataSetChanged();
         searchResultList.scrollToPosition(0);
 

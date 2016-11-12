@@ -19,12 +19,7 @@ package net.zionsoft.obadiah.search;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.graphics.Typeface;
 import android.support.v7.widget.RecyclerView;
-import android.text.SpannableStringBuilder;
-import android.text.Spanned;
-import android.text.style.RelativeSizeSpan;
-import android.text.style.StyleSpan;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,24 +28,16 @@ import android.widget.TextView;
 
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.datamodel.Settings;
-import net.zionsoft.obadiah.model.domain.VerseSearchResult;
 
 import java.util.List;
-import java.util.Locale;
 
 class SearchResultListAdapter extends RecyclerView.Adapter {
     private static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        private static final SpannableStringBuilder SPANNABLE_STRING_BUILDER = new SpannableStringBuilder();
-        private static final StyleSpan BOLD_SPAN = new StyleSpan(Typeface.BOLD);
-        private static final RelativeSizeSpan RELATIVE_SIZE_SPAN = new RelativeSizeSpan(1.2F);
-        private static final StringBuilder STRING_BUILDER = new StringBuilder();
-        private static final Locale DEFAULT_LOCALE = Locale.getDefault();
-
         private final SearchPresenter searchPresenter;
         private final Resources resources;
         private final TextView textView;
 
-        private VerseSearchResult verse;
+        private SearchedVerse verse;
 
         ViewHolder(View itemView, SearchPresenter searchPresenter, Resources resources) {
             super(itemView);
@@ -60,34 +47,14 @@ class SearchResultListAdapter extends RecyclerView.Adapter {
             itemView.setOnClickListener(this);
         }
 
-        void bind(String query, VerseSearchResult verse) {
+        void bind(SearchedVerse verse) {
+            this.verse = verse;
+
             final Settings settings = searchPresenter.getSettings();
             textView.setTextColor(settings.getTextColor());
             textView.setTextSize(TypedValue.COMPLEX_UNIT_PX,
                     resources.getDimension(settings.getTextSize().textSize));
-
-            STRING_BUILDER.setLength(0);
-            STRING_BUILDER.append(verse.bookName).append(' ')
-                    .append(verse.index.chapter() + 1).append(':').append(verse.index.verse() + 1)
-                    .append('\n').append(verse.text);
-            final int start = STRING_BUILDER.toString().toLowerCase(DEFAULT_LOCALE)
-                    .indexOf(query.toLowerCase(DEFAULT_LOCALE));
-            if (start >= 0) {
-                final int end = start + query.length();
-
-                SPANNABLE_STRING_BUILDER.clear();
-                SPANNABLE_STRING_BUILDER.clearSpans();
-                SPANNABLE_STRING_BUILDER.append(STRING_BUILDER);
-                SPANNABLE_STRING_BUILDER.setSpan(BOLD_SPAN, start, end, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-                SPANNABLE_STRING_BUILDER.setSpan(RELATIVE_SIZE_SPAN, start, end, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-
-                textView.setText(SPANNABLE_STRING_BUILDER);
-            } else {
-                // can this happen?
-                textView.setText(STRING_BUILDER.toString());
-            }
-
-            this.verse = verse;
+            textView.setText(verse.text);
         }
 
         @Override
@@ -103,8 +70,7 @@ class SearchResultListAdapter extends RecyclerView.Adapter {
     private final LayoutInflater inflater;
     private final Resources resources;
 
-    private String query;
-    private List<VerseSearchResult> verses;
+    private List<SearchedVerse> verses;
 
     SearchResultListAdapter(Context context, SearchPresenter searchPresenter) {
         this.searchPresenter = searchPresenter;
@@ -120,7 +86,7 @@ class SearchResultListAdapter extends RecyclerView.Adapter {
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        ((ViewHolder) holder).bind(query, verses.get(position));
+        ((ViewHolder) holder).bind(verses.get(position));
     }
 
     @Override
@@ -128,8 +94,7 @@ class SearchResultListAdapter extends RecyclerView.Adapter {
         return verses != null ? verses.size() : 0;
     }
 
-    void setVerses(String query, List<VerseSearchResult> verses) {
-        this.query = query;
+    void setVerses(List<SearchedVerse> verses) {
         this.verses = verses;
     }
 }

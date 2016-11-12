@@ -153,15 +153,31 @@ public class TranslationHelper {
 
     @NonNull
     public static List<VerseSearchResult> searchVerses(SQLiteDatabase db, String translationShortName,
-                                                       List<String> bookNames, String keyword) {
+                                                       List<String> bookNames, String query) {
         Cursor cursor = null;
         try {
+            final String[] keywords = query.trim().replaceAll("\\s+", " ").split(" ");
+            if (keywords.length == 0) {
+                return Collections.emptyList();
+            }
+
+            final String singleSelection = TextFormatter.format("%s LIKE ?", COLUMN_TEXT);
+            final StringBuilder selection = new StringBuilder();
+            final String[] selectionArgs = new String[keywords.length];
+            for (int i = 0; i < keywords.length; ++i) {
+                if (i > 0) {
+                    selection.append(" OR ");
+                }
+                selection.append(singleSelection);
+
+                selectionArgs[i] = TextFormatter.format("%%%s%%", keywords[i]);
+            }
+
             cursor = db.query(translationShortName,
                     new String[]{COLUMN_BOOK_INDEX, COLUMN_CHAPTER_INDEX, COLUMN_VERSE_INDEX, COLUMN_TEXT},
-                    TextFormatter.format("%s LIKE ?", COLUMN_TEXT),
-                    new String[]{TextFormatter.format("%%%s%%", keyword.trim().replaceAll("\\s+", "%"))},
-                    null, null, TextFormatter.format(" %s ASC, %s ASC, %s ASC", COLUMN_BOOK_INDEX,
-                            COLUMN_CHAPTER_INDEX, COLUMN_VERSE_INDEX));
+                    selection.toString(), selectionArgs, null, null,
+                    TextFormatter.format(" %s ASC, %s ASC, %s ASC",
+                            COLUMN_BOOK_INDEX, COLUMN_CHAPTER_INDEX, COLUMN_VERSE_INDEX));
             final int count = cursor.getCount();
             if (count == 0) {
                 return Collections.emptyList();
