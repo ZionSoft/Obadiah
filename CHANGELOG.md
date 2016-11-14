@@ -2,6 +2,8 @@ CHANGELOG
 ---------
 
 #### Next Release
+
+#### v1.15.2 (2016-11-14)
 - Supported query of multiple keywords.
 
 #### v1.15.1 (2016-11-07)
