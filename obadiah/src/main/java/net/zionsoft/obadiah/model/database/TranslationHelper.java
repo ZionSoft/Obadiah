@@ -166,7 +166,7 @@ public class TranslationHelper {
             final String[] selectionArgs = new String[keywords.length];
             for (int i = 0; i < keywords.length; ++i) {
                 if (i > 0) {
-                    selection.append(" OR ");
+                    selection.append(" AND ");
                 }
                 selection.append(singleSelection);
 

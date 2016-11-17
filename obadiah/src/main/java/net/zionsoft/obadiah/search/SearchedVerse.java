@@ -32,30 +32,45 @@ class SearchedVerse {
     private static final Locale DEFAULT_LOCALE = Locale.getDefault();
 
     final VerseIndex index;
-    final CharSequence text;
+
+    private String query;
+    private String bookName;
+    private String text;
+    private CharSequence textForDisplay;
 
     SearchedVerse(VerseSearchResult verseSearchResult, String query) {
         this.index = verseSearchResult.index;
+        this.query = query;
+        this.bookName = verseSearchResult.bookName;
+        this.text = verseSearchResult.text;
+    }
 
-        final SpannableStringBuilder builder = new SpannableStringBuilder();
-        builder.append(verseSearchResult.bookName).append(' ')
-                .append(Integer.toString(verseSearchResult.index.chapter() + 1))
-                .append(':')
-                .append(Integer.toString(verseSearchResult.index.verse() + 1))
-                .append('\n')
-                .append(verseSearchResult.text);
+    CharSequence getTextForDisplay() {
+        if (textForDisplay == null) {
+            final SpannableStringBuilder builder = new SpannableStringBuilder();
+            builder.append(bookName).append(' ')
+                    .append(Integer.toString(index.chapter() + 1))
+                    .append(':')
+                    .append(Integer.toString(index.verse() + 1))
+                    .append('\n')
+                    .append(text);
 
-        final String text = builder.toString().toLowerCase(DEFAULT_LOCALE);
-        final String[] keywords = query.trim().replaceAll("\\s+", " ").split(" ");
-        for (String keyword : keywords) {
-            final int start = text.indexOf(keyword.toLowerCase(DEFAULT_LOCALE));
-            if (start >= 0) {
-                final int end = start + keyword.length();
-                builder.setSpan(new StyleSpan(Typeface.BOLD), start, end, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-                builder.setSpan(new RelativeSizeSpan(1.2F), start, end, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+            final String lowerCase = builder.toString().toLowerCase(DEFAULT_LOCALE);
+            final String[] keywords = query.trim().replaceAll("\\s+", " ").split(" ");
+            for (String keyword : keywords) {
+                final int start = lowerCase.indexOf(keyword.toLowerCase(DEFAULT_LOCALE));
+                if (start >= 0) {
+                    final int end = start + keyword.length();
+                    builder.setSpan(new StyleSpan(Typeface.BOLD), start, end, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+                    builder.setSpan(new RelativeSizeSpan(1.2F), start, end, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+                }
             }
-        }
 
-        this.text = builder;
+            query = null;
+            bookName = null;
+            text = null;
+            textForDisplay = builder;
+        }
+        return textForDisplay;
     }
 }

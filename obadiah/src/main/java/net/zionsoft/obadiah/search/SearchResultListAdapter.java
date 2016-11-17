@@ -54,7 +54,7 @@ class SearchResultListAdapter extends RecyclerView.Adapter {
             textView.setTextColor(settings.getTextColor());
             textView.setTextSize(TypedValue.COMPLEX_UNIT_PX,
                     resources.getDimension(settings.getTextSize().textSize));
-            textView.setText(verse.text);
+            textView.setText(verse.getTextForDisplay());
         }
 
         @Override
