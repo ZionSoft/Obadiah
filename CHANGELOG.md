@@ -2,9 +2,13 @@ CHANGELOG
 ---------
 
 #### Next Release
+
+#### v1.15.3 (2016-11-18)
 - Updated deps:
   - Updated compile SDK to 25.
   - Updated Gradle to 3.2.
+- Fixed book / chapter comparison when showing / hiding bookmarks / notes.
+- Improved performance of search.
 
 #### v1.15.2 (2016-11-14)
 - Supported query of multiple keywords.
