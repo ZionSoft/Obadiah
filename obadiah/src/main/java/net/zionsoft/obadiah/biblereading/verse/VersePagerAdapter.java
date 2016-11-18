@@ -239,7 +239,8 @@ class VersePagerAdapter extends PagerAdapter implements VersePagerView {
         final int pageCount = pages.size();
         for (int i = 0; i < pageCount; ++i) {
             final Page page = pages.get(i);
-            if (page.chapter == bookmark.verseIndex().chapter()) {
+            final VerseIndex verseIndex = bookmark.verseIndex();
+            if (page.book == verseIndex.book() && page.chapter == verseIndex.chapter()) {
                 page.verseListAdapter.addBookmark(bookmark);
                 return;
             }
@@ -262,7 +263,7 @@ class VersePagerAdapter extends PagerAdapter implements VersePagerView {
         final int pageCount = pages.size();
         for (int i = 0; i < pageCount; ++i) {
             final Page page = pages.get(i);
-            if (page.chapter == verseIndex.chapter()) {
+            if (page.book == verseIndex.book() && page.chapter == verseIndex.chapter()) {
                 page.verseListAdapter.removeBookmark(verseIndex);
                 return;
             }
@@ -308,7 +309,7 @@ class VersePagerAdapter extends PagerAdapter implements VersePagerView {
         final int pageCount = pages.size();
         for (int i = 0; i < pageCount; ++i) {
             final Page page = pages.get(i);
-            if (page.chapter == verseIndex.chapter()) {
+            if (page.book == verseIndex.book() && page.chapter == verseIndex.chapter()) {
                 page.verseListAdapter.removeNote(verseIndex);
                 return;
             }
@@ -331,7 +332,7 @@ class VersePagerAdapter extends PagerAdapter implements VersePagerView {
         final int pageCount = pages.size();
         for (int i = 0; i < pageCount; ++i) {
             final Page page = pages.get(i);
-            if (page.chapter == verseIndex.chapter()) {
+            if (page.book == verseIndex.book() && page.chapter == verseIndex.chapter()) {
                 page.verseListAdapter.showNote(verseIndex);
                 return;
             }
@@ -343,7 +344,7 @@ class VersePagerAdapter extends PagerAdapter implements VersePagerView {
         final int pageCount = pages.size();
         for (int i = 0; i < pageCount; ++i) {
             final Page page = pages.get(i);
-            if (page.chapter == verseIndex.chapter()) {
+            if (page.book == verseIndex.book() && page.chapter == verseIndex.chapter()) {
                 page.verseListAdapter.hideNote(verseIndex);
                 return;
             }
