@@ -2,6 +2,9 @@ CHANGELOG
 ---------
 
 #### Next Release
+- Updated deps:
+  - Updated compile SDK to 25.
+  - Updated Gradle to 3.2.
 
 #### v1.15.2 (2016-11-14)
 - Supported query of multiple keywords.
