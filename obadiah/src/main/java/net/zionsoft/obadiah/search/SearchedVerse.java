@@ -52,13 +52,14 @@ class SearchedVerse {
                     .append(Integer.toString(index.chapter() + 1))
                     .append(':')
                     .append(Integer.toString(index.verse() + 1))
-                    .append('\n')
-                    .append(text);
+                    .append('\n');
+            final int startIndex = builder.length();
+            builder.append(text);
 
             final String lowerCase = builder.toString().toLowerCase(DEFAULT_LOCALE);
             final String[] keywords = query.trim().replaceAll("\\s+", " ").split(" ");
             for (String keyword : keywords) {
-                final int start = lowerCase.indexOf(keyword.toLowerCase(DEFAULT_LOCALE));
+                final int start = lowerCase.indexOf(keyword.toLowerCase(DEFAULT_LOCALE), startIndex);
                 if (start >= 0) {
                     final int end = start + keyword.length();
                     builder.setSpan(new StyleSpan(Typeface.BOLD), start, end, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
