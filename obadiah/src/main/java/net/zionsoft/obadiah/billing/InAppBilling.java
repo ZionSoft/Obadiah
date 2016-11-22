@@ -24,7 +24,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.ServiceConnection;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.IntDef;
@@ -34,9 +33,7 @@ import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
 
 import net.zionsoft.obadiah.R;
-import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.crash.Crash;
-import net.zionsoft.obadiah.utils.TextFormatter;
 
 import java.io.IOException;
 import java.lang.annotation.Retention;
@@ -121,8 +118,7 @@ public class InAppBilling implements ServiceConnection {
                 return;
             }
             if (response != BILLING_RESPONSE_RESULT_OK) {
-                Analytics.trackEvent(Analytics.CATEGORY_BILLING, Analytics.BILLING_ACTION_ERROR,
-                        "Failed to purchase ads removal - " + response);
+                Crash.report(new InAppBillingException("Failed to purchase ads removal: " + response));
                 listener.onAdsRemovalPurchased(false);
                 return;
             }
@@ -151,8 +147,7 @@ public class InAppBilling implements ServiceConnection {
                     applicationContext.getPackageName(), ITEM_TYPE_INAPP, null);
             final int response = purchases.getInt("RESPONSE_CODE");
             if (response != BILLING_RESPONSE_RESULT_OK) {
-                Analytics.trackEvent(Analytics.CATEGORY_BILLING, Analytics.BILLING_ACTION_ERROR,
-                        "Failed to load purchases - " + response);
+                Crash.report(new InAppBillingException("Failed to load purchases: " + response));
                 return false;
             }
             final String adsProductId = applicationContext.getString(R.string.in_app_product_no_ads);
@@ -192,8 +187,7 @@ public class InAppBilling implements ServiceConnection {
         final int response = data.getIntExtra("RESPONSE_CODE", 0);
         if (response != BILLING_RESPONSE_RESULT_OK
                 && response != BILLING_RESPONSE_RESULT_ITEM_ALREADY_OWNED) {
-            Analytics.trackEvent(Analytics.CATEGORY_BILLING, Analytics.BILLING_ACTION_ERROR,
-                    "Failed to purchase ads removal - " + response);
+            Crash.report(new InAppBillingException("Failed to purchase ads removal: " + response));
             informAdsRemovalPurchased(false);
             return true;
         }
@@ -234,9 +228,7 @@ public class InAppBilling implements ServiceConnection {
                 status = STATUS_READY;
             } else {
                 status = STATUS_UNSUPPORTED;
-                Analytics.trackEvent(Analytics.CATEGORY_BILLING, Analytics.BILLING_ACTION_NOT_SUPPORTED,
-                        TextFormatter.format("Manufacturer: %s, Model: %s, Reason: %d",
-                                Build.MANUFACTURER, Build.MODEL, response));
+                Crash.report(new InAppBillingException("In-app billing not supported: " + response));
             }
         } catch (Exception e) {
             status = STATUS_UNSUPPORTED;

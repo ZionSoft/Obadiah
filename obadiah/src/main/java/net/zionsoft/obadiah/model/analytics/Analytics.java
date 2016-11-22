@@ -29,10 +29,6 @@ import com.google.android.gms.analytics.Tracker;
 import net.zionsoft.obadiah.R;
 
 public class Analytics {
-    public static final String CATEGORY_BILLING = "billing";
-    public static final String BILLING_ACTION_NOT_SUPPORTED = "not_supported";
-    public static final String BILLING_ACTION_ERROR = "error";
-
     public static final String CATEGORY_DEEP_LINK = "deep_link";
     public static final String DEEP_LINK_ACTION_OPENED = "opened";
 
