@@ -36,9 +36,6 @@ public class Analytics {
     public static final String PARAM_CONTENT_TYPE = FirebaseAnalytics.Param.CONTENT_TYPE;
     public static final String PARAM_ITEM_ID = FirebaseAnalytics.Param.ITEM_ID;
 
-    public static final String CATEGORY_DEEP_LINK = "deep_link";
-    public static final String DEEP_LINK_ACTION_OPENED = "opened";
-
     public static final String CATEGORY_NOTIFICATION = "notification";
     public static final String NOTIFICATION_ACTION_SHOWN = "shown";
     public static final String NOTIFICATION_ACTION_OPENED = "opened";
@@ -54,9 +51,6 @@ public class Analytics {
 
     public static final String CATEGORY_SOCIAL = "social";
     public static final String SOCIAL_ACTION_INVITE_FRIENDS = "invite_friends";
-
-    public static final String CATEGORY_NFC = "nfc";
-    public static final String NFC_ACTION_VERSE = "verse";
 
     public static final String CATEGORY_BOOKMARKS = "bookmarks";
     public static final String BOOKMARKS_ACTION_ADDED = "added";
