@@ -5,6 +5,7 @@ CHANGELOG
 - Updated deps:
   - Updated support library to 25.0.1.
   - Updated okhttp to 3.4.2.
+  - Updated Play Services and Firebase to 10.0.0.
 - Used Firebase for crash reporting.
 
 #### v1.15.3 (2016-11-18)

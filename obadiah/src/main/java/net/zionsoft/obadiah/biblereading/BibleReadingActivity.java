@@ -108,8 +108,6 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
     @BindView(R.id.verse_pager)
     VerseViewPager versePager;
 
-    private AppIndexingManager appIndexingManager;
-
     private String currentTranslation;
     private List<String> bookNames;
     private int currentBook;
@@ -134,7 +132,6 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
         componentFragment.getComponent().inject(this);
 
         NfcHelper.registerNdefMessageCallback(this, this);
-        appIndexingManager = new AppIndexingManager(this);
 
         initializeUi();
         updatePresenters();
@@ -191,7 +188,6 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
     protected void onStart() {
         super.onStart();
 
-        appIndexingManager.onStart();
         populateUi();
     }
 
@@ -240,7 +236,7 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
         toolbar.onStop();
         chapterList.onStop();
         versePager.onStop();
-        appIndexingManager.onStop();
+        AppIndexingManager.onViewEnd();
         super.onStop();
     }
 
@@ -262,7 +258,7 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
             return;
         }
 
-        appIndexingManager.onView(currentTranslation, bookNames.get(currentBook), currentBook, currentChapter);
+        AppIndexingManager.onView(currentTranslation, bookNames.get(currentBook), currentBook, currentChapter);
 
         // TODO get an improved tracking algorithm, e.g. only consider as "read" if the user stays for a while
         bibleReadingPresenter.trackReadingProgress(currentBook, currentChapter);

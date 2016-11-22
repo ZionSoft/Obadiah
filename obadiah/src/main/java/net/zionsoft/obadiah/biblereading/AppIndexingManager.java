@@ -17,54 +17,27 @@
 
 package net.zionsoft.obadiah.biblereading;
 
-import android.content.Context;
-import android.net.Uri;
-
-import com.google.android.gms.appindexing.Action;
-import com.google.android.gms.appindexing.AppIndex;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.firebase.appindexing.Action;
+import com.google.firebase.appindexing.FirebaseUserActions;
 
 import net.zionsoft.obadiah.BuildConfig;
 
-class AppIndexingManager {
+abstract class AppIndexingManager {
     private static final StringBuilder STRING_BUILDER = new StringBuilder();
 
-    private final GoogleApiClient googleApiClient;
-    private Action action;
+    private static Action action;
 
-    AppIndexingManager(Context context) {
-        super();
+    static void onView(String translationShortName, String bookName, int bookIndex, int chapterIndex) {
+        onViewEnd();
 
-        if (ConnectionResult.SUCCESS != GoogleApiAvailability.getInstance()
-                .isGooglePlayServicesAvailable(context)) {
-            // no need to bother the user to install latest Google Play services
-            googleApiClient = null;
-            return;
-        }
-
-        googleApiClient = new GoogleApiClient.Builder(context).addApi(AppIndex.API).build();
-    }
-
-    void onStart() {
-        if (googleApiClient != null)
-            googleApiClient.connect();
-    }
-
-    void onView(String translationShortName, String bookName, int bookIndex, int chapterIndex) {
-        if (googleApiClient != null) {
-            onViewEnd();
-
+        final String title;
+        final String appUrl;
+        final String webUrl;
+        synchronized (STRING_BUILDER) {
             STRING_BUILDER.setLength(0);
             STRING_BUILDER.append(bookName).append(", ").append(chapterIndex + 1)
                     .append(" (").append(translationShortName).append(')');
-            final String title = STRING_BUILDER.toString();
-
-            STRING_BUILDER.setLength(0);
-            STRING_BUILDER.append("http://bible.zionsoft.net/bible/").append(translationShortName)
-                    .append('/').append(bookIndex).append('/').append(chapterIndex);
-            final Uri webUri = Uri.parse(STRING_BUILDER.toString());
+            title = STRING_BUILDER.toString();
 
             STRING_BUILDER.setLength(0);
             STRING_BUILDER.append(BuildConfig.DEBUG
@@ -72,24 +45,24 @@ class AppIndexingManager {
                     : "android-app://net.zionsoft.obadiah/http/bible.zionsoft.net/bible/")
                     .append(translationShortName)
                     .append('/').append(bookIndex).append('/').append(chapterIndex);
-            final Uri appUri = Uri.parse(STRING_BUILDER.toString());
+            appUrl = STRING_BUILDER.toString();
 
-            action = Action.newAction(Action.TYPE_VIEW, title, webUri, appUri);
-            AppIndex.AppIndexApi.start(googleApiClient, action);
+            STRING_BUILDER.setLength(0);
+            STRING_BUILDER.append("http://bible.zionsoft.net/bible/").append(translationShortName)
+                    .append('/').append(bookIndex).append('/').append(chapterIndex);
+            webUrl = STRING_BUILDER.toString();
         }
+
+        action = new Action.Builder(Action.Builder.VIEW_ACTION)
+                .setObject(title, appUrl, webUrl)
+                .build();
+        FirebaseUserActions.getInstance().start(action);
     }
 
-    private void onViewEnd() {
+    static void onViewEnd() {
         if (action != null) {
-            AppIndex.AppIndexApi.end(googleApiClient, action);
+            FirebaseUserActions.getInstance().end(action);
             action = null;
-        }
-    }
-
-    public void onStop() {
-        if (googleApiClient != null) {
-            onViewEnd();
-            googleApiClient.disconnect();
         }
     }
 }
