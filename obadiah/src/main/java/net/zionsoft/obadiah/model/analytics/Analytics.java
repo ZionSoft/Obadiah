@@ -49,9 +49,6 @@ public class Analytics {
     public static final String TRANSLATION_ACTION_REMOVED = "removed";
     public static final String TRANSLATION_ACTION_PARALLEL_SELECTED = "parallel_selected";
 
-    public static final String CATEGORY_SOCIAL = "social";
-    public static final String SOCIAL_ACTION_INVITE_FRIENDS = "invite_friends";
-
     public static final String CATEGORY_BOOKMARKS = "bookmarks";
     public static final String BOOKMARKS_ACTION_ADDED = "added";
     public static final String BOOKMARKS_ACTION_REMOVED = "removed";

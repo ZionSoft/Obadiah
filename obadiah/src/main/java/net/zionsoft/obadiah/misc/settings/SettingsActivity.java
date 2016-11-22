@@ -38,7 +38,6 @@ import net.zionsoft.obadiah.App;
 import net.zionsoft.obadiah.Constants;
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.misc.license.OpenSourceLicenseActivity;
-import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.datamodel.Settings;
 import net.zionsoft.obadiah.ui.utils.BaseAppCompatActivity;
 import net.zionsoft.obadiah.ui.utils.DialogHelper;
@@ -288,11 +287,7 @@ public class SettingsActivity extends BaseAppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_CODE_INVITE_FRIENDS) {
-            if (resultCode == RESULT_OK) {
-                Analytics.trackEvent(Analytics.CATEGORY_SOCIAL, Analytics.SOCIAL_ACTION_INVITE_FRIENDS);
-            }
-        } else {
+        if (requestCode != REQUEST_CODE_INVITE_FRIENDS) {
             super.onActivityResult(requestCode, resultCode, data);
         }
     }
