@@ -104,7 +104,6 @@ public class BibleReadingModel {
         preferences.edit().putString(Constants.PREF_KEY_LAST_READ_TRANSLATION, translation).apply();
         removeParallelTranslation(translation);
         currentTranslationUpdatesSubject.onNext(translation);
-        Analytics.trackEvent(Analytics.CATEGORY_TRANSLATION, Analytics.TRANSLATION_ACTION_SELECTED, translation);
     }
 
     public Observable<String> observeCurrentTranslation() {
@@ -123,7 +122,6 @@ public class BibleReadingModel {
         if (!isParallelTranslation(translation) && !translation.equals(loadCurrentTranslation())) {
             parallelTranslations.add(translation);
             parallelTranslationUpdatesSubject.onNext(null);
-            Analytics.trackEvent(Analytics.CATEGORY_TRANSLATION, Analytics.TRANSLATION_ACTION_PARALLEL_SELECTED, translation);
         }
     }
 

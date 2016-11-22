@@ -17,7 +17,6 @@
 
 package net.zionsoft.obadiah.model.datamodel;
 
-import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.database.BookmarkTableHelper;
 import net.zionsoft.obadiah.model.database.DatabaseHelper;
 import net.zionsoft.obadiah.model.domain.Bookmark;
@@ -48,7 +47,6 @@ public class BookmarkModel {
             public Bookmark call() throws Exception {
                 final Bookmark bookmark = Bookmark.create(verseIndex, System.currentTimeMillis());
                 BookmarkTableHelper.saveBookmark(databaseHelper.getDatabase(), bookmark);
-                Analytics.trackEvent(Analytics.CATEGORY_BOOKMARKS, Analytics.BOOKMARKS_ACTION_ADDED);
                 return bookmark;
             }
         });
@@ -60,7 +58,6 @@ public class BookmarkModel {
             public Observable<Void> call() {
                 try {
                     BookmarkTableHelper.removeBookmark(databaseHelper.getDatabase(), verseIndex);
-                    Analytics.trackEvent(Analytics.CATEGORY_BOOKMARKS, Analytics.BOOKMARKS_ACTION_REMOVED);
                     return Observable.empty();
                 } catch (Exception e) {
                     return Observable.error(e);

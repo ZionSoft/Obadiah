@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest
-    package="net.zionsoft.obadiah"
     xmlns:android="http://schemas.android.com/apk/res/android"
+    package="net.zionsoft.obadiah"
     android:installLocation="auto">
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
@@ -89,7 +89,6 @@
             android:authorities="${applicationId}.model.search.RecentSearchProvider"
             android:exported="false"/>
 
-        <receiver android:name=".notification.PushDismissedReceiver"/>
         <receiver android:name=".utils.PackageUpdateReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>

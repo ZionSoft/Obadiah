@@ -34,7 +34,6 @@ import com.squareup.moshi.Moshi;
 import net.zionsoft.obadiah.App;
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.biblereading.BibleReadingActivity;
-import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.crash.Crash;
 import net.zionsoft.obadiah.model.datamodel.BibleReadingModel;
 import net.zionsoft.obadiah.model.domain.Verse;
@@ -80,8 +79,6 @@ public class PushNotificationReceiver extends FirebaseMessagingService {
 
         final NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         nm.notify(notificationId, builder.build());
-
-        Analytics.trackEvent(Analytics.CATEGORY_NOTIFICATION, Analytics.NOTIFICATION_ACTION_SHOWN, messageType);
     }
 
     @NonNull
@@ -89,10 +86,7 @@ public class PushNotificationReceiver extends FirebaseMessagingService {
         final NotificationCompat.Builder builder = new NotificationCompat.Builder(context)
                 .setAutoCancel(true)
                 .setDefaults(Notification.DEFAULT_LIGHTS)
-                .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
-                .setDeleteIntent(PendingIntent.getBroadcast(context, 0,
-                        PushDismissedReceiver.newStartIntent(context, messageType),
-                        PendingIntent.FLAG_UPDATE_CURRENT));
+                .setVisibility(NotificationCompat.VISIBILITY_PRIVATE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             builder.setSmallIcon(R.drawable.ic_notification)
                     .setColor(ContextCompat.getColor(context, R.color.blue));

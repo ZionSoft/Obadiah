@@ -18,13 +18,10 @@
 package net.zionsoft.obadiah.translations;
 
 import android.database.sqlite.SQLiteDatabase;
-import android.os.SystemClock;
 
 import com.squareup.moshi.JsonAdapter;
-import com.squareup.moshi.JsonEncodingException;
 import com.squareup.moshi.Moshi;
 
-import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.crash.Crash;
 import net.zionsoft.obadiah.model.database.BookNamesTableHelper;
 import net.zionsoft.obadiah.model.database.DatabaseHelper;
@@ -112,7 +109,6 @@ class TranslationManagementModel {
     }
 
     private Observable<List<TranslationInfo>> loadFromNetwork() {
-        final long timestamp = SystemClock.elapsedRealtime();
         return backendInterface.fetchTranslations()
                 .map(new Func1<List<BackendTranslationInfo>, List<TranslationInfo>>() {
                     @Override
@@ -139,10 +135,6 @@ class TranslationManagementModel {
                                 database.endTransaction();
                             }
                         }
-
-                        Analytics.trackEvent(Analytics.CATEGORY_TRANSLATION,
-                                Analytics.TRANSLATION_ACTION_LIST_DOWNLOADED, null,
-                                SystemClock.elapsedRealtime() - timestamp);
                     }
                 })
                 // workaround for Retrofit / okhttp issue (of sorts)
@@ -200,8 +192,6 @@ class TranslationManagementModel {
                             database.endTransaction();
                         }
                     }
-                    Analytics.trackEvent(Analytics.CATEGORY_TRANSLATION,
-                            Analytics.TRANSLATION_ACTION_REMOVED, translation.shortName());
                     return Observable.empty();
                 } catch (Exception e) {
                     Crash.report(e);
@@ -215,7 +205,6 @@ class TranslationManagementModel {
         return Observable.fromEmitter(new Action1<Emitter<Integer>>() {
             @Override
             public void call(Emitter<Integer> emitter) {
-                final long timestamp = SystemClock.elapsedRealtime();
                 final SQLiteDatabase database = databaseHelper.getDatabase();
                 ZipInputStream is = null;
                 try {
@@ -259,15 +248,8 @@ class TranslationManagementModel {
                     }
                     database.setTransactionSuccessful();
 
-                    Analytics.trackEvent(Analytics.CATEGORY_TRANSLATION,
-                            Analytics.TRANSLATION_ACTION_DOWNLOADED, translation.shortName(),
-                            SystemClock.elapsedRealtime() - timestamp);
                     emitter.onCompleted();
                 } catch (Exception e) {
-                    if (e instanceof JsonEncodingException) {
-                        Analytics.trackEvent(Analytics.CATEGORY_TRANSLATION,
-                                Analytics.TRANSLATION_ACTION_DOWNLOAD_FAILED, translation.shortName());
-                    }
                     Crash.log("Failed to download translation: " + translation.shortName());
                     Crash.report(e);
                     emitter.onError(e);

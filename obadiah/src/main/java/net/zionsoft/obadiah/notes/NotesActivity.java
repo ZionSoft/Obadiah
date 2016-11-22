@@ -27,7 +27,6 @@ import android.util.Pair;
 import android.view.View;
 
 import net.zionsoft.obadiah.R;
-import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.datamodel.Settings;
 import net.zionsoft.obadiah.model.domain.Note;
 import net.zionsoft.obadiah.model.domain.Verse;
@@ -117,7 +116,6 @@ public class NotesActivity extends BaseRecyclerViewActivity implements NotesView
         final Pair<Note, Verse> item = notesListAdapter.getItem(position);
         if (item != null) {
             notesPresenter.saveReadingProgress(item.second.verseIndex);
-            Analytics.trackEvent(Analytics.CATEGORY_NOTES, Analytics.NOTES_ACTION_OPENED);
             finish();
         }
     }
