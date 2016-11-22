@@ -27,7 +27,6 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 
-import com.google.firebase.crash.FirebaseCrash;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.squareup.moshi.Moshi;
@@ -36,6 +35,7 @@ import net.zionsoft.obadiah.App;
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.biblereading.BibleReadingActivity;
 import net.zionsoft.obadiah.model.analytics.Analytics;
+import net.zionsoft.obadiah.model.crash.Crash;
 import net.zionsoft.obadiah.model.datamodel.BibleReadingModel;
 import net.zionsoft.obadiah.model.domain.Verse;
 import net.zionsoft.obadiah.utils.TextFormatter;
@@ -123,7 +123,7 @@ public class PushNotificationReceiver extends FirebaseMessagingService {
                     .setContentText(verse.text.text)
                     .setStyle(new NotificationCompat.BigTextStyle().bigText(verse.text.text));
         } catch (Exception e) {
-            FirebaseCrash.report(e);
+            Crash.report(e);
             return false;
         }
         return true;

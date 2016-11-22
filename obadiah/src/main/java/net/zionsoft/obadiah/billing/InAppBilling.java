@@ -30,12 +30,12 @@ import android.os.IBinder;
 import android.support.annotation.IntDef;
 
 import com.android.vending.billing.IInAppBillingService;
-import com.google.firebase.crash.FirebaseCrash;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
 
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.analytics.Analytics;
+import net.zionsoft.obadiah.model.crash.Crash;
 import net.zionsoft.obadiah.utils.TextFormatter;
 
 import java.io.IOException;
@@ -136,7 +136,7 @@ public class InAppBilling implements ServiceConnection {
                 activity.startIntentSenderForResult(intentSender, REQUEST_PURCHASE, new Intent(), 0, 0, 0);
             }
         } catch (Exception e) {
-            FirebaseCrash.report(e);
+            Crash.report(e);
             listener.onAdsRemovalPurchased(false);
         }
     }
@@ -170,7 +170,7 @@ public class InAppBilling implements ServiceConnection {
             }
             return false;
         } catch (Exception e) {
-            FirebaseCrash.report(e);
+            Crash.report(e);
             return false;
         }
     }
@@ -206,7 +206,7 @@ public class InAppBilling implements ServiceConnection {
                             && inAppPurchaseData.purchaseState == InAppPurchaseData.STATUS_PURCHASED;
             informAdsRemovalPurchased(isPurchased);
         } catch (IOException e) {
-            FirebaseCrash.report(e);
+            Crash.report(e);
             informAdsRemovalPurchased(false);
         }
 
@@ -240,7 +240,7 @@ public class InAppBilling implements ServiceConnection {
             }
         } catch (Exception e) {
             status = STATUS_UNSUPPORTED;
-            FirebaseCrash.report(e);
+            Crash.report(e);
         }
     }
 

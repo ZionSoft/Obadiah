@@ -24,10 +24,9 @@ import android.support.annotation.Nullable;
 import android.support.v4.util.LruCache;
 import android.text.TextUtils;
 
-import com.google.firebase.crash.FirebaseCrash;
-
 import net.zionsoft.obadiah.Constants;
 import net.zionsoft.obadiah.model.analytics.Analytics;
+import net.zionsoft.obadiah.model.crash.Crash;
 import net.zionsoft.obadiah.model.database.BookNamesTableHelper;
 import net.zionsoft.obadiah.model.database.DatabaseHelper;
 import net.zionsoft.obadiah.model.database.TranslationHelper;
@@ -198,7 +197,7 @@ public class BibleReadingModel {
                     if (!TextUtils.isEmpty(translation)) {
                         // if the translation name is empty, it means there's current no translation
                         // installed, no need to track the exception
-                        FirebaseCrash.report(e);
+                        Crash.report(e);
                     }
                     return Observable.error(e);
                 }

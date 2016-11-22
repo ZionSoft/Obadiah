@@ -21,9 +21,8 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
-import com.google.firebase.crash.FirebaseCrash;
-
 import net.zionsoft.obadiah.model.analytics.Analytics;
+import net.zionsoft.obadiah.model.crash.Crash;
 import net.zionsoft.obadiah.model.domain.Bible;
 import net.zionsoft.obadiah.utils.TextFormatter;
 
@@ -61,7 +60,7 @@ class UriHelper {
             bibleReadingPresenter.saveReadingProgress(bookIndex, chapterIndex, 0);
             Analytics.trackEvent(Analytics.CATEGORY_DEEP_LINK, Analytics.DEEP_LINK_ACTION_OPENED);
         } catch (Exception e) {
-            FirebaseCrash.report(e);
+            Crash.report(e);
         }
     }
 
