@@ -103,9 +103,4 @@ public class Analytics {
         }
         tracker.send(eventBuilder.build());
     }
-
-    public static void trackScreen(String name) {
-        tracker.setScreenName(name);
-        tracker.send(new HitBuilders.ScreenViewBuilder().build());
-    }
 }
