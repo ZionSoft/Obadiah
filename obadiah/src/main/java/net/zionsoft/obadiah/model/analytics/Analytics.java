@@ -18,6 +18,7 @@
 package net.zionsoft.obadiah.model.analytics;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -25,10 +26,16 @@ import android.text.TextUtils;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import net.zionsoft.obadiah.R;
 
 public class Analytics {
+    public static final String EVENT_SHARE = FirebaseAnalytics.Event.SHARE;
+
+    public static final String PARAM_CONTENT_TYPE = FirebaseAnalytics.Param.CONTENT_TYPE;
+    public static final String PARAM_ITEM_ID = FirebaseAnalytics.Param.ITEM_ID;
+
     public static final String CATEGORY_DEEP_LINK = "deep_link";
     public static final String DEEP_LINK_ACTION_OPENED = "opened";
 
@@ -36,9 +43,6 @@ public class Analytics {
     public static final String NOTIFICATION_ACTION_SHOWN = "shown";
     public static final String NOTIFICATION_ACTION_OPENED = "opened";
     public static final String NOTIFICATION_ACTION_DISMISSED = "dismissed";
-
-    public static final String CATEGORY_UI = "ui";
-    public static final String UI_ACTION_BUTTON_CLICK = "button_click";
 
     public static final String CATEGORY_TRANSLATION = "translation";
     public static final String TRANSLATION_ACTION_LIST_DOWNLOADED = "list_downloaded";
@@ -65,14 +69,28 @@ public class Analytics {
     public static final String NOTES_ACTION_OPENED = "opened";
 
     private static Tracker tracker;
+    private static FirebaseAnalytics analytics;
 
     public static void initialize(Context context) {
+        if (analytics == null) {
+            synchronized (Analytics.class) {
+                if (analytics == null) {
+                    analytics = FirebaseAnalytics.getInstance(context);
+                }
+            }
+        }
         if (tracker == null) {
             synchronized (Analytics.class) {
                 if (tracker == null) {
                     tracker = GoogleAnalytics.getInstance(context).newTracker(R.xml.analytics);
                 }
             }
+        }
+    }
+
+    public static void logEvent(@NonNull String event, @Nullable Bundle params) {
+        if (analytics != null) {
+            analytics.logEvent(event, params);
         }
     }
 

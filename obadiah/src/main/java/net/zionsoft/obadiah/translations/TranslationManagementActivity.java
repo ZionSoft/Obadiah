@@ -39,7 +39,6 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 
 import net.zionsoft.obadiah.R;
-import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.datamodel.Settings;
 import net.zionsoft.obadiah.model.domain.TranslationInfo;
 import net.zionsoft.obadiah.ui.utils.AnimationHelper;
@@ -395,7 +394,6 @@ public class TranslationManagementActivity extends BaseAppCompatActivity
     public boolean onMenuItemClick(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_remove_ads:
-                Analytics.trackEvent(Analytics.CATEGORY_UI, Analytics.UI_ACTION_BUTTON_CLICK, "remove_ads");
                 translationManagementPresenter.removeAds(this);
                 return true;
             default:
