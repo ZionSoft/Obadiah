@@ -30,7 +30,7 @@ import android.os.IBinder;
 import android.support.annotation.IntDef;
 
 import com.android.vending.billing.IInAppBillingService;
-import com.crashlytics.android.Crashlytics;
+import com.google.firebase.crash.FirebaseCrash;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
 
@@ -136,7 +136,7 @@ public class InAppBilling implements ServiceConnection {
                 activity.startIntentSenderForResult(intentSender, REQUEST_PURCHASE, new Intent(), 0, 0, 0);
             }
         } catch (Exception e) {
-            Crashlytics.getInstance().core.logException(e);
+            FirebaseCrash.report(e);
             listener.onAdsRemovalPurchased(false);
         }
     }
@@ -170,7 +170,7 @@ public class InAppBilling implements ServiceConnection {
             }
             return false;
         } catch (Exception e) {
-            Crashlytics.getInstance().core.logException(e);
+            FirebaseCrash.report(e);
             return false;
         }
     }
@@ -206,7 +206,7 @@ public class InAppBilling implements ServiceConnection {
                             && inAppPurchaseData.purchaseState == InAppPurchaseData.STATUS_PURCHASED;
             informAdsRemovalPurchased(isPurchased);
         } catch (IOException e) {
-            Crashlytics.getInstance().core.logException(e);
+            FirebaseCrash.report(e);
             informAdsRemovalPurchased(false);
         }
 
@@ -240,7 +240,7 @@ public class InAppBilling implements ServiceConnection {
             }
         } catch (Exception e) {
             status = STATUS_UNSUPPORTED;
-            Crashlytics.getInstance().core.logException(e);
+            FirebaseCrash.report(e);
         }
     }
 

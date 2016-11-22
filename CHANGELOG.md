@@ -2,6 +2,7 @@ CHANGELOG
 ---------
 
 #### Next Release
+- Used Firebase for crash reporting.
 
 #### v1.15.3 (2016-11-18)
 - Updated deps:

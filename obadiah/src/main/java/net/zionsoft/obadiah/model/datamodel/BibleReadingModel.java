@@ -24,7 +24,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.util.LruCache;
 import android.text.TextUtils;
 
-import com.crashlytics.android.Crashlytics;
+import com.google.firebase.crash.FirebaseCrash;
 
 import net.zionsoft.obadiah.Constants;
 import net.zionsoft.obadiah.model.analytics.Analytics;
@@ -198,7 +198,7 @@ public class BibleReadingModel {
                     if (!TextUtils.isEmpty(translation)) {
                         // if the translation name is empty, it means there's current no translation
                         // installed, no need to track the exception
-                        Crashlytics.getInstance().core.logException(e);
+                        FirebaseCrash.report(e);
                     }
                     return Observable.error(e);
                 }

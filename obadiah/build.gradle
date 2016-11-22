@@ -1,24 +1,20 @@
 buildscript {
     repositories {
         mavenCentral()
-        maven { url 'https://maven.fabric.io/public' }
     }
     dependencies {
         classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
-        classpath 'io.fabric.tools:gradle:1.21.5'
     }
 }
 
 repositories {
     mavenCentral()
-    maven { url 'https://maven.fabric.io/public' }
     maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
     maven { url "https://jitpack.io" }
 }
 
 apply plugin: 'com.android.application'
 apply plugin: 'com.neenbedankt.android-apt'
-apply plugin: 'io.fabric'
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
@@ -56,8 +52,6 @@ android {
         debug {
             applicationIdSuffix ".debug"
             versionNameSuffix " debug"
-
-            ext.enableCrashlytics = false
         }
         release {
             minifyEnabled true
@@ -80,6 +74,7 @@ dependencies {
 
     compile "com.google.firebase:firebase-core:$rootProject.ext.firebaseVersion"
     compile "com.google.firebase:firebase-ads:$rootProject.ext.firebaseVersion"
+    compile "com.google.firebase:firebase-crash:$rootProject.ext.firebaseVersion"
     compile "com.google.firebase:firebase-invites:$rootProject.ext.firebaseVersion"
     compile "com.google.firebase:firebase-messaging:$rootProject.ext.firebaseVersion"
     compile "com.google.android.gms:play-services-analytics:$rootProject.ext.playServicesVersion"
@@ -103,10 +98,6 @@ dependencies {
     compile "com.squareup.okhttp3:okhttp:$rootProject.ext.okhttpVersion"
     compile "com.squareup.moshi:moshi:$rootProject.ext.moshiVersion"
     compile "com.squareup.okio:okio:$rootProject.ext.okioVersion"
-
-    compile('com.crashlytics.sdk.android:crashlytics:2.5.7@aar') {
-        transitive = true;
-    }
 
     compile "com.github.xizzhu.auto-droid:auto-droid-annotations:$rootProject.ext.autoDroidVersion"
     apt "com.github.xizzhu.auto-droid:auto-droid-processors:$rootProject.ext.autoDroidVersion"

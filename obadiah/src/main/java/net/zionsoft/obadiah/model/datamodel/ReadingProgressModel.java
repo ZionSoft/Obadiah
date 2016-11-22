@@ -21,7 +21,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.text.format.DateUtils;
 import android.util.SparseArray;
 
-import com.crashlytics.android.Crashlytics;
+import com.google.firebase.crash.FirebaseCrash;
 
 import net.zionsoft.obadiah.model.database.DatabaseHelper;
 import net.zionsoft.obadiah.model.database.MetadataTableHelper;
@@ -100,7 +100,7 @@ public class ReadingProgressModel {
 
                     database.setTransactionSuccessful();
                 } catch (Exception e) {
-                    Crashlytics.getInstance().core.logException(e);
+                    FirebaseCrash.report(e);
                 } finally {
                     // yep, we can crash here, ref.
                     // https://fabric.io/zionsoft/android/apps/net.zionsoft.obadiah/issues/5785af31ffcdc042509c9d00
@@ -109,7 +109,7 @@ public class ReadingProgressModel {
                             database.endTransaction();
                         }
                     } catch (Exception e) {
-                        Crashlytics.getInstance().core.logException(e);
+                        FirebaseCrash.report(e);
                     }
                 }
                 return Observable.empty();

@@ -20,7 +20,7 @@ package net.zionsoft.obadiah.translations;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.SystemClock;
 
-import com.crashlytics.android.Crashlytics;
+import com.google.firebase.crash.FirebaseCrash;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.JsonEncodingException;
 import com.squareup.moshi.Moshi;
@@ -204,7 +204,7 @@ class TranslationManagementModel {
                             Analytics.TRANSLATION_ACTION_REMOVED, translation.shortName());
                     return Observable.empty();
                 } catch (Exception e) {
-                    Crashlytics.getInstance().core.logException(e);
+                    FirebaseCrash.report(e);
                     return Observable.error(e);
                 }
             }
@@ -268,8 +268,8 @@ class TranslationManagementModel {
                         Analytics.trackEvent(Analytics.CATEGORY_TRANSLATION,
                                 Analytics.TRANSLATION_ACTION_DOWNLOAD_FAILED, translation.shortName());
                     }
-                    Crashlytics.getInstance().core.log("Failed to download translation: " + translation.shortName());
-                    Crashlytics.getInstance().core.logException(e);
+                    FirebaseCrash.log("Failed to download translation: " + translation.shortName());
+                    FirebaseCrash.report(e);
                     emitter.onError(e);
                 } finally {
                     if (database.inTransaction()) {

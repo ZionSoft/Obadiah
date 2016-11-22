@@ -30,9 +30,3 @@ IInAppBillingService.aidl
 
 # Google Services
 google-services.json
-
-# Crashlytics
-crashlytics.properties
-crashlytics-build.properties
-com_crashlytics_export_strings.xml
-fabric.properties
