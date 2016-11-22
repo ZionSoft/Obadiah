@@ -2,6 +2,9 @@ CHANGELOG
 ---------
 
 #### Next Release
+- Updated deps:
+  - Updated support library to 25.0.1.
+  - Updated okhttp to 3.4.2.
 - Used Firebase for crash reporting.
 
 #### v1.15.3 (2016-11-18)
