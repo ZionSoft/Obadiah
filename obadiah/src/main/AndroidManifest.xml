@@ -10,6 +10,7 @@
 
     <!-- Only requires permissions for Marshmallow and above -->
     <uses-permission-sdk-23 android:name="android.permission.NFC"/>
+    <uses-permission-sdk-23 android:name="android.permission.WAKE_LOCK"/>
 
     <application
         android:name=".App"
@@ -109,26 +110,6 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT"/>
             </intent-filter>
         </service>
-
-        <!-- Enable background analytics dispatching for non-Google Play devices -->
-        <receiver android:name="com.google.android.gms.analytics.AnalyticsReceiver">
-            <intent-filter>
-                <action android:name="com.google.android.gms.analytics.ANALYTICS_DISPATCH"/>
-            </intent-filter>
-        </receiver>
-        <service android:name="com.google.android.gms.analytics.AnalyticsService"/>
-        <!-- End Enable background analytics dispatching for non-Google Play devices -->
-
-        <!-- Enable Google Play Store Campaign Measurement-->
-        <receiver
-            android:name="com.google.android.gms.analytics.CampaignTrackingReceiver"
-            android:permission="android.permission.INSTALL_PACKAGES">
-            <intent-filter>
-                <action android:name="com.android.vending.INSTALL_REFERRER"/>
-            </intent-filter>
-        </receiver>
-        <service android:name="com.google.android.gms.analytics.CampaignTrackingService"/>
-        <!-- End Enable Google Play Store Campaign Measurement-->
 
         <meta-data
             android:name="com.google.android.gms.version"
