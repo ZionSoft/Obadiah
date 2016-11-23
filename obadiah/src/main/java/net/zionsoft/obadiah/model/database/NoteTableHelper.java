@@ -18,7 +18,6 @@
 package net.zionsoft.obadiah.model.database;
 
 import android.database.Cursor;
-import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.NonNull;
 
@@ -50,13 +49,6 @@ public class NoteTableHelper {
                 VerseIndex.ColumnNames.VERSE_INDEX),
                 new String[]{Integer.toString(verseIndex.book()), Integer.toString(verseIndex.chapter()),
                         Integer.toString(verseIndex.verse())});
-    }
-
-    public static boolean hasNote(SQLiteDatabase db, VerseIndex verseIndex) {
-        return DatabaseUtils.queryNumEntries(db, TABLE_NOTE, TextFormatter.format("%s = ? AND %s = ? AND %s = ?",
-                VerseIndex.ColumnNames.BOOK_INDEX, VerseIndex.ColumnNames.CHAPTER_INDEX,
-                VerseIndex.ColumnNames.VERSE_INDEX), new String[]{Integer.toString(verseIndex.book()),
-                Integer.toString(verseIndex.chapter()), Integer.toString(verseIndex.verse())}) > 0L;
     }
 
     @NonNull

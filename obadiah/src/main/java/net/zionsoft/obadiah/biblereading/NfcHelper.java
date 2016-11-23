@@ -28,11 +28,9 @@ import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 
-import net.zionsoft.obadiah.model.analytics.Analytics;
-
 class NfcHelper {
-    public static void registerNdefMessageCallback(Activity activity,
-                                                   NfcAdapter.CreateNdefMessageCallback callback) {
+    static void registerNdefMessageCallback(Activity activity,
+                                            NfcAdapter.CreateNdefMessageCallback callback) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M
                 || ContextCompat.checkSelfPermission(activity, Manifest.permission.NFC) != PackageManager.PERMISSION_GRANTED) {
             // no NFC permission
@@ -45,9 +43,8 @@ class NfcHelper {
     }
 
     @Nullable
-    public static NdefMessage createNdefMessage(Context context, String translation,
-                                                int book, int chapter, int verse) {
-        Analytics.trackEvent(Analytics.CATEGORY_NFC, Analytics.NFC_ACTION_VERSE);
+    static NdefMessage createNdefMessage(Context context, String translation,
+                                         int book, int chapter, int verse) {
         return new NdefMessage(new NdefRecord[]{
                 NdefRecord.createUri(UriHelper.createUri(translation, book, chapter, verse)),
                 NdefRecord.createApplicationRecord(context.getPackageName())});

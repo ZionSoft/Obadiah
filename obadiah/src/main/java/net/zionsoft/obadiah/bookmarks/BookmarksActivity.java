@@ -116,7 +116,13 @@ public class BookmarksActivity extends BaseRecyclerViewActivity implements Bookm
         final Verse verse = bookmarksListAdapter.getItem(position);
         if (verse != null) {
             bookmarksPresenter.saveReadingProgress(verse.verseIndex);
-            Analytics.trackEvent(Analytics.CATEGORY_BOOKMARKS, Analytics.BOOKMARKS_ACTION_OPENED);
+
+            final Bundle params = new Bundle();
+            params.putString(Analytics.PARAM_CONTENT_TYPE, "bookmark");
+            params.putString(Analytics.PARAM_ITEM_ID, verse.verseIndex.book()
+                    + "-" + verse.verseIndex.chapter() + "-" + verse.verseIndex.verse());
+            Analytics.logEvent(Analytics.EVENT_SELECT_CONTENT, params);
+
             finish();
         }
     }

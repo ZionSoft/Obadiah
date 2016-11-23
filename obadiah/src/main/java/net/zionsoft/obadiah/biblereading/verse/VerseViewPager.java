@@ -25,6 +25,7 @@ import android.content.Intent;
 import android.content.pm.LabeledIntent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewPager;
@@ -128,8 +129,6 @@ public class VerseViewPager extends ViewPager implements VerseView, VerseSelecti
         final int chapter = VerseHelper.positionToChapterIndex(position);
         switch (item.getItemId()) {
             case R.id.action_copy:
-                Analytics.trackEvent(Analytics.CATEGORY_UI, Analytics.UI_ACTION_BUTTON_CLICK, "copy");
-
                 final List<Verse> verses = adapter.getSelectedVerses(book, chapter);
                 if (verses != null && verses.size() > 0) {
                     final ClipboardManager clipboardManager
@@ -143,7 +142,10 @@ public class VerseViewPager extends ViewPager implements VerseView, VerseSelecti
                 mode.finish();
                 return true;
             case R.id.action_share:
-                Analytics.trackEvent(Analytics.CATEGORY_UI, Analytics.UI_ACTION_BUTTON_CLICK, "share");
+                final Bundle params = new Bundle();
+                params.putString(Analytics.PARAM_CONTENT_TYPE, "verse");
+                params.putString(Analytics.PARAM_ITEM_ID, book + "-" + chapter);
+                Analytics.logEvent(Analytics.EVENT_SHARE, params);
 
                 // Facebook doesn't want us to pre-fill the message, but still captures ACTION_SEND
                 // therefore, I have to exclude their package from being shown

@@ -117,7 +117,13 @@ public class NotesActivity extends BaseRecyclerViewActivity implements NotesView
         final Pair<Note, Verse> item = notesListAdapter.getItem(position);
         if (item != null) {
             notesPresenter.saveReadingProgress(item.second.verseIndex);
-            Analytics.trackEvent(Analytics.CATEGORY_NOTES, Analytics.NOTES_ACTION_OPENED);
+
+            final Bundle params = new Bundle();
+            params.putString(Analytics.PARAM_CONTENT_TYPE, "note");
+            params.putString(Analytics.PARAM_ITEM_ID, item.second.verseIndex.book()
+                    + "-" + item.second.verseIndex.chapter() + "-" + item.second.verseIndex.verse());
+            Analytics.logEvent(Analytics.EVENT_SELECT_CONTENT, params);
+
             finish();
         }
     }

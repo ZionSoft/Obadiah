@@ -22,8 +22,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
 
-import net.zionsoft.obadiah.model.analytics.Analytics;
-
 import butterknife.ButterKnife;
 
 public abstract class BaseAppCompatActivity extends AppCompatActivity {
@@ -46,12 +44,5 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity {
     public void setContentView(View view, ViewGroup.LayoutParams params) {
         super.setContentView(view, params);
         ButterKnife.bind(this);
-    }
-
-    @CallSuper
-    @Override
-    protected void onStart() {
-        super.onStart();
-        Analytics.trackScreen(getClass().getSimpleName());
     }
 }

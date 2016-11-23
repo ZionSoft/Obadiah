@@ -18,10 +18,11 @@
 package net.zionsoft.obadiah.translations;
 
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Bundle;
 import android.os.SystemClock;
+import android.text.TextUtils;
 
 import com.squareup.moshi.JsonAdapter;
-import com.squareup.moshi.JsonEncodingException;
 import com.squareup.moshi.Moshi;
 
 import net.zionsoft.obadiah.model.analytics.Analytics;
@@ -112,7 +113,6 @@ class TranslationManagementModel {
     }
 
     private Observable<List<TranslationInfo>> loadFromNetwork() {
-        final long timestamp = SystemClock.elapsedRealtime();
         return backendInterface.fetchTranslations()
                 .map(new Func1<List<BackendTranslationInfo>, List<TranslationInfo>>() {
                     @Override
@@ -139,10 +139,6 @@ class TranslationManagementModel {
                                 database.endTransaction();
                             }
                         }
-
-                        Analytics.trackEvent(Analytics.CATEGORY_TRANSLATION,
-                                Analytics.TRANSLATION_ACTION_LIST_DOWNLOADED, null,
-                                SystemClock.elapsedRealtime() - timestamp);
                     }
                 })
                 // workaround for Retrofit / okhttp issue (of sorts)
@@ -195,13 +191,15 @@ class TranslationManagementModel {
                         BookNamesTableHelper.removeBookNames(database, translation.shortName());
                         bibleReadingModel.removeParallelTranslation(translation.shortName());
                         database.setTransactionSuccessful();
+
+                        final Bundle params = new Bundle();
+                        params.putString(Analytics.PARAM_ITEM_ID, translation.shortName());
+                        Analytics.logEvent(Analytics.EVENT_REMOVE_TRANSLATION, params);
                     } finally {
                         if (database.inTransaction()) {
                             database.endTransaction();
                         }
                     }
-                    Analytics.trackEvent(Analytics.CATEGORY_TRANSLATION,
-                            Analytics.TRANSLATION_ACTION_REMOVED, translation.shortName());
                     return Observable.empty();
                 } catch (Exception e) {
                     Crash.report(e);
@@ -259,15 +257,17 @@ class TranslationManagementModel {
                     }
                     database.setTransactionSuccessful();
 
-                    Analytics.trackEvent(Analytics.CATEGORY_TRANSLATION,
-                            Analytics.TRANSLATION_ACTION_DOWNLOADED, translation.shortName(),
-                            SystemClock.elapsedRealtime() - timestamp);
+                    final long elapsedTime = SystemClock.elapsedRealtime() - timestamp;
+                    final Bundle params = new Bundle();
+                    params.putString(Analytics.PARAM_ITEM_ID, translation.shortName());
+                    params.putLong(Analytics.PARAM_ELAPSED_TIME, elapsedTime);
+                    Analytics.logEvent(Analytics.EVENT_DOWNLOAD_TRANSLATION, params);
+                    if (TextUtils.isEmpty(bibleReadingModel.loadCurrentTranslation())) {
+                        Analytics.logEvent(Analytics.EVENT_DOWNLOAD_FIRST_TRANSLATION, params);
+                    }
+
                     emitter.onCompleted();
                 } catch (Exception e) {
-                    if (e instanceof JsonEncodingException) {
-                        Analytics.trackEvent(Analytics.CATEGORY_TRANSLATION,
-                                Analytics.TRANSLATION_ACTION_DOWNLOAD_FAILED, translation.shortName());
-                    }
                     Crash.log("Failed to download translation: " + translation.shortName());
                     Crash.report(e);
                     emitter.onError(e);

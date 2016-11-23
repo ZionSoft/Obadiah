@@ -17,9 +17,6 @@
 
 package net.zionsoft.obadiah.model.datamodel;
 
-import android.database.sqlite.SQLiteDatabase;
-
-import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.database.DatabaseHelper;
 import net.zionsoft.obadiah.model.database.NoteTableHelper;
 import net.zionsoft.obadiah.model.domain.Note;
@@ -48,16 +45,8 @@ public class NoteModel {
         return Single.fromCallable(new Callable<Note>() {
             @Override
             public Note call() throws Exception {
-                final SQLiteDatabase db = databaseHelper.getDatabase();
-                final boolean newNote = !NoteTableHelper.hasNote(db, verseIndex);
-
                 final Note n = Note.create(verseIndex, note, System.currentTimeMillis());
-                NoteTableHelper.saveNote(db, n);
-
-                if (newNote) {
-                    Analytics.trackEvent(Analytics.CATEGORY_NOTES, Analytics.NOTES_ACTION_ADDED);
-                }
-
+                NoteTableHelper.saveNote(databaseHelper.getDatabase(), n);
                 return n;
             }
         });
@@ -69,7 +58,6 @@ public class NoteModel {
             public Observable<Void> call() {
                 try {
                     NoteTableHelper.removeNote(databaseHelper.getDatabase(), verseIndex);
-                    Analytics.trackEvent(Analytics.CATEGORY_NOTES, Analytics.NOTES_ACTION_REMOVED);
                     return Observable.empty();
                 } catch (Exception e) {
                     return Observable.error(e);
