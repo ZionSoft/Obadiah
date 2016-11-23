@@ -15,32 +15,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.network;
+package net.zionsoft.obadiah.translations;
 
 import com.squareup.moshi.Json;
 
 import java.util.List;
 
 /**
- * Used to parse the books.json file.
+ * Used to parse one single chapter.
  */
-public class BackendBooks {
-    @Json(name = "name")
-    public final String name;
+class BackendChapter {
+    @Json(name = "verses")
+    final List<String> verses;
 
-    @Json(name = "shortName")
-    public final String shortName;
-
-    @Json(name = "language")
-    public final String language;
-
-    @Json(name = "books")
-    public final List<String> books;
-
-    public BackendBooks(String name, String shortName, String language, List<String> books) {
-        this.name = name;
-        this.shortName = shortName;
-        this.language = language;
-        this.books = books;
+    BackendChapter(List<String> verses) {
+        this.verses = verses;
     }
 }

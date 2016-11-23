@@ -22,7 +22,6 @@ import android.content.Context;
 import com.squareup.moshi.Moshi;
 
 import net.zionsoft.obadiah.model.database.DatabaseHelper;
-import net.zionsoft.obadiah.network.BackendInterface;
 
 import java.util.concurrent.TimeUnit;
 
@@ -75,16 +74,10 @@ public class BaseAppModule {
     @Singleton
     Retrofit provideRetrofit(Moshi moshi, OkHttpClient okHttpClient) {
         return new Retrofit.Builder()
-                .baseUrl(BackendInterface.BASE_URL)
+                .baseUrl(Constants.BASE_URL)
                 .client(okHttpClient)
                 .addConverterFactory(MoshiConverterFactory.create(moshi))
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .build();
-    }
-
-    @Provides
-    @Singleton
-    BackendInterface provideBackendInterface(Retrofit retrofit) {
-        return retrofit.create(BackendInterface.class);
     }
 }

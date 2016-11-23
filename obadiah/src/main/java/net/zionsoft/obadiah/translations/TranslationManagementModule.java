@@ -25,10 +25,10 @@ import net.zionsoft.obadiah.injection.scopes.ActivityScope;
 import net.zionsoft.obadiah.model.database.DatabaseHelper;
 import net.zionsoft.obadiah.model.datamodel.BibleReadingModel;
 import net.zionsoft.obadiah.model.datamodel.Settings;
-import net.zionsoft.obadiah.network.BackendInterface;
 
 import dagger.Module;
 import dagger.Provides;
+import retrofit2.Retrofit;
 
 @Module
 public class TranslationManagementModule {
@@ -38,10 +38,15 @@ public class TranslationManagementModule {
     }
 
     @Provides
+    TranslationService provideBackendInterface(Retrofit retrofit) {
+        return retrofit.create(TranslationService.class);
+    }
+
+    @Provides
     TranslationManagementModel provideTranslationManagementModel(
             DatabaseHelper databaseHelper, BibleReadingModel bibleReadingModel,
-            Moshi moshi, BackendInterface backendInterface) {
-        return new TranslationManagementModel(databaseHelper, bibleReadingModel, moshi, backendInterface);
+            Moshi moshi, TranslationService translationService) {
+        return new TranslationManagementModel(databaseHelper, bibleReadingModel, moshi, translationService);
     }
 
     @Provides

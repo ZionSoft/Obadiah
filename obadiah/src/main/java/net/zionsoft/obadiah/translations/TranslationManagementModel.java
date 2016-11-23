@@ -33,10 +33,6 @@ import net.zionsoft.obadiah.model.database.TranslationHelper;
 import net.zionsoft.obadiah.model.database.TranslationsTableHelper;
 import net.zionsoft.obadiah.model.datamodel.BibleReadingModel;
 import net.zionsoft.obadiah.model.domain.TranslationInfo;
-import net.zionsoft.obadiah.network.BackendBooks;
-import net.zionsoft.obadiah.network.BackendChapter;
-import net.zionsoft.obadiah.network.BackendInterface;
-import net.zionsoft.obadiah.network.BackendTranslationInfo;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -63,15 +59,15 @@ import rx.schedulers.Schedulers;
 class TranslationManagementModel {
     final DatabaseHelper databaseHelper;
     final BibleReadingModel bibleReadingModel;
-    final BackendInterface backendInterface;
+    final TranslationService translationService;
     final JsonAdapter<BackendBooks> translationInfoJsonAdapter;
     final JsonAdapter<BackendChapter> chapterJsonAdapter;
 
     TranslationManagementModel(DatabaseHelper databaseHelper, BibleReadingModel bibleReadingModel,
-                               Moshi moshi, BackendInterface backendInterface) {
+                               Moshi moshi, TranslationService translationService) {
         this.databaseHelper = databaseHelper;
         this.bibleReadingModel = bibleReadingModel;
-        this.backendInterface = backendInterface;
+        this.translationService = translationService;
         this.translationInfoJsonAdapter = moshi.adapter(BackendBooks.class);
         this.chapterJsonAdapter = moshi.adapter(BackendChapter.class);
     }
@@ -113,7 +109,7 @@ class TranslationManagementModel {
     }
 
     private Observable<List<TranslationInfo>> loadFromNetwork() {
-        return backendInterface.fetchTranslations()
+        return translationService.fetchTranslations()
                 .map(new Func1<List<BackendTranslationInfo>, List<TranslationInfo>>() {
                     @Override
                     public List<TranslationInfo> call(List<BackendTranslationInfo> backendTranslations) {
@@ -218,7 +214,7 @@ class TranslationManagementModel {
                 ZipInputStream is = null;
                 try {
                     final Response<ResponseBody> response
-                            = backendInterface.fetchTranslation(translation.blobKey()).execute();
+                            = translationService.fetchTranslation(translation.blobKey()).execute();
                     if (response.code() != 200) {
                         throw new IOException("Unsupported HTTP status code - " + response.code());
                     }
@@ -234,8 +230,10 @@ class TranslationManagementModel {
                         final String entryName = entry.getName();
                         BufferedSource bufferedSource = Okio.buffer(Okio.source(is));
                         if (entryName.equals("books.json")) {
-                            BookNamesTableHelper.saveBookNames(database,
-                                    translationInfoJsonAdapter.fromJson(bufferedSource));
+                            final BackendBooks backendBooks
+                                    = translationInfoJsonAdapter.fromJson(bufferedSource);
+                            BookNamesTableHelper.saveBookNames(
+                                    database, backendBooks.shortName, backendBooks.books);
                         } else {
                             final String[] parts = entryName.substring(0, entryName.length() - 5).split("-");
                             final int book = Integer.parseInt(parts[0]);

@@ -15,29 +15,31 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.network;
+package net.zionsoft.obadiah.translations;
+
+import android.support.annotation.NonNull;
 
 import com.squareup.moshi.Json;
 
 import net.zionsoft.obadiah.model.domain.TranslationInfo;
 
-public class BackendTranslationInfo {
+class BackendTranslationInfo {
     @Json(name = "name")
-    public final String name;
+    final String name;
 
     @Json(name = "shortName")
-    public final String shortName;
+    final String shortName;
 
     @Json(name = "language")
-    public final String language;
+    final String language;
 
     @Json(name = "blobKey")
-    public final String blobKey;
+    final String blobKey;
 
     @Json(name = "size")
-    public final int size;
+    final int size;
 
-    public BackendTranslationInfo(String name, String shortName, String language, String blobKey, int size) {
+    BackendTranslationInfo(String name, String shortName, String language, String blobKey, int size) {
         super();
 
         this.name = name;
@@ -47,7 +49,8 @@ public class BackendTranslationInfo {
         this.size = size;
     }
 
-    public TranslationInfo toTranslationInfo() {
+    @NonNull
+    TranslationInfo toTranslationInfo() {
         return TranslationInfo.create(name, shortName, language, blobKey, size);
     }
 }

@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.network;
+package net.zionsoft.obadiah.translations;
 
 import java.util.List;
 
@@ -26,9 +26,7 @@ import retrofit2.http.Query;
 import retrofit2.http.Streaming;
 import rx.Observable;
 
-public interface BackendInterface {
-    String BASE_URL = "https://z-bible.appspot.com/v1/";
-
+interface TranslationService {
     @GET("translations")
     Observable<List<BackendTranslationInfo>> fetchTranslations();
 

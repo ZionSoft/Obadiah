@@ -28,4 +28,6 @@ public class Constants {
     public static final String PREF_KEY_LAST_READ_VERSE = "currentVerse";
 
     public static final Uri GOOGLE_PLAY_URI = Uri.parse("market://details?id=net.zionsoft.obadiah");
+
+    public static final String BASE_URL = "https://z-bible.appspot.com/v1/";
 }
