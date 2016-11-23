@@ -25,6 +25,7 @@ import android.support.annotation.Nullable;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 public class Analytics {
+    public static final String EVENT_SELECT_CONTENT = FirebaseAnalytics.Event.SELECT_CONTENT;
     public static final String EVENT_SHARE = FirebaseAnalytics.Event.SHARE;
 
     public static final String PARAM_CONTENT_TYPE = FirebaseAnalytics.Param.CONTENT_TYPE;

@@ -26,6 +26,7 @@ import android.support.v4.app.FragmentManager;
 import android.view.View;
 
 import net.zionsoft.obadiah.R;
+import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.datamodel.Settings;
 import net.zionsoft.obadiah.model.domain.Bookmark;
 import net.zionsoft.obadiah.model.domain.Verse;
@@ -115,6 +116,13 @@ public class BookmarksActivity extends BaseRecyclerViewActivity implements Bookm
         final Verse verse = bookmarksListAdapter.getItem(position);
         if (verse != null) {
             bookmarksPresenter.saveReadingProgress(verse.verseIndex);
+
+            final Bundle params = new Bundle();
+            params.putString(Analytics.PARAM_CONTENT_TYPE, "bookmark");
+            params.putString(Analytics.PARAM_ITEM_ID, verse.verseIndex.book()
+                    + "-" + verse.verseIndex.chapter() + "-" + verse.verseIndex.verse());
+            Analytics.logEvent(Analytics.EVENT_SELECT_CONTENT, params);
+
             finish();
         }
     }

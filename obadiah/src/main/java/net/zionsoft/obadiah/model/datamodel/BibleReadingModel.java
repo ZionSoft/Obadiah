@@ -20,6 +20,7 @@ package net.zionsoft.obadiah.model.datamodel;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.util.LruCache;
 import android.text.TextUtils;
@@ -104,6 +105,11 @@ public class BibleReadingModel {
         preferences.edit().putString(Constants.PREF_KEY_LAST_READ_TRANSLATION, translation).apply();
         removeParallelTranslation(translation);
         currentTranslationUpdatesSubject.onNext(translation);
+
+        final Bundle params = new Bundle();
+        params.putString(Analytics.PARAM_CONTENT_TYPE, "translation");
+        params.putString(Analytics.PARAM_ITEM_ID, translation);
+        Analytics.logEvent(Analytics.EVENT_SELECT_CONTENT, params);
     }
 
     public Observable<String> observeCurrentTranslation() {
@@ -122,6 +128,11 @@ public class BibleReadingModel {
         if (!isParallelTranslation(translation) && !translation.equals(loadCurrentTranslation())) {
             parallelTranslations.add(translation);
             parallelTranslationUpdatesSubject.onNext(null);
+
+            final Bundle params = new Bundle();
+            params.putString(Analytics.PARAM_CONTENT_TYPE, "parallel_translation");
+            params.putString(Analytics.PARAM_ITEM_ID, translation);
+            Analytics.logEvent(Analytics.EVENT_SELECT_CONTENT, params);
         }
     }
 

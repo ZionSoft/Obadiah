@@ -143,8 +143,8 @@ public class VerseViewPager extends ViewPager implements VerseView, VerseSelecti
                 return true;
             case R.id.action_share:
                 final Bundle params = new Bundle();
-                params.putString(Analytics.PARAM_CONTENT_TYPE, "verses");
-                params.putString(Analytics.PARAM_ITEM_ID, book + " -" + chapter);
+                params.putString(Analytics.PARAM_CONTENT_TYPE, "verse");
+                params.putString(Analytics.PARAM_ITEM_ID, book + "-" + chapter);
                 Analytics.logEvent(Analytics.EVENT_SHARE, params);
 
                 // Facebook doesn't want us to pre-fill the message, but still captures ACTION_SEND
