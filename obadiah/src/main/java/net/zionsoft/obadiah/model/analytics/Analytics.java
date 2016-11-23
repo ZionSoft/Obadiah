@@ -27,9 +27,13 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 public class Analytics {
     public static final String EVENT_SELECT_CONTENT = FirebaseAnalytics.Event.SELECT_CONTENT;
     public static final String EVENT_SHARE = FirebaseAnalytics.Event.SHARE;
+    public static final String EVENT_DOWNLOAD_FIRST_TRANSLATION = "download_first_translation";
+    public static final String EVENT_DOWNLOAD_TRANSLATION = "download_translation";
+    public static final String EVENT_REMOVE_TRANSLATION = "remove_translation";
 
     public static final String PARAM_CONTENT_TYPE = FirebaseAnalytics.Param.CONTENT_TYPE;
     public static final String PARAM_ITEM_ID = FirebaseAnalytics.Param.ITEM_ID;
+    public static final String PARAM_ELAPSED_TIME = "elapsed_time";
 
     private static FirebaseAnalytics analytics;
 

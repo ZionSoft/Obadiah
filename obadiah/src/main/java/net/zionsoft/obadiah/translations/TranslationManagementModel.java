@@ -18,10 +18,14 @@
 package net.zionsoft.obadiah.translations;
 
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Bundle;
+import android.os.SystemClock;
+import android.text.TextUtils;
 
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
 
+import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.crash.Crash;
 import net.zionsoft.obadiah.model.database.BookNamesTableHelper;
 import net.zionsoft.obadiah.model.database.DatabaseHelper;
@@ -187,6 +191,10 @@ class TranslationManagementModel {
                         BookNamesTableHelper.removeBookNames(database, translation.shortName());
                         bibleReadingModel.removeParallelTranslation(translation.shortName());
                         database.setTransactionSuccessful();
+
+                        final Bundle params = new Bundle();
+                        params.putString(Analytics.PARAM_ITEM_ID, translation.shortName());
+                        Analytics.logEvent(Analytics.EVENT_REMOVE_TRANSLATION, params);
                     } finally {
                         if (database.inTransaction()) {
                             database.endTransaction();
@@ -205,6 +213,7 @@ class TranslationManagementModel {
         return Observable.fromEmitter(new Action1<Emitter<Integer>>() {
             @Override
             public void call(Emitter<Integer> emitter) {
+                final long timestamp = SystemClock.elapsedRealtime();
                 final SQLiteDatabase database = databaseHelper.getDatabase();
                 ZipInputStream is = null;
                 try {
@@ -247,6 +256,15 @@ class TranslationManagementModel {
                         }
                     }
                     database.setTransactionSuccessful();
+
+                    final long elapsedTime = SystemClock.elapsedRealtime() - timestamp;
+                    final Bundle params = new Bundle();
+                    params.putString(Analytics.PARAM_ITEM_ID, translation.shortName());
+                    params.putLong(Analytics.PARAM_ELAPSED_TIME, elapsedTime);
+                    Analytics.logEvent(Analytics.EVENT_DOWNLOAD_TRANSLATION, params);
+                    if (TextUtils.isEmpty(bibleReadingModel.loadCurrentTranslation())) {
+                        Analytics.logEvent(Analytics.EVENT_DOWNLOAD_FIRST_TRANSLATION, params);
+                    }
 
                     emitter.onCompleted();
                 } catch (Exception e) {
