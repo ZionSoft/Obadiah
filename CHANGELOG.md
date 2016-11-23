@@ -3,6 +3,7 @@ CHANGELOG
 
 #### Next Release
 - Updated deps:
+  - Updated build tool to 25.0.1.
   - Updated support library to 25.0.1.
   - Updated okhttp to 3.4.2.
   - Updated Play Services and Firebase to 10.0.0.
