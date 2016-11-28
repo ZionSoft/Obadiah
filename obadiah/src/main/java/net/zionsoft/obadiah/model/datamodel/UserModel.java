@@ -17,7 +17,6 @@
 
 package net.zionsoft.obadiah.model.datamodel;
 
-import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -43,10 +42,6 @@ import rx.subjects.SerializedSubject;
 
 @Singleton
 public class UserModel implements FirebaseAuth.AuthStateListener {
-    private static final String SCOPE = "oauth2:https://www.googleapis.com/auth/userinfo.profile";
-
-    @SuppressWarnings("WeakerAccess")
-    final Context context;
     @SuppressWarnings("WeakerAccess")
     final FirebaseAuth firebaseAuth;
 
@@ -54,8 +49,7 @@ public class UserModel implements FirebaseAuth.AuthStateListener {
             = PublishSubject.<User>create().toSerialized();
 
     @Inject
-    public UserModel(Context context) {
-        this.context = context;
+    public UserModel() {
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseAuth.addAuthStateListener(this);
     }
