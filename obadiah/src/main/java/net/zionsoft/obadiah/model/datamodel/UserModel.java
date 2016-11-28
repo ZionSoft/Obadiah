@@ -34,6 +34,7 @@ import net.zionsoft.obadiah.model.domain.User;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import rx.Completable;
 import rx.Observable;
 import rx.Single;
 import rx.SingleSubscriber;
@@ -98,6 +99,12 @@ public class UserModel implements FirebaseAuth.AuthStateListener {
                 }
             }
         });
+    }
+
+    @NonNull
+    public Completable logout() {
+        firebaseAuth.signOut();
+        return Completable.complete();
     }
 
     @Override

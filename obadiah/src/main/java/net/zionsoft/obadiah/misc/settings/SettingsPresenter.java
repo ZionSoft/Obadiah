@@ -25,6 +25,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.Status;
 
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.datamodel.Settings;
@@ -32,18 +33,25 @@ import net.zionsoft.obadiah.model.datamodel.UserModel;
 import net.zionsoft.obadiah.model.domain.User;
 import net.zionsoft.obadiah.mvp.BasePresenter;
 
+import java.util.concurrent.Callable;
+
+import rx.Completable;
 import rx.SingleSubscriber;
 import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action0;
+import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
 class SettingsPresenter extends BasePresenter<SettingsView> {
     private final UserModel userModel;
-    private final GoogleApiClient googleApiClient;
+    @SuppressWarnings("WeakerAccess")
+    final GoogleApiClient googleApiClient;
 
     private Subscription currentUserSubscription;
     private Subscription loginSubscription;
+    private Subscription logoutSubscription;
 
     SettingsPresenter(Context context, UserModel userModel, Settings settings) {
         super(settings);
@@ -55,12 +63,13 @@ class SettingsPresenter extends BasePresenter<SettingsView> {
                 .build();
         googleApiClient = new GoogleApiClient.Builder(context)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso).build();
-        googleApiClient.connect();
     }
 
     @Override
     protected void onViewTaken() {
         super.onViewTaken();
+
+        googleApiClient.connect();
 
         currentUserSubscription = userModel.observeCurrentUser()
                 .observeOn(AndroidSchedulers.mainThread())
@@ -96,6 +105,8 @@ class SettingsPresenter extends BasePresenter<SettingsView> {
             currentUserSubscription = null;
         }
         unsubscribeLoginSubscription();
+        unsubscribeLogoutSubscription();
+        googleApiClient.disconnect();
 
         super.onViewDropped();
     }
@@ -104,6 +115,13 @@ class SettingsPresenter extends BasePresenter<SettingsView> {
         if (loginSubscription != null) {
             loginSubscription.unsubscribe();
             loginSubscription = null;
+        }
+    }
+
+    private void unsubscribeLogoutSubscription() {
+        if (logoutSubscription != null) {
+            logoutSubscription.unsubscribe();
+            logoutSubscription = null;
         }
     }
 
@@ -126,6 +144,8 @@ class SettingsPresenter extends BasePresenter<SettingsView> {
             final GoogleSignInAccount account = result.getSignInAccount();
             if (account != null) {
                 unsubscribeLoginSubscription();
+                unsubscribeLogoutSubscription();
+
                 loginSubscription = userModel.login(account.getIdToken())
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
@@ -144,5 +164,33 @@ class SettingsPresenter extends BasePresenter<SettingsView> {
         }
 
         // TODO
+    }
+
+    void logout() {
+        unsubscribeLoginSubscription();
+        unsubscribeLogoutSubscription();
+
+        logoutSubscription = userModel.logout()
+                .andThen(Completable.fromCallable(new Callable<Void>() {
+                    @Override
+                    public Void call() throws Exception {
+                        final Status status = Auth.GoogleSignInApi.signOut(googleApiClient).await();
+                        if (!status.isSuccess()) {
+                            throw new RuntimeException("Failed to logout from Google API client");
+                        }
+                        return null;
+                    }
+                })).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Action0() {
+                    @Override
+                    public void call() {
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable e) {
+                        e.printStackTrace();
+                    }
+                });
     }
 }

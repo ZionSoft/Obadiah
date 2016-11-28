@@ -151,7 +151,7 @@ public class SettingsActivity extends BaseAppCompatActivity implements SettingsV
         logoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // TODO
+                settingsPresenter.logout();
             }
         });
 
@@ -253,8 +253,8 @@ public class SettingsActivity extends BaseAppCompatActivity implements SettingsV
         });
     }
 
-    private void animateColor(final int fromBackgroundColor, final int toBackgroundColor,
-                              final int fromTitleTextColor, final int toTitleTextColor) {
+    void animateColor(final int fromBackgroundColor, final int toBackgroundColor,
+                      final int fromTitleTextColor, final int toTitleTextColor) {
         final ArgbEvaluator argbEvaluator = new ArgbEvaluator();
         final ValueAnimator colorAnimator = ValueAnimator.ofFloat(0.0F, 1.0F);
         colorAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
@@ -273,7 +273,7 @@ public class SettingsActivity extends BaseAppCompatActivity implements SettingsV
         updateColor(settings.getBackgroundColor(), settings.getTextColor());
     }
 
-    private void updateColor(int backgroundColor, int titleTextColor) {
+    void updateColor(int backgroundColor, int titleTextColor) {
         rootView.setBackgroundColor(backgroundColor);
 
         loginButton.setTitleTextColor(titleTextColor);
@@ -289,8 +289,8 @@ public class SettingsActivity extends BaseAppCompatActivity implements SettingsV
         licenseSettingButton.setTitleTextColor(titleTextColor);
     }
 
-    private void animateTextSize(final float fromTextSize, final float toTextSize,
-                                 final float fromSmallerTextSize, final float toSmallerTextSize) {
+    void animateTextSize(final float fromTextSize, final float toTextSize,
+                         final float fromSmallerTextSize, final float toSmallerTextSize) {
         final ValueAnimator textSizeAnimator = ValueAnimator.ofFloat(0.0F, 1.0F);
         textSizeAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
@@ -311,7 +311,7 @@ public class SettingsActivity extends BaseAppCompatActivity implements SettingsV
                 resources.getDimension(textSizeSetting.smallerTextSize));
     }
 
-    private void updateTextSize(float textSize, float smallerTextSize) {
+    void updateTextSize(float textSize, float smallerTextSize) {
         accountSectionHeader.setHeaderTextSize(TypedValue.COMPLEX_UNIT_PX, smallerTextSize);
         loginButton.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize, smallerTextSize);
         accountButton.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize, smallerTextSize);
