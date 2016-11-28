@@ -39,6 +39,8 @@ import net.zionsoft.obadiah.Constants;
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.misc.license.OpenSourceLicenseActivity;
 import net.zionsoft.obadiah.model.datamodel.Settings;
+import net.zionsoft.obadiah.model.datamodel.UserModel;
+import net.zionsoft.obadiah.model.domain.User;
 import net.zionsoft.obadiah.ui.utils.BaseAppCompatActivity;
 import net.zionsoft.obadiah.ui.utils.DialogHelper;
 import net.zionsoft.obadiah.ui.widget.SectionHeader;
@@ -46,6 +48,9 @@ import net.zionsoft.obadiah.ui.widget.SectionHeader;
 import javax.inject.Inject;
 
 import butterknife.BindView;
+import rx.Subscriber;
+import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
 
 public class SettingsActivity extends BaseAppCompatActivity {
     public static Intent newStartIntent(Context context) {
@@ -58,8 +63,23 @@ public class SettingsActivity extends BaseAppCompatActivity {
     @Inject
     Settings settings;
 
+    @Inject
+    UserModel userModel;
+
     @BindView(R.id.toolbar)
     Toolbar toolbar;
+
+    @BindView(R.id.account_section_header)
+    SectionHeader accountSectionHeader;
+
+    @BindView(R.id.login_button)
+    SettingTitleDescriptionButton loginButton;
+
+    @BindView(R.id.account_button)
+    SettingTitleDescriptionButton accountButton;
+
+    @BindView(R.id.logout_button)
+    SettingTitleDescriptionButton logoutButton;
 
     @BindView(R.id.reading_section_header)
     SectionHeader readingSectionHeader;
@@ -96,12 +116,43 @@ public class SettingsActivity extends BaseAppCompatActivity {
 
     private View rootView;
 
+    private Subscription currentUserSubscription;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         App.getComponent().inject(this);
 
         initializeUi();
+
+        currentUserSubscription = userModel.observeCurrentUser()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<User>() {
+                    @Override
+                    public void onCompleted() {
+                        // won't reach here
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        // should I do anything?
+                    }
+
+                    @Override
+                    public void onNext(User user) {
+                        if (user == null) {
+                            loginButton.setVisibility(View.VISIBLE);
+                            accountButton.setVisibility(View.GONE);
+                            logoutButton.setVisibility(View.GONE);
+                        } else {
+                            loginButton.setVisibility(View.GONE);
+                            accountButton.setVisibility(View.VISIBLE);
+                            logoutButton.setVisibility(View.VISIBLE);
+
+                            accountButton.setDescriptionText(user.displayName);
+                        }
+                    }
+                });
     }
 
     private void initializeUi() {
@@ -115,6 +166,19 @@ public class SettingsActivity extends BaseAppCompatActivity {
         rootView.setKeepScreenOn(settings.keepScreenOn());
         updateColor();
         updateTextSize();
+
+        loginButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // TODO
+            }
+        });
+        logoutButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // TODO
+            }
+        });
 
         simpleReadingSwitch.setChecked(settings.isSimpleReading());
         simpleReadingSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -237,6 +301,9 @@ public class SettingsActivity extends BaseAppCompatActivity {
     private void updateColor(int backgroundColor, int titleTextColor) {
         rootView.setBackgroundColor(backgroundColor);
 
+        loginButton.setTitleTextColor(titleTextColor);
+        accountButton.setTitleTextColor(titleTextColor);
+        logoutButton.setTitleTextColor(titleTextColor);
         simpleReadingSwitch.setTitleTextColor(titleTextColor);
         screenOnSwitch.setTitleTextColor(titleTextColor);
         nightModeSwitch.setTitleTextColor(titleTextColor);
@@ -270,6 +337,11 @@ public class SettingsActivity extends BaseAppCompatActivity {
     }
 
     private void updateTextSize(float textSize, float smallerTextSize) {
+        accountSectionHeader.setHeaderTextSize(TypedValue.COMPLEX_UNIT_PX, smallerTextSize);
+        loginButton.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize, smallerTextSize);
+        accountButton.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize, smallerTextSize);
+        logoutButton.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize, smallerTextSize);
+
         readingSectionHeader.setHeaderTextSize(TypedValue.COMPLEX_UNIT_PX, smallerTextSize);
         simpleReadingSwitch.setTitleTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
 
@@ -290,5 +362,15 @@ public class SettingsActivity extends BaseAppCompatActivity {
         if (requestCode != REQUEST_CODE_INVITE_FRIENDS) {
             super.onActivityResult(requestCode, resultCode, data);
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (currentUserSubscription != null) {
+            currentUserSubscription.unsubscribe();
+            currentUserSubscription = null;
+        }
+
+        super.onDestroy();
     }
 }
