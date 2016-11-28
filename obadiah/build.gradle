@@ -72,6 +72,7 @@ dependencies {
     compile "com.android.support:recyclerview-v7:$rootProject.ext.supportLibVersion"
     compile "com.android.support:design:$rootProject.ext.supportLibVersion"
 
+    compile "com.google.firebase:firebase-auth:$rootProject.ext.firebaseVersion"
     compile "com.google.firebase:firebase-core:$rootProject.ext.firebaseVersion"
     compile "com.google.firebase:firebase-ads:$rootProject.ext.firebaseVersion"
     compile "com.google.firebase:firebase-crash:$rootProject.ext.firebaseVersion"
