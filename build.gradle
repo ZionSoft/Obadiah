@@ -10,7 +10,7 @@ buildscript {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '3.2'
+    gradleVersion = '3.2.1'
 }
 
 ext {
@@ -29,12 +29,12 @@ ext {
     supportLibVersion = '25.0.1'
     firebaseVersion = '10.0.0'
 
-    daggerVersion = '2.7'
+    daggerVersion = '2.8'
     javaxAnnotationApiVersion = '1.2'
     butterKnifeVersion = '8.4.0'
     rxAndroidVersion = '1.2.1'
-    rxJavaVersion = '1.2.2'
-    rxJavaProguardRulesVersion = '1.2.2.0'
+    rxJavaVersion = '1.2.3'
+    rxJavaProguardRulesVersion = '1.2.3.0'
     retrofitVersion = '2.1.0'
     okhttpVersion = '3.4.2'
     moshiVersion = '1.3.1'
@@ -42,7 +42,7 @@ ext {
     autoDroidVersion = '0.2'
     autoValueVersion = '1.2'
 
-    stethoVersion = '1.3.1'
+    stethoVersion = '1.4.1'
 
     junitVersion = '4.12'
 }
