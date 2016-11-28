@@ -80,6 +80,8 @@ dependencies {
     compile "com.google.firebase:firebase-invites:$rootProject.ext.firebaseVersion"
     compile "com.google.firebase:firebase-messaging:$rootProject.ext.firebaseVersion"
 
+    compile "com.google.android.gms:play-services-auth:$rootProject.ext.firebaseVersion"
+
     compile "com.google.dagger:dagger:$rootProject.ext.daggerVersion"
     apt "com.google.dagger:dagger-compiler:$rootProject.ext.daggerVersion"
     provided "javax.annotation:javax.annotation-api:$rootProject.ext.javaxAnnotationApiVersion"
