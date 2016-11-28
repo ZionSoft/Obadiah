@@ -43,6 +43,7 @@ import net.zionsoft.obadiah.model.datamodel.Settings;
 import net.zionsoft.obadiah.model.domain.User;
 import net.zionsoft.obadiah.ui.utils.BaseAppCompatActivity;
 import net.zionsoft.obadiah.ui.utils.DialogHelper;
+import net.zionsoft.obadiah.ui.widget.ProgressDialog;
 import net.zionsoft.obadiah.ui.widget.SectionHeader;
 
 import javax.inject.Inject;
@@ -110,6 +111,7 @@ public class SettingsActivity extends BaseAppCompatActivity implements SettingsV
     SettingTitleDescriptionButton licenseSettingButton;
 
     private View rootView;
+    ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -145,13 +147,23 @@ public class SettingsActivity extends BaseAppCompatActivity implements SettingsV
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                progressDialog = ProgressDialog.showIndeterminateProgressDialog(
+                        SettingsActivity.this, R.string.progress_dialog_login);
                 settingsPresenter.login();
             }
         });
         logoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                settingsPresenter.logout();
+                DialogHelper.showDialog(SettingsActivity.this, true,
+                        R.string.dialog_logout_confirm_message,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                progressDialog = ProgressDialog.showIndeterminateProgressDialog(
+                                        SettingsActivity.this, R.string.progress_dialog_logout);
+                                settingsPresenter.logout();
+                            }
+                        }, null);
             }
         });
 
@@ -360,8 +372,16 @@ public class SettingsActivity extends BaseAppCompatActivity implements SettingsV
         loginButton.setVisibility(View.GONE);
         accountButton.setVisibility(View.VISIBLE);
         logoutButton.setVisibility(View.VISIBLE);
+        dismissDialog();
 
         accountButton.setDescriptionText(user.displayName);
+    }
+
+    private void dismissDialog() {
+        if (progressDialog != null) {
+            progressDialog.dismiss();
+            progressDialog = null;
+        }
     }
 
     @Override
@@ -369,10 +389,25 @@ public class SettingsActivity extends BaseAppCompatActivity implements SettingsV
         loginButton.setVisibility(View.VISIBLE);
         accountButton.setVisibility(View.GONE);
         logoutButton.setVisibility(View.GONE);
+        dismissDialog();
     }
 
     @Override
     public void onStartLoginActivity(@NonNull Intent intent) {
         startActivityForResult(intent, REQUEST_CODE_LOGIN);
+    }
+
+    @Override
+    public void onUserLoginFailed() {
+        dismissDialog();
+
+        // TODO
+    }
+
+    @Override
+    public void onUserLogoutFailed() {
+        dismissDialog();
+
+        // TODO
     }
 }

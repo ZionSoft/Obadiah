@@ -134,11 +134,16 @@ class SettingsPresenter extends BasePresenter<SettingsView> {
         if (googleApiClient.isConnected()) {
             v.onStartLoginActivity(Auth.GoogleSignInApi.getSignInIntent(googleApiClient));
         } else {
-            // TODO
+            v.onUserLoginFailed();
         }
     }
 
     void handleLoginActivityResult(Intent data) {
+        final SettingsView v = getView();
+        if (v == null) {
+            return;
+        }
+
         final GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
         if (result.isSuccess()) {
             final GoogleSignInAccount account = result.getSignInAccount();
@@ -152,18 +157,22 @@ class SettingsPresenter extends BasePresenter<SettingsView> {
                         .subscribe(new SingleSubscriber<User>() {
                             @Override
                             public void onSuccess(User user) {
-                                System.out.println("--> " + user.displayName + ", " + user.uid);
+                                // do nothing
                             }
 
                             @Override
                             public void onError(Throwable e) {
-                                e.printStackTrace();
+                                final SettingsView v = getView();
+                                if (v != null) {
+                                    v.onUserLoginFailed();
+                                }
                             }
                         });
+                return;
             }
         }
 
-        // TODO
+        v.onUserLoginFailed();
     }
 
     void logout() {
@@ -189,7 +198,10 @@ class SettingsPresenter extends BasePresenter<SettingsView> {
                 }, new Action1<Throwable>() {
                     @Override
                     public void call(Throwable e) {
-                        e.printStackTrace();
+                        final SettingsView v = getView();
+                        if (v != null) {
+                            v.onUserLogoutFailed();
+                        }
                     }
                 });
     }

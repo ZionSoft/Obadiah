@@ -29,4 +29,8 @@ interface SettingsView extends MVPView {
     void onUserLoggedOut();
 
     void onStartLoginActivity(@NonNull Intent intent);
+
+    void onUserLoginFailed();
+
+    void onUserLogoutFailed();
 }
