@@ -17,6 +17,7 @@
 
 package net.zionsoft.obadiah.misc.settings;
 
+import android.content.Intent;
 import android.support.annotation.NonNull;
 
 import net.zionsoft.obadiah.model.domain.User;
@@ -26,4 +27,6 @@ interface SettingsView extends MVPView {
     void onUserLoggedIn(@NonNull User user);
 
     void onUserLoggedOut();
+
+    void onStartLoginActivity(@NonNull Intent intent);
 }

@@ -17,11 +17,17 @@
 
 package net.zionsoft.obadiah.model.datamodel;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GoogleAuthProvider;
 
 import net.zionsoft.obadiah.model.domain.User;
 
@@ -29,29 +35,39 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import rx.Observable;
+import rx.Single;
+import rx.SingleSubscriber;
 import rx.subjects.PublishSubject;
 import rx.subjects.SerializedSubject;
 
 @Singleton
 public class UserModel implements FirebaseAuth.AuthStateListener {
-    private final FirebaseAuth firebaseAuth;
+    private static final String SCOPE = "oauth2:https://www.googleapis.com/auth/userinfo.profile";
+
+    @SuppressWarnings("WeakerAccess")
+    final Context context;
+    @SuppressWarnings("WeakerAccess")
+    final FirebaseAuth firebaseAuth;
 
     private final SerializedSubject<User, User> currentUserUpdatesSubject
             = PublishSubject.<User>create().toSerialized();
 
     @Inject
-    public UserModel() {
+    public UserModel(Context context) {
+        this.context = context;
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseAuth.addAuthStateListener(this);
     }
 
     @Nullable
     public User getCurrentUser() {
-        final FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
-        if (firebaseUser == null) {
-            return null;
-        }
-        return new User(firebaseUser.getUid(), firebaseUser.getDisplayName());
+        return fromFirebaseUser(firebaseAuth.getCurrentUser());
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    @Nullable
+    static User fromFirebaseUser(@Nullable FirebaseUser firebaseUser) {
+        return firebaseUser != null ? new User(firebaseUser.getUid(), firebaseUser.getDisplayName()) : null;
     }
 
     @NonNull
@@ -59,8 +75,33 @@ public class UserModel implements FirebaseAuth.AuthStateListener {
         return currentUserUpdatesSubject.asObservable();
     }
 
+    @NonNull
+    public Single<User> login(final String token) {
+        return Single.create(new Single.OnSubscribe<User>() {
+            @Override
+            public void call(final SingleSubscriber<? super User> subscriber) {
+                try {
+                    final AuthCredential credential = GoogleAuthProvider.getCredential(token, null);
+                    firebaseAuth.signInWithCredential(credential)
+                            .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                                @Override
+                                public void onComplete(@NonNull Task<AuthResult> task) {
+                                    if (task.isSuccessful()) {
+                                        subscriber.onSuccess(fromFirebaseUser(task.getResult().getUser()));
+                                    } else {
+                                        subscriber.onError(task.getException());
+                                    }
+                                }
+                            });
+                } catch (Throwable e) {
+                    subscriber.onError(e);
+                }
+            }
+        });
+    }
+
     @Override
     public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-        currentUserUpdatesSubject.onNext(getCurrentUser());
+        currentUserUpdatesSubject.onNext(fromFirebaseUser(firebaseAuth.getCurrentUser()));
     }
 }

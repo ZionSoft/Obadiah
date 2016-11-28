@@ -17,6 +17,8 @@
 
 package net.zionsoft.obadiah.misc.settings;
 
+import android.content.Context;
+
 import net.zionsoft.obadiah.injection.scopes.ActivityScope;
 import net.zionsoft.obadiah.model.datamodel.Settings;
 import net.zionsoft.obadiah.model.datamodel.UserModel;
@@ -28,7 +30,7 @@ import dagger.Provides;
 public class SettingsModule {
     @Provides
     @ActivityScope
-    SettingsPresenter provideSettingsPresenter(UserModel userModel, Settings settings) {
-        return new SettingsPresenter(userModel, settings);
+    SettingsPresenter provideSettingsPresenter(Context context, UserModel userModel, Settings settings) {
+        return new SettingsPresenter(context, userModel, settings);
     }
 }

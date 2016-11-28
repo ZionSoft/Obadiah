@@ -56,6 +56,7 @@ public class SettingsActivity extends BaseAppCompatActivity implements SettingsV
 
     private static final long ANIMATION_DURATION = 300L;
     private static final int REQUEST_CODE_INVITE_FRIENDS = 8964;
+    private static final int REQUEST_CODE_LOGIN = 8965;
 
     @Inject
     SettingsPresenter settingsPresenter;
@@ -144,7 +145,7 @@ public class SettingsActivity extends BaseAppCompatActivity implements SettingsV
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // TODO
+                settingsPresenter.login();
             }
         });
         logoutButton.setOnClickListener(new View.OnClickListener() {
@@ -345,7 +346,11 @@ public class SettingsActivity extends BaseAppCompatActivity implements SettingsV
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode != REQUEST_CODE_INVITE_FRIENDS) {
+        if (requestCode == REQUEST_CODE_INVITE_FRIENDS) {
+            // do nothing
+        } else if (requestCode == REQUEST_CODE_LOGIN) {
+            settingsPresenter.handleLoginActivityResult(data);
+        } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
     }
@@ -364,5 +369,10 @@ public class SettingsActivity extends BaseAppCompatActivity implements SettingsV
         loginButton.setVisibility(View.VISIBLE);
         accountButton.setVisibility(View.GONE);
         logoutButton.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void onStartLoginActivity(@NonNull Intent intent) {
+        startActivityForResult(intent, REQUEST_CODE_LOGIN);
     }
 }
