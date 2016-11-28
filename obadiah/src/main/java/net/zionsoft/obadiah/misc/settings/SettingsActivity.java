@@ -401,13 +401,25 @@ public class SettingsActivity extends BaseAppCompatActivity implements SettingsV
     public void onUserLoginFailed() {
         dismissDialog();
 
-        // TODO
+        DialogHelper.showDialog(this, true, R.string.error_unknown_error,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        settingsPresenter.login();
+                    }
+                }, null);
     }
 
     @Override
     public void onUserLogoutFailed() {
         dismissDialog();
 
-        // TODO
+        DialogHelper.showDialog(this, true, R.string.error_unknown_error,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        settingsPresenter.logout();
+                    }
+                }, null);
     }
 }
