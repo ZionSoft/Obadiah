@@ -27,6 +27,8 @@ import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.Toolbar;
 import android.util.TypedValue;
 import android.view.View;
@@ -34,12 +36,10 @@ import android.widget.CompoundButton;
 
 import com.google.android.gms.appinvite.AppInviteInvitation;
 
-import net.zionsoft.obadiah.App;
 import net.zionsoft.obadiah.Constants;
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.misc.license.OpenSourceLicenseActivity;
 import net.zionsoft.obadiah.model.datamodel.Settings;
-import net.zionsoft.obadiah.model.datamodel.UserModel;
 import net.zionsoft.obadiah.model.domain.User;
 import net.zionsoft.obadiah.ui.utils.BaseAppCompatActivity;
 import net.zionsoft.obadiah.ui.utils.DialogHelper;
@@ -48,11 +48,8 @@ import net.zionsoft.obadiah.ui.widget.SectionHeader;
 import javax.inject.Inject;
 
 import butterknife.BindView;
-import rx.Subscriber;
-import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
 
-public class SettingsActivity extends BaseAppCompatActivity {
+public class SettingsActivity extends BaseAppCompatActivity implements SettingsView {
     public static Intent newStartIntent(Context context) {
         return new Intent(context, SettingsActivity.class);
     }
@@ -61,10 +58,7 @@ public class SettingsActivity extends BaseAppCompatActivity {
     private static final int REQUEST_CODE_INVITE_FRIENDS = 8964;
 
     @Inject
-    Settings settings;
-
-    @Inject
-    UserModel userModel;
+    SettingsPresenter settingsPresenter;
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -116,43 +110,22 @@ public class SettingsActivity extends BaseAppCompatActivity {
 
     private View rootView;
 
-    private Subscription currentUserSubscription;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        App.getComponent().inject(this);
+        final FragmentManager fm = getSupportFragmentManager();
+
+        SettingsComponentFragment componentFragment = (SettingsComponentFragment)
+                fm.findFragmentByTag(SettingsComponentFragment.FRAGMENT_TAG);
+        if (componentFragment == null) {
+            componentFragment = SettingsComponentFragment.newInstance();
+            fm.beginTransaction()
+                    .add(componentFragment, SettingsComponentFragment.FRAGMENT_TAG)
+                    .commitNow();
+        }
+        componentFragment.getComponent().inject(this);
 
         initializeUi();
-
-        currentUserSubscription = userModel.observeCurrentUser()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<User>() {
-                    @Override
-                    public void onCompleted() {
-                        // won't reach here
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        // should I do anything?
-                    }
-
-                    @Override
-                    public void onNext(User user) {
-                        if (user == null) {
-                            loginButton.setVisibility(View.VISIBLE);
-                            accountButton.setVisibility(View.GONE);
-                            logoutButton.setVisibility(View.GONE);
-                        } else {
-                            loginButton.setVisibility(View.GONE);
-                            accountButton.setVisibility(View.VISIBLE);
-                            logoutButton.setVisibility(View.VISIBLE);
-
-                            accountButton.setDescriptionText(user.displayName);
-                        }
-                    }
-                });
     }
 
     private void initializeUi() {
@@ -163,9 +136,10 @@ public class SettingsActivity extends BaseAppCompatActivity {
         toolbar.setLogo(R.drawable.ic_action_bar);
         toolbar.setTitle(R.string.activity_settings);
 
+        final Settings settings = settingsPresenter.getSettings();
         rootView.setKeepScreenOn(settings.keepScreenOn());
-        updateColor();
-        updateTextSize();
+        updateColor(settings);
+        updateTextSize(settings);
 
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -294,7 +268,7 @@ public class SettingsActivity extends BaseAppCompatActivity {
         colorAnimator.setDuration(ANIMATION_DURATION).start();
     }
 
-    private void updateColor() {
+    private void updateColor(Settings settings) {
         updateColor(settings.getBackgroundColor(), settings.getTextColor());
     }
 
@@ -329,7 +303,7 @@ public class SettingsActivity extends BaseAppCompatActivity {
         textSizeAnimator.setDuration(ANIMATION_DURATION).start();
     }
 
-    private void updateTextSize() {
+    private void updateTextSize(Settings settings) {
         final Settings.TextSize textSizeSetting = settings.getTextSize();
         final Resources resources = getResources();
         updateTextSize(resources.getDimension(textSizeSetting.textSize),
@@ -358,6 +332,18 @@ public class SettingsActivity extends BaseAppCompatActivity {
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        settingsPresenter.takeView(this);
+    }
+
+    @Override
+    protected void onStop() {
+        settingsPresenter.dropView();
+        super.onStop();
+    }
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode != REQUEST_CODE_INVITE_FRIENDS) {
             super.onActivityResult(requestCode, resultCode, data);
@@ -365,12 +351,18 @@ public class SettingsActivity extends BaseAppCompatActivity {
     }
 
     @Override
-    protected void onDestroy() {
-        if (currentUserSubscription != null) {
-            currentUserSubscription.unsubscribe();
-            currentUserSubscription = null;
-        }
+    public void onUserLoggedIn(@NonNull User user) {
+        loginButton.setVisibility(View.GONE);
+        accountButton.setVisibility(View.VISIBLE);
+        logoutButton.setVisibility(View.VISIBLE);
 
-        super.onDestroy();
+        accountButton.setDescriptionText(user.displayName);
+    }
+
+    @Override
+    public void onUserLoggedOut() {
+        loginButton.setVisibility(View.VISIBLE);
+        accountButton.setVisibility(View.GONE);
+        logoutButton.setVisibility(View.GONE);
     }
 }
