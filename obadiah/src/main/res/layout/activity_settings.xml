@@ -16,6 +16,42 @@
             android:orientation="vertical">
 
             <net.zionsoft.obadiah.ui.widget.SectionHeader
+                android:id="@+id/account_section_header"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                obadiah:settingSectionHeaderText="@string/pref_account"/>
+
+            <net.zionsoft.obadiah.misc.settings.SettingTitleDescriptionButton
+                android:id="@+id/login_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/background_text"
+                android:clickable="true"
+                android:visibility="gone"
+                obadiah:settingTitleDescriptionButtonDividerVisible="false"
+                obadiah:settingTitleDescriptionButtonTitle="@string/pref_login"/>
+
+            <net.zionsoft.obadiah.misc.settings.SettingTitleDescriptionButton
+                android:id="@+id/account_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/background_text"
+                android:clickable="true"
+                android:visibility="gone"
+                obadiah:settingTitleDescriptionButtonDividerVisible="true"
+                obadiah:settingTitleDescriptionButtonTitle="@string/pref_account"/>
+
+            <net.zionsoft.obadiah.misc.settings.SettingTitleDescriptionButton
+                android:id="@+id/logout_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/background_text"
+                android:clickable="true"
+                android:visibility="gone"
+                obadiah:settingTitleDescriptionButtonDividerVisible="false"
+                obadiah:settingTitleDescriptionButtonTitle="@string/pref_logout"/>
+
+            <net.zionsoft.obadiah.ui.widget.SectionHeader
                 android:id="@+id/reading_section_header"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

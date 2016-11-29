@@ -22,6 +22,7 @@
     <string name="action_share">Share</string>
 
     <string name="dialog_translation_delete_confirm_message">Are you sure to delete this translation?</string>
+    <string name="dialog_logout_confirm_message">Are you sure to logout?</string>
 
     <string name="error_unknown_error">Unknown error.</string>
     <string name="error_no_translation">No translation available, download now?</string>
@@ -29,6 +30,9 @@
     <string name="error_network">Fail to load, please check your network connection and retry.</string>
     <string name="error_failed_to_remove">Failed to remove the translation, try again?</string>
 
+    <string name="pref_account">Account</string>
+    <string name="pref_login">Log In</string>
+    <string name="pref_logout">Log Out</string>
     <string name="pref_reading">Reading</string>
     <string name="pref_simple_reading">Simple Reading</string>
     <string name="pref_night_mode">Night Mode</string>
@@ -49,6 +53,8 @@
 
     <string name="progress_dialog_translation_deleting">Deleting&#8230;</string>
     <string name="progress_dialog_translation_downloading">Downloading&#8230;</string>
+    <string name="progress_dialog_login">Login&#8230;</string>
+    <string name="progress_dialog_logout">Logout&#8230;</string>
 
     <string name="text_invite_friends_message">Great Bible reading app.</string>
 

@@ -27,6 +27,8 @@ import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.Toolbar;
 import android.util.TypedValue;
 import android.view.View;
@@ -34,32 +36,46 @@ import android.widget.CompoundButton;
 
 import com.google.android.gms.appinvite.AppInviteInvitation;
 
-import net.zionsoft.obadiah.App;
 import net.zionsoft.obadiah.Constants;
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.misc.license.OpenSourceLicenseActivity;
 import net.zionsoft.obadiah.model.datamodel.Settings;
+import net.zionsoft.obadiah.model.domain.User;
 import net.zionsoft.obadiah.ui.utils.BaseAppCompatActivity;
 import net.zionsoft.obadiah.ui.utils.DialogHelper;
+import net.zionsoft.obadiah.ui.widget.ProgressDialog;
 import net.zionsoft.obadiah.ui.widget.SectionHeader;
 
 import javax.inject.Inject;
 
 import butterknife.BindView;
 
-public class SettingsActivity extends BaseAppCompatActivity {
+public class SettingsActivity extends BaseAppCompatActivity implements SettingsView {
     public static Intent newStartIntent(Context context) {
         return new Intent(context, SettingsActivity.class);
     }
 
     private static final long ANIMATION_DURATION = 300L;
     private static final int REQUEST_CODE_INVITE_FRIENDS = 8964;
+    private static final int REQUEST_CODE_LOGIN = 8965;
 
     @Inject
-    Settings settings;
+    SettingsPresenter settingsPresenter;
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
+
+    @BindView(R.id.account_section_header)
+    SectionHeader accountSectionHeader;
+
+    @BindView(R.id.login_button)
+    SettingTitleDescriptionButton loginButton;
+
+    @BindView(R.id.account_button)
+    SettingTitleDescriptionButton accountButton;
+
+    @BindView(R.id.logout_button)
+    SettingTitleDescriptionButton logoutButton;
 
     @BindView(R.id.reading_section_header)
     SectionHeader readingSectionHeader;
@@ -95,11 +111,22 @@ public class SettingsActivity extends BaseAppCompatActivity {
     SettingTitleDescriptionButton licenseSettingButton;
 
     private View rootView;
+    ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        App.getComponent().inject(this);
+        final FragmentManager fm = getSupportFragmentManager();
+
+        SettingsComponentFragment componentFragment = (SettingsComponentFragment)
+                fm.findFragmentByTag(SettingsComponentFragment.FRAGMENT_TAG);
+        if (componentFragment == null) {
+            componentFragment = SettingsComponentFragment.newInstance();
+            fm.beginTransaction()
+                    .add(componentFragment, SettingsComponentFragment.FRAGMENT_TAG)
+                    .commitNow();
+        }
+        componentFragment.getComponent().inject(this);
 
         initializeUi();
     }
@@ -112,9 +139,33 @@ public class SettingsActivity extends BaseAppCompatActivity {
         toolbar.setLogo(R.drawable.ic_action_bar);
         toolbar.setTitle(R.string.activity_settings);
 
+        final Settings settings = settingsPresenter.getSettings();
         rootView.setKeepScreenOn(settings.keepScreenOn());
-        updateColor();
-        updateTextSize();
+        updateColor(settings);
+        updateTextSize(settings);
+
+        loginButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                progressDialog = ProgressDialog.showIndeterminateProgressDialog(
+                        SettingsActivity.this, R.string.progress_dialog_login);
+                settingsPresenter.login();
+            }
+        });
+        logoutButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DialogHelper.showDialog(SettingsActivity.this, true,
+                        R.string.dialog_logout_confirm_message,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                progressDialog = ProgressDialog.showIndeterminateProgressDialog(
+                                        SettingsActivity.this, R.string.progress_dialog_logout);
+                                settingsPresenter.logout();
+                            }
+                        }, null);
+            }
+        });
 
         simpleReadingSwitch.setChecked(settings.isSimpleReading());
         simpleReadingSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -214,8 +265,8 @@ public class SettingsActivity extends BaseAppCompatActivity {
         });
     }
 
-    private void animateColor(final int fromBackgroundColor, final int toBackgroundColor,
-                              final int fromTitleTextColor, final int toTitleTextColor) {
+    void animateColor(final int fromBackgroundColor, final int toBackgroundColor,
+                      final int fromTitleTextColor, final int toTitleTextColor) {
         final ArgbEvaluator argbEvaluator = new ArgbEvaluator();
         final ValueAnimator colorAnimator = ValueAnimator.ofFloat(0.0F, 1.0F);
         colorAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
@@ -230,13 +281,16 @@ public class SettingsActivity extends BaseAppCompatActivity {
         colorAnimator.setDuration(ANIMATION_DURATION).start();
     }
 
-    private void updateColor() {
+    private void updateColor(Settings settings) {
         updateColor(settings.getBackgroundColor(), settings.getTextColor());
     }
 
-    private void updateColor(int backgroundColor, int titleTextColor) {
+    void updateColor(int backgroundColor, int titleTextColor) {
         rootView.setBackgroundColor(backgroundColor);
 
+        loginButton.setTitleTextColor(titleTextColor);
+        accountButton.setTitleTextColor(titleTextColor);
+        logoutButton.setTitleTextColor(titleTextColor);
         simpleReadingSwitch.setTitleTextColor(titleTextColor);
         screenOnSwitch.setTitleTextColor(titleTextColor);
         nightModeSwitch.setTitleTextColor(titleTextColor);
@@ -247,8 +301,8 @@ public class SettingsActivity extends BaseAppCompatActivity {
         licenseSettingButton.setTitleTextColor(titleTextColor);
     }
 
-    private void animateTextSize(final float fromTextSize, final float toTextSize,
-                                 final float fromSmallerTextSize, final float toSmallerTextSize) {
+    void animateTextSize(final float fromTextSize, final float toTextSize,
+                         final float fromSmallerTextSize, final float toSmallerTextSize) {
         final ValueAnimator textSizeAnimator = ValueAnimator.ofFloat(0.0F, 1.0F);
         textSizeAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
@@ -262,14 +316,19 @@ public class SettingsActivity extends BaseAppCompatActivity {
         textSizeAnimator.setDuration(ANIMATION_DURATION).start();
     }
 
-    private void updateTextSize() {
+    private void updateTextSize(Settings settings) {
         final Settings.TextSize textSizeSetting = settings.getTextSize();
         final Resources resources = getResources();
         updateTextSize(resources.getDimension(textSizeSetting.textSize),
                 resources.getDimension(textSizeSetting.smallerTextSize));
     }
 
-    private void updateTextSize(float textSize, float smallerTextSize) {
+    void updateTextSize(float textSize, float smallerTextSize) {
+        accountSectionHeader.setHeaderTextSize(TypedValue.COMPLEX_UNIT_PX, smallerTextSize);
+        loginButton.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize, smallerTextSize);
+        accountButton.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize, smallerTextSize);
+        logoutButton.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize, smallerTextSize);
+
         readingSectionHeader.setHeaderTextSize(TypedValue.COMPLEX_UNIT_PX, smallerTextSize);
         simpleReadingSwitch.setTitleTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
 
@@ -286,9 +345,81 @@ public class SettingsActivity extends BaseAppCompatActivity {
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        settingsPresenter.takeView(this);
+    }
+
+    @Override
+    protected void onStop() {
+        settingsPresenter.dropView();
+        super.onStop();
+    }
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode != REQUEST_CODE_INVITE_FRIENDS) {
+        if (requestCode == REQUEST_CODE_INVITE_FRIENDS) {
+            // do nothing
+        } else if (requestCode == REQUEST_CODE_LOGIN) {
+            settingsPresenter.handleLoginActivityResult(data);
+        } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
+    }
+
+    @Override
+    public void onUserLoggedIn(@NonNull User user) {
+        loginButton.setVisibility(View.GONE);
+        accountButton.setVisibility(View.VISIBLE);
+        logoutButton.setVisibility(View.VISIBLE);
+        dismissDialog();
+
+        accountButton.setDescriptionText(user.displayName);
+    }
+
+    private void dismissDialog() {
+        if (progressDialog != null) {
+            progressDialog.dismiss();
+            progressDialog = null;
+        }
+    }
+
+    @Override
+    public void onUserLoggedOut() {
+        loginButton.setVisibility(View.VISIBLE);
+        accountButton.setVisibility(View.GONE);
+        logoutButton.setVisibility(View.GONE);
+        dismissDialog();
+    }
+
+    @Override
+    public void onStartLoginActivity(@NonNull Intent intent) {
+        startActivityForResult(intent, REQUEST_CODE_LOGIN);
+    }
+
+    @Override
+    public void onUserLoginFailed() {
+        dismissDialog();
+
+        DialogHelper.showDialog(this, true, R.string.error_unknown_error,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        settingsPresenter.login();
+                    }
+                }, null);
+    }
+
+    @Override
+    public void onUserLogoutFailed() {
+        dismissDialog();
+
+        DialogHelper.showDialog(this, true, R.string.error_unknown_error,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        settingsPresenter.logout();
+                    }
+                }, null);
     }
 }

@@ -23,7 +23,8 @@ import net.zionsoft.obadiah.bookmarks.BookmarksComponent;
 import net.zionsoft.obadiah.bookmarks.BookmarksModule;
 import net.zionsoft.obadiah.misc.license.OpenSourceLicenseComponent;
 import net.zionsoft.obadiah.misc.license.OpenSourceLicenseModule;
-import net.zionsoft.obadiah.misc.settings.SettingsActivity;
+import net.zionsoft.obadiah.misc.settings.SettingsComponent;
+import net.zionsoft.obadiah.misc.settings.SettingsModule;
 import net.zionsoft.obadiah.notes.NotesComponent;
 import net.zionsoft.obadiah.notes.NotesModule;
 import net.zionsoft.obadiah.notification.PushNotificationReceiver;
@@ -43,8 +44,6 @@ import dagger.Component;
 public interface AppComponent {
     void inject(App app);
 
-    void inject(SettingsActivity settingsActivity);
-
     void inject(PushNotificationReceiver pushNotificationReceiver);
 
     BibleReadingComponent plus(BibleReadingModule bibleReadingModule);
@@ -58,6 +57,8 @@ public interface AppComponent {
     ReadingProgressComponent plus(ReadingProgressModule readingProgressModule);
 
     SearchComponent plus(SearchModule searchModule);
+
+    SettingsComponent plus(SettingsModule settingsModule);
 
     TranslationManagementComponent plus(TranslationManagementModule translationManagementModule);
 

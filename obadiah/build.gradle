@@ -72,12 +72,15 @@ dependencies {
     compile "com.android.support:recyclerview-v7:$rootProject.ext.supportLibVersion"
     compile "com.android.support:design:$rootProject.ext.supportLibVersion"
 
+    compile "com.google.firebase:firebase-auth:$rootProject.ext.firebaseVersion"
     compile "com.google.firebase:firebase-core:$rootProject.ext.firebaseVersion"
     compile "com.google.firebase:firebase-ads:$rootProject.ext.firebaseVersion"
     compile "com.google.firebase:firebase-crash:$rootProject.ext.firebaseVersion"
     compile "com.google.firebase:firebase-appindexing:$rootProject.ext.firebaseVersion"
     compile "com.google.firebase:firebase-invites:$rootProject.ext.firebaseVersion"
     compile "com.google.firebase:firebase-messaging:$rootProject.ext.firebaseVersion"
+
+    compile "com.google.android.gms:play-services-auth:$rootProject.ext.firebaseVersion"
 
     compile "com.google.dagger:dagger:$rootProject.ext.daggerVersion"
     apt "com.google.dagger:dagger-compiler:$rootProject.ext.daggerVersion"
