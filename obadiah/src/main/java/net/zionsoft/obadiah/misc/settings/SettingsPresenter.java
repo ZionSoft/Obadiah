@@ -19,6 +19,7 @@ package net.zionsoft.obadiah.misc.settings;
 
 import android.content.Context;
 import android.content.Intent;
+import android.support.annotation.Nullable;
 
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -86,16 +87,22 @@ class SettingsPresenter extends BasePresenter<SettingsView> {
 
                     @Override
                     public void onNext(User user) {
-                        final SettingsView v = getView();
-                        if (v != null) {
-                            if (user != null) {
-                                v.onUserLoggedIn(user);
-                            } else {
-                                v.onUserLoggedOut();
-                            }
-                        }
+                        onUserLoaded(user);
                     }
                 });
+        onUserLoaded(userModel.getCurrentUser());
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    void onUserLoaded(@Nullable User user) {
+        final SettingsView v = getView();
+        if (v != null) {
+            if (user != null) {
+                v.onUserLoggedIn(user);
+            } else {
+                v.onUserLoggedOut();
+            }
+        }
     }
 
     @Override
