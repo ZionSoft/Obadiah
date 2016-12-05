@@ -291,9 +291,9 @@ public class SettingsActivity extends BaseAppCompatActivity implements SettingsV
         loginButton.setTitleTextColor(titleTextColor);
         accountButton.setTitleTextColor(titleTextColor);
         logoutButton.setTitleTextColor(titleTextColor);
-        simpleReadingSwitch.setTitleTextColor(titleTextColor);
-        screenOnSwitch.setTitleTextColor(titleTextColor);
-        nightModeSwitch.setTitleTextColor(titleTextColor);
+        simpleReadingSwitch.setTextColor(titleTextColor);
+        screenOnSwitch.setTextColor(titleTextColor);
+        nightModeSwitch.setTextColor(titleTextColor);
         textSizeSettingButton.setTitleTextColor(titleTextColor);
         rateMeSettingButton.setTitleTextColor(titleTextColor);
         inviteFriendsSettingButton.setTitleTextColor(titleTextColor);
@@ -330,11 +330,11 @@ public class SettingsActivity extends BaseAppCompatActivity implements SettingsV
         logoutButton.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize, smallerTextSize);
 
         readingSectionHeader.setHeaderTextSize(TypedValue.COMPLEX_UNIT_PX, smallerTextSize);
-        simpleReadingSwitch.setTitleTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+        simpleReadingSwitch.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
 
         displaySectionHeader.setHeaderTextSize(TypedValue.COMPLEX_UNIT_PX, smallerTextSize);
-        screenOnSwitch.setTitleTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
-        nightModeSwitch.setTitleTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+        screenOnSwitch.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+        nightModeSwitch.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
         textSizeSettingButton.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize, smallerTextSize);
 
         rateMeSettingButton.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize, smallerTextSize);

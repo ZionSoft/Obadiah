@@ -28,7 +28,6 @@
                 android:background="@drawable/background_text"
                 android:clickable="true"
                 android:visibility="gone"
-                obadiah:settingTitleDescriptionButtonDividerVisible="false"
                 obadiah:settingTitleDescriptionButtonTitle="@string/pref_login"/>
 
             <net.zionsoft.obadiah.misc.settings.SettingTitleDescriptionButton
@@ -38,7 +37,6 @@
                 android:background="@drawable/background_text"
                 android:clickable="true"
                 android:visibility="gone"
-                obadiah:settingTitleDescriptionButtonDividerVisible="true"
                 obadiah:settingTitleDescriptionButtonTitle="@string/pref_account"/>
 
             <net.zionsoft.obadiah.misc.settings.SettingTitleDescriptionButton
@@ -48,7 +46,6 @@
                 android:background="@drawable/background_text"
                 android:clickable="true"
                 android:visibility="gone"
-                obadiah:settingTitleDescriptionButtonDividerVisible="false"
                 obadiah:settingTitleDescriptionButtonTitle="@string/pref_logout"/>
 
             <net.zionsoft.obadiah.ui.widget.SectionHeader
@@ -61,7 +58,6 @@
                 android:id="@+id/simple_reading_switch"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                obadiah:settingSwitchDividerVisible="false"
                 obadiah:settingSwitchTitle="@string/pref_simple_reading"/>
 
             <net.zionsoft.obadiah.ui.widget.SectionHeader
@@ -74,14 +70,12 @@
                 android:id="@+id/screen_on_switch"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                obadiah:settingSwitchDividerVisible="true"
                 obadiah:settingSwitchTitle="@string/pref_screen_on"/>
 
             <net.zionsoft.obadiah.misc.settings.SettingSwitch
                 android:id="@+id/night_mode_switch"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                obadiah:settingSwitchDividerVisible="true"
                 obadiah:settingSwitchTitle="@string/pref_night_mode"/>
 
             <net.zionsoft.obadiah.misc.settings.SettingTitleDescriptionButton
@@ -89,7 +83,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/background_text"
-                obadiah:settingTitleDescriptionButtonDividerVisible="false"
                 obadiah:settingTitleDescriptionButtonTitle="@string/pref_text_size"/>
 
             <net.zionsoft.obadiah.ui.widget.SectionHeader
@@ -103,7 +96,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/background_text"
-                obadiah:settingTitleDescriptionButtonDividerVisible="true"
                 obadiah:settingTitleDescriptionButtonTitle="@string/pref_rate_me"/>
 
             <net.zionsoft.obadiah.misc.settings.SettingTitleDescriptionButton
@@ -111,7 +103,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/background_text"
-                obadiah:settingTitleDescriptionButtonDividerVisible="true"
                 obadiah:settingTitleDescriptionButtonTitle="@string/pref_invite_friends"/>
 
             <net.zionsoft.obadiah.misc.settings.SettingTitleDescriptionButton
@@ -120,7 +111,6 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/background_text"
                 android:clickable="true"
-                obadiah:settingTitleDescriptionButtonDividerVisible="true"
                 obadiah:settingTitleDescriptionButtonTitle="@string/pref_version"/>
 
             <net.zionsoft.obadiah.misc.settings.SettingTitleDescriptionButton
@@ -129,7 +119,6 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/background_text"
                 android:clickable="true"
-                obadiah:settingTitleDescriptionButtonDividerVisible="false"
                 obadiah:settingTitleDescriptionButtonTitle="@string/pref_license"/>
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>

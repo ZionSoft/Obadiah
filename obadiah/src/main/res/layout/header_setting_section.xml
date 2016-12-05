@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+       xmlns:tools="http://schemas.android.com/tools">
 
     <TextView
         android:id="@+id/header_text_view"
@@ -9,13 +9,12 @@
         android:layout_gravity="bottom"
         android:paddingLeft="@dimen/paddingLeft"
         android:paddingRight="@dimen/paddingRight"
-        android:paddingTop="@dimen/padding"
         android:textColor="@color/blue"
         android:textStyle="bold"
-        tools:text="Setting Section Header" />
+        tools:text="Setting Section Header"/>
 
     <View
         style="@style/Divider.Horizontal"
         android:layout_gravity="bottom"
-        android:background="@color/blue" />
+        android:background="@color/blue"/>
 </merge>

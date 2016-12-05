@@ -26,7 +26,6 @@ import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.text.TextUtils;
 import android.util.AttributeSet;
-import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
@@ -41,9 +40,6 @@ public class SettingTitleDescriptionButton extends FrameLayout {
 
     @BindView(R.id.description_text_view)
     TextView descriptionTextView;
-
-    @BindView(R.id.divider_view)
-    View dividerView;
 
     public SettingTitleDescriptionButton(Context context) {
         super(context);
@@ -75,7 +71,6 @@ public class SettingTitleDescriptionButton extends FrameLayout {
             final TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.SettingTitleDescriptionButton);
             loadTextFromAttrs(titleTextView, a, R.styleable.SettingTitleDescriptionButton_settingTitleDescriptionButtonTitle);
             loadTextFromAttrs(descriptionTextView, a, R.styleable.SettingTitleDescriptionButton_settingTitleDescriptionButtonDescription);
-            dividerView.setVisibility(a.getBoolean(R.styleable.SettingTitleDescriptionButton_settingTitleDescriptionButtonDividerVisible, true) ? VISIBLE : GONE);
             a.recycle();
         }
     }
