@@ -9,7 +9,7 @@ CHANGELOG
   - Updated Dagger to 2.8.
   - Updated RxJava to 1.2.3.
   - Updated okhttp to 3.4.2.
-  - Updated Play Services and Firebase to 10.0.0.
+  - Updated Play Services and Firebase to 10.0.1.
   - Updated Stetho to 1.4.1.
 - Used Firebase for analytics and crash reporting.
 - Supported Firebase auth (with Google account).
