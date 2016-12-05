@@ -75,8 +75,9 @@ dependencies {
     compile "com.google.firebase:firebase-auth:$rootProject.ext.firebaseVersion"
     compile "com.google.firebase:firebase-core:$rootProject.ext.firebaseVersion"
     compile "com.google.firebase:firebase-ads:$rootProject.ext.firebaseVersion"
-    compile "com.google.firebase:firebase-crash:$rootProject.ext.firebaseVersion"
     compile "com.google.firebase:firebase-appindexing:$rootProject.ext.firebaseVersion"
+    compile "com.google.firebase:firebase-crash:$rootProject.ext.firebaseVersion"
+    compile "com.google.firebase:firebase-database:$rootProject.ext.firebaseVersion"
     compile "com.google.firebase:firebase-invites:$rootProject.ext.firebaseVersion"
     compile "com.google.firebase:firebase-messaging:$rootProject.ext.firebaseVersion"
 
