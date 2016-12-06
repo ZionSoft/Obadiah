@@ -18,6 +18,7 @@
 package net.zionsoft.obadiah.model.datamodel;
 
 import android.support.annotation.NonNull;
+import android.util.Pair;
 
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -33,6 +34,7 @@ import javax.inject.Singleton;
 
 import rx.Observer;
 import rx.Single;
+import rx.Subscription;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
@@ -45,6 +47,10 @@ public class SyncModel {
     @SuppressWarnings("WeakerAccess")
     final FirebaseDatabase firebaseDatabase;
 
+    @SuppressWarnings("WeakerAccess")
+    DatabaseReference bookmarksReference;
+    private Subscription observeBookmarksSubscription;
+
     @Inject
     public SyncModel(UserModel userModel, BookmarkModel bookmarkModel) {
         this.bookmarkModel = bookmarkModel;
@@ -52,33 +58,51 @@ public class SyncModel {
         firebaseDatabase = FirebaseDatabase.getInstance();
         firebaseDatabase.setPersistenceEnabled(true);
 
-        userModel.observeCurrentUser().observeOn(Schedulers.io()).subscribe(new Observer<User>() {
-            @Override
-            public void onCompleted() {
-                // do nothing
-            }
+        userModel.observeCurrentUser().observeOn(Schedulers.io())
+                .subscribe(new Observer<User>() {
+                    @Override
+                    public void onCompleted() {
+                        // do nothing
+                    }
 
-            @Override
-            public void onError(Throwable e) {
-                // do nothing
-            }
+                    @Override
+                    public void onError(Throwable e) {
+                        // do nothing
+                    }
 
-            @Override
-            public void onNext(User user) {
-                if (user != null) {
-                    initialSync(user);
-                }
-            }
-        });
+                    @Override
+                    public void onNext(User user) {
+                        unsubscribeAll();
+                        if (user != null) {
+                            initialSync(user);
+                        }
+                    }
+                });
     }
 
     @SuppressWarnings("WeakerAccess")
-    void initialSync(@NonNull final User user) {
+    void unsubscribeAll() {
+        unsubscribeObserveBookmarks();
+    }
+
+    private void unsubscribeObserveBookmarks() {
+        if (observeBookmarksSubscription != null) {
+            observeBookmarksSubscription.unsubscribe();
+            observeBookmarksSubscription = null;
+        }
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    void initialSync(@NonNull User user) {
+        syncBookmarks(user);
+    }
+
+    private void syncBookmarks(@NonNull final User user) {
+        final String path = buildBookMarksRootPath(user);
+        bookmarksReference = firebaseDatabase.getReference(path);
         bookmarkModel.loadBookmarks().map(new Func1<List<Bookmark>, Void>() {
             @Override
             public Void call(List<Bookmark> bookmarks) {
-                final String path = buildBookMarksRootPath(user);
-                final DatabaseReference bookmarksReference = firebaseDatabase.getReference(path);
                 for (int i = bookmarks.size() - 1; i >= 0; --i) {
                     final Bookmark bookmark = bookmarks.get(i);
                     bookmarksReference.child(buildBookMarkKey(bookmark)).setValue(bookmark.timestamp());
@@ -87,6 +111,36 @@ public class SyncModel {
                 return null;
             }
         }).onErrorResumeNext(Single.<Void>just(null)).subscribeOn(Schedulers.io()).subscribe();
+
+        unsubscribeObserveBookmarks();
+        observeBookmarksSubscription = bookmarkModel.observeBookmarks().observeOn(Schedulers.io())
+                .subscribe(new Observer<Pair<Integer, Bookmark>>() {
+                    @Override
+                    public void onCompleted() {
+                        // do nothing
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        // do nothing
+                    }
+
+                    @Override
+                    public void onNext(Pair<Integer, Bookmark> bookmark) {
+                        if (bookmarksReference != null) {
+                            final DatabaseReference reference
+                                    = bookmarksReference.child(buildBookMarkKey(bookmark.second));
+                            switch (bookmark.first) {
+                                case BookmarkModel.ACTION_ADD:
+                                    reference.setValue(bookmark.second.timestamp());
+                                    break;
+                                case BookmarkModel.ACTION_REMOVE:
+                                    reference.removeValue();
+                                    break;
+                            }
+                        }
+                    }
+                });
     }
 
     @SuppressWarnings("WeakerAccess")
