@@ -34,6 +34,7 @@ import rx.functions.Func0;
 
 @Singleton
 public class BookmarkModel {
+    @SuppressWarnings("WeakerAccess")
     final DatabaseHelper databaseHelper;
 
     @Inject
