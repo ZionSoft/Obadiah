@@ -17,6 +17,7 @@
 
 package net.zionsoft.obadiah.model.datamodel;
 
+import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.util.Pair;
@@ -71,10 +72,26 @@ public class BookmarkModel {
         return Single.fromCallable(new Callable<Bookmark>() {
             @Override
             public Bookmark call() throws Exception {
-                final Bookmark bookmark = Bookmark.create(verseIndex, System.currentTimeMillis());
-                BookmarkTableHelper.saveBookmark(databaseHelper.getDatabase(), bookmark);
-                bookmarksUpdatesSubject.onNext(new Pair<>(ACTION_ADD, bookmark));
-                return bookmark;
+                final SQLiteDatabase db = databaseHelper.getDatabase();
+                try {
+                    db.beginTransaction();
+
+                    Bookmark bookmark = BookmarkTableHelper.getBookmark(db, verseIndex);
+                    if (bookmark != null) {
+                        return bookmark;
+                    }
+
+                    bookmark = Bookmark.create(verseIndex, System.currentTimeMillis());
+                    BookmarkTableHelper.saveBookmark(db, bookmark);
+                    bookmarksUpdatesSubject.onNext(new Pair<>(ACTION_ADD, bookmark));
+
+                    db.setTransactionSuccessful();
+                    return bookmark;
+                } finally {
+                    if (db.inTransaction()) {
+                        db.endTransaction();
+                    }
+                }
             }
         });
     }
@@ -83,12 +100,24 @@ public class BookmarkModel {
         return Observable.defer(new Func0<Observable<Void>>() {
             @Override
             public Observable<Void> call() {
+                final SQLiteDatabase db = databaseHelper.getDatabase();
                 try {
-                    BookmarkTableHelper.removeBookmark(databaseHelper.getDatabase(), verseIndex);
-                    bookmarksUpdatesSubject.onNext(new Pair<>(ACTION_REMOVE, Bookmark.create(verseIndex, -1L)));
+                    db.beginTransaction();
+
+                    final Bookmark bookmark = BookmarkTableHelper.getBookmark(db, verseIndex);
+                    if (bookmark != null) {
+                        BookmarkTableHelper.removeBookmark(databaseHelper.getDatabase(), verseIndex);
+                        bookmarksUpdatesSubject.onNext(new Pair<>(ACTION_REMOVE, Bookmark.create(verseIndex, -1L)));
+                    }
+
+                    db.setTransactionSuccessful();
                     return Observable.empty();
                 } catch (Exception e) {
                     return Observable.error(e);
+                } finally {
+                    if (db.inTransaction()) {
+                        db.endTransaction();
+                    }
                 }
             }
         });

@@ -18,8 +18,12 @@
 package net.zionsoft.obadiah.model.datamodel;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Pair;
 
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -32,6 +36,7 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import rx.Observable;
 import rx.Observer;
 import rx.Single;
 import rx.Subscription;
@@ -39,7 +44,7 @@ import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
 @Singleton
-public class SyncModel {
+public class SyncModel implements ChildEventListener {
     private static final StringBuilder STRING_BUILDER = new StringBuilder();
 
     private final BookmarkModel bookmarkModel;
@@ -100,6 +105,8 @@ public class SyncModel {
     private void syncBookmarks(@NonNull final User user) {
         final String path = buildBookMarksRootPath(user);
         bookmarksReference = firebaseDatabase.getReference(path);
+        bookmarksReference.addChildEventListener(this);
+
         bookmarkModel.loadBookmarks().map(new Func1<List<Bookmark>, Void>() {
             @Override
             public Void call(List<Bookmark> bookmarks) {
@@ -161,5 +168,48 @@ public class SyncModel {
                     .append(verseIndex.chapter()).append(':').append(verseIndex.verse());
             return STRING_BUILDER.toString();
         }
+    }
+
+    @Override
+    public void onChildAdded(DataSnapshot snapshot, String previousChildName) {
+        final VerseIndex verseIndex = fromBookmarkKey(snapshot.getKey());
+        if (verseIndex != null) {
+            bookmarkModel.addBookmark(verseIndex).subscribeOn(Schedulers.io())
+                    .onErrorResumeNext(Single.<Bookmark>just(null)).subscribe();
+        }
+    }
+
+    @Nullable
+    private static VerseIndex fromBookmarkKey(String bookmarkKey) {
+        final String[] fields = bookmarkKey.split(":");
+        if (fields.length != 3) {
+            return null;
+        }
+        return VerseIndex.create(Integer.parseInt(fields[0]), Integer.parseInt(fields[1]),
+                Integer.parseInt(fields[2]));
+    }
+
+    @Override
+    public void onChildChanged(DataSnapshot snapshot, String previousChildName) {
+        // do nothing
+    }
+
+    @Override
+    public void onChildRemoved(DataSnapshot snapshot) {
+        final VerseIndex verseIndex = fromBookmarkKey(snapshot.getKey());
+        if (verseIndex != null) {
+            bookmarkModel.removeBookmark(verseIndex).subscribeOn(Schedulers.io())
+                    .onErrorResumeNext(Observable.<Void>empty()).subscribe();
+        }
+    }
+
+    @Override
+    public void onChildMoved(DataSnapshot snapshot, String previousChildName) {
+        // do nothing
+    }
+
+    @Override
+    public void onCancelled(DatabaseError error) {
+        // do nothing
     }
 }
