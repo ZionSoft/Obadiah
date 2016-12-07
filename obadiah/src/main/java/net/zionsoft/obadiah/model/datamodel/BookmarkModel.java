@@ -17,11 +17,18 @@
 
 package net.zionsoft.obadiah.model.datamodel;
 
+import android.database.sqlite.SQLiteDatabase;
+import android.support.annotation.IntDef;
+import android.support.annotation.NonNull;
+import android.util.Pair;
+
 import net.zionsoft.obadiah.model.database.BookmarkTableHelper;
 import net.zionsoft.obadiah.model.database.DatabaseHelper;
 import net.zionsoft.obadiah.model.domain.Bookmark;
 import net.zionsoft.obadiah.model.domain.VerseIndex;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -31,9 +38,24 @@ import javax.inject.Singleton;
 import rx.Observable;
 import rx.Single;
 import rx.functions.Func0;
+import rx.subjects.PublishSubject;
+import rx.subjects.SerializedSubject;
 
 @Singleton
 public class BookmarkModel {
+    public static final int ACTION_ADD = 0;
+    public static final int ACTION_REMOVE = 1;
+
+    @IntDef({ACTION_ADD, ACTION_REMOVE})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface Action {
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    final SerializedSubject<Pair<Integer, Bookmark>, Pair<Integer, Bookmark>> bookmarksUpdatesSubject
+            = PublishSubject.<Pair<Integer, Bookmark>>create().toSerialized();
+
+    @SuppressWarnings("WeakerAccess")
     final DatabaseHelper databaseHelper;
 
     @Inject
@@ -41,13 +63,35 @@ public class BookmarkModel {
         this.databaseHelper = databaseHelper;
     }
 
+    @NonNull
+    public Observable<Pair<Integer, Bookmark>> observeBookmarks() {
+        return bookmarksUpdatesSubject.asObservable();
+    }
+
     public Single<Bookmark> addBookmark(final VerseIndex verseIndex) {
         return Single.fromCallable(new Callable<Bookmark>() {
             @Override
             public Bookmark call() throws Exception {
-                final Bookmark bookmark = Bookmark.create(verseIndex, System.currentTimeMillis());
-                BookmarkTableHelper.saveBookmark(databaseHelper.getDatabase(), bookmark);
-                return bookmark;
+                final SQLiteDatabase db = databaseHelper.getDatabase();
+                try {
+                    db.beginTransaction();
+
+                    Bookmark bookmark = BookmarkTableHelper.getBookmark(db, verseIndex);
+                    if (bookmark != null) {
+                        return bookmark;
+                    }
+
+                    bookmark = Bookmark.create(verseIndex, System.currentTimeMillis());
+                    BookmarkTableHelper.saveBookmark(db, bookmark);
+                    bookmarksUpdatesSubject.onNext(new Pair<>(ACTION_ADD, bookmark));
+
+                    db.setTransactionSuccessful();
+                    return bookmark;
+                } finally {
+                    if (db.inTransaction()) {
+                        db.endTransaction();
+                    }
+                }
             }
         });
     }
@@ -56,11 +100,24 @@ public class BookmarkModel {
         return Observable.defer(new Func0<Observable<Void>>() {
             @Override
             public Observable<Void> call() {
+                final SQLiteDatabase db = databaseHelper.getDatabase();
                 try {
-                    BookmarkTableHelper.removeBookmark(databaseHelper.getDatabase(), verseIndex);
+                    db.beginTransaction();
+
+                    final Bookmark bookmark = BookmarkTableHelper.getBookmark(db, verseIndex);
+                    if (bookmark != null) {
+                        BookmarkTableHelper.removeBookmark(databaseHelper.getDatabase(), verseIndex);
+                        bookmarksUpdatesSubject.onNext(new Pair<>(ACTION_REMOVE, Bookmark.create(verseIndex, -1L)));
+                    }
+
+                    db.setTransactionSuccessful();
                     return Observable.empty();
                 } catch (Exception e) {
                     return Observable.error(e);
+                } finally {
+                    if (db.inTransaction()) {
+                        db.endTransaction();
+                    }
                 }
             }
         });
