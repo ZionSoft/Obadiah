@@ -17,11 +17,18 @@
 
 package net.zionsoft.obadiah.model.datamodel;
 
+import android.database.sqlite.SQLiteDatabase;
+import android.support.annotation.IntDef;
+import android.support.annotation.NonNull;
+import android.util.Pair;
+
 import net.zionsoft.obadiah.model.database.DatabaseHelper;
 import net.zionsoft.obadiah.model.database.NoteTableHelper;
 import net.zionsoft.obadiah.model.domain.Note;
 import net.zionsoft.obadiah.model.domain.VerseIndex;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -31,9 +38,24 @@ import javax.inject.Singleton;
 import rx.Observable;
 import rx.Single;
 import rx.functions.Func0;
+import rx.subjects.PublishSubject;
+import rx.subjects.SerializedSubject;
 
 @Singleton
 public class NoteModel {
+    public static final int ACTION_ADD = 0;
+    public static final int ACTION_REMOVE = 1;
+
+    @IntDef({ACTION_ADD, ACTION_REMOVE})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface Action {
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    final SerializedSubject<Pair<Integer, Note>, Pair<Integer, Note>> notesUpdatesSubject
+            = PublishSubject.<Pair<Integer, Note>>create().toSerialized();
+
+    @SuppressWarnings("WeakerAccess")
     final DatabaseHelper databaseHelper;
 
     @Inject
@@ -41,13 +63,37 @@ public class NoteModel {
         this.databaseHelper = databaseHelper;
     }
 
+    @NonNull
+    public Observable<Pair<Integer, Note>> observeNotes() {
+        return notesUpdatesSubject.asObservable();
+    }
+
     public Single<Note> updateNote(final VerseIndex verseIndex, final String note) {
+        return updateNote(verseIndex, note, System.currentTimeMillis());
+    }
+
+    public Single<Note> updateNote(final VerseIndex verseIndex, final String note, final long timestamp) {
         return Single.fromCallable(new Callable<Note>() {
             @Override
             public Note call() throws Exception {
-                final Note n = Note.create(verseIndex, note, System.currentTimeMillis());
-                NoteTableHelper.saveNote(databaseHelper.getDatabase(), n);
-                return n;
+                final SQLiteDatabase db = databaseHelper.getDatabase();
+                try {
+                    db.beginTransaction();
+
+                    Note n = NoteTableHelper.getNote(db, verseIndex);
+                    if (n == null || timestamp > n.timestamp()) {
+                        n = Note.create(verseIndex, note, timestamp);
+                        NoteTableHelper.saveNote(databaseHelper.getDatabase(), n);
+                        notesUpdatesSubject.onNext(new Pair<>(ACTION_ADD, n));
+                    }
+
+                    db.setTransactionSuccessful();
+                    return n;
+                } finally {
+                    if (db.inTransaction()) {
+                        db.endTransaction();
+                    }
+                }
             }
         });
     }
@@ -56,11 +102,24 @@ public class NoteModel {
         return Observable.defer(new Func0<Observable<Void>>() {
             @Override
             public Observable<Void> call() {
+                final SQLiteDatabase db = databaseHelper.getDatabase();
                 try {
-                    NoteTableHelper.removeNote(databaseHelper.getDatabase(), verseIndex);
+                    db.beginTransaction();
+
+                    final Note note = NoteTableHelper.getNote(db, verseIndex);
+                    if (note != null) {
+                        NoteTableHelper.removeNote(databaseHelper.getDatabase(), verseIndex);
+                        notesUpdatesSubject.onNext(new Pair<>(ACTION_REMOVE, note));
+                    }
+
+                    db.setTransactionSuccessful();
                     return Observable.empty();
                 } catch (Exception e) {
                     return Observable.error(e);
+                } finally {
+                    if (db.inTransaction()) {
+                        db.endTransaction();
+                    }
                 }
             }
         });

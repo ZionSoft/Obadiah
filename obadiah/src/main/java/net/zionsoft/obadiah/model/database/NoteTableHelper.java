@@ -20,6 +20,7 @@ package net.zionsoft.obadiah.model.database;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import net.zionsoft.obadiah.model.domain.Note;
 import net.zionsoft.obadiah.model.domain.VerseIndex;
@@ -49,6 +50,27 @@ public class NoteTableHelper {
                 VerseIndex.ColumnNames.VERSE_INDEX),
                 new String[]{Integer.toString(verseIndex.book()), Integer.toString(verseIndex.chapter()),
                         Integer.toString(verseIndex.verse())});
+    }
+
+    @Nullable
+    public static Note getNote(SQLiteDatabase db, VerseIndex verseIndex) {
+        Cursor cursor = null;
+        try {
+            cursor = db.query(TABLE_NOTE, null, TextFormatter.format("%s = ? AND %s = ? AND %s = ?",
+                    VerseIndex.ColumnNames.BOOK_INDEX, VerseIndex.ColumnNames.CHAPTER_INDEX,
+                    VerseIndex.ColumnNames.VERSE_INDEX),
+                    new String[]{Integer.toString(verseIndex.book()), Integer.toString(verseIndex.chapter()),
+                            Integer.toString(verseIndex.verse())},
+                    null, null, null);
+            if (cursor.moveToFirst()) {
+                return Note.create(cursor);
+            }
+            return null;
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
     }
 
     @NonNull

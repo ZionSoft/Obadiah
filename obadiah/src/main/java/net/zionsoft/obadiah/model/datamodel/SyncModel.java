@@ -19,6 +19,7 @@ package net.zionsoft.obadiah.model.datamodel;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.util.Pair;
 
 import com.google.firebase.database.ChildEventListener;
@@ -28,6 +29,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import net.zionsoft.obadiah.model.domain.Bookmark;
+import net.zionsoft.obadiah.model.domain.Note;
 import net.zionsoft.obadiah.model.domain.User;
 import net.zionsoft.obadiah.model.domain.VerseIndex;
 
@@ -49,18 +51,24 @@ public class SyncModel implements ChildEventListener {
 
     private final UserModel userModel;
     private final BookmarkModel bookmarkModel;
+    private final NoteModel noteModel;
 
     @SuppressWarnings("WeakerAccess")
     final FirebaseDatabase firebaseDatabase;
 
     @SuppressWarnings("WeakerAccess")
     DatabaseReference bookmarksReference;
+    @SuppressWarnings("WeakerAccess")
+    DatabaseReference notesReference;
+
     private Subscription observeBookmarksSubscription;
+    private Subscription observeNotesSubscription;
 
     @Inject
-    public SyncModel(UserModel userModel, BookmarkModel bookmarkModel) {
+    public SyncModel(UserModel userModel, BookmarkModel bookmarkModel, NoteModel noteModel) {
         this.userModel = userModel;
         this.bookmarkModel = bookmarkModel;
+        this.noteModel = noteModel;
 
         firebaseDatabase = FirebaseDatabase.getInstance();
         firebaseDatabase.setPersistenceEnabled(true);
@@ -82,6 +90,9 @@ public class SyncModel implements ChildEventListener {
                         unsubscribeAll();
                         if (user != null) {
                             initialSync(user);
+                        } else {
+                            bookmarksReference = null;
+                            notesReference = null;
                         }
                     }
                 });
@@ -90,6 +101,7 @@ public class SyncModel implements ChildEventListener {
     @SuppressWarnings("WeakerAccess")
     void unsubscribeAll() {
         unsubscribeObserveBookmarks();
+        unsubscribeObserveNotes();
     }
 
     private void unsubscribeObserveBookmarks() {
@@ -99,14 +111,21 @@ public class SyncModel implements ChildEventListener {
         }
     }
 
+    private void unsubscribeObserveNotes() {
+        if (observeNotesSubscription != null) {
+            observeNotesSubscription.unsubscribe();
+            observeNotesSubscription = null;
+        }
+    }
+
     @SuppressWarnings("WeakerAccess")
     void initialSync(@NonNull User user) {
         syncBookmarks(user);
+        syncNotes(user);
     }
 
     private void syncBookmarks(@NonNull final User user) {
-        final String path = buildBookMarksRootPath(user);
-        bookmarksReference = firebaseDatabase.getReference(path);
+        bookmarksReference = firebaseDatabase.getReference(buildBookmarksRootPath(user));
         bookmarksReference.addChildEventListener(this);
 
         bookmarkModel.loadBookmarks().map(new Func1<List<Bookmark>, Void>() {
@@ -114,7 +133,8 @@ public class SyncModel implements ChildEventListener {
             public Void call(List<Bookmark> bookmarks) {
                 for (int i = bookmarks.size() - 1; i >= 0; --i) {
                     final Bookmark bookmark = bookmarks.get(i);
-                    bookmarksReference.child(buildBookMarkKey(bookmark)).setValue(bookmark.timestamp());
+                    bookmarksReference.child(verseIndexToKey(bookmark.verseIndex()))
+                            .setValue(bookmark.timestamp());
                 }
 
                 return null;
@@ -137,8 +157,8 @@ public class SyncModel implements ChildEventListener {
                     @Override
                     public void onNext(Pair<Integer, Bookmark> bookmark) {
                         if (bookmarksReference != null) {
-                            final DatabaseReference reference
-                                    = bookmarksReference.child(buildBookMarkKey(bookmark.second));
+                            final DatabaseReference reference = bookmarksReference.child(
+                                    verseIndexToKey(bookmark.second.verseIndex()));
                             switch (bookmark.first) {
                                 case BookmarkModel.ACTION_ADD:
                                     reference.setValue(bookmark.second.timestamp());
@@ -152,8 +172,7 @@ public class SyncModel implements ChildEventListener {
                 });
     }
 
-    @SuppressWarnings("WeakerAccess")
-    static String buildBookMarksRootPath(@NonNull User user) {
+    private static String buildBookmarksRootPath(@NonNull User user) {
         synchronized (STRING_BUILDER) {
             STRING_BUILDER.setLength(0);
             STRING_BUILDER.append("/bookmarks/").append(user.uid);
@@ -162,33 +181,114 @@ public class SyncModel implements ChildEventListener {
     }
 
     @SuppressWarnings("WeakerAccess")
-    static String buildBookMarkKey(@NonNull Bookmark bookmark) {
+    static String verseIndexToKey(@NonNull VerseIndex verseIndex) {
         synchronized (STRING_BUILDER) {
             STRING_BUILDER.setLength(0);
-            final VerseIndex verseIndex = bookmark.verseIndex();
             STRING_BUILDER.append(verseIndex.book()).append(':')
                     .append(verseIndex.chapter()).append(':').append(verseIndex.verse());
             return STRING_BUILDER.toString();
         }
     }
 
+    private void syncNotes(@NonNull final User user) {
+        notesReference = firebaseDatabase.getReference(buildNotesRootPath(user));
+        notesReference.addChildEventListener(this);
+
+        noteModel.loadNotes().map(new Func1<List<Note>, Void>() {
+            @Override
+            public Void call(List<Note> notes) {
+                for (int i = notes.size() - 1; i >= 0; --i) {
+                    final Note note = notes.get(i);
+                    final DatabaseReference reference
+                            = notesReference.child(verseIndexToKey(note.verseIndex()));
+                    reference.child("timestamp").setValue(note.timestamp());
+                    reference.child("note").setValue(note.note());
+                }
+
+                return null;
+            }
+        }).onErrorResumeNext(Single.<Void>just(null)).subscribeOn(Schedulers.io()).subscribe();
+
+        unsubscribeObserveNotes();
+        observeNotesSubscription = noteModel.observeNotes().observeOn(Schedulers.io())
+                .subscribe(new Observer<Pair<Integer, Note>>() {
+                    @Override
+                    public void onCompleted() {
+                        // do nothing
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        // do nothing
+                    }
+
+                    @Override
+                    public void onNext(Pair<Integer, Note> note) {
+                        if (notesReference != null) {
+                            final DatabaseReference reference
+                                    = notesReference.child(verseIndexToKey(note.second.verseIndex()));
+                            switch (note.first) {
+                                case NoteModel.ACTION_ADD:
+                                    reference.child("timestamp").setValue(note.second.timestamp());
+                                    reference.child("note").setValue(note.second.note());
+                                    break;
+                                case NoteModel.ACTION_REMOVE:
+                                    reference.removeValue();
+                                    break;
+                            }
+                        }
+                    }
+                });
+    }
+
+    private static String buildNotesRootPath(@NonNull User user) {
+        synchronized (STRING_BUILDER) {
+            STRING_BUILDER.setLength(0);
+            STRING_BUILDER.append("/notes/").append(user.uid);
+            return STRING_BUILDER.toString();
+        }
+    }
+
     @Override
     public void onChildAdded(DataSnapshot snapshot, String previousChildName) {
-        final User user = userModel.getCurrentUser();
-        if (user == null || !user.uid.equals(snapshot.getRef().getParent().getKey())) {
+        final String type = getSnapshotType(snapshot);
+        if (TextUtils.isEmpty(type)) {
             return;
         }
 
-        final VerseIndex verseIndex = fromBookmarkKey(snapshot.getKey());
+        final VerseIndex verseIndex = keyToVerseIndex(snapshot.getKey());
         if (verseIndex != null) {
-            bookmarkModel.addBookmark(verseIndex).subscribeOn(Schedulers.io())
-                    .onErrorResumeNext(Single.<Bookmark>just(null)).subscribe();
+            if ("bookmarks".equals(type)) {
+                bookmarkModel.addBookmark(verseIndex).subscribeOn(Schedulers.io())
+                        .onErrorResumeNext(Single.<Bookmark>just(null)).subscribe();
+            } else if ("notes".equals(type)) {
+                final String note = (String) snapshot.child("note").getValue();
+                final Long timestamp = (Long) snapshot.child("timestamp").getValue();
+                if (!TextUtils.isEmpty(note) && timestamp != null) {
+                    noteModel.updateNote(verseIndex, note, timestamp).subscribeOn(Schedulers.io())
+                            .onErrorResumeNext(Single.<Note>just(null)).subscribe();
+                }
+            }
         }
     }
 
     @Nullable
-    private static VerseIndex fromBookmarkKey(String bookmarkKey) {
-        final String[] fields = bookmarkKey.split(":");
+    private String getSnapshotType(DataSnapshot snapshot) {
+        final User user = userModel.getCurrentUser();
+        if (user == null) {
+            return null;
+        }
+        DatabaseReference parent = snapshot.getRef().getParent();
+        if (parent == null || !user.uid.equals(parent.getKey())) {
+            return null;
+        }
+        parent = parent.getParent();
+        return parent != null ? parent.getKey() : null;
+    }
+
+    @Nullable
+    private static VerseIndex keyToVerseIndex(String key) {
+        final String[] fields = key.split(":");
         if (fields.length != 3) {
             return null;
         }
@@ -198,20 +298,25 @@ public class SyncModel implements ChildEventListener {
 
     @Override
     public void onChildChanged(DataSnapshot snapshot, String previousChildName) {
-        // do nothing
+        onChildAdded(snapshot, previousChildName);
     }
 
     @Override
     public void onChildRemoved(DataSnapshot snapshot) {
-        final User user = userModel.getCurrentUser();
-        if (user == null || !user.uid.equals(snapshot.getRef().getParent().getKey())) {
+        final String type = getSnapshotType(snapshot);
+        if (TextUtils.isEmpty(type)) {
             return;
         }
 
-        final VerseIndex verseIndex = fromBookmarkKey(snapshot.getKey());
+        final VerseIndex verseIndex = keyToVerseIndex(snapshot.getKey());
         if (verseIndex != null) {
-            bookmarkModel.removeBookmark(verseIndex).subscribeOn(Schedulers.io())
-                    .onErrorResumeNext(Observable.<Void>empty()).subscribe();
+            if ("bookmarks".equals(type)) {
+                bookmarkModel.removeBookmark(verseIndex).subscribeOn(Schedulers.io())
+                        .onErrorResumeNext(Observable.<Void>empty()).subscribe();
+            } else if ("notes".equals(type)) {
+                noteModel.removeNote(verseIndex).subscribeOn(Schedulers.io())
+                        .onErrorResumeNext(Observable.<Void>empty()).subscribe();
+            }
         }
     }
 
