@@ -13,6 +13,7 @@ CHANGELOG
   - Updated Stetho to 1.4.1.
 - Used Firebase for analytics and crash reporting.
 - Supported Firebase auth (with Google account).
+- Supported syncing user data (bookmarks).
 
 #### v1.15.3 (2016-11-18)
 - Updated deps:
