@@ -4,11 +4,12 @@ CHANGELOG
 #### Next Release
 - Updated deps:
   - Updated Gradle to 3.2.1.
+  - Updated Android Gradle plugin to 2.2.3.
   - Updated build tool to 25.0.1.
   - Updated support library to 25.0.1.
   - Updated Dagger to 2.8.
   - Updated RxJava to 1.2.3.
-  - Updated okhttp to 3.4.2.
+  - Updated okhttp to 3.5.0.
   - Updated Play Services and Firebase to 10.0.1.
   - Updated Stetho to 1.4.1.
 - Used Firebase for analytics and crash reporting.
