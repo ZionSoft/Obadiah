@@ -77,13 +77,11 @@ public class BookmarkModel {
                     db.beginTransaction();
 
                     Bookmark bookmark = BookmarkTableHelper.getBookmark(db, verseIndex);
-                    if (bookmark != null) {
-                        return bookmark;
+                    if (bookmark == null) {
+                        bookmark = Bookmark.create(verseIndex, System.currentTimeMillis());
+                        BookmarkTableHelper.saveBookmark(db, bookmark);
+                        bookmarksUpdatesSubject.onNext(new Pair<>(ACTION_ADD, bookmark));
                     }
-
-                    bookmark = Bookmark.create(verseIndex, System.currentTimeMillis());
-                    BookmarkTableHelper.saveBookmark(db, bookmark);
-                    bookmarksUpdatesSubject.onNext(new Pair<>(ACTION_ADD, bookmark));
 
                     db.setTransactionSuccessful();
                     return bookmark;
@@ -107,7 +105,7 @@ public class BookmarkModel {
                     final Bookmark bookmark = BookmarkTableHelper.getBookmark(db, verseIndex);
                     if (bookmark != null) {
                         BookmarkTableHelper.removeBookmark(databaseHelper.getDatabase(), verseIndex);
-                        bookmarksUpdatesSubject.onNext(new Pair<>(ACTION_REMOVE, Bookmark.create(verseIndex, -1L)));
+                        bookmarksUpdatesSubject.onNext(new Pair<>(ACTION_REMOVE, bookmark));
                     }
 
                     db.setTransactionSuccessful();
