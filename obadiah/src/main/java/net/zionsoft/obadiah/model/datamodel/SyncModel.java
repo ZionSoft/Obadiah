@@ -47,6 +47,7 @@ import rx.schedulers.Schedulers;
 public class SyncModel implements ChildEventListener {
     private static final StringBuilder STRING_BUILDER = new StringBuilder();
 
+    private final UserModel userModel;
     private final BookmarkModel bookmarkModel;
 
     @SuppressWarnings("WeakerAccess")
@@ -58,6 +59,7 @@ public class SyncModel implements ChildEventListener {
 
     @Inject
     public SyncModel(UserModel userModel, BookmarkModel bookmarkModel) {
+        this.userModel = userModel;
         this.bookmarkModel = bookmarkModel;
 
         firebaseDatabase = FirebaseDatabase.getInstance();
@@ -172,6 +174,11 @@ public class SyncModel implements ChildEventListener {
 
     @Override
     public void onChildAdded(DataSnapshot snapshot, String previousChildName) {
+        final User user = userModel.getCurrentUser();
+        if (user == null || !user.uid.equals(snapshot.getRef().getParent().getKey())) {
+            return;
+        }
+
         final VerseIndex verseIndex = fromBookmarkKey(snapshot.getKey());
         if (verseIndex != null) {
             bookmarkModel.addBookmark(verseIndex).subscribeOn(Schedulers.io())
@@ -196,6 +203,11 @@ public class SyncModel implements ChildEventListener {
 
     @Override
     public void onChildRemoved(DataSnapshot snapshot) {
+        final User user = userModel.getCurrentUser();
+        if (user == null || !user.uid.equals(snapshot.getRef().getParent().getKey())) {
+            return;
+        }
+
         final VerseIndex verseIndex = fromBookmarkKey(snapshot.getKey());
         if (verseIndex != null) {
             bookmarkModel.removeBookmark(verseIndex).subscribeOn(Schedulers.io())
