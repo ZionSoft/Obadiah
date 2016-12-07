@@ -17,16 +17,22 @@
 
 package net.zionsoft.obadiah;
 
-import dagger.Lazy;
-import javax.inject.Inject;
 import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.datamodel.BibleReadingModel;
+import net.zionsoft.obadiah.model.datamodel.SyncModel;
 import net.zionsoft.obadiah.notification.PushNotificationRegister;
 import net.zionsoft.obadiah.ui.utils.UiHelper;
+
+import javax.inject.Inject;
+
+import dagger.Lazy;
 
 public class App extends BaseApp {
     @Inject
     Lazy<BibleReadingModel> bibleReadingModel;
+
+    @Inject
+    SyncModel syncModel;
 
     private static AppComponent appComponent;
 
