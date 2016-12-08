@@ -27,6 +27,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import net.zionsoft.obadiah.model.domain.Bookmark;
 import net.zionsoft.obadiah.model.domain.Note;
@@ -161,7 +162,20 @@ public class SyncModel implements ChildEventListener {
                                     verseIndexToKey(bookmark.second.verseIndex()));
                             switch (bookmark.first) {
                                 case BookmarkModel.ACTION_ADD:
-                                    reference.setValue(bookmark.second.timestamp());
+                                    final long timestamp = bookmark.second.timestamp();
+                                    reference.addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(DataSnapshot snapshot) {
+                                            if (!snapshot.exists()) {
+                                                reference.setValue(timestamp);
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onCancelled(DatabaseError databaseError) {
+                                            // do nothing
+                                        }
+                                    });
                                     break;
                                 case BookmarkModel.ACTION_REMOVE:
                                     reference.removeValue();
@@ -229,8 +243,34 @@ public class SyncModel implements ChildEventListener {
                                     = notesReference.child(verseIndexToKey(note.second.verseIndex()));
                             switch (note.first) {
                                 case NoteModel.ACTION_ADD:
-                                    reference.child("timestamp").setValue(note.second.timestamp());
-                                    reference.child("note").setValue(note.second.note());
+                                    final long t = note.second.timestamp();
+                                    final String n = note.second.note();
+                                    reference.addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(DataSnapshot dataSnapshot) {
+                                            if (!dataSnapshot.exists()) {
+                                                reference.child("timestamp").addListenerForSingleValueEvent(new ValueEventListener() {
+                                                    @Override
+                                                    public void onDataChange(DataSnapshot dataSnapshot) {
+                                                        if (!dataSnapshot.exists() || t > (long) dataSnapshot.getValue()) {
+                                                            reference.child("timestamp").setValue(t);
+                                                            reference.child("note").setValue(n);
+                                                        }
+                                                    }
+
+                                                    @Override
+                                                    public void onCancelled(DatabaseError databaseError) {
+                                                        // do nothing
+                                                    }
+                                                });
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onCancelled(DatabaseError databaseError) {
+                                            // do nothing
+                                        }
+                                    });
                                     break;
                                 case NoteModel.ACTION_REMOVE:
                                     reference.removeValue();
@@ -259,8 +299,11 @@ public class SyncModel implements ChildEventListener {
         final VerseIndex verseIndex = keyToVerseIndex(snapshot.getKey());
         if (verseIndex != null) {
             if ("bookmarks".equals(type)) {
-                bookmarkModel.addBookmark(verseIndex).subscribeOn(Schedulers.io())
-                        .onErrorResumeNext(Single.<Bookmark>just(null)).subscribe();
+                final Long timestamp = (Long) snapshot.getValue();
+                if (timestamp != null) {
+                    bookmarkModel.addBookmark(verseIndex, timestamp).subscribeOn(Schedulers.io())
+                            .onErrorResumeNext(Single.<Bookmark>just(null)).subscribe();
+                }
             } else if ("notes".equals(type)) {
                 final String note = (String) snapshot.child("note").getValue();
                 final Long timestamp = (Long) snapshot.child("timestamp").getValue();

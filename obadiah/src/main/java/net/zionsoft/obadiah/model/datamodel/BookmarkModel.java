@@ -69,6 +69,10 @@ public class BookmarkModel {
     }
 
     public Single<Bookmark> addBookmark(final VerseIndex verseIndex) {
+        return addBookmark(verseIndex, System.currentTimeMillis());
+    }
+
+    public Single<Bookmark> addBookmark(final VerseIndex verseIndex, final long timestamp) {
         return Single.fromCallable(new Callable<Bookmark>() {
             @Override
             public Bookmark call() throws Exception {
@@ -78,7 +82,7 @@ public class BookmarkModel {
 
                     Bookmark bookmark = BookmarkTableHelper.getBookmark(db, verseIndex);
                     if (bookmark == null) {
-                        bookmark = Bookmark.create(verseIndex, System.currentTimeMillis());
+                        bookmark = Bookmark.create(verseIndex, timestamp);
                         BookmarkTableHelper.saveBookmark(db, bookmark);
                         bookmarksUpdatesSubject.onNext(new Pair<>(ACTION_ADD, bookmark));
                     }
