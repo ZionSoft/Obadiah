@@ -25,6 +25,7 @@ import android.support.annotation.Nullable;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 public class Analytics {
+    public static final String EVENT_LOGIN = FirebaseAnalytics.Event.LOGIN;
     public static final String EVENT_SELECT_CONTENT = FirebaseAnalytics.Event.SELECT_CONTENT;
     public static final String EVENT_SHARE = FirebaseAnalytics.Event.SHARE;
     public static final String EVENT_DOWNLOAD_FIRST_TRANSLATION = "download_first_translation";
@@ -45,6 +46,10 @@ public class Analytics {
                 }
             }
         }
+    }
+
+    public static void logEvent(@NonNull String event) {
+        logEvent(event, null);
     }
 
     public static void logEvent(@NonNull String event, @Nullable Bundle params) {

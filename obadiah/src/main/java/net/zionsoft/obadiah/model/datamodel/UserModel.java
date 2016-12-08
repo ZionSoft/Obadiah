@@ -28,6 +28,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
+import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.domain.User;
 
 import javax.inject.Inject;
@@ -82,6 +83,7 @@ public class UserModel implements FirebaseAuth.AuthStateListener {
                                 @Override
                                 public void onComplete(@NonNull Task<AuthResult> task) {
                                     if (task.isSuccessful()) {
+                                        Analytics.logEvent(Analytics.EVENT_LOGIN);
                                         subscriber.onSuccess(fromFirebaseUser(task.getResult().getUser()));
                                     } else {
                                         subscriber.onError(task.getException());
