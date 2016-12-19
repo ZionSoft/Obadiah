@@ -45,8 +45,8 @@ public class ReadingProgressModel {
     final DatabaseHelper databaseHelper;
 
     @SuppressWarnings("WeakerAccess")
-    final SerializedSubject<Void, Void> readingProgressUpdatesSubject
-            = PublishSubject.<Void>create().toSerialized();
+    final SerializedSubject<ReadingProgress.ReadChapter, ReadingProgress.ReadChapter> readingProgressUpdatesSubject
+            = PublishSubject.<ReadingProgress.ReadChapter>create().toSerialized();
 
     @Inject
     public ReadingProgressModel(DatabaseHelper databaseHelper) {
@@ -54,7 +54,7 @@ public class ReadingProgressModel {
     }
 
     @NonNull
-    public Observable<Void> observeReadingProgress() {
+    public Observable<ReadingProgress.ReadChapter> observeReadingProgress() {
         return readingProgressUpdatesSubject.asObservable();
     }
 
@@ -91,7 +91,7 @@ public class ReadingProgressModel {
 
                     final long now = System.currentTimeMillis();
                     ReadingProgressTableHelper.saveChapterReading(database, book, chapter, now);
-                    readingProgressUpdatesSubject.onNext(null);
+                    readingProgressUpdatesSubject.onNext(new ReadingProgress.ReadChapter(book, chapter, now));
 
                     final long lastReadingDay = Long.parseLong(MetadataTableHelper.getMetadata(
                             database, MetadataTableHelper.KEY_LAST_READING_TIMESTAMP, "0")) / DateUtils.DAY_IN_MILLIS;

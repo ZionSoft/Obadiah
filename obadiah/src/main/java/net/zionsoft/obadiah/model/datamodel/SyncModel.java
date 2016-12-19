@@ -330,6 +330,71 @@ public class SyncModel implements ChildEventListener {
                 return null;
             }
         }).onErrorResumeNext(Observable.<Void>just(null)).subscribeOn(Schedulers.io()).subscribe();
+
+        unsubscribeObserveReadingProgress();
+        observeReadingProgressSubscription = readingProgressModel.observeReadingProgress().observeOn(Schedulers.io())
+                .subscribe(new Observer<ReadingProgress.ReadChapter>() {
+                    @Override
+                    public void onCompleted() {
+                        // do nothing
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        // do nothing
+                    }
+
+                    @Override
+                    public void onNext(ReadingProgress.ReadChapter readChapter) {
+                        if (readingProgressReference == null) {
+                            return;
+                        }
+                        readingProgressReference.child(verseIndexToKey(readChapter.book, readChapter.chapter))
+                                .setValue(readChapter.timestamp);
+                    }
+                });
+
+        observeReadingProgressSubscription = bookmarkModel.observeBookmarks().observeOn(Schedulers.io())
+                .subscribe(new Observer<Pair<Integer, Bookmark>>() {
+                    @Override
+                    public void onCompleted() {
+                        // do nothing
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        // do nothing
+                    }
+
+                    @Override
+                    public void onNext(Pair<Integer, Bookmark> bookmark) {
+                        if (bookmarksReference != null) {
+                            final DatabaseReference reference = bookmarksReference.child(
+                                    verseIndexToKey(bookmark.second.verseIndex()));
+                            switch (bookmark.first) {
+                                case BookmarkModel.ACTION_ADD:
+                                    final long timestamp = bookmark.second.timestamp();
+                                    reference.addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(DataSnapshot snapshot) {
+                                            if (!snapshot.exists()) {
+                                                reference.setValue(timestamp);
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onCancelled(DatabaseError databaseError) {
+                                            // do nothing
+                                        }
+                                    });
+                                    break;
+                                case BookmarkModel.ACTION_REMOVE:
+                                    reference.removeValue();
+                                    break;
+                            }
+                        }
+                    }
+                });
     }
 
     private static String buildReadingProgressRootPath(@NonNull User user) {

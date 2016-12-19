@@ -24,6 +24,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ReadingProgress {
+    public static class ReadChapter {
+        public final int book;
+        public final int chapter;
+        public final long timestamp;
+
+        public ReadChapter(int book, int chapter, long timestamp) {
+            this.book = book;
+            this.chapter = chapter;
+            this.timestamp = timestamp;
+        }
+    }
+
     private final int totalChaptersRead;
     private final int finishedBooks;
     private final int finishedOldTestament;
