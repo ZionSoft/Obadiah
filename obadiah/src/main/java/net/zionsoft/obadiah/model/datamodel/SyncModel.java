@@ -310,7 +310,7 @@ public class SyncModel implements ChildEventListener {
 
     private void syncReadingProgress(@NonNull final User user) {
         readingProgressReference = firebaseDatabase.getReference(buildReadingProgressRootPath(user));
-        //readingProgressReference.addChildEventListener(this);
+        readingProgressReference.addChildEventListener(this);
 
         readingProgressModel.loadReadingProgress().map(new Func1<ReadingProgress, Void>() {
             @Override
@@ -353,48 +353,6 @@ public class SyncModel implements ChildEventListener {
                                 .setValue(readChapter.timestamp);
                     }
                 });
-
-        observeReadingProgressSubscription = bookmarkModel.observeBookmarks().observeOn(Schedulers.io())
-                .subscribe(new Observer<Pair<Integer, Bookmark>>() {
-                    @Override
-                    public void onCompleted() {
-                        // do nothing
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        // do nothing
-                    }
-
-                    @Override
-                    public void onNext(Pair<Integer, Bookmark> bookmark) {
-                        if (bookmarksReference != null) {
-                            final DatabaseReference reference = bookmarksReference.child(
-                                    verseIndexToKey(bookmark.second.verseIndex()));
-                            switch (bookmark.first) {
-                                case BookmarkModel.ACTION_ADD:
-                                    final long timestamp = bookmark.second.timestamp();
-                                    reference.addListenerForSingleValueEvent(new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(DataSnapshot snapshot) {
-                                            if (!snapshot.exists()) {
-                                                reference.setValue(timestamp);
-                                            }
-                                        }
-
-                                        @Override
-                                        public void onCancelled(DatabaseError databaseError) {
-                                            // do nothing
-                                        }
-                                    });
-                                    break;
-                                case BookmarkModel.ACTION_REMOVE:
-                                    reference.removeValue();
-                                    break;
-                            }
-                        }
-                    }
-                });
     }
 
     private static String buildReadingProgressRootPath(@NonNull User user) {
@@ -421,20 +379,33 @@ public class SyncModel implements ChildEventListener {
             return;
         }
 
-        final VerseIndex verseIndex = keyToVerseIndex(snapshot.getKey());
-        if (verseIndex != null) {
-            if ("bookmarks".equals(type)) {
-                final Long timestamp = (Long) snapshot.getValue();
-                if (timestamp != null) {
-                    bookmarkModel.addBookmark(verseIndex, timestamp).subscribeOn(Schedulers.io())
-                            .onErrorResumeNext(Single.<Bookmark>just(null)).subscribe();
-                }
-            } else if ("notes".equals(type)) {
-                final String note = (String) snapshot.child("note").getValue();
-                final Long timestamp = (Long) snapshot.child("timestamp").getValue();
-                if (!TextUtils.isEmpty(note) && timestamp != null) {
-                    noteModel.updateNote(verseIndex, note, timestamp).subscribeOn(Schedulers.io())
-                            .onErrorResumeNext(Single.<Note>just(null)).subscribe();
+        if ("readingProgress".equals(type)) {
+            final String[] fields = snapshot.getKey().split(":");
+            if (fields.length != 2) {
+                return;
+            }
+            final int book = Integer.parseInt(fields[0]);
+            final int chapter = Integer.parseInt(fields[1]);
+            final Long timestamp = (Long) snapshot.getValue();
+            if (timestamp != null) {
+                readingProgressModel.trackReadingProgress(book, chapter, timestamp);
+            }
+        } else {
+            final VerseIndex verseIndex = keyToVerseIndex(snapshot.getKey());
+            if (verseIndex != null) {
+                if ("bookmarks".equals(type)) {
+                    final Long timestamp = (Long) snapshot.getValue();
+                    if (timestamp != null) {
+                        bookmarkModel.addBookmark(verseIndex, timestamp).subscribeOn(Schedulers.io())
+                                .onErrorResumeNext(Single.<Bookmark>just(null)).subscribe();
+                    }
+                } else if ("notes".equals(type)) {
+                    final String note = (String) snapshot.child("note").getValue();
+                    final Long timestamp = (Long) snapshot.child("timestamp").getValue();
+                    if (!TextUtils.isEmpty(note) && timestamp != null) {
+                        noteModel.updateNote(verseIndex, note, timestamp).subscribeOn(Schedulers.io())
+                                .onErrorResumeNext(Single.<Note>just(null)).subscribe();
+                    }
                 }
             }
         }

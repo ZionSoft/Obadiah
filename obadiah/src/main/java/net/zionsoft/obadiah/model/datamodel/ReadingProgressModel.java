@@ -82,6 +82,10 @@ public class ReadingProgressModel {
     }
 
     public Observable<Void> trackReadingProgress(final int book, final int chapter) {
+        return trackReadingProgress(book, chapter, System.currentTimeMillis());
+    }
+
+    public Observable<Void> trackReadingProgress(final int book, final int chapter, final long timestamp) {
         return Observable.defer(new Func0<Observable<Void>>() {
             @Override
             public Observable<Void> call() {
@@ -89,13 +93,17 @@ public class ReadingProgressModel {
                 try {
                     database.beginTransaction();
 
-                    final long now = System.currentTimeMillis();
-                    ReadingProgressTableHelper.saveChapterReading(database, book, chapter, now);
-                    readingProgressUpdatesSubject.onNext(new ReadingProgress.ReadChapter(book, chapter, now));
+                    final long lastReadingTimestamp = Long.parseLong(MetadataTableHelper.getMetadata(
+                            database, MetadataTableHelper.KEY_LAST_READING_TIMESTAMP, "0"));
+                    if (lastReadingTimestamp >= timestamp) {
+                        return null;
+                    }
 
-                    final long lastReadingDay = Long.parseLong(MetadataTableHelper.getMetadata(
-                            database, MetadataTableHelper.KEY_LAST_READING_TIMESTAMP, "0")) / DateUtils.DAY_IN_MILLIS;
-                    final long today = now / DateUtils.DAY_IN_MILLIS;
+                    ReadingProgressTableHelper.saveChapterReading(database, book, chapter, timestamp);
+                    readingProgressUpdatesSubject.onNext(new ReadingProgress.ReadChapter(book, chapter, timestamp));
+
+                    final long lastReadingDay = lastReadingTimestamp / DateUtils.DAY_IN_MILLIS;
+                    final long today = timestamp / DateUtils.DAY_IN_MILLIS;
                     final long diff = today - lastReadingDay;
                     int continuousReadingDays = 1;
                     if (diff == 1L) {
@@ -105,7 +113,7 @@ public class ReadingProgressModel {
                     }
                     if (diff >= 1L) {
                         MetadataTableHelper.saveMetadata(database,
-                                MetadataTableHelper.KEY_LAST_READING_TIMESTAMP, Long.toString(now));
+                                MetadataTableHelper.KEY_LAST_READING_TIMESTAMP, Long.toString(timestamp));
                         MetadataTableHelper.saveMetadata(database,
                                 MetadataTableHelper.KEY_CONTINUOUS_READING_DAYS,
                                 Integer.toString(continuousReadingDays));
