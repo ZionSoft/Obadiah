@@ -17,14 +17,15 @@
 
 package net.zionsoft.obadiah.readingprogress;
 
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.Resources;
 import android.support.v7.widget.RecyclerView;
-import android.util.Pair;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.TextView;
 
 import net.zionsoft.obadiah.R;
@@ -40,7 +41,7 @@ import butterknife.ButterKnife;
 
 class ReadingProgressListAdapter extends RecyclerView.Adapter {
     static class HeaderViewHolder extends RecyclerView.ViewHolder {
-        private final Resources resources;
+        final Resources resources;
 
         @BindView(R.id.continuous_reading_text_view)
         TextView continuousReading;
@@ -112,12 +113,22 @@ class ReadingProgressListAdapter extends RecyclerView.Adapter {
             finishedNewTestamentCount.setTextSize(TypedValue.COMPLEX_UNIT_PX, smallerTextSize);
         }
 
-        void bind(ReadingProgress readingProgress) {
+        void bind(final ReadingProgress readingProgress) {
             continuousReadingCount.setText(resources.getString(
                     R.string.text_continuous_reading_count, readingProgress.getContinuousReadingDays()));
 
-            chapterReadCount.setText(resources.getString(
-                    R.string.text_chapters_read_count, readingProgress.getTotalChapterRead()));
+            final ValueAnimator animator = ValueAnimator.ofFloat(0.0F, 1.0F).setDuration(1500L);
+            animator.setInterpolator(new AccelerateDecelerateInterpolator());
+            animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                    final int count = Math.round(valueAnimator.getAnimatedFraction()
+                            * readingProgress.getTotalChapterRead());
+                    chapterReadCount.setText(resources.getString(
+                            R.string.text_chapters_read_count, count));
+                }
+            });
+            animator.start();
 
             finishedBooksCount.setText(resources.getString(
                     R.string.text_finished_books_count, readingProgress.getFinishedBooksCount()));
@@ -177,10 +188,12 @@ class ReadingProgressListAdapter extends RecyclerView.Adapter {
             this.readingProgress.setText(STRING_BUILDER.toString());
 
             if (chaptersRead > 0) {
-                final Pair<Integer, Long> lastReadChapter = readingProgress.getLastReadChapter(book);
-                this.lastReadChapter.setText(resources.getString(R.string.text_last_read_chapter,
-                        lastReadChapter.first + 1, dateFormatter.format(lastReadChapter.second)));
-                this.lastReadChapter.setVisibility(View.VISIBLE);
+                final ReadingProgress.ReadChapter lastReadChapter = readingProgress.getLastReadChapter(book);
+                if (lastReadChapter != null) {
+                    this.lastReadChapter.setText(resources.getString(R.string.text_last_read_chapter,
+                            lastReadChapter.chapter + 1, dateFormatter.format(lastReadChapter.timestamp)));
+                    this.lastReadChapter.setVisibility(View.VISIBLE);
+                }
             } else {
                 this.lastReadChapter.setVisibility(View.GONE);
             }

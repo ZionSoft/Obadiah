@@ -29,16 +29,20 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import net.zionsoft.obadiah.model.domain.Bible;
 import net.zionsoft.obadiah.model.domain.Bookmark;
 import net.zionsoft.obadiah.model.domain.Note;
+import net.zionsoft.obadiah.model.domain.ReadingProgress;
 import net.zionsoft.obadiah.model.domain.User;
 import net.zionsoft.obadiah.model.domain.VerseIndex;
+import net.zionsoft.obadiah.utils.Triple;
 
 import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import rx.Completable;
 import rx.Observable;
 import rx.Observer;
 import rx.Single;
@@ -53,6 +57,7 @@ public class SyncModel implements ChildEventListener {
     private final UserModel userModel;
     private final BookmarkModel bookmarkModel;
     private final NoteModel noteModel;
+    private final ReadingProgressModel readingProgressModel;
 
     @SuppressWarnings("WeakerAccess")
     final FirebaseDatabase firebaseDatabase;
@@ -61,15 +66,22 @@ public class SyncModel implements ChildEventListener {
     DatabaseReference bookmarksReference;
     @SuppressWarnings("WeakerAccess")
     DatabaseReference notesReference;
+    @SuppressWarnings("WeakerAccess")
+    DatabaseReference readingProgressReference;
+    @SuppressWarnings("WeakerAccess")
+    DatabaseReference metadataReference;
 
     private Subscription observeBookmarksSubscription;
     private Subscription observeNotesSubscription;
+    private Subscription observeReadingProgressSubscription;
 
     @Inject
-    public SyncModel(UserModel userModel, BookmarkModel bookmarkModel, NoteModel noteModel) {
+    public SyncModel(UserModel userModel, BookmarkModel bookmarkModel, NoteModel noteModel,
+                     final ReadingProgressModel readingProgressModel) {
         this.userModel = userModel;
         this.bookmarkModel = bookmarkModel;
         this.noteModel = noteModel;
+        this.readingProgressModel = readingProgressModel;
 
         firebaseDatabase = FirebaseDatabase.getInstance();
         firebaseDatabase.setPersistenceEnabled(true);
@@ -94,6 +106,8 @@ public class SyncModel implements ChildEventListener {
                         } else {
                             bookmarksReference = null;
                             notesReference = null;
+                            readingProgressReference = null;
+                            metadataReference = null;
                         }
                     }
                 });
@@ -103,6 +117,7 @@ public class SyncModel implements ChildEventListener {
     void unsubscribeAll() {
         unsubscribeObserveBookmarks();
         unsubscribeObserveNotes();
+        unsubscribeObserveReadingProgress();
     }
 
     private void unsubscribeObserveBookmarks() {
@@ -119,10 +134,18 @@ public class SyncModel implements ChildEventListener {
         }
     }
 
+    private void unsubscribeObserveReadingProgress() {
+        if (observeReadingProgressSubscription != null) {
+            observeReadingProgressSubscription.unsubscribe();
+            observeReadingProgressSubscription = null;
+        }
+    }
+
     @SuppressWarnings("WeakerAccess")
     void initialSync(@NonNull User user) {
         syncBookmarks(user);
         syncNotes(user);
+        syncReadingProgress(user);
     }
 
     private void syncBookmarks(@NonNull final User user) {
@@ -289,6 +312,83 @@ public class SyncModel implements ChildEventListener {
         }
     }
 
+    private void syncReadingProgress(@NonNull final User user) {
+        readingProgressReference = firebaseDatabase.getReference(buildReadingProgressRootPath(user));
+        readingProgressReference.addChildEventListener(this);
+        metadataReference = firebaseDatabase.getReference(buildMetadataRootPath(user));
+        metadataReference.addChildEventListener(this);
+
+        readingProgressModel.loadReadingProgress().map(new Func1<ReadingProgress, Void>() {
+            @Override
+            public Void call(ReadingProgress readingProgress) {
+                final int booksCount = Bible.getBookCount();
+                for (int i = 0; i < booksCount; ++i) {
+                    final List<ReadingProgress.ReadChapter> readChapters = readingProgress.getReadChapters(i);
+                    for (int j = readChapters.size() - 1; j >= 0; --j) {
+                        final ReadingProgress.ReadChapter readChapter = readChapters.get(j);
+                        readingProgressReference.child(verseIndexToKey(i, readChapter.chapter))
+                                .setValue(readChapter.timestamp);
+                    }
+                }
+
+                metadataReference.child("continuousReadingDays").setValue(readingProgress.getContinuousReadingDays());
+                metadataReference.child("lastReadingTimestamp").setValue(readingProgress.getLastReadingTimestamp());
+
+                return null;
+            }
+        }).onErrorResumeNext(Observable.<Void>just(null)).subscribeOn(Schedulers.io()).subscribe();
+
+        unsubscribeObserveReadingProgress();
+        observeReadingProgressSubscription = readingProgressModel.observeReadingProgress().observeOn(Schedulers.io())
+                .subscribe(new Observer<Triple<ReadingProgress.ReadChapter, Integer, Long>>() {
+                    @Override
+                    public void onCompleted() {
+                        // do nothing
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        // do nothing
+                    }
+
+                    @Override
+                    public void onNext(Triple<ReadingProgress.ReadChapter, Integer, Long> readChapter) {
+                        if (readingProgressReference == null || metadataReference == null) {
+                            return;
+                        }
+                        readingProgressReference.child(verseIndexToKey(readChapter.first.book, readChapter.first.chapter))
+                                .setValue(readChapter.first.timestamp);
+                        metadataReference.child("continuousReadingDays").setValue(readChapter.second);
+                        metadataReference.child("lastReadingTimestamp").setValue(readChapter.third);
+                    }
+                });
+    }
+
+    private static String buildReadingProgressRootPath(@NonNull User user) {
+        synchronized (STRING_BUILDER) {
+            STRING_BUILDER.setLength(0);
+            STRING_BUILDER.append("/readingProgress/").append(user.uid);
+            return STRING_BUILDER.toString();
+        }
+    }
+
+    private static String buildMetadataRootPath(@NonNull User user) {
+        synchronized (STRING_BUILDER) {
+            STRING_BUILDER.setLength(0);
+            STRING_BUILDER.append("/metadata/").append(user.uid);
+            return STRING_BUILDER.toString();
+        }
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    static String verseIndexToKey(int book, int chapter) {
+        synchronized (STRING_BUILDER) {
+            STRING_BUILDER.setLength(0);
+            STRING_BUILDER.append(book).append(':').append(chapter);
+            return STRING_BUILDER.toString();
+        }
+    }
+
     @Override
     public void onChildAdded(DataSnapshot snapshot, String previousChildName) {
         final String type = getSnapshotType(snapshot);
@@ -296,20 +396,51 @@ public class SyncModel implements ChildEventListener {
             return;
         }
 
-        final VerseIndex verseIndex = keyToVerseIndex(snapshot.getKey());
-        if (verseIndex != null) {
-            if ("bookmarks".equals(type)) {
-                final Long timestamp = (Long) snapshot.getValue();
-                if (timestamp != null) {
-                    bookmarkModel.addBookmark(verseIndex, timestamp).subscribeOn(Schedulers.io())
-                            .onErrorResumeNext(Single.<Bookmark>just(null)).subscribe();
+        if ("readingProgress".equals(type)) {
+            final String[] fields = snapshot.getKey().split(":");
+            if (fields.length != 2) {
+                return;
+            }
+            final int book = Integer.parseInt(fields[0]);
+            final int chapter = Integer.parseInt(fields[1]);
+            final Long timestamp = (Long) snapshot.getValue();
+            if (timestamp != null) {
+                readingProgressModel.trackReadingProgress(book, chapter, timestamp);
+            }
+        } else if ("metadata".equals(type)) {
+            final String key = snapshot.getKey();
+            Completable completable = null;
+            if ("continuousReadingDays".equals(key)) {
+                final Long continuousReadingDays = (Long) snapshot.getValue();
+                if (continuousReadingDays != null) {
+                    completable = readingProgressModel
+                            .updateContinuousReadingDays(continuousReadingDays.intValue());
                 }
-            } else if ("notes".equals(type)) {
-                final String note = (String) snapshot.child("note").getValue();
-                final Long timestamp = (Long) snapshot.child("timestamp").getValue();
-                if (!TextUtils.isEmpty(note) && timestamp != null) {
-                    noteModel.updateNote(verseIndex, note, timestamp).subscribeOn(Schedulers.io())
-                            .onErrorResumeNext(Single.<Note>just(null)).subscribe();
+            } else if ("lastReadingTimestamp".equals(key)) {
+                final Long lastReaingTimestamp = (Long) snapshot.getValue();
+                if (lastReaingTimestamp != null) {
+                    completable = readingProgressModel.updateLastReadingTimestamp(lastReaingTimestamp);
+                }
+            }
+            if (completable != null) {
+                completable.subscribeOn(Schedulers.io()).onErrorComplete().subscribe();
+            }
+        } else {
+            final VerseIndex verseIndex = keyToVerseIndex(snapshot.getKey());
+            if (verseIndex != null) {
+                if ("bookmarks".equals(type)) {
+                    final Long timestamp = (Long) snapshot.getValue();
+                    if (timestamp != null) {
+                        bookmarkModel.addBookmark(verseIndex, timestamp).subscribeOn(Schedulers.io())
+                                .onErrorResumeNext(Single.<Bookmark>just(null)).subscribe();
+                    }
+                } else if ("notes".equals(type)) {
+                    final String note = (String) snapshot.child("note").getValue();
+                    final Long timestamp = (Long) snapshot.child("timestamp").getValue();
+                    if (!TextUtils.isEmpty(note) && timestamp != null) {
+                        noteModel.updateNote(verseIndex, note, timestamp).subscribeOn(Schedulers.io())
+                                .onErrorResumeNext(Single.<Note>just(null)).subscribe();
+                    }
                 }
             }
         }
