@@ -26,6 +26,7 @@ import net.zionsoft.obadiah.model.database.DatabaseHelper;
 import net.zionsoft.obadiah.model.database.MetadataTableHelper;
 import net.zionsoft.obadiah.model.database.ReadingProgressTableHelper;
 import net.zionsoft.obadiah.model.domain.ReadingProgress;
+import net.zionsoft.obadiah.utils.Triple;
 
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -33,6 +34,8 @@ import java.util.concurrent.Callable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import rx.Completable;
+import rx.CompletableSubscriber;
 import rx.Observable;
 import rx.functions.Func0;
 import rx.subjects.PublishSubject;
@@ -44,8 +47,8 @@ public class ReadingProgressModel {
     final DatabaseHelper databaseHelper;
 
     @SuppressWarnings("WeakerAccess")
-    final SerializedSubject<ReadingProgress.ReadChapter, ReadingProgress.ReadChapter> readingProgressUpdatesSubject
-            = PublishSubject.<ReadingProgress.ReadChapter>create().toSerialized();
+    final SerializedSubject<Triple<ReadingProgress.ReadChapter, Integer, Long>, Triple<ReadingProgress.ReadChapter, Integer, Long>> readingProgressUpdatesSubject
+            = PublishSubject.<Triple<ReadingProgress.ReadChapter, Integer, Long>>create().toSerialized();
 
     @Inject
     public ReadingProgressModel(DatabaseHelper databaseHelper) {
@@ -53,10 +56,11 @@ public class ReadingProgressModel {
     }
 
     @NonNull
-    public Observable<ReadingProgress.ReadChapter> observeReadingProgress() {
+    public Observable<Triple<ReadingProgress.ReadChapter, Integer, Long>> observeReadingProgress() {
         return readingProgressUpdatesSubject.asObservable();
     }
 
+    @NonNull
     public Observable<ReadingProgress> loadReadingProgress() {
         return Observable.fromCallable(new Callable<ReadingProgress>() {
             @Override
@@ -68,9 +72,11 @@ public class ReadingProgressModel {
                             = ReadingProgressTableHelper.getChaptersReadPerBook(database);
                     final int continuousReadingDays = Integer.parseInt(MetadataTableHelper.getMetadata(
                             database, MetadataTableHelper.KEY_CONTINUOUS_READING_DAYS, "1"));
+                    final long lastReadingTimestamp = Long.parseLong(MetadataTableHelper.getMetadata(
+                            database, MetadataTableHelper.KEY_LAST_READING_TIMESTAMP, "0"));
                     database.setTransactionSuccessful();
 
-                    return new ReadingProgress(readChapters, continuousReadingDays);
+                    return new ReadingProgress(readChapters, continuousReadingDays, lastReadingTimestamp);
                 } finally {
                     if (database.inTransaction()) {
                         database.endTransaction();
@@ -80,10 +86,12 @@ public class ReadingProgressModel {
         });
     }
 
+    @NonNull
     public Observable<Void> trackReadingProgress(final int book, final int chapter) {
         return trackReadingProgress(book, chapter, System.currentTimeMillis());
     }
 
+    @NonNull
     public Observable<Void> trackReadingProgress(final int book, final int chapter, final long timestamp) {
         return Observable.defer(new Func0<Observable<Void>>() {
             @Override
@@ -92,14 +100,13 @@ public class ReadingProgressModel {
                 try {
                     database.beginTransaction();
 
-                    final long lastReadingTimestamp = Long.parseLong(MetadataTableHelper.getMetadata(
+                    long lastReadingTimestamp = Long.parseLong(MetadataTableHelper.getMetadata(
                             database, MetadataTableHelper.KEY_LAST_READING_TIMESTAMP, "0"));
                     if (lastReadingTimestamp >= timestamp) {
                         return null;
                     }
 
                     ReadingProgressTableHelper.saveChapterReading(database, book, chapter, timestamp);
-                    readingProgressUpdatesSubject.onNext(new ReadingProgress.ReadChapter(book, chapter, timestamp));
 
                     final long lastReadingDay = lastReadingTimestamp / DateUtils.DAY_IN_MILLIS;
                     final long today = timestamp / DateUtils.DAY_IN_MILLIS;
@@ -111,12 +118,18 @@ public class ReadingProgressModel {
                                         MetadataTableHelper.KEY_CONTINUOUS_READING_DAYS, "0"));
                     }
                     if (diff >= 1L) {
+                        lastReadingTimestamp = timestamp;
                         MetadataTableHelper.saveMetadata(database,
-                                MetadataTableHelper.KEY_LAST_READING_TIMESTAMP, Long.toString(timestamp));
+                                MetadataTableHelper.KEY_LAST_READING_TIMESTAMP,
+                                Long.toString(lastReadingTimestamp));
                         MetadataTableHelper.saveMetadata(database,
                                 MetadataTableHelper.KEY_CONTINUOUS_READING_DAYS,
                                 Integer.toString(continuousReadingDays));
                     }
+
+                    readingProgressUpdatesSubject.onNext(new Triple<>(
+                            new ReadingProgress.ReadChapter(book, chapter, timestamp),
+                            continuousReadingDays, lastReadingTimestamp));
 
                     database.setTransactionSuccessful();
                 } catch (Exception e) {
@@ -133,6 +146,52 @@ public class ReadingProgressModel {
                     }
                 }
                 return Observable.empty();
+            }
+        });
+    }
+
+    @NonNull
+    Completable updateContinuousReadingDays(final int days) {
+        return Completable.create(new Completable.OnSubscribe() {
+            @Override
+            public void call(CompletableSubscriber subscriber) {
+                try {
+                    MetadataTableHelper.saveMetadata(databaseHelper.getDatabase(),
+                            MetadataTableHelper.KEY_CONTINUOUS_READING_DAYS,
+                            Integer.toString(days));
+                    subscriber.onCompleted();
+                } catch (Throwable e) {
+                    subscriber.onError(e);
+                }
+            }
+        });
+    }
+
+    @NonNull
+    Completable updateLastReadingTimestamp(final long timestamp) {
+        return Completable.create(new Completable.OnSubscribe() {
+            @Override
+            public void call(CompletableSubscriber subscriber) {
+                final SQLiteDatabase database = databaseHelper.getDatabase();
+                try {
+                    database.beginTransaction();
+                    final long lastReadingTimestamp = Long.parseLong(MetadataTableHelper.getMetadata(
+                            database, MetadataTableHelper.KEY_LAST_READING_TIMESTAMP, "0"));
+                    if (timestamp > lastReadingTimestamp) {
+                        MetadataTableHelper.saveMetadata(databaseHelper.getDatabase(),
+                                MetadataTableHelper.KEY_LAST_READING_TIMESTAMP,
+                                Long.toString(timestamp));
+                    }
+                    database.setTransactionSuccessful();
+
+                    subscriber.onCompleted();
+                } catch (Throwable e) {
+                    subscriber.onError(e);
+                } finally {
+                    if (database.inTransaction()) {
+                        database.endTransaction();
+                    }
+                }
             }
         });
     }

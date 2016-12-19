@@ -35,12 +35,14 @@ import net.zionsoft.obadiah.model.domain.Note;
 import net.zionsoft.obadiah.model.domain.ReadingProgress;
 import net.zionsoft.obadiah.model.domain.User;
 import net.zionsoft.obadiah.model.domain.VerseIndex;
+import net.zionsoft.obadiah.utils.Triple;
 
 import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import rx.Completable;
 import rx.Observable;
 import rx.Observer;
 import rx.Single;
@@ -66,6 +68,8 @@ public class SyncModel implements ChildEventListener {
     DatabaseReference notesReference;
     @SuppressWarnings("WeakerAccess")
     DatabaseReference readingProgressReference;
+    @SuppressWarnings("WeakerAccess")
+    DatabaseReference metadataReference;
 
     private Subscription observeBookmarksSubscription;
     private Subscription observeNotesSubscription;
@@ -103,6 +107,7 @@ public class SyncModel implements ChildEventListener {
                             bookmarksReference = null;
                             notesReference = null;
                             readingProgressReference = null;
+                            metadataReference = null;
                         }
                     }
                 });
@@ -310,6 +315,8 @@ public class SyncModel implements ChildEventListener {
     private void syncReadingProgress(@NonNull final User user) {
         readingProgressReference = firebaseDatabase.getReference(buildReadingProgressRootPath(user));
         readingProgressReference.addChildEventListener(this);
+        metadataReference = firebaseDatabase.getReference(buildMetadataRootPath(user));
+        metadataReference.addChildEventListener(this);
 
         readingProgressModel.loadReadingProgress().map(new Func1<ReadingProgress, Void>() {
             @Override
@@ -324,13 +331,16 @@ public class SyncModel implements ChildEventListener {
                     }
                 }
 
+                metadataReference.child("continuousReadingDays").setValue(readingProgress.getContinuousReadingDays());
+                metadataReference.child("lastReadingTimestamp").setValue(readingProgress.getLastReadingTimestamp());
+
                 return null;
             }
         }).onErrorResumeNext(Observable.<Void>just(null)).subscribeOn(Schedulers.io()).subscribe();
 
         unsubscribeObserveReadingProgress();
         observeReadingProgressSubscription = readingProgressModel.observeReadingProgress().observeOn(Schedulers.io())
-                .subscribe(new Observer<ReadingProgress.ReadChapter>() {
+                .subscribe(new Observer<Triple<ReadingProgress.ReadChapter, Integer, Long>>() {
                     @Override
                     public void onCompleted() {
                         // do nothing
@@ -342,12 +352,14 @@ public class SyncModel implements ChildEventListener {
                     }
 
                     @Override
-                    public void onNext(ReadingProgress.ReadChapter readChapter) {
-                        if (readingProgressReference == null) {
+                    public void onNext(Triple<ReadingProgress.ReadChapter, Integer, Long> readChapter) {
+                        if (readingProgressReference == null || metadataReference == null) {
                             return;
                         }
-                        readingProgressReference.child(verseIndexToKey(readChapter.book, readChapter.chapter))
-                                .setValue(readChapter.timestamp);
+                        readingProgressReference.child(verseIndexToKey(readChapter.first.book, readChapter.first.chapter))
+                                .setValue(readChapter.first.timestamp);
+                        metadataReference.child("continuousReadingDays").setValue(readChapter.second);
+                        metadataReference.child("lastReadingTimestamp").setValue(readChapter.third);
                     }
                 });
     }
@@ -356,6 +368,14 @@ public class SyncModel implements ChildEventListener {
         synchronized (STRING_BUILDER) {
             STRING_BUILDER.setLength(0);
             STRING_BUILDER.append("/readingProgress/").append(user.uid);
+            return STRING_BUILDER.toString();
+        }
+    }
+
+    private static String buildMetadataRootPath(@NonNull User user) {
+        synchronized (STRING_BUILDER) {
+            STRING_BUILDER.setLength(0);
+            STRING_BUILDER.append("/metadata/").append(user.uid);
             return STRING_BUILDER.toString();
         }
     }
@@ -386,6 +406,24 @@ public class SyncModel implements ChildEventListener {
             final Long timestamp = (Long) snapshot.getValue();
             if (timestamp != null) {
                 readingProgressModel.trackReadingProgress(book, chapter, timestamp);
+            }
+        } else if ("metadata".equals(type)) {
+            final String key = snapshot.getKey();
+            Completable completable = null;
+            if ("continuousReadingDays".equals(key)) {
+                final Long continuousReadingDays = (Long) snapshot.getValue();
+                if (continuousReadingDays != null) {
+                    completable = readingProgressModel
+                            .updateContinuousReadingDays(continuousReadingDays.intValue());
+                }
+            } else if ("lastReadingTimestamp".equals(key)) {
+                final Long lastReaingTimestamp = (Long) snapshot.getValue();
+                if (lastReaingTimestamp != null) {
+                    completable = readingProgressModel.updateLastReadingTimestamp(lastReaingTimestamp);
+                }
+            }
+            if (completable != null) {
+                completable.subscribeOn(Schedulers.io()).onErrorComplete().subscribe();
             }
         } else {
             final VerseIndex verseIndex = keyToVerseIndex(snapshot.getKey());

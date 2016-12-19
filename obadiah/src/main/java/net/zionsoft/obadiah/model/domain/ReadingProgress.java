@@ -43,13 +43,14 @@ public class ReadingProgress {
     private final int finishedOldTestament;
     private final int finishedNewTestament;
     private final int continuousReading;
+    private final long lastReadingTimestamp;
 
     private final SparseArray<List<ReadChapter>> chaptersReadPerBook = new SparseArray<>(Bible.getBookCount());
 
-    public ReadingProgress(List<ReadingProgress.ReadChapter> readChapters, int continuousReading) {
-        super();
+    public ReadingProgress(List<ReadingProgress.ReadChapter> readChapters, int continuousReading, long lastReadingTimestamp) {
         this.totalChaptersRead = readChapters.size();
         this.continuousReading = continuousReading;
+        this.lastReadingTimestamp = lastReadingTimestamp;
 
         for (int i = totalChaptersRead - 1; i >= 0; --i) {
             final ReadingProgress.ReadChapter readChapter = readChapters.get(i);
@@ -120,5 +121,9 @@ public class ReadingProgress {
 
     public int getContinuousReadingDays() {
         return continuousReading;
+    }
+
+    public long getLastReadingTimestamp() {
+        return lastReadingTimestamp;
     }
 }
