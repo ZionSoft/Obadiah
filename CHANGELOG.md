@@ -7,6 +7,7 @@ CHANGELOG
   - Updated build tool to 25.0.2.
   - Updated support library to 25.1.0.
   - Updated RxJava to 1.2.4.
+- Supported syncing user data (reading progress).
 
 #### v1.16.0 (2016-12-08)
 - Updated deps:
