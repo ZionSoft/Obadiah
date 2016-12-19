@@ -20,7 +20,6 @@ package net.zionsoft.obadiah.readingprogress;
 import android.content.Context;
 import android.content.res.Resources;
 import android.support.v7.widget.RecyclerView;
-import android.util.Pair;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -177,10 +176,12 @@ class ReadingProgressListAdapter extends RecyclerView.Adapter {
             this.readingProgress.setText(STRING_BUILDER.toString());
 
             if (chaptersRead > 0) {
-                final Pair<Integer, Long> lastReadChapter = readingProgress.getLastReadChapter(book);
-                this.lastReadChapter.setText(resources.getString(R.string.text_last_read_chapter,
-                        lastReadChapter.first + 1, dateFormatter.format(lastReadChapter.second)));
-                this.lastReadChapter.setVisibility(View.VISIBLE);
+                final ReadingProgress.ReadChapter lastReadChapter = readingProgress.getLastReadChapter(book);
+                if (lastReadChapter != null) {
+                    this.lastReadChapter.setText(resources.getString(R.string.text_last_read_chapter,
+                            lastReadChapter.chapter + 1, dateFormatter.format(lastReadChapter.timestamp)));
+                    this.lastReadChapter.setVisibility(View.VISIBLE);
+                }
             } else {
                 this.lastReadChapter.setVisibility(View.GONE);
             }

@@ -21,9 +21,8 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.NonNull;
-import android.util.SparseArray;
 
-import net.zionsoft.obadiah.model.domain.Bible;
+import net.zionsoft.obadiah.model.domain.ReadingProgress;
 import net.zionsoft.obadiah.utils.TextFormatter;
 
 import java.util.ArrayList;
@@ -42,27 +41,22 @@ public class ReadingProgressTableHelper {
     }
 
     @NonNull
-    public static List<SparseArray<Long>> getChaptersReadPerBook(SQLiteDatabase db) {
+    public static List<ReadingProgress.ReadChapter> getChaptersReadPerBook(SQLiteDatabase db) {
         Cursor cursor = null;
         try {
             cursor = db.query(TABLE_READING_PROGRESS, new String[]{COLUMN_BOOK_INDEX,
                             COLUMN_CHAPTER_INDEX, COLUMN_LAST_READING_TIMESTAMP},
-                    null, null, null, null, null
-            );
+                    null, null, null, null, TextFormatter.format("%s, %s ASC", COLUMN_BOOK_INDEX, COLUMN_CHAPTER_INDEX));
             final int bookIndex = cursor.getColumnIndex(COLUMN_BOOK_INDEX);
             final int chapterIndex = cursor.getColumnIndex(COLUMN_CHAPTER_INDEX);
             final int lastReadingTimestamp = cursor.getColumnIndex(COLUMN_LAST_READING_TIMESTAMP);
 
-            final int bookCount = Bible.getBookCount();
-            final List<SparseArray<Long>> chaptersReadPerBook = new ArrayList<>(bookCount);
-            for (int i = 0; i < bookCount; ++i) {
-                chaptersReadPerBook.add(new SparseArray<Long>(Bible.getChapterCount(i)));
-            }
+            final List<ReadingProgress.ReadChapter> readChapters = new ArrayList<>(cursor.getCount());
             while (cursor.moveToNext()) {
-                chaptersReadPerBook.get(cursor.getInt(bookIndex))
-                        .append(cursor.getInt(chapterIndex), cursor.getLong(lastReadingTimestamp));
+                readChapters.add(new ReadingProgress.ReadChapter(cursor.getInt(bookIndex),
+                        cursor.getInt(chapterIndex), cursor.getLong(lastReadingTimestamp)));
             }
-            return chaptersReadPerBook;
+            return readChapters;
         } finally {
             if (cursor != null) {
                 cursor.close();

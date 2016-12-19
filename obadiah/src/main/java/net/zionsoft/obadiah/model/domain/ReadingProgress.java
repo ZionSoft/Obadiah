@@ -17,10 +17,12 @@
 
 package net.zionsoft.obadiah.model.domain;
 
-import android.util.Pair;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.SparseArray;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class ReadingProgress {
@@ -41,39 +43,32 @@ public class ReadingProgress {
     private final int finishedOldTestament;
     private final int finishedNewTestament;
     private final int continuousReading;
-    private final List<SparseArray<Long>> chaptersReadPerBook;
-    private final List<Integer> numberOfChaptersReadPerBook;
-    private final List<Pair<Integer, Long>> lastChapterReadPerBook;
 
-    public ReadingProgress(List<SparseArray<Long>> chaptersReadPerBook, int continuousReading) {
+    private final SparseArray<List<ReadChapter>> chaptersReadPerBook = new SparseArray<>(Bible.getBookCount());
+
+    public ReadingProgress(List<ReadingProgress.ReadChapter> readChapters, int continuousReading) {
         super();
+        this.totalChaptersRead = readChapters.size();
+        this.continuousReading = continuousReading;
 
-        int totalChaptersRead = 0;
+        for (int i = totalChaptersRead - 1; i >= 0; --i) {
+            final ReadingProgress.ReadChapter readChapter = readChapters.get(i);
+
+            List<ReadChapter> chaptersByBook = chaptersReadPerBook.get(readChapter.book);
+            if (chaptersByBook == null) {
+                chaptersByBook = new ArrayList<>();
+                chaptersReadPerBook.put(readChapter.book, chaptersByBook);
+            }
+            chaptersByBook.add(readChapter);
+        }
+
         int finishedBooks = 0;
         int finishedOldTestament = 0;
         int finishedNewTestament = 0;
-        int i = 0;
-        this.chaptersReadPerBook = chaptersReadPerBook;
-        numberOfChaptersReadPerBook = new ArrayList<>(Bible.getBookCount());
-        lastChapterReadPerBook = new ArrayList<>(Bible.getBookCount());
-        for (SparseArray<Long> chaptersRead : chaptersReadPerBook) {
-            final int chaptersCount = Bible.getChapterCount(i);
-            int lastReadChapter = -1;
-            long lastReadTimestamp = 0L;
-            for (int j = 0; j < chaptersCount; ++j) {
-                final long timestamp = chaptersRead.get(j, 0L);
-                if (lastReadTimestamp < timestamp) {
-                    lastReadTimestamp = timestamp;
-                    lastReadChapter = j;
-                }
-            }
-            lastChapterReadPerBook.add(new Pair<>(lastReadChapter, lastReadTimestamp));
-
-            final int chaptersReadCount = chaptersRead.size();
-            this.numberOfChaptersReadPerBook.add(chaptersReadCount);
-            totalChaptersRead += chaptersReadCount;
-
-            if (chaptersReadCount == Bible.getChapterCount(i)) {
+        for (int i = Bible.getBookCount() - 1; i >= 0; --i) {
+            final List<ReadChapter> chaptersByBook = chaptersReadPerBook.get(i);
+            final int count = chaptersByBook != null ? chaptersByBook.size() : 0;
+            if (count == Bible.getChapterCount(i)) {
                 ++finishedBooks;
                 if (i < Bible.getOldTestamentBookCount()) {
                     ++finishedOldTestament;
@@ -81,13 +76,10 @@ public class ReadingProgress {
                     ++finishedNewTestament;
                 }
             }
-            ++i;
         }
-        this.totalChaptersRead = totalChaptersRead;
         this.finishedBooks = finishedBooks;
         this.finishedOldTestament = finishedOldTestament;
         this.finishedNewTestament = finishedNewTestament;
-        this.continuousReading = continuousReading;
     }
 
     public int getFinishedBooksCount() {
@@ -106,16 +98,20 @@ public class ReadingProgress {
         return totalChaptersRead;
     }
 
-    public Pair<Integer, Long> getLastReadChapter(int book) {
-        return lastChapterReadPerBook.get(book);
+    @Nullable
+    public ReadChapter getLastReadChapter(int book) {
+        final List<ReadChapter> readChapters = getReadChapters(book);
+        final int count = readChapters.size();
+        return count > 0 ? readChapters.get(count - 1) : null;
     }
 
-    public SparseArray<Long> getReadChapters(int books) {
-        return chaptersReadPerBook.get(books);
+    @NonNull
+    public List<ReadChapter> getReadChapters(int book) {
+        return chaptersReadPerBook.get(book, Collections.<ReadChapter>emptyList());
     }
 
     public int getChapterRead(int book) {
-        return numberOfChaptersReadPerBook.get(book);
+        return getReadChapters(book).size();
     }
 
     public int getChapterCount(int book) {

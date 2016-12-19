@@ -20,7 +20,6 @@ package net.zionsoft.obadiah.model.datamodel;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.NonNull;
 import android.text.format.DateUtils;
-import android.util.SparseArray;
 
 import net.zionsoft.obadiah.model.crash.Crash;
 import net.zionsoft.obadiah.model.database.DatabaseHelper;
@@ -65,13 +64,13 @@ public class ReadingProgressModel {
                 final SQLiteDatabase database = databaseHelper.getDatabase();
                 try {
                     database.beginTransaction();
-                    final List<SparseArray<Long>> chaptersReadPerBook
+                    final List<ReadingProgress.ReadChapter> readChapters
                             = ReadingProgressTableHelper.getChaptersReadPerBook(database);
                     final int continuousReadingDays = Integer.parseInt(MetadataTableHelper.getMetadata(
                             database, MetadataTableHelper.KEY_CONTINUOUS_READING_DAYS, "1"));
                     database.setTransactionSuccessful();
 
-                    return new ReadingProgress(chaptersReadPerBook, continuousReadingDays);
+                    return new ReadingProgress(readChapters, continuousReadingDays);
                 } finally {
                     if (database.inTransaction()) {
                         database.endTransaction();

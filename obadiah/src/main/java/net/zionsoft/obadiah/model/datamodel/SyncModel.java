@@ -21,7 +21,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Pair;
-import android.util.SparseArray;
 
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -317,13 +316,11 @@ public class SyncModel implements ChildEventListener {
             public Void call(ReadingProgress readingProgress) {
                 final int booksCount = Bible.getBookCount();
                 for (int i = 0; i < booksCount; ++i) {
-                    final SparseArray<Long> chaptersRead = readingProgress.getReadChapters(i);
-                    final int chaptersCount = Bible.getChapterCount(i);
-                    for (int j = 0; j < chaptersCount; ++j) {
-                        final long timestamp = chaptersRead.get(j, 0L);
-                        if (timestamp > 0L) {
-                            readingProgressReference.child(verseIndexToKey(i, j)).setValue(timestamp);
-                        }
+                    final List<ReadingProgress.ReadChapter> readChapters = readingProgress.getReadChapters(i);
+                    for (int j = readChapters.size() - 1; j >= 0; --j) {
+                        final ReadingProgress.ReadChapter readChapter = readChapters.get(j);
+                        readingProgressReference.child(verseIndexToKey(i, readChapter.chapter))
+                                .setValue(readChapter.timestamp);
                     }
                 }
 
