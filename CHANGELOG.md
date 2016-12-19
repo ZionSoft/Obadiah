@@ -2,6 +2,8 @@ CHANGELOG
 ---------
 
 #### Next Release
+
+#### v1.16.1 (2016-12-19)
 - Updated deps:
   - Updated Android Gradle plugin to 2.3.0-beta1.
   - Updated build tool to 25.0.2.
