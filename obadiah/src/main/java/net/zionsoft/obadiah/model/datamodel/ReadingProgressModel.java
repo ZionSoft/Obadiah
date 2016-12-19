@@ -18,6 +18,7 @@
 package net.zionsoft.obadiah.model.datamodel;
 
 import android.database.sqlite.SQLiteDatabase;
+import android.support.annotation.NonNull;
 import android.text.format.DateUtils;
 import android.util.SparseArray;
 
@@ -35,14 +36,26 @@ import javax.inject.Singleton;
 
 import rx.Observable;
 import rx.functions.Func0;
+import rx.subjects.PublishSubject;
+import rx.subjects.SerializedSubject;
 
 @Singleton
 public class ReadingProgressModel {
+    @SuppressWarnings("WeakerAccess")
     final DatabaseHelper databaseHelper;
+
+    @SuppressWarnings("WeakerAccess")
+    final SerializedSubject<Void, Void> readingProgressUpdatesSubject
+            = PublishSubject.<Void>create().toSerialized();
 
     @Inject
     public ReadingProgressModel(DatabaseHelper databaseHelper) {
         this.databaseHelper = databaseHelper;
+    }
+
+    @NonNull
+    public Observable<Void> observeReadingProgress() {
+        return readingProgressUpdatesSubject.asObservable();
     }
 
     public Observable<ReadingProgress> loadReadingProgress() {
@@ -78,6 +91,7 @@ public class ReadingProgressModel {
 
                     final long now = System.currentTimeMillis();
                     ReadingProgressTableHelper.saveChapterReading(database, book, chapter, now);
+                    readingProgressUpdatesSubject.onNext(null);
 
                     final long lastReadingDay = Long.parseLong(MetadataTableHelper.getMetadata(
                             database, MetadataTableHelper.KEY_LAST_READING_TIMESTAMP, "0")) / DateUtils.DAY_IN_MILLIS;

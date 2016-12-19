@@ -21,6 +21,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Pair;
+import android.util.SparseArray;
 
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -29,8 +30,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import net.zionsoft.obadiah.model.domain.Bible;
 import net.zionsoft.obadiah.model.domain.Bookmark;
 import net.zionsoft.obadiah.model.domain.Note;
+import net.zionsoft.obadiah.model.domain.ReadingProgress;
 import net.zionsoft.obadiah.model.domain.User;
 import net.zionsoft.obadiah.model.domain.VerseIndex;
 
@@ -53,6 +56,7 @@ public class SyncModel implements ChildEventListener {
     private final UserModel userModel;
     private final BookmarkModel bookmarkModel;
     private final NoteModel noteModel;
+    private final ReadingProgressModel readingProgressModel;
 
     @SuppressWarnings("WeakerAccess")
     final FirebaseDatabase firebaseDatabase;
@@ -61,15 +65,20 @@ public class SyncModel implements ChildEventListener {
     DatabaseReference bookmarksReference;
     @SuppressWarnings("WeakerAccess")
     DatabaseReference notesReference;
+    @SuppressWarnings("WeakerAccess")
+    DatabaseReference readingProgressReference;
 
     private Subscription observeBookmarksSubscription;
     private Subscription observeNotesSubscription;
+    private Subscription observeReadingProgressSubscription;
 
     @Inject
-    public SyncModel(UserModel userModel, BookmarkModel bookmarkModel, NoteModel noteModel) {
+    public SyncModel(UserModel userModel, BookmarkModel bookmarkModel, NoteModel noteModel,
+                     final ReadingProgressModel readingProgressModel) {
         this.userModel = userModel;
         this.bookmarkModel = bookmarkModel;
         this.noteModel = noteModel;
+        this.readingProgressModel = readingProgressModel;
 
         firebaseDatabase = FirebaseDatabase.getInstance();
         firebaseDatabase.setPersistenceEnabled(true);
@@ -94,6 +103,7 @@ public class SyncModel implements ChildEventListener {
                         } else {
                             bookmarksReference = null;
                             notesReference = null;
+                            readingProgressReference = null;
                         }
                     }
                 });
@@ -103,6 +113,7 @@ public class SyncModel implements ChildEventListener {
     void unsubscribeAll() {
         unsubscribeObserveBookmarks();
         unsubscribeObserveNotes();
+        unsubscribeObserveReadingProgress();
     }
 
     private void unsubscribeObserveBookmarks() {
@@ -119,10 +130,18 @@ public class SyncModel implements ChildEventListener {
         }
     }
 
+    private void unsubscribeObserveReadingProgress() {
+        if (observeReadingProgressSubscription != null) {
+            observeReadingProgressSubscription.unsubscribe();
+            observeReadingProgressSubscription = null;
+        }
+    }
+
     @SuppressWarnings("WeakerAccess")
     void initialSync(@NonNull User user) {
         syncBookmarks(user);
         syncNotes(user);
+        syncReadingProgress(user);
     }
 
     private void syncBookmarks(@NonNull final User user) {
@@ -285,6 +304,47 @@ public class SyncModel implements ChildEventListener {
         synchronized (STRING_BUILDER) {
             STRING_BUILDER.setLength(0);
             STRING_BUILDER.append("/notes/").append(user.uid);
+            return STRING_BUILDER.toString();
+        }
+    }
+
+    private void syncReadingProgress(@NonNull final User user) {
+        readingProgressReference = firebaseDatabase.getReference(buildReadingProgressRootPath(user));
+        //readingProgressReference.addChildEventListener(this);
+
+        readingProgressModel.loadReadingProgress().map(new Func1<ReadingProgress, Void>() {
+            @Override
+            public Void call(ReadingProgress readingProgress) {
+                final int booksCount = Bible.getBookCount();
+                for (int i = 0; i < booksCount; ++i) {
+                    final SparseArray<Long> chaptersRead = readingProgress.getReadChapters(i);
+                    final int chaptersCount = Bible.getChapterCount(i);
+                    for (int j = 0; j < chaptersCount; ++j) {
+                        final long timestamp = chaptersRead.get(j, 0L);
+                        if (timestamp > 0L) {
+                            readingProgressReference.child(verseIndexToKey(i, j)).setValue(timestamp);
+                        }
+                    }
+                }
+
+                return null;
+            }
+        }).onErrorResumeNext(Observable.<Void>just(null)).subscribeOn(Schedulers.io()).subscribe();
+    }
+
+    private static String buildReadingProgressRootPath(@NonNull User user) {
+        synchronized (STRING_BUILDER) {
+            STRING_BUILDER.setLength(0);
+            STRING_BUILDER.append("/readingProgress/").append(user.uid);
+            return STRING_BUILDER.toString();
+        }
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    static String verseIndexToKey(int book, int chapter) {
+        synchronized (STRING_BUILDER) {
+            STRING_BUILDER.setLength(0);
+            STRING_BUILDER.append(book).append(':').append(chapter);
             return STRING_BUILDER.toString();
         }
     }

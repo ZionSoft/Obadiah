@@ -29,7 +29,8 @@ public class ReadingProgress {
     private final int finishedOldTestament;
     private final int finishedNewTestament;
     private final int continuousReading;
-    private final List<Integer> chaptersReadPerBook;
+    private final List<SparseArray<Long>> chaptersReadPerBook;
+    private final List<Integer> numberOfChaptersReadPerBook;
     private final List<Pair<Integer, Long>> lastChapterReadPerBook;
 
     public ReadingProgress(List<SparseArray<Long>> chaptersReadPerBook, int continuousReading) {
@@ -40,7 +41,8 @@ public class ReadingProgress {
         int finishedOldTestament = 0;
         int finishedNewTestament = 0;
         int i = 0;
-        this.chaptersReadPerBook = new ArrayList<>(Bible.getBookCount());
+        this.chaptersReadPerBook = chaptersReadPerBook;
+        numberOfChaptersReadPerBook = new ArrayList<>(Bible.getBookCount());
         lastChapterReadPerBook = new ArrayList<>(Bible.getBookCount());
         for (SparseArray<Long> chaptersRead : chaptersReadPerBook) {
             final int chaptersCount = Bible.getChapterCount(i);
@@ -56,7 +58,7 @@ public class ReadingProgress {
             lastChapterReadPerBook.add(new Pair<>(lastReadChapter, lastReadTimestamp));
 
             final int chaptersReadCount = chaptersRead.size();
-            this.chaptersReadPerBook.add(chaptersReadCount);
+            this.numberOfChaptersReadPerBook.add(chaptersReadCount);
             totalChaptersRead += chaptersReadCount;
 
             if (chaptersReadCount == Bible.getChapterCount(i)) {
@@ -96,8 +98,12 @@ public class ReadingProgress {
         return lastChapterReadPerBook.get(book);
     }
 
+    public SparseArray<Long> getReadChapters(int books) {
+        return chaptersReadPerBook.get(books);
+    }
+
     public int getChapterRead(int book) {
-        return chaptersReadPerBook.get(book);
+        return numberOfChaptersReadPerBook.get(book);
     }
 
     public int getChapterCount(int book) {
