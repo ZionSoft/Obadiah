@@ -17,6 +17,7 @@
 
 package net.zionsoft.obadiah.utils;
 
+import rx.Completable;
 import rx.Observable;
 import rx.Single;
 import rx.android.schedulers.AndroidSchedulers;
@@ -39,6 +40,14 @@ public class RxHelper {
         }
     };
 
+    private static final Completable.Transformer SCHEDULERS_TRANSFORMER_FOR_COMPLETABLE
+            = new Completable.Transformer() {
+        @Override
+        public Completable call(Completable completable) {
+            return completable.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+        }
+    };
+
     // idea stolen from http://blog.danlew.net/2015/03/02/dont-break-the-chain/
     public static <T> Observable.Transformer<T, T> applySchedulers() {
         //noinspection unchecked
@@ -48,5 +57,9 @@ public class RxHelper {
     public static <T> Single.Transformer<T, T> applySchedulersForSingle() {
         //noinspection unchecked
         return (Single.Transformer<T, T>) SCHEDULERS_TRANSFORMER_FOR_SINGLE;
+    }
+
+    public static Completable.Transformer applySchedulersForCompletable() {
+        return SCHEDULERS_TRANSFORMER_FOR_COMPLETABLE;
     }
 }

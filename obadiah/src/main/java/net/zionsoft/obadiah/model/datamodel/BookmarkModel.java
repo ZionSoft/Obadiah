@@ -35,9 +35,10 @@ import java.util.concurrent.Callable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import rx.Completable;
+import rx.CompletableSubscriber;
 import rx.Observable;
 import rx.Single;
-import rx.functions.Func0;
 import rx.subjects.PublishSubject;
 import rx.subjects.SerializedSubject;
 
@@ -101,10 +102,10 @@ public class BookmarkModel {
     }
 
     @NonNull
-    public Observable<Void> removeBookmark(final VerseIndex verseIndex) {
-        return Observable.defer(new Func0<Observable<Void>>() {
+    public Completable removeBookmark(final VerseIndex verseIndex) {
+        return Completable.create(new Completable.OnSubscribe() {
             @Override
-            public Observable<Void> call() {
+            public void call(CompletableSubscriber subscriber) {
                 final SQLiteDatabase db = databaseHelper.getDatabase();
                 try {
                     db.beginTransaction();
@@ -116,9 +117,9 @@ public class BookmarkModel {
                     }
 
                     db.setTransactionSuccessful();
-                    return Observable.empty();
+                    subscriber.onCompleted();
                 } catch (Exception e) {
-                    return Observable.error(e);
+                    subscriber.onError(e);
                 } finally {
                     if (db.inTransaction()) {
                         db.endTransaction();

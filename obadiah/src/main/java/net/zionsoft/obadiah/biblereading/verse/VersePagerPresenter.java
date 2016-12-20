@@ -32,9 +32,11 @@ import net.zionsoft.obadiah.utils.RxHelper;
 
 import java.util.List;
 
+import rx.CompletableSubscriber;
 import rx.Observable;
 import rx.SingleSubscriber;
 import rx.Subscriber;
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
 import rx.functions.Func3;
@@ -111,7 +113,7 @@ public class VersePagerPresenter extends BasePresenter<VersePagerView> {
     }
 
     @NonNull
-    private CompositeSubscription getSubscription() {
+    CompositeSubscription getSubscription() {
         if (subscription == null) {
             subscription = new CompositeSubscription();
         }
@@ -223,9 +225,9 @@ public class VersePagerPresenter extends BasePresenter<VersePagerView> {
     }
 
     void removeBookmark(final VerseIndex verseIndex) {
-        getSubscription().add(bookmarkModel.removeBookmark(verseIndex)
-                .compose(RxHelper.<Void>applySchedulers())
-                .subscribe(new Subscriber<Void>() {
+        bookmarkModel.removeBookmark(verseIndex)
+                .compose(RxHelper.applySchedulersForCompletable())
+                .subscribe(new CompletableSubscriber() {
                     @Override
                     public void onCompleted() {
                         final VersePagerView v = getView();
@@ -243,10 +245,10 @@ public class VersePagerPresenter extends BasePresenter<VersePagerView> {
                     }
 
                     @Override
-                    public void onNext(Void o) {
-                        // do nothing
+                    public void onSubscribe(Subscription subscription) {
+                        getSubscription().add(subscription);
                     }
-                }));
+                });
     }
 
     void updateNote(final VerseIndex verseIndex, final String note) {

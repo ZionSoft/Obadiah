@@ -486,7 +486,7 @@ public class SyncModel implements ChildEventListener {
         if (verseIndex != null) {
             if ("bookmarks".equals(type)) {
                 bookmarkModel.removeBookmark(verseIndex).subscribeOn(Schedulers.io())
-                        .onErrorResumeNext(Observable.<Void>empty()).subscribe();
+                        .onErrorComplete().subscribe();
             } else if ("notes".equals(type)) {
                 noteModel.removeNote(verseIndex).subscribeOn(Schedulers.io())
                         .onErrorResumeNext(Observable.<Void>empty()).subscribe();
