@@ -35,6 +35,7 @@ import java.util.List;
 
 import rx.CompletableSubscriber;
 import rx.Observable;
+import rx.Single;
 import rx.SingleSubscriber;
 import rx.Subscriber;
 import rx.Subscription;
@@ -180,23 +181,23 @@ public class VersePagerPresenter extends BasePresenter<VersePagerView> {
     }
 
     void loadVerses(final int book, final int chapter) {
-        final Observable<List<Verse>> loadVerseObservable;
+        final Single<List<Verse>> verses;
         if (bibleReadingModel.hasParallelTranslation()) {
-            loadVerseObservable = bibleReadingModel.loadVersesWithParallelTranslations(book, chapter);
+            verses = bibleReadingModel.loadVersesWithParallelTranslations(book, chapter);
         } else {
-            loadVerseObservable = bibleReadingModel.loadVerses(loadCurrentTranslation(), book, chapter);
+            verses = bibleReadingModel.loadVerses(loadCurrentTranslation(), book, chapter);
         }
 
-        final Observable<VerseList> observable;
+        final Single<VerseList> loaded;
         if (getSettings().isSimpleReading()) {
-            observable = loadVerseObservable.map(new Func1<List<Verse>, VerseList>() {
+            loaded = verses.map(new Func1<List<Verse>, VerseList>() {
                 @Override
                 public VerseList call(List<Verse> verses) {
                     return new VerseList(verses, null, null);
                 }
             });
         } else {
-            observable = Observable.zip(loadVerseObservable,
+            loaded = Single.zip(verses,
                     bookmarkModel.loadBookmarks(book, chapter), noteModel.loadNotes(book, chapter),
                     new Func3<List<Verse>, List<Bookmark>, List<Note>, VerseList>() {
                         @Override
@@ -206,11 +207,14 @@ public class VersePagerPresenter extends BasePresenter<VersePagerView> {
                     });
         }
 
-        getSubscription().add(observable.compose(RxHelper.<VerseList>applySchedulers())
-                .subscribe(new Subscriber<VerseList>() {
+        getSubscription().add(loaded.compose(RxHelper.<VerseList>applySchedulersForSingle())
+                .subscribe(new SingleSubscriber<VerseList>() {
                     @Override
-                    public void onCompleted() {
-                        // do nothing
+                    public void onSuccess(VerseList result) {
+                        final VersePagerView v = getView();
+                        if (v != null) {
+                            v.onVersesLoaded(result.verses, result.bookmarks, result.notes);
+                        }
                     }
 
                     @Override
@@ -218,14 +222,6 @@ public class VersePagerPresenter extends BasePresenter<VersePagerView> {
                         final VersePagerView v = getView();
                         if (v != null) {
                             v.onVersesLoadFailed(book, chapter);
-                        }
-                    }
-
-                    @Override
-                    public void onNext(VerseList result) {
-                        final VersePagerView v = getView();
-                        if (v != null) {
-                            v.onVersesLoaded(result.verses, result.bookmarks, result.notes);
                         }
                     }
                 }));

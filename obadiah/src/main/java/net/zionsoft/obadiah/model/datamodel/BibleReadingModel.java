@@ -21,6 +21,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.util.LruCache;
 import android.text.TextUtils;
@@ -54,9 +55,11 @@ import rx.subjects.SerializedSubject;
 
 @Singleton
 public class BibleReadingModel {
+    @SuppressWarnings("WeakerAccess")
     final DatabaseHelper databaseHelper;
     private final SharedPreferences preferences;
 
+    @SuppressWarnings("WeakerAccess")
     final LruCache<String, List<String>> bookNameCache
             = new LruCache<String, List<String>>((int) (Runtime.getRuntime().maxMemory() / 16L)) {
         @Override
@@ -68,6 +71,7 @@ public class BibleReadingModel {
             return length;
         }
     };
+    @SuppressWarnings("WeakerAccess")
     final LruCache<String, List<Verse>> verseCache
             = new LruCache<String, List<Verse>>((int) (Runtime.getRuntime().maxMemory() / 8L)) {
         @Override
@@ -88,6 +92,7 @@ public class BibleReadingModel {
     private final SerializedSubject<VerseIndex, VerseIndex> currentReadingProgressUpdatesSubject
             = PublishSubject.<VerseIndex>create().toSerialized();
 
+    @SuppressWarnings("WeakerAccess")
     final List<String> parallelTranslations = new ArrayList<>();
 
     @Inject
@@ -219,7 +224,8 @@ public class BibleReadingModel {
         });
     }
 
-    public Observable<List<Verse>> loadVersesWithParallelTranslations(final int book, final int chapter) {
+    @NonNull
+    public Single<List<Verse>> loadVersesWithParallelTranslations(final int book, final int chapter) {
         return loadVerses(loadCurrentTranslation(), book, chapter)
                 .map(new Func1<List<Verse>, List<Verse>>() {
                     @Override
@@ -259,23 +265,18 @@ public class BibleReadingModel {
                 });
     }
 
-    public Observable<List<Verse>> loadVerses(String translation, int book, int chapter) {
-        return Observable.concat(loadVersesFromCache(translation, book, chapter),
-                loadVersesFromDatabase(translation, book, chapter))
-                .first(new Func1<List<Verse>, Boolean>() {
-                    @Override
-                    public Boolean call(List<Verse> verses) {
-                        return verses != null && verses.size() > 0;
-                    }
-                });
-    }
-
-    private Observable<List<Verse>> loadVersesFromCache(String translation, int book, int chapter) {
-        return Observable.just(verseCache.get(buildVersesCacheKey(translation, book, chapter)));
+    @NonNull
+    public Single<List<Verse>> loadVerses(String translation, int book, int chapter) {
+        final List<Verse> fromCache = verseCache.get(buildVersesCacheKey(translation, book, chapter));
+        if (fromCache != null && fromCache.size() > 0) {
+            return Single.just(fromCache);
+        }
+        return loadVersesFromDatabase(translation, book, chapter);
     }
 
     private static final StringBuilder STRING_BUILDER = new StringBuilder(32);
 
+    @SuppressWarnings("WeakerAccess")
     static String buildVersesCacheKey(String translation, int book, int chapter) {
         synchronized (STRING_BUILDER) {
             STRING_BUILDER.setLength(0);
@@ -284,7 +285,8 @@ public class BibleReadingModel {
         }
     }
 
-    private Observable<List<Verse>> loadVersesFromDatabase(
+    @NonNull
+    private Single<List<Verse>> loadVersesFromDatabase(
             final String translation, final int book, final int chapter) {
         return loadBookNames(translation)
                 .map(new Func1<List<String>, List<Verse>>() {
@@ -298,7 +300,7 @@ public class BibleReadingModel {
                     public void call(List<Verse> verses) {
                         verseCache.put(buildVersesCacheKey(translation, book, chapter), verses);
                     }
-                });
+                }).toSingle();
     }
 
     public Observable<Verse> loadVerse(final String translation, final int book, final int chapter, final int verse) {

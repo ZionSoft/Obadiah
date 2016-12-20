@@ -130,8 +130,8 @@ public class BookmarkModel {
     }
 
     @NonNull
-    public Observable<List<Bookmark>> loadBookmarks(final int book, final int chapter) {
-        return Observable.fromCallable(new Callable<List<Bookmark>>() {
+    public Single<List<Bookmark>> loadBookmarks(final int book, final int chapter) {
+        return Single.fromCallable(new Callable<List<Bookmark>>() {
             @Override
             public List<Bookmark> call() throws Exception {
                 return BookmarkTableHelper.getBookmarks(databaseHelper.getDatabase(), book, chapter);

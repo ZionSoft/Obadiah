@@ -130,8 +130,8 @@ public class NoteModel {
     }
 
     @NonNull
-    public Observable<List<Note>> loadNotes(final int book, final int chapter) {
-        return Observable.fromCallable(new Callable<List<Note>>() {
+    public Single<List<Note>> loadNotes(final int book, final int chapter) {
+        return Single.fromCallable(new Callable<List<Note>>() {
             @Override
             public List<Note> call() throws Exception {
                 return NoteTableHelper.getNotes(databaseHelper.getDatabase(), book, chapter);
