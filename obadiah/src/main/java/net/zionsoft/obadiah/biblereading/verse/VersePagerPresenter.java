@@ -298,9 +298,9 @@ public class VersePagerPresenter extends BasePresenter<VersePagerView> {
     }
 
     void removeNote(final VerseIndex verseIndex) {
-        getSubscription().add(noteModel.removeNote(verseIndex)
-                .compose(RxHelper.<Void>applySchedulers())
-                .subscribe(new Subscriber<Void>() {
+        noteModel.removeNote(verseIndex)
+                .compose(RxHelper.applySchedulersForCompletable())
+                .subscribe(new CompletableSubscriber() {
                     @Override
                     public void onCompleted() {
                         final VersePagerView v = getView();
@@ -318,10 +318,10 @@ public class VersePagerPresenter extends BasePresenter<VersePagerView> {
                     }
 
                     @Override
-                    public void onNext(Void v) {
-                        // should not reach here
+                    public void onSubscribe(Subscription subscription) {
+                        getSubscription().add(subscription);
                     }
-                }));
+                });
     }
 
     void showNote(VerseIndex verseIndex) {

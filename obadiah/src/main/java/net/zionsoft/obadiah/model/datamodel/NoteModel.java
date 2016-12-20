@@ -35,9 +35,10 @@ import java.util.concurrent.Callable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import rx.Completable;
+import rx.CompletableSubscriber;
 import rx.Observable;
 import rx.Single;
-import rx.functions.Func0;
 import rx.subjects.PublishSubject;
 import rx.subjects.SerializedSubject;
 
@@ -68,10 +69,12 @@ public class NoteModel {
         return notesUpdatesSubject.asObservable();
     }
 
+    @NonNull
     public Single<Note> updateNote(final VerseIndex verseIndex, final String note) {
         return updateNote(verseIndex, note, System.currentTimeMillis());
     }
 
+    @NonNull
     public Single<Note> updateNote(final VerseIndex verseIndex, final String note, final long timestamp) {
         return Single.fromCallable(new Callable<Note>() {
             @Override
@@ -98,10 +101,11 @@ public class NoteModel {
         });
     }
 
-    public Observable<Void> removeNote(final VerseIndex verseIndex) {
-        return Observable.defer(new Func0<Observable<Void>>() {
+    @NonNull
+    public Completable removeNote(final VerseIndex verseIndex) {
+        return Completable.create(new Completable.OnSubscribe() {
             @Override
-            public Observable<Void> call() {
+            public void call(CompletableSubscriber subscriber) {
                 final SQLiteDatabase db = databaseHelper.getDatabase();
                 try {
                     db.beginTransaction();
@@ -113,9 +117,9 @@ public class NoteModel {
                     }
 
                     db.setTransactionSuccessful();
-                    return Observable.empty();
+                    subscriber.onCompleted();
                 } catch (Exception e) {
-                    return Observable.error(e);
+                    subscriber.onError(e);
                 } finally {
                     if (db.inTransaction()) {
                         db.endTransaction();
@@ -125,6 +129,7 @@ public class NoteModel {
         });
     }
 
+    @NonNull
     public Observable<List<Note>> loadNotes(final int book, final int chapter) {
         return Observable.fromCallable(new Callable<List<Note>>() {
             @Override
@@ -134,6 +139,7 @@ public class NoteModel {
         });
     }
 
+    @NonNull
     public Single<List<Note>> loadNotes() {
         return Single.fromCallable(new Callable<List<Note>>() {
             @Override
