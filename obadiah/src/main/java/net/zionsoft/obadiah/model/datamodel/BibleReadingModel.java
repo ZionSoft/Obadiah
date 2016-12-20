@@ -303,7 +303,8 @@ public class BibleReadingModel {
                 }).toSingle();
     }
 
-    public Observable<Verse> loadVerse(final String translation, final int book, final int chapter, final int verse) {
+    @NonNull
+    public Single<Verse> loadVerse(final String translation, final int book, final int chapter, final int verse) {
         return loadBookNames(translation)
                 .map(new Func1<List<String>, Verse>() {
                     @Override
@@ -311,7 +312,7 @@ public class BibleReadingModel {
                         return TranslationHelper.getVerse(databaseHelper.getDatabase(),
                                 translation, bookNames.get(book), book, chapter, verse);
                     }
-                });
+                }).toSingle();
     }
 
     public Observable<List<VerseSearchResult>> search(final String translation, final String query) {

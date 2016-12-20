@@ -110,7 +110,7 @@ public class PushNotificationReceiver extends FirebaseMessagingService {
                     PendingIntent.FLAG_UPDATE_CURRENT);
             final Verse verse = bibleReadingModel
                     .loadVerse(translationShortName, verseIndex.book, verseIndex.chapter, verseIndex.verse)
-                    .toBlocking().first();
+                    .toBlocking().value();
             builder.setContentIntent(pendingIntent)
                     .setContentTitle(TextFormatter.format("%s, %d:%d",
                             verse.text.bookName, verseIndex.chapter + 1, verseIndex.verse + 1))
