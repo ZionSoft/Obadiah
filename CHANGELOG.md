@@ -2,6 +2,7 @@ CHANGELOG
 ---------
 
 #### Next Release
+- Updated UI immediately when data is synced from server.
 
 #### v1.16.1 (2016-12-19)
 - Updated deps:
