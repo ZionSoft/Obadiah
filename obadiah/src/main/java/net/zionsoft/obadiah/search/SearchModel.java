@@ -19,17 +19,20 @@ package net.zionsoft.obadiah.search;
 
 import android.content.Context;
 import android.provider.SearchRecentSuggestions;
+import android.support.annotation.NonNull;
 
 import net.zionsoft.obadiah.model.datamodel.BibleReadingModel;
 import net.zionsoft.obadiah.model.domain.VerseSearchResult;
 
 import java.util.List;
+import java.util.concurrent.Callable;
 
+import rx.Completable;
 import rx.Observable;
-import rx.functions.Func0;
 
 class SearchModel {
     private final BibleReadingModel bibleReadingModel;
+    @SuppressWarnings("WeakerAccess")
     final SearchRecentSuggestions recentSearches;
 
     SearchModel(Context context, BibleReadingModel bibleReadingModel) {
@@ -38,17 +41,19 @@ class SearchModel {
                 RecentSearchProvider.AUTHORITY, RecentSearchProvider.MODE);
     }
 
+    @NonNull
     Observable<List<VerseSearchResult>> search(String translation, String query) {
         recentSearches.saveRecentQuery(query, null);
         return bibleReadingModel.search(translation, query);
     }
 
-    Observable<Void> clearSearchHistory() {
-        return Observable.defer(new Func0<Observable<Void>>() {
+    @NonNull
+    Completable clearSearchHistory() {
+        return Completable.fromCallable(new Callable<Void>() {
             @Override
-            public Observable<Void> call() {
+            public Void call() throws Exception {
                 recentSearches.clearHistory();
-                return Observable.empty();
+                return null;
             }
         });
     }
