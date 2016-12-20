@@ -18,6 +18,7 @@
 package net.zionsoft.obadiah.biblereading.verse;
 
 import android.support.annotation.NonNull;
+import android.util.Pair;
 
 import net.zionsoft.obadiah.model.datamodel.BibleReadingModel;
 import net.zionsoft.obadiah.model.datamodel.BookmarkModel;
@@ -107,6 +108,34 @@ public class VersePagerPresenter extends BasePresenter<VersePagerView> {
                         final VersePagerView v = getView();
                         if (v != null) {
                             v.onReadingProgressChanged(verseIndex);
+                        }
+                    }
+                }));
+        getSubscription().add(bookmarkModel.observeBookmarks()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<Pair<Integer, Bookmark>>() {
+                    @Override
+                    public void onCompleted() {
+                        // do nothing
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        // do nothing
+                    }
+
+                    @Override
+                    public void onNext(Pair<Integer, Bookmark> bookmark) {
+                        final VersePagerView v = getView();
+                        if (v != null) {
+                            switch (bookmark.first) {
+                                case BookmarkModel.ACTION_ADD:
+                                    v.onBookmarkAdded(bookmark.second);
+                                    break;
+                                case BookmarkModel.ACTION_REMOVE:
+                                    v.onBookmarkRemoved(bookmark.second.verseIndex());
+                                    break;
+                            }
                         }
                     }
                 }));
@@ -208,10 +237,7 @@ public class VersePagerPresenter extends BasePresenter<VersePagerView> {
                 .subscribe(new SingleSubscriber<Bookmark>() {
                     @Override
                     public void onSuccess(Bookmark bookmark) {
-                        final VersePagerView v = getView();
-                        if (v != null) {
-                            v.onBookmarkAdded(bookmark);
-                        }
+                        // already handled in the listener
                     }
 
                     @Override
@@ -230,10 +256,7 @@ public class VersePagerPresenter extends BasePresenter<VersePagerView> {
                 .subscribe(new CompletableSubscriber() {
                     @Override
                     public void onCompleted() {
-                        final VersePagerView v = getView();
-                        if (v != null) {
-                            v.onBookmarkRemoved(verseIndex);
-                        }
+                        // already handled in the listener
                     }
 
                     @Override
