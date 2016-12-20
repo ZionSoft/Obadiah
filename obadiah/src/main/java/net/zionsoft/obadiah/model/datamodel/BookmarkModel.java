@@ -68,10 +68,12 @@ public class BookmarkModel {
         return bookmarksUpdatesSubject.asObservable();
     }
 
+    @NonNull
     public Single<Bookmark> addBookmark(final VerseIndex verseIndex) {
         return addBookmark(verseIndex, System.currentTimeMillis());
     }
 
+    @NonNull
     public Single<Bookmark> addBookmark(final VerseIndex verseIndex, final long timestamp) {
         return Single.fromCallable(new Callable<Bookmark>() {
             @Override
@@ -98,6 +100,7 @@ public class BookmarkModel {
         });
     }
 
+    @NonNull
     public Observable<Void> removeBookmark(final VerseIndex verseIndex) {
         return Observable.defer(new Func0<Observable<Void>>() {
             @Override
@@ -125,6 +128,7 @@ public class BookmarkModel {
         });
     }
 
+    @NonNull
     public Observable<List<Bookmark>> loadBookmarks(final int book, final int chapter) {
         return Observable.fromCallable(new Callable<List<Bookmark>>() {
             @Override
@@ -134,6 +138,7 @@ public class BookmarkModel {
         });
     }
 
+    @NonNull
     public Single<List<Bookmark>> loadBookmarks() {
         return Single.fromCallable(new Callable<List<Bookmark>>() {
             @Override
