@@ -3,6 +3,7 @@ CHANGELOG
 
 #### Next Release
 - Updated UI immediately when data is synced from server.
+- Improved search speed (by first returing 20 results, and then the rest).
 
 #### v1.16.1 (2016-12-19)
 - Updated deps:

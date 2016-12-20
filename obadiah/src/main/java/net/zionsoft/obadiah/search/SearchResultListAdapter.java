@@ -29,6 +29,7 @@ import android.widget.TextView;
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.model.datamodel.Settings;
 
+import java.util.ArrayList;
 import java.util.List;
 
 class SearchResultListAdapter extends RecyclerView.Adapter {
@@ -69,8 +70,7 @@ class SearchResultListAdapter extends RecyclerView.Adapter {
     private final SearchPresenter searchPresenter;
     private final LayoutInflater inflater;
     private final Resources resources;
-
-    private List<SearchedVerse> verses;
+    private final List<SearchedVerse> verses = new ArrayList<>();
 
     SearchResultListAdapter(Context context, SearchPresenter searchPresenter) {
         this.searchPresenter = searchPresenter;
@@ -91,10 +91,17 @@ class SearchResultListAdapter extends RecyclerView.Adapter {
 
     @Override
     public int getItemCount() {
-        return verses != null ? verses.size() : 0;
+        return verses.size();
     }
 
-    void setVerses(List<SearchedVerse> verses) {
-        this.verses = verses;
+    void clear() {
+        verses.clear();
+        notifyDataSetChanged();
+    }
+
+    void addVerses(List<SearchedVerse> verses) {
+        final int originalCount = this.verses.size();
+        this.verses.addAll(verses);
+        notifyItemRangeInserted(originalCount, verses.size());
     }
 }

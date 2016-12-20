@@ -153,7 +153,7 @@ public class TranslationHelper {
 
     @NonNull
     public static List<VerseSearchResult> searchVerses(SQLiteDatabase db, String translationShortName,
-                                                       List<String> bookNames, String query) {
+                                                       List<String> bookNames, String query, int offset, int limit) {
         Cursor cursor = null;
         try {
             final String[] keywords = query.trim().replaceAll("\\s+", " ").split(" ");
@@ -177,7 +177,8 @@ public class TranslationHelper {
                     new String[]{COLUMN_BOOK_INDEX, COLUMN_CHAPTER_INDEX, COLUMN_VERSE_INDEX, COLUMN_TEXT},
                     selection.toString(), selectionArgs, null, null,
                     TextFormatter.format(" %s ASC, %s ASC, %s ASC",
-                            COLUMN_BOOK_INDEX, COLUMN_CHAPTER_INDEX, COLUMN_VERSE_INDEX));
+                            COLUMN_BOOK_INDEX, COLUMN_CHAPTER_INDEX, COLUMN_VERSE_INDEX),
+                    TextFormatter.format("%d, %d", offset, limit));
             final int count = cursor.getCount();
             if (count == 0) {
                 return Collections.emptyList();

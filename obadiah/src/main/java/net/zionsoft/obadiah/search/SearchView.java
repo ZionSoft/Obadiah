@@ -24,6 +24,8 @@ import java.util.List;
 interface SearchView extends MVPView {
     void onVersesSearched(List<SearchedVerse> verses);
 
+    void onVersesSearchFinished();
+
     void onVersesSearchFailed();
 
     void openBibleReadingActivity();

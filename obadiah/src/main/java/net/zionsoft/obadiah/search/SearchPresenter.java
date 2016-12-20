@@ -73,12 +73,15 @@ class SearchPresenter extends BasePresenter<SearchView> {
                 .subscribe(new Subscriber<List<SearchedVerse>>() {
                     @Override
                     public void onCompleted() {
-                        // do nothing
+                        final SearchView v = getView();
+                        if (v != null) {
+                            v.onVersesSearchFinished();
+                        }
                     }
 
                     @Override
                     public void onError(Throwable e) {
-                        SearchView v = getView();
+                        final SearchView v = getView();
                         if (v != null) {
                             v.onVersesSearchFailed();
                         }
@@ -86,7 +89,7 @@ class SearchPresenter extends BasePresenter<SearchView> {
 
                     @Override
                     public void onNext(List<SearchedVerse> verses) {
-                        SearchView v = getView();
+                        final SearchView v = getView();
                         if (v != null) {
                             v.onVersesSearched(verses);
                         }

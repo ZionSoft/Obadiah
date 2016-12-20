@@ -316,11 +316,26 @@ public class BibleReadingModel {
 
     public Observable<List<VerseSearchResult>> search(final String translation, final String query) {
         return loadBookNames(translation)
-                .map(new Func1<List<String>, List<VerseSearchResult>>() {
+                .flatMap(new Func1<List<String>, Observable<List<VerseSearchResult>>>() {
                     @Override
-                    public List<VerseSearchResult> call(List<String> bookNames) {
-                        return TranslationHelper.searchVerses(
-                                databaseHelper.getDatabase(), translation, bookNames, query);
+                    public Observable<List<VerseSearchResult>> call(final List<String> bookNames) {
+                        final Observable<List<VerseSearchResult>> first
+                                = Observable.fromCallable(new Callable<List<VerseSearchResult>>() {
+                            @Override
+                            public List<VerseSearchResult> call() throws Exception {
+                                return TranslationHelper.searchVerses(databaseHelper.getDatabase(),
+                                        translation, bookNames, query, 0, 20);
+                            }
+                        });
+                        final Observable<List<VerseSearchResult>> rest
+                                = Observable.fromCallable(new Callable<List<VerseSearchResult>>() {
+                            @Override
+                            public List<VerseSearchResult> call() throws Exception {
+                                return TranslationHelper.searchVerses(databaseHelper.getDatabase(),
+                                        translation, bookNames, query, 20, 31102);
+                            }
+                        });
+                        return Observable.concat(first, rest);
                     }
                 });
     }

@@ -189,7 +189,7 @@ public class SearchActivity extends BaseAppCompatActivity
         setTitle(selected);
         if (!selected.equals(currentTranslation)) {
             currentTranslation = selected;
-            searchResultAdapter.setVerses(null);
+            searchResultAdapter.clear();
         }
         searchResultAdapter.notifyDataSetChanged();
 
@@ -234,6 +234,7 @@ public class SearchActivity extends BaseAppCompatActivity
         loadingSpinner.setVisibility(View.VISIBLE);
         searchResultList.setVisibility(View.GONE);
 
+        searchResultAdapter.clear();
         searchPresenter.search(currentTranslation, query);
     }
 
@@ -250,14 +251,18 @@ public class SearchActivity extends BaseAppCompatActivity
 
     @Override
     public void onVersesSearched(List<SearchedVerse> verses) {
-        AnimationHelper.fadeOut(loadingSpinner);
-        AnimationHelper.fadeIn(searchResultList);
+        if (searchResultAdapter.getItemCount() == 0) {
+            AnimationHelper.fadeOut(loadingSpinner);
+            AnimationHelper.fadeIn(searchResultList);
+            searchResultList.scrollToPosition(0);
+        }
 
-        searchResultAdapter.setVerses(verses);
-        searchResultAdapter.notifyDataSetChanged();
-        searchResultList.scrollToPosition(0);
+        searchResultAdapter.addVerses(verses);
+    }
 
-        Toast.makeText(this, getString(R.string.toast_verses_searched, verses.size()),
+    @Override
+    public void onVersesSearchFinished() {
+        Toast.makeText(this, getString(R.string.toast_verses_searched, searchResultAdapter.getItemCount()),
                 Toast.LENGTH_SHORT).show();
     }
 
