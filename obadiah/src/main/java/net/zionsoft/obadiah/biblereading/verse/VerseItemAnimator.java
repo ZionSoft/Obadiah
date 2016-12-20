@@ -46,7 +46,9 @@ class VerseItemAnimator extends DefaultItemAnimator {
         }
     }
 
+    @SuppressWarnings("WeakerAccess")
     final DecelerateInterpolator decelerateInterpolator = new DecelerateInterpolator();
+    @SuppressWarnings("WeakerAccess")
     final OvershootInterpolator overshootInterpolator = new OvershootInterpolator(4);
 
     @Override
@@ -86,7 +88,7 @@ class VerseItemAnimator extends DefaultItemAnimator {
                         .setListener(new AnimatorListenerAdapter() {
                             @Override
                             public void onAnimationEnd(Animator animation) {
-                                holder.setBookmark(true);
+                                holder.bindBookmark(true);
                                 holder.bookmarkIcon.animate().scaleX(1.0F).scaleY(1.0F)
                                         .setInterpolator(overshootInterpolator)
                                         .setDuration(500L)
@@ -99,7 +101,7 @@ class VerseItemAnimator extends DefaultItemAnimator {
                             }
                         });
             } else if (VerseItemHolderInfo.ACTION_REMOVE_BOOKMARK.equals(action)) {
-                holder.setBookmark(false);
+                holder.bindBookmark(false);
                 dispatchAnimationFinished(holder);
             } else if (VerseItemHolderInfo.ACTION_SHOW_NOTE.equals(action)) {
                 AnimationHelper.fadeIn(holder.noteHolder);

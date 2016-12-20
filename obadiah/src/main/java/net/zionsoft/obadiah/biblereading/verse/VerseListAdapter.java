@@ -82,25 +82,30 @@ class VerseListAdapter extends RecyclerView.Adapter<VerseItemViewHolder> {
             }
         }
 
-        String note = null;
-        final int noteCount = notes.size();
+        holder.bind(verses.get(position), selected[position], isBookmarked, getNote(position), expanded[position]);
+    }
+
+    @Nullable
+    private String getNote(int position) {
+        final int noteCount = notes != null ? notes.size() : 0;
         for (int i = 0; i < noteCount; ++i) {
             final Note n = notes.get(i);
             if (n.verseIndex().verse() == position) {
-                note = n.note();
-                break;
+                return n.note();
             }
         }
-
-        holder.bind(verses.get(position), selected[position], isBookmarked, note, expanded[position]);
+        return null;
     }
 
     @Override
     public void onBindViewHolder(VerseItemViewHolder holder, int position, List<Object> payloads) {
-        if (payloads.size() == 0) {
+        final int count = payloads.size();
+        if (count == 0) {
             onBindViewHolder(holder, position);
+        } else if (count == 1 && payloads.get(0) == VerseItemAnimator.VerseItemHolderInfo.ACTION_UPDATE_NOTE && expanded != null) {
+            holder.bindNote(getNote(position), expanded[position]);
         }
-        // if there are payloads, the view will be updated by VerseItemAnimator
+        // for all other cases with payloads, the view will be updated by VerseItemAnimator
     }
 
     void setVerses(List<Verse> verses, @Nullable List<Bookmark> bookmarks, @Nullable List<Note> notes) {

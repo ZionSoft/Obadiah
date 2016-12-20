@@ -44,10 +44,10 @@ import rx.subjects.SerializedSubject;
 
 @Singleton
 public class NoteModel {
-    public static final int ACTION_ADD = 0;
+    public static final int ACTION_UPDATED = 0;
     public static final int ACTION_REMOVE = 1;
 
-    @IntDef({ACTION_ADD, ACTION_REMOVE})
+    @IntDef({ACTION_UPDATED, ACTION_REMOVE})
     @Retention(RetentionPolicy.SOURCE)
     public @interface Action {
     }
@@ -87,7 +87,7 @@ public class NoteModel {
                     if (n == null || timestamp > n.timestamp()) {
                         n = Note.create(verseIndex, note, timestamp);
                         NoteTableHelper.saveNote(databaseHelper.getDatabase(), n);
-                        notesUpdatesSubject.onNext(new Pair<>(ACTION_ADD, n));
+                        notesUpdatesSubject.onNext(new Pair<>(ACTION_UPDATED, n));
                     }
 
                     db.setTransactionSuccessful();

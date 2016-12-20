@@ -159,23 +159,23 @@ class VerseItemViewHolder extends RecyclerView.ViewHolder implements View.OnClic
         setVerse(verse);
 
         bookmarkIcon.setVisibility(View.VISIBLE);
-        setBookmark(isBookmarked);
+        bindBookmark(isBookmarked);
 
         final Settings settings = versePagerPresenter.getSettings();
         noteIcon.setVisibility(View.VISIBLE);
         this.note.setTextColor(settings.getTextColor());
         this.note.setTextSize(TypedValue.COMPLEX_UNIT_PX,
                 resources.getDimension(settings.getTextSize().smallerTextSize));
-        setNote(note, expanded);
+        bindNote(note, expanded);
         setExpanded(expanded);
     }
 
-    void setBookmark(boolean isBookmarked) {
+    void bindBookmark(boolean isBookmarked) {
         this.isBookmarked = isBookmarked;
         bookmarkIcon.setColorFilter(isBookmarked ? ON : OFF);
     }
 
-    private void setNote(String note, boolean expanded) {
+    void bindNote(String note, boolean expanded) {
         this.note.removeTextChangedListener(this);
         this.note.setText(note);
         this.note.addTextChangedListener(this);

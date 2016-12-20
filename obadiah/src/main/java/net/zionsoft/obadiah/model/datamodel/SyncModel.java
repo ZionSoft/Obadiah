@@ -265,7 +265,7 @@ public class SyncModel implements ChildEventListener {
                             final DatabaseReference reference
                                     = notesReference.child(verseIndexToKey(note.second.verseIndex()));
                             switch (note.first) {
-                                case NoteModel.ACTION_ADD:
+                                case NoteModel.ACTION_UPDATED:
                                     final long t = note.second.timestamp();
                                     final String n = note.second.note();
                                     reference.addListenerForSingleValueEvent(new ValueEventListener() {

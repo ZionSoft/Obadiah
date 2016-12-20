@@ -140,6 +140,34 @@ public class VersePagerPresenter extends BasePresenter<VersePagerView> {
                         }
                     }
                 }));
+        getSubscription().add(noteModel.observeNotes()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<Pair<Integer, Note>>() {
+                    @Override
+                    public void onCompleted() {
+                        // do nothing
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        // do nothing
+                    }
+
+                    @Override
+                    public void onNext(Pair<Integer, Note> note) {
+                        final VersePagerView v = getView();
+                        if (v != null) {
+                            switch (note.first) {
+                                case NoteModel.ACTION_UPDATED:
+                                    v.onNoteUpdated(note.second);
+                                    break;
+                                case NoteModel.ACTION_REMOVE:
+                                    v.onNoteRemoved(note.second.verseIndex());
+                                    break;
+                            }
+                        }
+                    }
+                }));
     }
 
     @NonNull
@@ -276,10 +304,7 @@ public class VersePagerPresenter extends BasePresenter<VersePagerView> {
                 .subscribe(new SingleSubscriber<Note>() {
                     @Override
                     public void onSuccess(Note note) {
-                        final VersePagerView v = getView();
-                        if (v != null) {
-                            v.onNoteUpdated(note);
-                        }
+                        // already handled in the listener
                     }
 
                     @Override
@@ -299,10 +324,7 @@ public class VersePagerPresenter extends BasePresenter<VersePagerView> {
                 .subscribe(new CompletableSubscriber() {
                     @Override
                     public void onCompleted() {
-                        final VersePagerView v = getView();
-                        if (v != null) {
-                            v.onNoteRemoved(verseIndex);
-                        }
+                        // already handled in the listener
                     }
 
                     @Override
