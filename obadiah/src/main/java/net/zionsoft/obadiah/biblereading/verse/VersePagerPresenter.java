@@ -42,6 +42,7 @@ import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
 import rx.functions.Func3;
+import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
 public class VersePagerPresenter extends BasePresenter<VersePagerView> {
@@ -225,8 +226,9 @@ public class VersePagerPresenter extends BasePresenter<VersePagerView> {
                 }
             });
         } else {
-            loaded = Single.zip(verses,
-                    bookmarkModel.loadBookmarks(book, chapter), noteModel.loadNotes(book, chapter),
+            loaded = Single.zip(verses.subscribeOn(Schedulers.io()),
+                    bookmarkModel.loadBookmarks(book, chapter).subscribeOn(Schedulers.io()),
+                    noteModel.loadNotes(book, chapter).subscribeOn(Schedulers.io()),
                     new Func3<List<Verse>, List<Bookmark>, List<Note>, VerseList>() {
                         @Override
                         public VerseList call(List<Verse> verses, List<Bookmark> bookmarks, List<Note> notes) {

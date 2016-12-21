@@ -32,6 +32,7 @@ import rx.Observable;
 import rx.Subscriber;
 import rx.Subscription;
 import rx.functions.Func2;
+import rx.schedulers.Schedulers;
 
 class ReadingProgressPresenter extends BasePresenter<ReadingProgressView> {
     private final BibleReadingModel bibleReadingModel;
@@ -58,8 +59,8 @@ class ReadingProgressPresenter extends BasePresenter<ReadingProgressView> {
     }
 
     void loadReadingProgress() {
-        subscription = Observable.zip(readingProgressModel.loadReadingProgress(),
-                bibleReadingModel.loadBookNames(bibleReadingModel.loadCurrentTranslation()),
+        subscription = Observable.zip(readingProgressModel.loadReadingProgress().subscribeOn(Schedulers.io()),
+                bibleReadingModel.loadBookNames(bibleReadingModel.loadCurrentTranslation()).subscribeOn(Schedulers.io()),
                 new Func2<ReadingProgress, List<String>, Pair<ReadingProgress, List<String>>>() {
                     @Override
                     public Pair<ReadingProgress, List<String>> call(ReadingProgress readingProgress, List<String> bookNames) {

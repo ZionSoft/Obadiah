@@ -103,15 +103,16 @@ class TranslationManagementModel {
                 return TranslationsTableHelper.getDownloadedTranslations(databaseHelper.getDatabase());
             }
         });
-        return Observable.zip(translations, downloaded, new Func2<List<TranslationInfo>, List<String>, Translations>() {
-            @Override
-            public Translations call(List<TranslationInfo> translations, List<String> downloaded) {
-                return new Translations.Builder()
-                        .translations(translations)
-                        .downloaded(downloaded)
-                        .build();
-            }
-        });
+        return Observable.zip(translations.subscribeOn(Schedulers.io()), downloaded.subscribeOn(Schedulers.io()),
+                new Func2<List<TranslationInfo>, List<String>, Translations>() {
+                    @Override
+                    public Translations call(List<TranslationInfo> translations, List<String> downloaded) {
+                        return new Translations.Builder()
+                                .translations(translations)
+                                .downloaded(downloaded)
+                                .build();
+                    }
+                });
     }
 
     private Observable<List<TranslationInfo>> loadFromNetwork() {
