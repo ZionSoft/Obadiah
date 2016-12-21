@@ -2,8 +2,11 @@ CHANGELOG
 ---------
 
 #### Next Release
+
+#### v1.16.2 (2016-12-21)
 - Updated UI immediately when data is synced from server.
 - Improved search speed (by first returing 20 results, and then the rest).
+- Fixed handling of reading progress tracking.
 
 #### v1.16.1 (2016-12-19)
 - Updated deps:
