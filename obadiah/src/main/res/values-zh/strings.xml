@@ -74,6 +74,9 @@
     <string name="text_finished_new_testament">新約</string>
     <string name="text_last_read_chapter">您在%2$s閱讀到第%1$d章。</string>
 
+    <string name="text_no_bookmark">您尚未添加任何的書籤。</string>
+    <string name="text_no_note">您尚未添加任何的筆記。</string>
+
     <!--
         %1$d: date, %2$s: month, %3$d: year
          -->

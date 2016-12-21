@@ -70,6 +70,7 @@ public class BookmarksActivity extends BaseRecyclerViewActivity implements Bookm
         rootView.setBackgroundColor(settings.getBackgroundColor());
 
         toolbar.setTitle(R.string.activity_bookmarks);
+        empty.setText(R.string.text_no_bookmark);
 
         bookmarksListAdapter = new BookmarksListAdapter(this, bookmarksPresenter.getSettings());
         recyclerView.setAdapter(bookmarksListAdapter);
@@ -97,7 +98,12 @@ public class BookmarksActivity extends BaseRecyclerViewActivity implements Bookm
         AnimationHelper.fadeOut(loadingSpinner);
         AnimationHelper.fadeIn(recyclerView);
 
-        bookmarksListAdapter.setBookmarks(bookmarks, verses);
+        if (bookmarks == null || bookmarks.size() == 0) {
+            empty.setVisibility(View.VISIBLE);
+        } else {
+            empty.setVisibility(View.GONE);
+            bookmarksListAdapter.setBookmarks(bookmarks, verses);
+        }
     }
 
     @Override

@@ -74,6 +74,9 @@
     <string name="text_finished_new_testament">Uusi Testamentti</string>
     <string name="text_last_read_chapter">Viimeksi lukenut luvun %1$d, %2$s.</string>
 
+    <string name="text_no_bookmark">Ei kirjanmerkkejä.</string>
+    <string name="text_no_note">Ei huomautus.</string>
+
     <!--
     %1$d: date, %2$s: month, %3$d: year
      -->

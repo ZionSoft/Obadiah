@@ -23,6 +23,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.TextView;
 
 import net.zionsoft.obadiah.R;
 
@@ -38,6 +39,9 @@ public abstract class BaseRecyclerViewActivity extends BaseAppCompatActivity
 
     @BindView(R.id.loading_spinner)
     protected View loadingSpinner;
+
+    @BindView(R.id.empty)
+    protected TextView empty;
 
     @CallSuper
     @Override

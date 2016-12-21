@@ -71,6 +71,7 @@ public class NotesActivity extends BaseRecyclerViewActivity implements NotesView
         rootView.setBackgroundColor(settings.getBackgroundColor());
 
         toolbar.setTitle(R.string.activity_notes);
+        empty.setText(R.string.text_no_note);
 
         notesListAdapter = new NotesListAdapter(this, notesPresenter.getSettings());
         recyclerView.setAdapter(notesListAdapter);
@@ -98,7 +99,12 @@ public class NotesActivity extends BaseRecyclerViewActivity implements NotesView
         AnimationHelper.fadeOut(loadingSpinner);
         AnimationHelper.fadeIn(recyclerView);
 
-        notesListAdapter.setNotes(notes, verses);
+        if (notes == null || notes.size() == 0) {
+            empty.setVisibility(View.VISIBLE);
+        } else {
+            empty.setVisibility(View.GONE);
+            notesListAdapter.setNotes(notes, verses);
+        }
     }
 
     @Override
