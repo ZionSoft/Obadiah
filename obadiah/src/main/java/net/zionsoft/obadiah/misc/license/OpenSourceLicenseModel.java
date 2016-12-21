@@ -28,17 +28,18 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-import rx.Observable;
+import rx.Single;
 
 class OpenSourceLicenseModel {
-    private final Context applicationContext;
+    @SuppressWarnings("WeakerAccess")
+    final Context applicationContext;
 
     OpenSourceLicenseModel(Context context) {
         this.applicationContext = context.getApplicationContext();
     }
 
-    Observable<List<String>> loadLicense() {
-        return Observable.fromCallable(new Callable<List<String>>() {
+    Single<List<String>> loadLicense() {
+        return Single.fromCallable(new Callable<List<String>>() {
             @Override
             public List<String> call() throws Exception {
                 final List<String> licenses = new ArrayList<>();

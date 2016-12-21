@@ -27,6 +27,8 @@ import net.zionsoft.obadiah.model.domain.TranslationInfo;
 import net.zionsoft.obadiah.mvp.BasePresenter;
 import net.zionsoft.obadiah.utils.RxHelper;
 
+import rx.CompletableSubscriber;
+import rx.SingleSubscriber;
 import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
@@ -36,11 +38,14 @@ import rx.subscriptions.CompositeSubscription;
 class TranslationManagementPresenter extends BasePresenter<TranslationManagementView>
         implements AdsModel.OnAdsRemovalPurchasedListener {
     private final AdsModel adsModel;
+    @SuppressWarnings("WeakerAccess")
     final BibleReadingModel bibleReadingModel;
     private final TranslationManagementModel translationManagementModel;
 
     private CompositeSubscription subscription = new CompositeSubscription();
+    @SuppressWarnings("WeakerAccess")
     Subscription removeTranslationSubscription;
+    @SuppressWarnings("WeakerAccess")
     Subscription fetchTranslationSubscription;
 
     TranslationManagementPresenter(AdsModel adsModel, BibleReadingModel bibleReadingModel,
@@ -109,14 +114,14 @@ class TranslationManagementPresenter extends BasePresenter<TranslationManagement
             return;
         }
 
-        removeTranslationSubscription = translationManagementModel.removeTranslation(translation)
+        translationManagementModel.removeTranslation(translation)
                 .doOnTerminate(new Action0() {
                     @Override
                     public void call() {
                         removeTranslationSubscription = null;
                     }
-                }).compose(RxHelper.<Void>applySchedulers())
-                .subscribe(new Subscriber<Void>() {
+                }).compose(RxHelper.applySchedulersForCompletable())
+                .subscribe(new CompletableSubscriber() {
                     @Override
                     public void onCompleted() {
                         final TranslationManagementView v = getView();
@@ -134,8 +139,8 @@ class TranslationManagementPresenter extends BasePresenter<TranslationManagement
                     }
 
                     @Override
-                    public void onNext(Void aVoid) {
-                        // won't reach here
+                    public void onSubscribe(Subscription subscription) {
+                        removeTranslationSubscription = subscription;
                     }
                 });
     }
@@ -200,22 +205,9 @@ class TranslationManagementPresenter extends BasePresenter<TranslationManagement
     void loadAdsStatus() {
         subscription.add(adsModel.shouldHideAds()
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<Boolean>() {
+                .subscribe(new SingleSubscriber<Boolean>() {
                     @Override
-                    public void onCompleted() {
-                        // do nothing
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        final TranslationManagementView v = getView();
-                        if (v != null) {
-                            v.showAds();
-                        }
-                    }
-
-                    @Override
-                    public void onNext(Boolean shouldHideAds) {
+                    public void onSuccess(Boolean shouldHideAds) {
                         final TranslationManagementView v = getView();
                         if (v != null) {
                             if (shouldHideAds) {
@@ -223,6 +215,14 @@ class TranslationManagementPresenter extends BasePresenter<TranslationManagement
                             } else {
                                 v.showAds();
                             }
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        final TranslationManagementView v = getView();
+                        if (v != null) {
+                            v.showAds();
                         }
                     }
                 }));

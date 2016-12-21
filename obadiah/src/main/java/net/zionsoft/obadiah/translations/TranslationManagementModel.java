@@ -48,6 +48,7 @@ import okhttp3.ResponseBody;
 import okio.BufferedSource;
 import okio.Okio;
 import retrofit2.Response;
+import rx.Completable;
 import rx.Emitter;
 import rx.Observable;
 import rx.functions.Action1;
@@ -57,10 +58,15 @@ import rx.functions.Func2;
 import rx.schedulers.Schedulers;
 
 class TranslationManagementModel {
+    @SuppressWarnings("WeakerAccess")
     final DatabaseHelper databaseHelper;
+    @SuppressWarnings("WeakerAccess")
     final BibleReadingModel bibleReadingModel;
+    @SuppressWarnings("WeakerAccess")
     final TranslationService translationService;
+    @SuppressWarnings("WeakerAccess")
     final JsonAdapter<BackendBooks> translationInfoJsonAdapter;
+    @SuppressWarnings("WeakerAccess")
     final JsonAdapter<BackendChapter> chapterJsonAdapter;
 
     TranslationManagementModel(DatabaseHelper databaseHelper, BibleReadingModel bibleReadingModel,
@@ -152,6 +158,7 @@ class TranslationManagementModel {
         });
     }
 
+    @SuppressWarnings("WeakerAccess")
     static List<TranslationInfo> sortByLocale(List<TranslationInfo> translations) {
         Collections.sort(translations, new Comparator<TranslationInfo>() {
             @Override
@@ -175,10 +182,10 @@ class TranslationManagementModel {
         return translations;
     }
 
-    Observable<Void> removeTranslation(final TranslationInfo translation) {
-        return Observable.defer(new Func0<Observable<Void>>() {
+    Completable removeTranslation(final TranslationInfo translation) {
+        return Completable.defer(new Func0<Completable>() {
             @Override
-            public Observable<Void> call() {
+            public Completable call() {
                 try {
                     final SQLiteDatabase database = databaseHelper.getDatabase();
                     try {
@@ -196,10 +203,10 @@ class TranslationManagementModel {
                             database.endTransaction();
                         }
                     }
-                    return Observable.empty();
+                    return Completable.complete();
                 } catch (Exception e) {
                     Crash.report(e);
-                    return Observable.error(e);
+                    return Completable.error(e);
                 }
             }
         });

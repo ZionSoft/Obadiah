@@ -28,6 +28,7 @@ import net.zionsoft.obadiah.billing.InAppBilling;
 import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
+import rx.Single;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
@@ -36,6 +37,7 @@ class AdsModel implements InAppBilling.OnAdsRemovalPurchasedListener {
         void onAdsRemovalPurchased(boolean purchased);
     }
 
+    @SuppressWarnings("WeakerAccess")
     final InAppBilling inAppBilling;
     private OnAdsRemovalPurchasedListener onAdsRemovalPurchasedListener;
 
@@ -43,7 +45,7 @@ class AdsModel implements InAppBilling.OnAdsRemovalPurchasedListener {
         inAppBilling = new InAppBilling(context, moshi);
     }
 
-    Observable<Boolean> shouldHideAds() {
+    Single<Boolean> shouldHideAds() {
         return Observable.interval(500L, TimeUnit.MILLISECONDS, Schedulers.io())
                 .filter(new Func1<Long, Boolean>() {
                     @Override
@@ -57,7 +59,7 @@ class AdsModel implements InAppBilling.OnAdsRemovalPurchasedListener {
                     public Boolean call(Long aLong) {
                         return inAppBilling.hasPurchasedAdsRemoval();
                     }
-                });
+                }).toSingle();
     }
 
     void purchaseAdsRemoval(Activity activity, OnAdsRemovalPurchasedListener listener) {

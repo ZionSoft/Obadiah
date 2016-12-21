@@ -48,7 +48,7 @@ class OpenSourceLicensePresenter extends BasePresenter<OpenSourceLicenseView> {
 
     void loadLicense() {
         subscription = openSourceLicenseModel.loadLicense()
-                .compose(RxHelper.<List<String>>applySchedulers())
+                .compose(RxHelper.<List<String>>applySchedulersForSingle())
                 .subscribe(new Action1<List<String>>() {
                     @Override
                     public void call(List<String> licenses) {

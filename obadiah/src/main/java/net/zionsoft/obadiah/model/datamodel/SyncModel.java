@@ -405,7 +405,8 @@ public class SyncModel implements ChildEventListener {
             final int chapter = Integer.parseInt(fields[1]);
             final Long timestamp = (Long) snapshot.getValue();
             if (timestamp != null) {
-                readingProgressModel.trackReadingProgress(book, chapter, timestamp);
+                readingProgressModel.trackReadingProgress(book, chapter, timestamp)
+                        .subscribeOn(Schedulers.io()).onErrorComplete().subscribe();
             }
         } else if ("metadata".equals(type)) {
             final String key = snapshot.getKey();

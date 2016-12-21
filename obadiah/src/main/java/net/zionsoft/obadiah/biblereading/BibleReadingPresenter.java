@@ -140,6 +140,7 @@ class BibleReadingPresenter extends BasePresenter<BibleReadingView> {
     void trackReadingProgress(int book, int chapter) {
         readingProgressModel.trackReadingProgress(book, chapter)
                 .subscribeOn(Schedulers.io())
+                .onErrorComplete()
                 .subscribe();
     }
 
@@ -147,6 +148,7 @@ class BibleReadingPresenter extends BasePresenter<BibleReadingView> {
         loadBookNames(bibleReadingModel.loadCurrentTranslation());
     }
 
+    @SuppressWarnings("WeakerAccess")
     void loadBookNames(String translation) {
         getSubscription().add(bibleReadingModel.loadBookNames(translation)
                 .compose(RxHelper.<List<String>>applySchedulers())

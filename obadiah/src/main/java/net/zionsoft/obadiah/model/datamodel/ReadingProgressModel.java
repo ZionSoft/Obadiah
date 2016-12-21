@@ -87,15 +87,15 @@ public class ReadingProgressModel {
     }
 
     @NonNull
-    public Observable<Void> trackReadingProgress(final int book, final int chapter) {
+    public Completable trackReadingProgress(final int book, final int chapter) {
         return trackReadingProgress(book, chapter, System.currentTimeMillis());
     }
 
     @NonNull
-    public Observable<Void> trackReadingProgress(final int book, final int chapter, final long timestamp) {
-        return Observable.defer(new Func0<Observable<Void>>() {
+    public Completable trackReadingProgress(final int book, final int chapter, final long timestamp) {
+        return Completable.defer(new Func0<Completable>() {
             @Override
-            public Observable<Void> call() {
+            public Completable call() {
                 final SQLiteDatabase database = databaseHelper.getDatabase();
                 try {
                     database.beginTransaction();
@@ -132,8 +132,10 @@ public class ReadingProgressModel {
                             continuousReadingDays, lastReadingTimestamp));
 
                     database.setTransactionSuccessful();
+                    return Completable.complete();
                 } catch (Exception e) {
                     Crash.report(e);
+                    return Completable.error(e);
                 } finally {
                     // yep, we can crash here, ref.
                     // https://fabric.io/zionsoft/android/apps/net.zionsoft.obadiah/issues/5785af31ffcdc042509c9d00
@@ -145,7 +147,6 @@ public class ReadingProgressModel {
                         Crash.report(e);
                     }
                 }
-                return Observable.empty();
             }
         });
     }
