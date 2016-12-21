@@ -256,8 +256,6 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
         }
 
         AppIndexingManager.onView(currentTranslation, bookNames.get(currentBook), currentBook, currentChapter);
-
-        // TODO get an improved tracking algorithm, e.g. only consider as "read" if the user stays for a while
         bibleReadingPresenter.trackReadingProgress(currentBook, currentChapter);
     }
 

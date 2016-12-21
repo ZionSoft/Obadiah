@@ -28,8 +28,11 @@ import net.zionsoft.obadiah.mvp.BasePresenter;
 import net.zionsoft.obadiah.utils.RxHelper;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
+import rx.Completable;
 import rx.Subscriber;
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
@@ -39,6 +42,7 @@ class BibleReadingPresenter extends BasePresenter<BibleReadingView> {
     private final ReadingProgressModel readingProgressModel;
 
     private CompositeSubscription subscription;
+    private Subscription trackReadingProgressSubscription;
 
     BibleReadingPresenter(BibleReadingModel bibleReadingModel, ReadingProgressModel readingProgressModel, Settings settings) {
         super(settings);
@@ -108,6 +112,7 @@ class BibleReadingPresenter extends BasePresenter<BibleReadingView> {
             subscription.unsubscribe();
             subscription = null;
         }
+        cancelTrackReadingProgress();
 
         super.onViewDropped();
     }
@@ -138,10 +143,22 @@ class BibleReadingPresenter extends BasePresenter<BibleReadingView> {
     }
 
     void trackReadingProgress(int book, int chapter) {
-        readingProgressModel.trackReadingProgress(book, chapter)
+        cancelTrackReadingProgress();
+
+        // let's wait for 10 seconds before tracking the progress, so that if user is just scrolling
+        // through the chapters, it won't be tracked
+        trackReadingProgressSubscription = Completable.complete().delay(10L, TimeUnit.SECONDS)
+                .andThen(readingProgressModel.trackReadingProgress(book, chapter))
                 .subscribeOn(Schedulers.io())
                 .onErrorComplete()
                 .subscribe();
+    }
+
+    private void cancelTrackReadingProgress() {
+        if (trackReadingProgressSubscription != null) {
+            trackReadingProgressSubscription.unsubscribe();
+            trackReadingProgressSubscription = null;
+        }
     }
 
     void loadBookNamesForCurrentTranslation() {
