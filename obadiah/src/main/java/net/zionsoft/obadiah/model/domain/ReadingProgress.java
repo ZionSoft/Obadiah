@@ -103,7 +103,17 @@ public class ReadingProgress {
     public ReadChapter getLastReadChapter(int book) {
         final List<ReadChapter> readChapters = getReadChapters(book);
         final int count = readChapters.size();
-        return count > 0 ? readChapters.get(count - 1) : null;
+        if (count == 0) {
+            return null;
+        }
+        ReadChapter lastReadChapter = readChapters.get(0);
+        for (int i = 1; i < count; ++i) {
+            final ReadChapter readChapter = readChapters.get(i);
+            if (readChapter.timestamp > lastReadChapter.timestamp) {
+                lastReadChapter = readChapter;
+            }
+        }
+        return lastReadChapter;
     }
 
     @NonNull
