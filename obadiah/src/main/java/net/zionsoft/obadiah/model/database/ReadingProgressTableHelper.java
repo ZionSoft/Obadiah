@@ -71,4 +71,18 @@ public class ReadingProgressTableHelper {
         values.put(COLUMN_LAST_READING_TIMESTAMP, timestamp);
         db.insertWithOnConflict(TABLE_READING_PROGRESS, null, values, SQLiteDatabase.CONFLICT_REPLACE);
     }
+
+    public static long getChapterReadTimestamp(SQLiteDatabase db, int book, int chapter) {
+        Cursor cursor = null;
+        try {
+            cursor = db.query(TABLE_READING_PROGRESS, new String[]{COLUMN_LAST_READING_TIMESTAMP},
+                    TextFormatter.format("%s = ? AND %s = ?", COLUMN_BOOK_INDEX, COLUMN_CHAPTER_INDEX),
+                    new String[]{Integer.toString(book), Integer.toString(chapter)}, null, null, null);
+            return cursor.moveToFirst() ? cursor.getLong(0) : 0L;
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+    }
 }

@@ -102,7 +102,8 @@ public class ReadingProgressModel {
 
                     long lastReadingTimestamp = Long.parseLong(MetadataTableHelper.getMetadata(
                             database, MetadataTableHelper.KEY_LAST_READING_TIMESTAMP, "0"));
-                    if (lastReadingTimestamp >= timestamp) {
+                    if (lastReadingTimestamp >= timestamp
+                            || ReadingProgressTableHelper.getChapterReadTimestamp(database, book, chapter) >= timestamp) {
                         return null;
                     }
 
@@ -127,11 +128,12 @@ public class ReadingProgressModel {
                                 Integer.toString(continuousReadingDays));
                     }
 
+                    database.setTransactionSuccessful();
+
                     readingProgressUpdatesSubject.onNext(new Triple<>(
                             new ReadingProgress.ReadChapter(book, chapter, timestamp),
                             continuousReadingDays, lastReadingTimestamp));
 
-                    database.setTransactionSuccessful();
                     return Completable.complete();
                 } catch (Exception e) {
                     Crash.report(e);
