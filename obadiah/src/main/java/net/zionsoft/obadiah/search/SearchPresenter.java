@@ -100,6 +100,7 @@ class SearchPresenter extends BasePresenter<SearchView> {
     void clearSearchHistory() {
         searchModel.clearSearchHistory()
                 .subscribeOn(Schedulers.io())
+                .onErrorComplete()
                 .subscribe();
     }
 
