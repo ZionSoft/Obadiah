@@ -70,7 +70,7 @@ public class PushNotificationReceiver extends FirebaseMessagingService {
         final String messageType = data.get("type");
         final String messageAttrs = data.get("attrs");
 
-        final NotificationCompat.Builder builder = buildBasicNotificationBuilder(this, messageType);
+        final NotificationCompat.Builder builder = buildBasicNotificationBuilder(this);
         final int notificationId;
         if (MESSAGE_TYPE_VERSE.equals(messageType)) {
             notificationId = NOTIFICATION_ID_VERSE;
@@ -86,7 +86,7 @@ public class PushNotificationReceiver extends FirebaseMessagingService {
     }
 
     @NonNull
-    private static NotificationCompat.Builder buildBasicNotificationBuilder(Context context, String messageType) {
+    private static NotificationCompat.Builder buildBasicNotificationBuilder(Context context) {
         final NotificationCompat.Builder builder = new NotificationCompat.Builder(context)
                 .setAutoCancel(true)
                 .setDefaults(Notification.DEFAULT_LIGHTS)
