@@ -36,6 +36,7 @@ import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.biblereading.BibleReadingActivity;
 import net.zionsoft.obadiah.model.crash.Crash;
 import net.zionsoft.obadiah.model.datamodel.BibleReadingModel;
+import net.zionsoft.obadiah.model.datamodel.Settings;
 import net.zionsoft.obadiah.model.domain.Verse;
 import net.zionsoft.obadiah.utils.TextFormatter;
 
@@ -54,6 +55,9 @@ public class PushNotificationReceiver extends FirebaseMessagingService {
     @Inject
     BibleReadingModel bibleReadingModel;
 
+    @Inject
+    Settings settings;
+
     @Override
     public void onMessageReceived(RemoteMessage message) {
         App.getComponent().inject(this);
@@ -70,7 +74,7 @@ public class PushNotificationReceiver extends FirebaseMessagingService {
         final int notificationId;
         if (MESSAGE_TYPE_VERSE.equals(messageType)) {
             notificationId = NOTIFICATION_ID_VERSE;
-            if (!prepareForVerse(builder, messageType, messageAttrs)) {
+            if (!settings.isDailyVerseOn() || !prepareForVerse(builder, messageType, messageAttrs)) {
                 return;
             }
         } else {

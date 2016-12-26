@@ -78,6 +78,7 @@ public class Settings {
     }
 
     private static final String SETTING_KEY_SIMPLE_READING = "pref_simple_reading";
+    private static final String SETTING_KEY_DAILY_VERSE = "pref_daily_verse";
     private static final String SETTING_KEY_NIGHT_MODE = "pref_night_mode";
     private static final String SETTING_KEY_SCREEN_ON = "pref_screen_on";
     private static final String SETTING_KEY_TEXT_SIZE = "pref_text_size";
@@ -85,6 +86,7 @@ public class Settings {
     private final SharedPreferences sharedPreferences;
 
     private boolean simpleReading;
+    private boolean dailyVerseOn;
     private boolean nightMode;
     private boolean screenOn;
     private TextSize textSize;
@@ -94,6 +96,7 @@ public class Settings {
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 
         simpleReading = sharedPreferences.getBoolean(SETTING_KEY_SIMPLE_READING, false);
+        dailyVerseOn = sharedPreferences.getBoolean(SETTING_KEY_DAILY_VERSE, true);
         nightMode = sharedPreferences.getBoolean(SETTING_KEY_NIGHT_MODE, false);
         screenOn = sharedPreferences.getBoolean(SETTING_KEY_SCREEN_ON, false);
         textSize = TextSize.fromSettingKey(sharedPreferences.getString(SETTING_KEY_TEXT_SIZE, null));
@@ -118,6 +121,17 @@ public class Settings {
         simpleReading = isSimpleReading;
         sharedPreferences.edit()
                 .putBoolean(SETTING_KEY_SIMPLE_READING, isSimpleReading)
+                .apply();
+    }
+
+    public boolean isDailyVerseOn() {
+        return dailyVerseOn;
+    }
+
+    public void setDailyVerseOn(boolean on) {
+        dailyVerseOn = on;
+        sharedPreferences.edit()
+                .putBoolean(SETTING_KEY_DAILY_VERSE, on)
                 .apply();
     }
 
