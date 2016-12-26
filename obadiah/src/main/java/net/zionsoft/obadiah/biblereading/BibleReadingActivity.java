@@ -43,6 +43,7 @@ import net.zionsoft.obadiah.biblereading.toolbar.ToolbarPresenter;
 import net.zionsoft.obadiah.biblereading.verse.VersePagerPresenter;
 import net.zionsoft.obadiah.biblereading.verse.VersePresenter;
 import net.zionsoft.obadiah.biblereading.verse.VerseViewPager;
+import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.datamodel.Settings;
 import net.zionsoft.obadiah.model.domain.VerseIndex;
 import net.zionsoft.obadiah.translations.TranslationManagementActivity;
@@ -171,6 +172,12 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
                     .putExtra(KEY_VERSE_INDEX, (Parcelable) null);
 
             bibleReadingPresenter.saveReadingProgress(verseIndex);
+
+            final Bundle params = new Bundle();
+            params.putString(Analytics.PARAM_ITEM_ID, verseIndex.book()
+                    + "-" + verseIndex.chapter() + "-" + verseIndex.verse());
+            Analytics.logEvent(Analytics.EVENT_SELECT_CONTENT, params);
+            Analytics.logEvent(Analytics.EVENT_DAILY_VERSE_OPENED, params);
         }
     }
 
