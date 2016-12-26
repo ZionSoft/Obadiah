@@ -3,6 +3,7 @@ CHANGELOG
 
 #### Next Release
 - Added setting & analytics for daily verse.
+- Added link to Facebook page.
 
 #### v1.16.3 (2016-12-26)
 - Fixed cursor jumping in notes due to synchronization.

@@ -105,6 +105,13 @@
                 obadiah:settingTitleDescriptionButtonTitle="@string/pref_rate_me"/>
 
             <net.zionsoft.obadiah.misc.settings.SettingTitleDescriptionButton
+                android:id="@+id/facebook_setting_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/background_text"
+                obadiah:settingTitleDescriptionButtonTitle="@string/pref_facebook"/>
+
+            <net.zionsoft.obadiah.misc.settings.SettingTitleDescriptionButton
                 android:id="@+id/invite_friends_setting_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

@@ -104,6 +104,9 @@ public class SettingsActivity extends BaseAppCompatActivity implements SettingsV
     @BindView(R.id.rate_me_setting_button)
     SettingTitleDescriptionButton rateMeSettingButton;
 
+    @BindView(R.id.facebook_setting_button)
+    SettingTitleDescriptionButton facebookSettingButton;
+
     @BindView(R.id.invite_friends_setting_button)
     SettingTitleDescriptionButton inviteFriendsSettingButton;
 
@@ -219,6 +222,17 @@ public class SettingsActivity extends BaseAppCompatActivity implements SettingsV
             }
         });
 
+        facebookSettingButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    startActivity(new Intent(Intent.ACTION_VIEW).setData(Constants.FACEBOOK_PAGE_URI));
+                } catch (ActivityNotFoundException e) {
+                    DialogHelper.showDialog(SettingsActivity.this, R.string.error_unknown_error, null);
+                }
+            }
+        });
+
         inviteFriendsSettingButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -308,6 +322,7 @@ public class SettingsActivity extends BaseAppCompatActivity implements SettingsV
         nightModeSwitch.setTextColor(titleTextColor);
         textSizeSettingButton.setTitleTextColor(titleTextColor);
         rateMeSettingButton.setTitleTextColor(titleTextColor);
+        facebookSettingButton.setTitleTextColor(titleTextColor);
         inviteFriendsSettingButton.setTitleTextColor(titleTextColor);
         versionSettingButton.setTitleTextColor(titleTextColor);
         licenseSettingButton.setTitleTextColor(titleTextColor);
@@ -351,6 +366,7 @@ public class SettingsActivity extends BaseAppCompatActivity implements SettingsV
         textSizeSettingButton.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize, smallerTextSize);
 
         rateMeSettingButton.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize, smallerTextSize);
+        facebookSettingButton.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize, smallerTextSize);
         inviteFriendsSettingButton.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize, smallerTextSize);
         aboutSectionHeader.setHeaderTextSize(TypedValue.COMPLEX_UNIT_PX, smallerTextSize);
         versionSettingButton.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize, smallerTextSize);
