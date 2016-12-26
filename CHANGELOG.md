@@ -2,6 +2,8 @@ CHANGELOG
 ---------
 
 #### Next Release
+
+#### v1.16.3 (2016-12-26)
 - Fixed cursor jumping in notes due to synchronization.
 
 #### v1.16.2 (2016-12-21)
