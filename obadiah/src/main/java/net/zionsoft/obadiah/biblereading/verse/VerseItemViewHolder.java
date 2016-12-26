@@ -176,11 +176,18 @@ class VerseItemViewHolder extends RecyclerView.ViewHolder implements View.OnClic
     }
 
     void bindNote(String note, boolean expanded) {
-        this.note.removeTextChangedListener(this);
-        this.note.setText(note);
-        this.note.addTextChangedListener(this);
+        final CharSequence current = this.note.getText();
+        final String currentNote = current != null ? current.toString() : null;
+        if (currentNote == null || !currentNote.equals(note)) {
+            // due to synchronization, the model would trigger the update, so we only update if the
+            // text is actually changed
+            this.note.removeTextChangedListener(this);
+            this.note.setText(note);
+            this.note.addTextChangedListener(this);
 
-        noteIcon.setColorFilter(TextUtils.isEmpty(note) ? OFF : ON);
+            noteIcon.setColorFilter(TextUtils.isEmpty(note) ? OFF : ON);
+        }
+
         noteIcon.setImageResource(expanded ? R.drawable.ic_arrow_up : R.drawable.ic_note);
     }
 
