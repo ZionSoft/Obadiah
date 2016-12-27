@@ -46,6 +46,7 @@ class UriHelper {
             final String translationShortName = parts[2];
             final int bookIndex = Integer.parseInt(parts[3]);
             final int chapterIndex = Integer.parseInt(parts[4]);
+            final int verseIndex = parts.length >= 6 ? Integer.parseInt(parts[5]) : 0;
 
             // validity of translation short name will be checked later when loading the available
             // translation list
@@ -56,7 +57,7 @@ class UriHelper {
             }
 
             bibleReadingPresenter.saveCurrentTranslation(translationShortName);
-            bibleReadingPresenter.saveReadingProgress(bookIndex, chapterIndex, 0);
+            bibleReadingPresenter.saveReadingProgress(bookIndex, chapterIndex, verseIndex);
         } catch (Exception e) {
             Crash.report(e);
         }
