@@ -83,6 +83,9 @@ public class SettingsActivity extends BaseAppCompatActivity implements SettingsV
     @BindView(R.id.simple_reading_switch)
     SettingSwitch simpleReadingSwitch;
 
+    @BindView(R.id.daily_verse_switch)
+    SettingSwitch dailyVerseSwitch;
+
     @BindView(R.id.display_section_header)
     SectionHeader displaySectionHeader;
 
@@ -172,6 +175,14 @@ public class SettingsActivity extends BaseAppCompatActivity implements SettingsV
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 settings.setSimpleReading(isChecked);
+            }
+        });
+
+        dailyVerseSwitch.setChecked(settings.isDailyVerseOn());
+        dailyVerseSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                settings.setDailyVerseOn(isChecked);
             }
         });
 
@@ -292,6 +303,7 @@ public class SettingsActivity extends BaseAppCompatActivity implements SettingsV
         accountButton.setTitleTextColor(titleTextColor);
         logoutButton.setTitleTextColor(titleTextColor);
         simpleReadingSwitch.setTextColor(titleTextColor);
+        dailyVerseSwitch.setTextColor(titleTextColor);
         screenOnSwitch.setTextColor(titleTextColor);
         nightModeSwitch.setTextColor(titleTextColor);
         textSizeSettingButton.setTitleTextColor(titleTextColor);
@@ -331,6 +343,7 @@ public class SettingsActivity extends BaseAppCompatActivity implements SettingsV
 
         readingSectionHeader.setHeaderTextSize(TypedValue.COMPLEX_UNIT_PX, smallerTextSize);
         simpleReadingSwitch.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+        dailyVerseSwitch.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
 
         displaySectionHeader.setHeaderTextSize(TypedValue.COMPLEX_UNIT_PX, smallerTextSize);
         screenOnSwitch.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);

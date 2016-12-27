@@ -31,6 +31,8 @@ public class Analytics {
     public static final String EVENT_DOWNLOAD_FIRST_TRANSLATION = "download_first_translation";
     public static final String EVENT_DOWNLOAD_TRANSLATION = "download_translation";
     public static final String EVENT_REMOVE_TRANSLATION = "remove_translation";
+    public static final String EVENT_DAILY_VERSE_SHOWN = "daily_verse_shown";
+    public static final String EVENT_DAILY_VERSE_OPENED = "daily_verse_opened";
 
     public static final String PARAM_CONTENT_TYPE = FirebaseAnalytics.Param.CONTENT_TYPE;
     public static final String PARAM_ITEM_ID = FirebaseAnalytics.Param.ITEM_ID;

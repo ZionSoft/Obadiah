@@ -60,6 +60,12 @@
                 android:layout_height="wrap_content"
                 obadiah:settingSwitchTitle="@string/pref_simple_reading"/>
 
+            <net.zionsoft.obadiah.misc.settings.SettingSwitch
+                android:id="@+id/daily_verse_switch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                obadiah:settingSwitchTitle="@string/pref_daily_verse"/>
+
             <net.zionsoft.obadiah.ui.widget.SectionHeader
                 android:id="@+id/display_section_header"
                 android:layout_width="match_parent"

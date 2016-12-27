@@ -22,7 +22,9 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.os.Build;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
@@ -34,8 +36,10 @@ import com.squareup.moshi.Moshi;
 import net.zionsoft.obadiah.App;
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.biblereading.BibleReadingActivity;
+import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.crash.Crash;
 import net.zionsoft.obadiah.model.datamodel.BibleReadingModel;
+import net.zionsoft.obadiah.model.datamodel.Settings;
 import net.zionsoft.obadiah.model.domain.Verse;
 import net.zionsoft.obadiah.utils.TextFormatter;
 
@@ -54,6 +58,9 @@ public class PushNotificationReceiver extends FirebaseMessagingService {
     @Inject
     BibleReadingModel bibleReadingModel;
 
+    @Inject
+    Settings settings;
+
     @Override
     public void onMessageReceived(RemoteMessage message) {
         App.getComponent().inject(this);
@@ -66,13 +73,22 @@ public class PushNotificationReceiver extends FirebaseMessagingService {
         final String messageType = data.get("type");
         final String messageAttrs = data.get("attrs");
 
-        final NotificationCompat.Builder builder = buildBasicNotificationBuilder(this, messageType);
+        final NotificationCompat.Builder builder = buildBasicNotificationBuilder(this);
         final int notificationId;
         if (MESSAGE_TYPE_VERSE.equals(messageType)) {
             notificationId = NOTIFICATION_ID_VERSE;
-            if (!prepareForVerse(builder, messageType, messageAttrs)) {
+            if (!settings.isDailyVerseOn()) {
                 return;
             }
+
+            final PushAttrVerseIndex verseIndex = prepareForVerse(builder, messageType, messageAttrs);
+            if (verseIndex == null) {
+                return;
+            }
+
+            final Bundle params = new Bundle();
+            params.putString(Analytics.PARAM_ITEM_ID, verseIndex.book + "-" + verseIndex.chapter + "-" + verseIndex.verse);
+            Analytics.logEvent(Analytics.EVENT_DAILY_VERSE_SHOWN, params);
         } else {
             return;
         }
@@ -82,7 +98,7 @@ public class PushNotificationReceiver extends FirebaseMessagingService {
     }
 
     @NonNull
-    private static NotificationCompat.Builder buildBasicNotificationBuilder(Context context, String messageType) {
+    private static NotificationCompat.Builder buildBasicNotificationBuilder(Context context) {
         final NotificationCompat.Builder builder = new NotificationCompat.Builder(context)
                 .setAutoCancel(true)
                 .setDefaults(Notification.DEFAULT_LIGHTS)
@@ -96,11 +112,12 @@ public class PushNotificationReceiver extends FirebaseMessagingService {
         return builder;
     }
 
-    private boolean prepareForVerse(NotificationCompat.Builder builder,
-                                    String messageType, String messageAttrs) {
+    @Nullable
+    private PushAttrVerseIndex prepareForVerse(NotificationCompat.Builder builder,
+                                               String messageType, String messageAttrs) {
         final String translationShortName = bibleReadingModel.loadCurrentTranslation();
         if (TextUtils.isEmpty(translationShortName)) {
-            return false;
+            return null;
         }
 
         try {
@@ -116,10 +133,11 @@ public class PushNotificationReceiver extends FirebaseMessagingService {
                             verse.text.bookName, verseIndex.chapter + 1, verseIndex.verse + 1))
                     .setContentText(verse.text.text)
                     .setStyle(new NotificationCompat.BigTextStyle().bigText(verse.text.text));
+
+            return verseIndex;
         } catch (Exception e) {
             Crash.report(e);
-            return false;
+            return null;
         }
-        return true;
     }
 }
