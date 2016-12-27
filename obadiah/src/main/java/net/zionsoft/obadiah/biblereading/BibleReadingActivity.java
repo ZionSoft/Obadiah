@@ -44,7 +44,9 @@ import net.zionsoft.obadiah.biblereading.verse.VersePagerPresenter;
 import net.zionsoft.obadiah.biblereading.verse.VersePresenter;
 import net.zionsoft.obadiah.biblereading.verse.VerseViewPager;
 import net.zionsoft.obadiah.model.analytics.Analytics;
+import net.zionsoft.obadiah.model.crash.Crash;
 import net.zionsoft.obadiah.model.datamodel.Settings;
+import net.zionsoft.obadiah.model.domain.Bible;
 import net.zionsoft.obadiah.model.domain.VerseIndex;
 import net.zionsoft.obadiah.translations.TranslationManagementActivity;
 import net.zionsoft.obadiah.ui.utils.BaseAppCompatActivity;
@@ -155,7 +157,36 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
         final Intent startIntent = getIntent();
         final Uri uri = startIntent.getData();
         if (uri != null) {
-            UriHelper.checkUri(bibleReadingPresenter, uri);
+            final String path = uri.getPath();
+            if (TextUtils.isEmpty(path)) {
+                return;
+            }
+
+            final String[] parts = path.split("/");
+            if (parts.length < 5) {
+                return;
+            }
+
+            try {
+                final String translationShortName = parts[2];
+                final int bookIndex = Integer.parseInt(parts[3]);
+                final int chapterIndex = Integer.parseInt(parts[4]);
+                final int verseIndex = parts.length >= 6 ? Integer.parseInt(parts[5]) : 0;
+
+                // validity of translation short name will be checked later when loading the available
+                // translation list
+                if (TextUtils.isEmpty(translationShortName)
+                        || bookIndex < 0 || bookIndex >= Bible.getBookCount()
+                        || chapterIndex < 0 || chapterIndex >= Bible.getChapterCount(bookIndex)) {
+                    return;
+                }
+
+                bibleReadingPresenter.saveCurrentTranslation(translationShortName);
+                bibleReadingPresenter.saveReadingProgress(bookIndex, chapterIndex, verseIndex);
+            } catch (Exception e) {
+                Crash.report(e);
+            }
+
             startIntent.setData(null);
         } else {
             final String messageType = startIntent.getStringExtra(KEY_MESSAGE_TYPE);

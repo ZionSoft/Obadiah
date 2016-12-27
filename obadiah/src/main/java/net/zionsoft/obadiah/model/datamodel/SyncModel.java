@@ -22,6 +22,9 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Pair;
 
+import com.google.firebase.appindexing.FirebaseAppIndex;
+import com.google.firebase.appindexing.Indexable;
+import com.google.firebase.appindexing.builders.Indexables;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -36,7 +39,9 @@ import net.zionsoft.obadiah.model.domain.ReadingProgress;
 import net.zionsoft.obadiah.model.domain.User;
 import net.zionsoft.obadiah.model.domain.VerseIndex;
 import net.zionsoft.obadiah.utils.Triple;
+import net.zionsoft.obadiah.utils.UriBuilder;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -55,6 +60,7 @@ public class SyncModel implements ChildEventListener {
     private static final StringBuilder STRING_BUILDER = new StringBuilder();
 
     private final UserModel userModel;
+    private final BibleReadingModel bibleReadingModel;
     private final BookmarkModel bookmarkModel;
     private final NoteModel noteModel;
     private final ReadingProgressModel readingProgressModel;
@@ -76,9 +82,11 @@ public class SyncModel implements ChildEventListener {
     private Subscription observeReadingProgressSubscription;
 
     @Inject
-    public SyncModel(UserModel userModel, BookmarkModel bookmarkModel, NoteModel noteModel,
+    public SyncModel(UserModel userModel, BibleReadingModel bibleReadingModel,
+                     BookmarkModel bookmarkModel, NoteModel noteModel,
                      final ReadingProgressModel readingProgressModel) {
         this.userModel = userModel;
+        this.bibleReadingModel = bibleReadingModel;
         this.bookmarkModel = bookmarkModel;
         this.noteModel = noteModel;
         this.readingProgressModel = readingProgressModel;
@@ -317,9 +325,19 @@ public class SyncModel implements ChildEventListener {
     }
 
     @SuppressWarnings("WeakerAccess")
-    static void syncNote(@NonNull Note note, @NonNull DatabaseReference reference) {
+    void syncNote(@NonNull Note note, @NonNull DatabaseReference reference) {
         reference.child("timestamp").setValue(note.timestamp());
         reference.child("note").setValue(note.note());
+
+        final Indexable indexable = Indexables.noteDigitalDocumentBuilder()
+                .setName("")
+                .setUrl(UriBuilder.createUri(bibleReadingModel.loadCurrentTranslation(),
+                        note.verseIndex().book(), note.verseIndex().chapter(), note.verseIndex().verse()))
+                .setDateModified(new Date(note.timestamp()))
+                .setText(note.note())
+                .setMetadata(new Indexable.Metadata.Builder().setWorksOffline(true))
+                .build();
+        FirebaseAppIndex.getInstance().update(indexable);
     }
 
     private void syncReadingProgress(@NonNull final User user) {
