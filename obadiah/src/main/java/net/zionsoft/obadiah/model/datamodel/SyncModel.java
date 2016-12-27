@@ -235,11 +235,7 @@ public class SyncModel implements ChildEventListener {
             @Override
             public Void call(List<Note> notes) {
                 for (int i = notes.size() - 1; i >= 0; --i) {
-                    final Note note = notes.get(i);
-                    final DatabaseReference reference
-                            = notesReference.child(verseIndexToKey(note.verseIndex()));
-                    reference.child("timestamp").setValue(note.timestamp());
-                    reference.child("note").setValue(note.note());
+                    syncNote(notes.get(i));
                 }
 
                 return null;
@@ -262,41 +258,13 @@ public class SyncModel implements ChildEventListener {
                     @Override
                     public void onNext(Pair<Integer, Note> note) {
                         if (notesReference != null) {
-                            final DatabaseReference reference
-                                    = notesReference.child(verseIndexToKey(note.second.verseIndex()));
                             switch (note.first) {
                                 case NoteModel.ACTION_UPDATED:
-                                    final long t = note.second.timestamp();
-                                    final String n = note.second.note();
-                                    reference.addListenerForSingleValueEvent(new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(DataSnapshot dataSnapshot) {
-                                            if (!dataSnapshot.exists()) {
-                                                reference.child("timestamp").addListenerForSingleValueEvent(new ValueEventListener() {
-                                                    @Override
-                                                    public void onDataChange(DataSnapshot dataSnapshot) {
-                                                        if (!dataSnapshot.exists() || t > (long) dataSnapshot.getValue()) {
-                                                            reference.child("timestamp").setValue(t);
-                                                            reference.child("note").setValue(n);
-                                                        }
-                                                    }
-
-                                                    @Override
-                                                    public void onCancelled(DatabaseError databaseError) {
-                                                        // do nothing
-                                                    }
-                                                });
-                                            }
-                                        }
-
-                                        @Override
-                                        public void onCancelled(DatabaseError databaseError) {
-                                            // do nothing
-                                        }
-                                    });
+                                    syncNote(note.second);
                                     break;
                                 case NoteModel.ACTION_REMOVE:
-                                    reference.removeValue();
+                                    notesReference.child(verseIndexToKey(note.second.verseIndex()))
+                                            .removeValue();
                                     break;
                             }
                         }
@@ -310,6 +278,48 @@ public class SyncModel implements ChildEventListener {
             STRING_BUILDER.append("/notes/").append(user.uid);
             return STRING_BUILDER.toString();
         }
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    void syncNote(@NonNull final Note note) {
+        if (notesReference == null) {
+            return;
+        }
+
+        final DatabaseReference reference = notesReference.child(verseIndexToKey(note.verseIndex()));
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    reference.child("timestamp").addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            if (!dataSnapshot.exists() || note.timestamp() > (long) dataSnapshot.getValue()) {
+                                syncNote(note, reference);
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                            // do nothing
+                        }
+                    });
+                } else {
+                    syncNote(note, reference);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // do nothing
+            }
+        });
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    static void syncNote(@NonNull Note note, @NonNull DatabaseReference reference) {
+        reference.child("timestamp").setValue(note.timestamp());
+        reference.child("note").setValue(note.note());
     }
 
     private void syncReadingProgress(@NonNull final User user) {
