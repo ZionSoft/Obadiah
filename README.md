@@ -3,6 +3,8 @@ Bible reader
 
 A simple and easy-to-use Bible reader with offline reading, multi-versions support, and full text search.
 
+[![Build Status](https://api.travis-ci.org/ZionSoft/Obadiah.svg?branch=master)](https://travis-ci.org/ZionSoft/Obadiah) [![API](https://img.shields.io/badge/API-15%2B-green.svg?style=flat)](https://developer.android.com/about/versions/android-4.0.3.html)
+
 [![Get it on Google Play](https://developer.android.com/images/brand/en_generic_rgb_wo_45.png)](https://play.google.com/store/apps/details?id=net.zionsoft.obadiah)
 
 You can find the latest release notes at: [CHANGELOG.md](CHANGELOG.md)
