@@ -4,12 +4,10 @@
 
 # Gradle
 .gradle
-gradle
 gradle.properties
 
 # Android Studio
 local.properties
-gradlew*
 
 # Build Artifacts
 build
@@ -24,9 +22,3 @@ libs
 
 # Key Store
 *.keystore
-
-# Google In-App Billing
-IInAppBillingService.aidl
-
-# Google Services
-google-services.json
