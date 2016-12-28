@@ -13,5 +13,5 @@
     <string name="text_finished_old_testament_count" translatable="false">%1$d / 39</string>
     <string name="text_finished_new_testament_count" translatable="false">%1$d / 27</string>
 
-    <string name="pref_facebook">Facebook</string>
+    <string name="pref_facebook" translatable="false">Facebook</string>
 </resources>
