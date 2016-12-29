@@ -361,9 +361,9 @@ class VersePagerAdapter extends PagerAdapter implements VersePagerView {
 
     @Override
     public void onReadingProgressChanged(VerseIndex verseIndex) {
-        if (currentBook == verseIndex.book() && currentChapter == verseIndex.chapter()) {
-            currentVerse = verseIndex.verse();
-        }
+        currentBook = verseIndex.book();
+        currentChapter = verseIndex.chapter();
+        currentVerse = verseIndex.verse();
     }
 
     void onStart() {
