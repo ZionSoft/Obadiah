@@ -112,6 +112,7 @@ class VersePagerAdapter extends PagerAdapter implements VersePagerView {
     }
 
     private final Context context;
+    @SuppressWarnings("WeakerAccess")
     final VersePagerPresenter versePagerPresenter;
     private final LayoutInflater inflater;
     private final ArrayList<Page> pages;
@@ -120,6 +121,7 @@ class VersePagerAdapter extends PagerAdapter implements VersePagerView {
 
     private int currentBook;
     private int currentChapter;
+    @SuppressWarnings("WeakerAccess")
     int currentVerse;
 
     VersePagerAdapter(Context context, VersePagerPresenter versePagerPresenter, int offScreenPageLimit) {
@@ -165,6 +167,7 @@ class VersePagerAdapter extends PagerAdapter implements VersePagerView {
         return page;
     }
 
+    @SuppressWarnings("WeakerAccess")
     void loadVerses(int book, int chapter) {
         versePagerPresenter.loadVerses(book, chapter);
     }
