@@ -23,7 +23,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
-import android.util.Pair;
+import android.support.v4.util.Pair;
 import android.view.View;
 
 import net.zionsoft.obadiah.R;

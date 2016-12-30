@@ -19,8 +19,8 @@ package net.zionsoft.obadiah.model.datamodel;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.util.Pair;
 import android.text.TextUtils;
-import android.util.Pair;
 
 import com.google.firebase.appindexing.FirebaseAppIndex;
 import com.google.firebase.appindexing.Indexable;

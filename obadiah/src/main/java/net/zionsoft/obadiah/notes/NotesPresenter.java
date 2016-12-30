@@ -17,7 +17,7 @@
 
 package net.zionsoft.obadiah.notes;
 
-import android.util.Pair;
+import android.support.v4.util.Pair;
 
 import net.zionsoft.obadiah.model.datamodel.BibleReadingModel;
 import net.zionsoft.obadiah.model.datamodel.NoteModel;
@@ -36,6 +36,7 @@ import rx.Subscription;
 import rx.functions.Func1;
 
 class NotesPresenter extends BasePresenter<NotesView> {
+    @SuppressWarnings("WeakerAccess")
     final BibleReadingModel bibleReadingModel;
     private final NoteModel noteModel;
 

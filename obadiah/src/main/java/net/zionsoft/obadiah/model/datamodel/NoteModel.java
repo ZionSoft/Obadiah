@@ -20,7 +20,7 @@ package net.zionsoft.obadiah.model.datamodel;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
-import android.util.Pair;
+import android.support.v4.util.Pair;
 
 import net.zionsoft.obadiah.model.database.DatabaseHelper;
 import net.zionsoft.obadiah.model.database.NoteTableHelper;
