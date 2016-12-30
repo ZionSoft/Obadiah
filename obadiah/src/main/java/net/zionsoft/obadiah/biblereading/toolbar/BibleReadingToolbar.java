@@ -30,7 +30,6 @@ import net.zionsoft.obadiah.misc.settings.SettingsActivity;
 import net.zionsoft.obadiah.model.domain.VerseIndex;
 import net.zionsoft.obadiah.notes.NotesActivity;
 import net.zionsoft.obadiah.readingprogress.ReadingProgressActivity;
-import net.zionsoft.obadiah.search.SearchActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -116,11 +115,6 @@ public class BibleReadingToolbar extends Toolbar implements ToolbarView, Toolbar
     @Override
     public boolean onMenuItemClick(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.action_search: {
-                final Context context = getContext();
-                context.startActivity(SearchActivity.newStartReorderToTopIntent(context));
-                return true;
-            }
             case R.id.action_bookmarks: {
                 final Context context = getContext();
                 context.startActivity(BookmarksActivity.newStartIntent(context));

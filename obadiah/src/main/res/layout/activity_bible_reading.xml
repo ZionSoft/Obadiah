@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/drawer_layout"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+                                        xmlns:app="http://schemas.android.com/apk/res-auto"
+                                        android:id="@+id/drawer_layout"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent">
 
     <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"
@@ -13,7 +13,19 @@
             android:id="@+id/verse_pager"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/search"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="@dimen/bigger_padding"
+            android:src="@drawable/ic_action_search"
+            app:backgroundTint="@color/blue"
+            app:fabSize="normal"
+            app:layout_behavior="net.zionsoft.obadiah.ui.behavior.FloatingActionButtonScrollAwareBehavior"
+            app:useCompatPadding="true"/>
 
         <android.support.design.widget.AppBarLayout
             android:layout_width="match_parent"
@@ -26,7 +38,7 @@
                 android:background="?attr/colorPrimary"
                 app:layout_scrollFlags="scroll|enterAlways"
                 app:titleMarginStart="0dp"
-                app:titleTextAppearance="@style/Toolbar.TitleText" />
+                app:titleTextAppearance="@style/Toolbar.TitleText"/>
         </android.support.design.widget.AppBarLayout>
     </android.support.design.widget.CoordinatorLayout>
 
@@ -34,5 +46,5 @@
         android:id="@+id/chapter_list"
         android:layout_width="@dimen/left_drawer_width"
         android:layout_height="match_parent"
-        android:layout_gravity="start" />
+        android:layout_gravity="start"/>
 </android.support.v4.widget.DrawerLayout>

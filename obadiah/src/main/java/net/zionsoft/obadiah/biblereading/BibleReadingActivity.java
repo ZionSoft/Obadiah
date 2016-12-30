@@ -28,6 +28,7 @@ import android.nfc.NfcEvent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -48,6 +49,7 @@ import net.zionsoft.obadiah.model.crash.Crash;
 import net.zionsoft.obadiah.model.datamodel.Settings;
 import net.zionsoft.obadiah.model.domain.Bible;
 import net.zionsoft.obadiah.model.domain.VerseIndex;
+import net.zionsoft.obadiah.search.SearchActivity;
 import net.zionsoft.obadiah.translations.TranslationManagementActivity;
 import net.zionsoft.obadiah.ui.utils.BaseAppCompatActivity;
 import net.zionsoft.obadiah.ui.utils.DialogHelper;
@@ -59,7 +61,7 @@ import javax.inject.Inject;
 import butterknife.BindView;
 
 public class BibleReadingActivity extends BaseAppCompatActivity implements BibleReadingView,
-        NfcAdapter.CreateNdefMessageCallback {
+        NfcAdapter.CreateNdefMessageCallback, View.OnClickListener {
     private static final String KEY_MESSAGE_TYPE = "net.zionsoft.obadiah.KEY_MESSAGE_TYPE";
     private static final String KEY_VERSE_INDEX = "net.zionsoft.obadiah.KEY_VERSE_INDEX";
 
@@ -110,6 +112,9 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
     @BindView(R.id.verse_pager)
     VerseViewPager versePager;
 
+    @BindView(R.id.search)
+    FloatingActionButton search;
+
     private String currentTranslation;
     private List<String> bookNames;
     private int currentBook;
@@ -145,6 +150,8 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
 
         drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, 0, 0);
         drawerLayout.addDrawerListener(drawerToggle);
+
+        search.setOnClickListener(this);
     }
 
     private void updatePresenters() {
@@ -330,5 +337,12 @@ public class BibleReadingActivity extends BaseAppCompatActivity implements Bible
     @Override
     public NdefMessage createNdefMessage(NfcEvent event) {
         return NfcHelper.createNdefMessage(this, currentTranslation, currentBook, currentChapter, currentVerse);
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (v == search) {
+            startActivity(SearchActivity.newStartReorderToTopIntent(this));
+        }
     }
 }

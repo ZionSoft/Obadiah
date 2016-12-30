@@ -7,10 +7,6 @@
         app:actionViewClass="android.support.v7.widget.AppCompatSpinner"
         app:showAsAction="always" />
     <item
-        android:id="@+id/action_search"
-        android:title="@string/action_search"
-        app:showAsAction="never" />
-    <item
         android:id="@+id/action_bookmarks"
         android:title="@string/action_bookmarks"
         app:showAsAction="never" />

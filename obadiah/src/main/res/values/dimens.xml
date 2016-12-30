@@ -4,6 +4,7 @@
     <dimen name="padding">8dp</dimen>
     <dimen name="paddingLeft">16dp</dimen>
     <dimen name="paddingRight">16dp</dimen>
+    <dimen name="bigger_padding">16dp</dimen>
 
     <dimen name="smaller_text_size_very_small">10sp</dimen>
     <dimen name="smaller_text_size_small">12sp</dimen>

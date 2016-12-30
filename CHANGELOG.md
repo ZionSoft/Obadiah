@@ -6,6 +6,7 @@ CHANGELOG
 - Added link to Facebook page.
 - Added notes to Firebase App Indexing.
 - Fixed issue that it scrolls to wrong position when changing translations.
+- Moved "search menu" to FAB.
 
 #### v1.16.3 (2016-12-26)
 - Fixed cursor jumping in notes due to synchronization.
