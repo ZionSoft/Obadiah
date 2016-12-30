@@ -113,7 +113,11 @@ public class ReadingProgressModel {
                     final long today = timestamp / DateUtils.DAY_IN_MILLIS;
                     final long diff = today - lastReadingDay;
                     int continuousReadingDays = 1;
-                    if (diff == 1L) {
+                    if (diff == 0L) {
+                        continuousReadingDays = Integer.parseInt(
+                                MetadataTableHelper.getMetadata(database,
+                                        MetadataTableHelper.KEY_CONTINUOUS_READING_DAYS, "0"));
+                    } else if (diff == 1L) {
                         continuousReadingDays = 1 + Integer.parseInt(
                                 MetadataTableHelper.getMetadata(database,
                                         MetadataTableHelper.KEY_CONTINUOUS_READING_DAYS, "0"));
