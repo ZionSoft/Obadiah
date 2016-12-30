@@ -42,7 +42,9 @@ import net.zionsoft.obadiah.utils.Triple;
 import net.zionsoft.obadiah.utils.UriBuilder;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -163,11 +165,13 @@ public class SyncModel implements ChildEventListener {
         bookmarkModel.loadBookmarks().map(new Func1<List<Bookmark>, Void>() {
             @Override
             public Void call(List<Bookmark> bookmarks) {
-                for (int i = bookmarks.size() - 1; i >= 0; --i) {
+                final int count = bookmarks.size();
+                final Map<String, Object> updates = new HashMap<>(count);
+                for (int i = 0; i < count; ++i) {
                     final Bookmark bookmark = bookmarks.get(i);
-                    bookmarksReference.child(verseIndexToKey(bookmark.verseIndex()))
-                            .setValue(bookmark.timestamp());
+                    updates.put(verseIndexToKey(bookmark.verseIndex()), bookmark.timestamp());
                 }
+                bookmarksReference.updateChildren(updates);
 
                 return null;
             }
@@ -326,8 +330,10 @@ public class SyncModel implements ChildEventListener {
 
     @SuppressWarnings("WeakerAccess")
     void syncNote(@NonNull Note note, @NonNull DatabaseReference reference) {
-        reference.child("timestamp").setValue(note.timestamp());
-        reference.child("note").setValue(note.note());
+        final Map<String, Object> updates = new HashMap<>(2);
+        updates.put("timestamp", note.timestamp());
+        updates.put("note", note.note());
+        reference.updateChildren(updates);
 
         final Indexable indexable = Indexables.noteDigitalDocumentBuilder()
                 .setName("")
@@ -350,17 +356,18 @@ public class SyncModel implements ChildEventListener {
             @Override
             public Void call(ReadingProgress readingProgress) {
                 final int booksCount = Bible.getBookCount();
+                final Map<String, Object> readingProgressUpdates = new HashMap<>();
                 for (int i = 0; i < booksCount; ++i) {
                     final List<ReadingProgress.ReadChapter> readChapters = readingProgress.getReadChapters(i);
                     for (int j = readChapters.size() - 1; j >= 0; --j) {
                         final ReadingProgress.ReadChapter readChapter = readChapters.get(j);
-                        readingProgressReference.child(verseIndexToKey(i, readChapter.chapter))
-                                .setValue(readChapter.timestamp);
+                        readingProgressUpdates.put(verseIndexToKey(i, readChapter.chapter), readChapter.timestamp);
                     }
                 }
+                readingProgressReference.updateChildren(readingProgressUpdates);
 
-                metadataReference.child("continuousReadingDays").setValue(readingProgress.getContinuousReadingDays());
-                metadataReference.child("lastReadingTimestamp").setValue(readingProgress.getLastReadingTimestamp());
+                syncMetadata(metadataReference, readingProgress.getContinuousReadingDays(),
+                        readingProgress.getLastReadingTimestamp());
 
                 return null;
             }
@@ -386,10 +393,18 @@ public class SyncModel implements ChildEventListener {
                         }
                         readingProgressReference.child(verseIndexToKey(readChapter.first.book, readChapter.first.chapter))
                                 .setValue(readChapter.first.timestamp);
-                        metadataReference.child("continuousReadingDays").setValue(readChapter.second);
-                        metadataReference.child("lastReadingTimestamp").setValue(readChapter.third);
+                        syncMetadata(metadataReference, readChapter.second, readChapter.third);
                     }
                 });
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    static void syncMetadata(@NonNull DatabaseReference metadataReference, int continuousReadingDays,
+                             long lastReadingTimestamp) {
+        final Map<String, Object> metadataUpdates = new HashMap<>(2);
+        metadataUpdates.put("continuousReadingDays", continuousReadingDays);
+        metadataUpdates.put("lastReadingTimestamp", lastReadingTimestamp);
+        metadataReference.updateChildren(metadataUpdates);
     }
 
     private static String buildReadingProgressRootPath(@NonNull User user) {
