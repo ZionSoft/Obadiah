@@ -2,6 +2,8 @@ CHANGELOG
 ---------
 
 #### Next Release
+
+#### v1.17.0 (2016-12-30)
 - Added setting & analytics for daily verse.
 - Added link to Facebook page.
 - Added notes to Firebase App Indexing.
