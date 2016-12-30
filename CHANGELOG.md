@@ -8,6 +8,7 @@ CHANGELOG
 - Fixed issue that it scrolls to wrong position when changing translations.
 - Moved "search menu" to FAB.
 - Fixed continuous reading days while syncing.
+- Enabled travis build.
 
 #### v1.16.3 (2016-12-26)
 - Fixed cursor jumping in notes due to synchronization.
