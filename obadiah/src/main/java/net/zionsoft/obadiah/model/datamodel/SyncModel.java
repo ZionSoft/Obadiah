@@ -247,7 +247,7 @@ public class SyncModel implements ChildEventListener {
             @Override
             public Void call(List<Note> notes) {
                 for (int i = notes.size() - 1; i >= 0; --i) {
-                    syncNote(notes.get(i));
+                    updateNote(notes.get(i));
                 }
 
                 return null;
@@ -272,7 +272,7 @@ public class SyncModel implements ChildEventListener {
                         if (notesReference != null) {
                             switch (note.first) {
                                 case NoteModel.ACTION_UPDATED:
-                                    syncNote(note.second);
+                                    updateNote(note.second);
                                     break;
                                 case NoteModel.ACTION_REMOVE:
                                     notesReference.child(verseIndexToKey(note.second.verseIndex()))
@@ -293,7 +293,7 @@ public class SyncModel implements ChildEventListener {
     }
 
     @SuppressWarnings("WeakerAccess")
-    void syncNote(@NonNull final Note note) {
+    void updateNote(@NonNull final Note note) {
         if (notesReference == null) {
             return;
         }
@@ -307,7 +307,7 @@ public class SyncModel implements ChildEventListener {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             if (!dataSnapshot.exists() || note.timestamp() > (long) dataSnapshot.getValue()) {
-                                syncNote(note, reference);
+                                updateNote(note, reference);
                             }
                         }
 
@@ -317,7 +317,7 @@ public class SyncModel implements ChildEventListener {
                         }
                     });
                 } else {
-                    syncNote(note, reference);
+                    updateNote(note, reference);
                 }
             }
 
@@ -329,7 +329,7 @@ public class SyncModel implements ChildEventListener {
     }
 
     @SuppressWarnings("WeakerAccess")
-    void syncNote(@NonNull Note note, @NonNull DatabaseReference reference) {
+    void updateNote(@NonNull Note note, @NonNull DatabaseReference reference) {
         final Map<String, Object> updates = new HashMap<>(2);
         updates.put("timestamp", note.timestamp());
         updates.put("note", note.note());
