@@ -2,6 +2,7 @@ CHANGELOG
 ---------
 
 #### Next Release
+- Fixed reading progress syncing across devices.
 
 #### v1.17.0 (2016-12-30)
 - Added setting & analytics for daily verse.

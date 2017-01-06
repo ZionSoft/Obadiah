@@ -100,43 +100,44 @@ public class ReadingProgressModel {
                 try {
                     database.beginTransaction();
 
+                    if (ReadingProgressTableHelper.getChapterReadTimestamp(database, book, chapter) < timestamp) {
+                        ReadingProgressTableHelper.saveChapterReading(database, book, chapter, timestamp);
+                    }
+
                     long lastReadingTimestamp = Long.parseLong(MetadataTableHelper.getMetadata(
                             database, MetadataTableHelper.KEY_LAST_READING_TIMESTAMP, "0"));
-                    if (lastReadingTimestamp >= timestamp
-                            || ReadingProgressTableHelper.getChapterReadTimestamp(database, book, chapter) >= timestamp) {
-                        return null;
-                    }
+                    if (lastReadingTimestamp < timestamp) {
+                        final long lastReadingDay = lastReadingTimestamp / DateUtils.DAY_IN_MILLIS;
+                        final long today = timestamp / DateUtils.DAY_IN_MILLIS;
+                        final long diff = today - lastReadingDay;
+                        final int continuousReadingDays;
+                        if (diff == 0L) {
+                            continuousReadingDays = Integer.parseInt(
+                                    MetadataTableHelper.getMetadata(database,
+                                            MetadataTableHelper.KEY_CONTINUOUS_READING_DAYS, "0"));
+                        } else if (diff == 1L) {
+                            continuousReadingDays = 1 + Integer.parseInt(
+                                    MetadataTableHelper.getMetadata(database,
+                                            MetadataTableHelper.KEY_CONTINUOUS_READING_DAYS, "0"));
+                        } else {
+                            continuousReadingDays = 1;
+                        }
+                        if (diff >= 1L) {
+                            lastReadingTimestamp = timestamp;
+                            MetadataTableHelper.saveMetadata(database,
+                                    MetadataTableHelper.KEY_LAST_READING_TIMESTAMP,
+                                    Long.toString(lastReadingTimestamp));
+                            MetadataTableHelper.saveMetadata(database,
+                                    MetadataTableHelper.KEY_CONTINUOUS_READING_DAYS,
+                                    Integer.toString(continuousReadingDays));
+                        }
 
-                    ReadingProgressTableHelper.saveChapterReading(database, book, chapter, timestamp);
-
-                    final long lastReadingDay = lastReadingTimestamp / DateUtils.DAY_IN_MILLIS;
-                    final long today = timestamp / DateUtils.DAY_IN_MILLIS;
-                    final long diff = today - lastReadingDay;
-                    int continuousReadingDays = 1;
-                    if (diff == 0L) {
-                        continuousReadingDays = Integer.parseInt(
-                                MetadataTableHelper.getMetadata(database,
-                                        MetadataTableHelper.KEY_CONTINUOUS_READING_DAYS, "0"));
-                    } else if (diff == 1L) {
-                        continuousReadingDays = 1 + Integer.parseInt(
-                                MetadataTableHelper.getMetadata(database,
-                                        MetadataTableHelper.KEY_CONTINUOUS_READING_DAYS, "0"));
-                    }
-                    if (diff >= 1L) {
-                        lastReadingTimestamp = timestamp;
-                        MetadataTableHelper.saveMetadata(database,
-                                MetadataTableHelper.KEY_LAST_READING_TIMESTAMP,
-                                Long.toString(lastReadingTimestamp));
-                        MetadataTableHelper.saveMetadata(database,
-                                MetadataTableHelper.KEY_CONTINUOUS_READING_DAYS,
-                                Integer.toString(continuousReadingDays));
+                        readingProgressUpdatesSubject.onNext(new Triple<>(
+                                new ReadingProgress.ReadChapter(book, chapter, timestamp),
+                                continuousReadingDays, lastReadingTimestamp));
                     }
 
                     database.setTransactionSuccessful();
-
-                    readingProgressUpdatesSubject.onNext(new Triple<>(
-                            new ReadingProgress.ReadChapter(book, chapter, timestamp),
-                            continuousReadingDays, lastReadingTimestamp));
 
                     return Completable.complete();
                 } catch (Exception e) {
