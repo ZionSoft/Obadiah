@@ -2,6 +2,8 @@ CHANGELOG
 ---------
 
 #### Next Release
+
+#### v1.17.1 (2017-01-07)
 - Fixed reading progress syncing across devices.
 
 #### v1.17.0 (2016-12-30)

@@ -23,8 +23,8 @@ ext {
     sourceJavaVersion = JavaVersion.VERSION_1_7
     targetJavaVersion = JavaVersion.VERSION_1_7
 
-    versionName = '1.17.0'
-    versionCode = 11700
+    versionName = '1.17.1'
+    versionCode = 11701
 
     supportLibVersion = '25.1.0'
     playServicesVersion = '10.0.1'
