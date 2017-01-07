@@ -176,11 +176,9 @@ class VerseItemViewHolder extends RecyclerView.ViewHolder implements View.OnClic
     }
 
     void bindNote(String note, boolean expanded) {
-        final CharSequence current = this.note.getText();
-        final String currentNote = current != null ? current.toString() : null;
-        if (currentNote == null || !currentNote.equals(note)) {
-            // due to synchronization, the model would trigger the update, so we only update if the
-            // text is actually changed
+        if (!this.note.isFocused()) {
+            // due to synchronization, the model would trigger the update, so we only update if it's
+            // not focused (i.e. user is not typing here)
             this.note.removeTextChangedListener(this);
             this.note.setText(note);
             this.note.addTextChangedListener(this);
