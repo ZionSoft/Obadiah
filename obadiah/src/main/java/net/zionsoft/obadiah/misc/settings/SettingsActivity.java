@@ -226,7 +226,21 @@ public class SettingsActivity extends BaseAppCompatActivity implements SettingsV
             @Override
             public void onClick(View v) {
                 try {
-                    startActivity(new Intent(Intent.ACTION_VIEW).setData(Constants.FACEBOOK_PAGE_URI));
+                    startActivity(new Intent(Intent.ACTION_VIEW).setData(Constants.FACEBOOK_PAGE_NEW_URI));
+                    return;
+                } catch (ActivityNotFoundException e) {
+                    // fall through
+                }
+
+                try {
+                    startActivity(new Intent(Intent.ACTION_VIEW).setData(Constants.FACEBOOK_PAGE_OLD_URI));
+                    return;
+                } catch (ActivityNotFoundException e) {
+                    // fall through
+                }
+
+                try {
+                    startActivity(new Intent(Intent.ACTION_VIEW).setData(Constants.FACEBOOK_PAGE_FALLBACK_URI));
                 } catch (ActivityNotFoundException e) {
                     DialogHelper.showDialog(SettingsActivity.this, R.string.error_unknown_error, null);
                 }

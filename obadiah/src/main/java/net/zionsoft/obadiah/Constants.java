@@ -28,7 +28,10 @@ public class Constants {
     public static final String PREF_KEY_LAST_READ_VERSE = "currentVerse";
 
     public static final Uri GOOGLE_PLAY_URI = Uri.parse("market://details?id=net.zionsoft.obadiah");
-    public static final Uri FACEBOOK_PAGE_URI = Uri.parse("https://www.facebook.com/WeReadBible/");
+
+    public static final Uri FACEBOOK_PAGE_NEW_URI = Uri.parse("fb://facewebmodal/f?href=https://www.facebook.com/WeReadBible/");
+    public static final Uri FACEBOOK_PAGE_OLD_URI = Uri.parse("fb://page/WeReadBible/");
+    public static final Uri FACEBOOK_PAGE_FALLBACK_URI = Uri.parse("https://www.facebook.com/WeReadBible/");
 
     public static final String BASE_URL = "https://z-bible.appspot.com/v1/";
 }
