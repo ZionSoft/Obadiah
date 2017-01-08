@@ -17,13 +17,16 @@
 
 package net.zionsoft.obadiah.biblereading.verse;
 
+import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
-import android.support.v7.app.AlertDialog;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
@@ -46,6 +49,8 @@ import butterknife.ButterKnife;
 
 class VerseItemViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener,
         View.OnLongClickListener, TextWatcher {
+    private static final String VERSE_DETAIL_FRAGMENT_TAG = "net.zionsoft.net.VERSE_DETAIL_FRAGMENT_TAG";
+
     private static final StringBuilder STRING_BUILDER = new StringBuilder();
     static final PorterDuffColorFilter ON = new PorterDuffColorFilter(Color.RED, PorterDuff.Mode.MULTIPLY);
     static final PorterDuffColorFilter OFF = new PorterDuffColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
@@ -229,16 +234,22 @@ class VerseItemViewHolder extends RecyclerView.ViewHolder implements View.OnClic
 
     @Override
     public boolean onLongClick(View v) {
-        // TODO
+        final Context context = itemView.getContext();
+        if (!(context instanceof FragmentActivity)) {
+            return false;
+        }
 
         STRING_BUILDER.setLength(0);
         STRING_BUILDER.append(verse.text.bookName).append(' ')
                 .append(verse.verseIndex.chapter() + 1).append(':').append(verse.verseIndex.verse() + 1);
 
-        new AlertDialog.Builder(itemView.getContext())
-                .setTitle(STRING_BUILDER.toString())
-                .setView(R.layout.dialog_verse_detail)
-                .create().show();
+        final FragmentManager fm = ((FragmentActivity) context).getSupportFragmentManager();
+        final Fragment fragment = fm.findFragmentByTag(VERSE_DETAIL_FRAGMENT_TAG);
+        if (fragment != null) {
+            fm.beginTransaction().remove(fragment).commitNowAllowingStateLoss();
+        }
+        VerseDetailDialogFragment.newInstance(STRING_BUILDER.toString(), bookmarked, note)
+                .show(fm, VERSE_DETAIL_FRAGMENT_TAG);
 
         return true;
     }
