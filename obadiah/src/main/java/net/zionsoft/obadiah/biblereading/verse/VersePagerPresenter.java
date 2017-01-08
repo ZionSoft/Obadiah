@@ -217,27 +217,15 @@ public class VersePagerPresenter extends BasePresenter<VersePagerView> {
             verses = bibleReadingModel.loadVerses(loadCurrentTranslation(), book, chapter);
         }
 
-        final Single<VerseList> loaded;
-        if (getSettings().isSimpleReading()) {
-            loaded = verses.map(new Func1<List<Verse>, VerseList>() {
-                @Override
-                public VerseList call(List<Verse> verses) {
-                    return new VerseList(verses, null, null);
-                }
-            });
-        } else {
-            loaded = Single.zip(verses.subscribeOn(Schedulers.io()),
-                    bookmarkModel.loadBookmarks(book, chapter).subscribeOn(Schedulers.io()),
-                    noteModel.loadNotes(book, chapter).subscribeOn(Schedulers.io()),
-                    new Func3<List<Verse>, List<Bookmark>, List<Note>, VerseList>() {
-                        @Override
-                        public VerseList call(List<Verse> verses, List<Bookmark> bookmarks, List<Note> notes) {
-                            return new VerseList(verses, bookmarks, notes);
-                        }
-                    });
-        }
-
-        getSubscription().add(loaded.compose(RxHelper.<VerseList>applySchedulersForSingle())
+        getSubscription().add(Single.zip(verses.subscribeOn(Schedulers.io()),
+                bookmarkModel.loadBookmarks(book, chapter).subscribeOn(Schedulers.io()),
+                noteModel.loadNotes(book, chapter).subscribeOn(Schedulers.io()),
+                new Func3<List<Verse>, List<Bookmark>, List<Note>, VerseList>() {
+                    @Override
+                    public VerseList call(List<Verse> verses, List<Bookmark> bookmarks, List<Note> notes) {
+                        return new VerseList(verses, bookmarks, notes);
+                    }
+                }).compose(RxHelper.<VerseList>applySchedulersForSingle())
                 .subscribe(new SingleSubscriber<VerseList>() {
                     @Override
                     public void onSuccess(VerseList result) {
