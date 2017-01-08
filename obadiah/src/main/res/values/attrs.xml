@@ -15,7 +15,7 @@
         <attr name="settingTitleDescriptionButtonDescription" format="string|reference" />
     </declare-styleable>
 
-    <declare-styleable name="SettingSwitch">
-        <attr name="settingSwitchTitle" format="string|reference" />
+    <declare-styleable name="Switch">
+        <attr name="switchTitle" format="string|reference" />
     </declare-styleable>
 </resources>

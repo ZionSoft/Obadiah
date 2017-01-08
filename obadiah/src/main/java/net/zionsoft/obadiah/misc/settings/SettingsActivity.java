@@ -45,6 +45,7 @@ import net.zionsoft.obadiah.ui.utils.BaseAppCompatActivity;
 import net.zionsoft.obadiah.ui.utils.DialogHelper;
 import net.zionsoft.obadiah.ui.widget.ProgressDialog;
 import net.zionsoft.obadiah.ui.widget.SectionHeader;
+import net.zionsoft.obadiah.ui.widget.Switch;
 
 import javax.inject.Inject;
 
@@ -81,19 +82,19 @@ public class SettingsActivity extends BaseAppCompatActivity implements SettingsV
     SectionHeader readingSectionHeader;
 
     @BindView(R.id.simple_reading_switch)
-    SettingSwitch simpleReadingSwitch;
+    Switch simpleReadingSwitch;
 
     @BindView(R.id.daily_verse_switch)
-    SettingSwitch dailyVerseSwitch;
+    Switch dailyVerseSwitch;
 
     @BindView(R.id.display_section_header)
     SectionHeader displaySectionHeader;
 
     @BindView(R.id.screen_on_switch)
-    SettingSwitch screenOnSwitch;
+    Switch screenOnSwitch;
 
     @BindView(R.id.night_mode_switch)
-    SettingSwitch nightModeSwitch;
+    Switch nightModeSwitch;
 
     @BindView(R.id.text_size_setting_button)
     SettingTitleDescriptionButton textSizeSettingButton;

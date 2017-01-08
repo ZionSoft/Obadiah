@@ -54,17 +54,17 @@
                 android:layout_height="wrap_content"
                 obadiah:settingSectionHeaderText="@string/pref_reading"/>
 
-            <net.zionsoft.obadiah.misc.settings.SettingSwitch
+            <net.zionsoft.obadiah.ui.widget.Switch
                 android:id="@+id/simple_reading_switch"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                obadiah:settingSwitchTitle="@string/pref_simple_reading"/>
+                obadiah:switchTitle="@string/pref_simple_reading"/>
 
-            <net.zionsoft.obadiah.misc.settings.SettingSwitch
+            <net.zionsoft.obadiah.ui.widget.Switch
                 android:id="@+id/daily_verse_switch"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                obadiah:settingSwitchTitle="@string/pref_daily_verse"/>
+                obadiah:switchTitle="@string/pref_daily_verse"/>
 
             <net.zionsoft.obadiah.ui.widget.SectionHeader
                 android:id="@+id/display_section_header"
@@ -72,17 +72,17 @@
                 android:layout_height="wrap_content"
                 obadiah:settingSectionHeaderText="@string/pref_display"/>
 
-            <net.zionsoft.obadiah.misc.settings.SettingSwitch
+            <net.zionsoft.obadiah.ui.widget.Switch
                 android:id="@+id/screen_on_switch"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                obadiah:settingSwitchTitle="@string/pref_screen_on"/>
+                obadiah:switchTitle="@string/pref_screen_on"/>
 
-            <net.zionsoft.obadiah.misc.settings.SettingSwitch
+            <net.zionsoft.obadiah.ui.widget.Switch
                 android:id="@+id/night_mode_switch"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                obadiah:settingSwitchTitle="@string/pref_night_mode"/>
+                obadiah:switchTitle="@string/pref_night_mode"/>
 
             <net.zionsoft.obadiah.misc.settings.SettingTitleDescriptionButton
                 android:id="@+id/text_size_setting_button"
