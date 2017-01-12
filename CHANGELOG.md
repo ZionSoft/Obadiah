@@ -2,6 +2,10 @@ CHANGELOG
 ---------
 
 #### Next Release
+- Updated dependencies:
+  - Updated Android Gradle plugin to 2.3.0-beta2.
+  - Updated Gradle to 3.3.
+  - Updated RxJava to 1.2.5.
 
 #### v1.17.1 (2017-01-07)
 - Fixed reading progress syncing across devices.
