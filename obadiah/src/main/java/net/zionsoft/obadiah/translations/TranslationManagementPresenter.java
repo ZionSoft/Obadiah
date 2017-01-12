@@ -18,8 +18,12 @@
 package net.zionsoft.obadiah.translations;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.text.TextUtils;
+
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 
 import net.zionsoft.obadiah.model.datamodel.BibleReadingModel;
 import net.zionsoft.obadiah.model.datamodel.Settings;
@@ -37,6 +41,7 @@ import rx.subscriptions.CompositeSubscription;
 
 class TranslationManagementPresenter extends BasePresenter<TranslationManagementView>
         implements AdsModel.OnAdsRemovalPurchasedListener {
+    private final Context context;
     private final AdsModel adsModel;
     @SuppressWarnings("WeakerAccess")
     final BibleReadingModel bibleReadingModel;
@@ -48,9 +53,10 @@ class TranslationManagementPresenter extends BasePresenter<TranslationManagement
     @SuppressWarnings("WeakerAccess")
     Subscription fetchTranslationSubscription;
 
-    TranslationManagementPresenter(AdsModel adsModel, BibleReadingModel bibleReadingModel,
+    TranslationManagementPresenter(Context context, AdsModel adsModel, BibleReadingModel bibleReadingModel,
                                    TranslationManagementModel translationManagementModel, Settings settings) {
         super(settings);
+        this.context = context;
         this.adsModel = adsModel;
         this.bibleReadingModel = bibleReadingModel;
         this.translationManagementModel = translationManagementModel;
@@ -203,6 +209,14 @@ class TranslationManagementPresenter extends BasePresenter<TranslationManagement
     }
 
     void loadAdsStatus() {
+        if (GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(context) != ConnectionResult.SUCCESS) {
+            final TranslationManagementView v = getView();
+            if (v != null) {
+                v.hideAds();
+            }
+            return;
+        }
+
         subscription.add(adsModel.shouldHideAds()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new SingleSubscriber<Boolean>() {

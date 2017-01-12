@@ -52,8 +52,8 @@ public class TranslationManagementModule {
     @Provides
     @ActivityScope
     TranslationManagementPresenter provideTranslationManagementPresenter(
-            AdsModel adsModel, BibleReadingModel bibleReadingModel,
+            Context context, AdsModel adsModel, BibleReadingModel bibleReadingModel,
             TranslationManagementModel translationManagementModel, Settings settings) {
-        return new TranslationManagementPresenter(adsModel, bibleReadingModel, translationManagementModel, settings);
+        return new TranslationManagementPresenter(context, adsModel, bibleReadingModel, translationManagementModel, settings);
     }
 }
