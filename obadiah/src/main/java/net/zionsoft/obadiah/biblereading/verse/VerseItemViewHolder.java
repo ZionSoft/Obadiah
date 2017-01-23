@@ -48,7 +48,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 class VerseItemViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener,
-        View.OnLongClickListener, TextWatcher {
+        View.OnLongClickListener, TextWatcher, VerseDetailDialogFragment.Listener {
     private static final String VERSE_DETAIL_FRAGMENT_TAG = "net.zionsoft.net.VERSE_DETAIL_FRAGMENT_TAG";
 
     private static final StringBuilder STRING_BUILDER = new StringBuilder();
@@ -248,8 +248,10 @@ class VerseItemViewHolder extends RecyclerView.ViewHolder implements View.OnClic
         if (fragment != null) {
             fm.beginTransaction().remove(fragment).commitNowAllowingStateLoss();
         }
-        VerseDetailDialogFragment.newInstance(STRING_BUILDER.toString(), bookmarked, note)
-                .show(fm, VERSE_DETAIL_FRAGMENT_TAG);
+        final VerseDetailDialogFragment dialogFragment
+                = VerseDetailDialogFragment.newInstance(STRING_BUILDER.toString(), bookmarked, note);
+        dialogFragment.setListener(this);
+        dialogFragment.show(fm, VERSE_DETAIL_FRAGMENT_TAG);
 
         return true;
     }
@@ -274,5 +276,10 @@ class VerseItemViewHolder extends RecyclerView.ViewHolder implements View.OnClic
                 versePagerPresenter.updateNote(verseIndex, s.toString());
             }
         }
+    }
+
+    @Override
+    public void onVerseDetailUpdated(boolean bookmarked, String note) {
+        // TODO
     }
 }
