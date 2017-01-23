@@ -126,6 +126,8 @@ class VerseItemViewHolder extends RecyclerView.ViewHolder implements View.OnClic
                     index.setText(TextFormatter.format("%3d", verse.verseIndex.verse() + 1));
                 }
 
+                verseIndex = verse.verseIndex;
+
                 text.setTextColor(textColor);
                 text.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
                 text.setText(verse.text.text);
@@ -280,6 +282,17 @@ class VerseItemViewHolder extends RecyclerView.ViewHolder implements View.OnClic
 
     @Override
     public void onVerseDetailUpdated(boolean bookmarked, String note) {
-        // TODO
+        if (verseIndex != null) {
+            if (bookmarked) {
+                versePagerPresenter.addBookmark(verseIndex);
+            } else {
+                versePagerPresenter.removeBookmark(verseIndex);
+            }
+            if (TextUtils.isEmpty(note)) {
+                versePagerPresenter.removeNote(verseIndex);
+            } else {
+                versePagerPresenter.updateNote(verseIndex, note);
+            }
+        }
     }
 }
