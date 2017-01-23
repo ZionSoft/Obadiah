@@ -17,15 +17,18 @@
 
 package net.zionsoft.obadiah.biblereading.verse;
 
+import android.app.Activity;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.DialogFragment;
+import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import net.zionsoft.obadiah.R;
 import net.zionsoft.obadiah.ui.widget.Switch;
@@ -33,7 +36,7 @@ import net.zionsoft.obadiah.ui.widget.Switch;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class VerseDetailDialogFragment extends DialogFragment {
+public class VerseDetailDialogFragment extends DialogFragment implements Dialog.OnClickListener {
     private static final String KEY_TITLE = "net.zionsoft.obadiah.KEY_TITLE";
     private static final String KEY_BOOKMARKED = "net.zionsoft.obadiah.KEY_BOOKMARKED";
     private static final String KEY_NOTE = "net.zionsoft.obadiah.KEY_NOTE";
@@ -53,14 +56,27 @@ public class VerseDetailDialogFragment extends DialogFragment {
         return fragment;
     }
 
-    @BindView(R.id.title)
-    TextView title;
-
     @BindView(R.id.bookmark)
     Switch bookmark;
 
     @BindView(R.id.note)
     TextInputEditText note;
+
+    @NonNull
+    @Override
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+        final Activity activity = getActivity();
+        final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(activity)
+                .setTitle(getArguments().getString(KEY_TITLE))
+                .setPositiveButton(android.R.string.ok, this)
+                .setNegativeButton(android.R.string.cancel, this);
+
+        final View view = onCreateView(activity.getLayoutInflater(), null, savedInstanceState);
+        onViewCreated(view, savedInstanceState);
+        dialogBuilder.setView(view);
+
+        return dialogBuilder.create();
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -73,8 +89,19 @@ public class VerseDetailDialogFragment extends DialogFragment {
         ButterKnife.bind(this, view);
 
         final Bundle args = getArguments();
-        title.setText(args.getString(KEY_TITLE));
         bookmark.setChecked(args.getBoolean(KEY_BOOKMARKED));
         note.setText(args.getString(KEY_NOTE));
+    }
+
+    @Override
+    public void onClick(DialogInterface dialog, int which) {
+        switch (which) {
+            case DialogInterface.BUTTON_POSITIVE:
+                // TODO
+                break;
+            case DialogInterface.BUTTON_NEGATIVE:
+                dismiss();
+                break;
+        }
     }
 }
