@@ -12,7 +12,7 @@ You can find the latest release notes at: [CHANGELOG.md](CHANGELOG.md)
 License
 -------
     Obadiah: a simple and easy-to-use Bible reader
-    Copyright (C) 2016  ZionSoft
+    Copyright (C) 2017  ZionSoft
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
