@@ -98,6 +98,7 @@
         <item>Joulu</item>
     </string-array>
 
+    <string name="text_bookmark">Kirjanmerkki</string>
     <string name="text_note">Huomautus</string>
 
     <string name="toast_translation_deleted">Poistettu.</string>
