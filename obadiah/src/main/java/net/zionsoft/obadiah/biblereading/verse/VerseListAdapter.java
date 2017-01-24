@@ -37,18 +37,15 @@ class VerseListAdapter extends RecyclerView.Adapter<VerseItemViewHolder> {
     private final LayoutInflater inflater;
     private final Resources resources;
 
-    @Nullable
+    private List<Verse> verses;
     private List<Bookmark> bookmarks;
-
-    @Nullable
     private List<Note> notes;
+
+    private boolean[] selected;
+    private int selectedCount;
 
     @Nullable
     private boolean[] expanded;
-
-    private List<Verse> verses;
-    private boolean[] selected;
-    private int selectedCount;
 
     VerseListAdapter(Context context, VersePagerPresenter versePagerPresenter) {
         this.versePagerPresenter = versePagerPresenter;
@@ -68,11 +65,6 @@ class VerseListAdapter extends RecyclerView.Adapter<VerseItemViewHolder> {
 
     @Override
     public void onBindViewHolder(VerseItemViewHolder holder, int position) {
-        if (bookmarks == null || notes == null || expanded == null) {
-            holder.bind(verses.get(position), verses.size(), selected[position]);
-            return;
-        }
-
         boolean isBookmarked = false;
         final int bookmarkCount = bookmarks.size();
         for (int i = 0; i < bookmarkCount; ++i) {
@@ -81,8 +73,8 @@ class VerseListAdapter extends RecyclerView.Adapter<VerseItemViewHolder> {
                 break;
             }
         }
-
-        holder.bind(verses.get(position), selected[position], isBookmarked, getNote(position), expanded[position]);
+        holder.bind(verses.get(position), verses.size(), isBookmarked, getNote(position),
+                selected[position], expanded != null && expanded[position]);
     }
 
     @Nullable
@@ -108,7 +100,7 @@ class VerseListAdapter extends RecyclerView.Adapter<VerseItemViewHolder> {
         // for all other cases with payloads, the view will be updated by VerseItemAnimator
     }
 
-    void setVerses(List<Verse> verses, @Nullable List<Bookmark> bookmarks, @Nullable List<Note> notes) {
+    void setVerses(List<Verse> verses, List<Bookmark> bookmarks, List<Note> notes) {
         this.verses = verses;
         this.bookmarks = bookmarks;
         this.notes = notes;
@@ -119,7 +111,7 @@ class VerseListAdapter extends RecyclerView.Adapter<VerseItemViewHolder> {
         }
         deselectVerses();
 
-        if (bookmarks != null && notes != null) {
+        if (!versePagerPresenter.getSettings().isSimpleReading()) {
             if (expanded == null || expanded.length < size) {
                 expanded = new boolean[size];
             }

@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.zionsoft.obadiah.misc.settings;
+package net.zionsoft.obadiah.ui.widget;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -28,18 +28,18 @@ import android.util.AttributeSet;
 
 import net.zionsoft.obadiah.R;
 
-public class SettingSwitch extends SwitchCompat {
-    public SettingSwitch(Context context) {
+public class Switch extends SwitchCompat {
+    public Switch(Context context) {
         super(context);
         init(context, null);
     }
 
-    public SettingSwitch(Context context, AttributeSet attrs) {
+    public Switch(Context context, AttributeSet attrs) {
         super(context, attrs);
         init(context, attrs);
     }
 
-    public SettingSwitch(Context context, AttributeSet attrs, int defStyleAttr) {
+    public Switch(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init(context, attrs);
     }
@@ -53,13 +53,13 @@ public class SettingSwitch extends SwitchCompat {
                 resources.getDimensionPixelSize(R.dimen.paddingRight), 0);
 
         if (attrs != null) {
-            final TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.SettingSwitch);
+            final TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.Switch);
 
-            final int titleResourceId = a.getResourceId(R.styleable.SettingSwitch_settingSwitchTitle, -1);
+            final int titleResourceId = a.getResourceId(R.styleable.Switch_switchTitle, -1);
             if (titleResourceId != -1) {
                 setText(titleResourceId);
             } else {
-                final String titleString = a.getString(R.styleable.SettingSwitch_settingSwitchTitle);
+                final String titleString = a.getString(R.styleable.Switch_switchTitle);
                 if (!TextUtils.isEmpty(titleString)) {
                     setText(titleString);
                 }

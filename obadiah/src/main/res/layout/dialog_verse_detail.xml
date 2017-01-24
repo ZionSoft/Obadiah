@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical">
+
+    <net.zionsoft.obadiah.ui.widget.Switch
+        android:id="@+id/bookmark"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/text_bookmark"
+        android:textSize="@dimen/text_size_medium"/>
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/bigger_padding"
+        android:theme="@style/DialogEditTextStyle">
+
+        <android.support.design.widget.TextInputEditText
+            android:id="@+id/note"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/text_note"
+            android:imeOptions="actionDone"
+            android:inputType="textMultiLine"/>
+    </android.support.design.widget.TextInputLayout>
+</LinearLayout>

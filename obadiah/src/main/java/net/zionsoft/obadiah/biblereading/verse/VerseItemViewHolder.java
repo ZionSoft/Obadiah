@@ -17,11 +17,16 @@
 
 package net.zionsoft.obadiah.biblereading.verse;
 
+import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
+import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
@@ -42,7 +47,10 @@ import net.zionsoft.obadiah.utils.TextFormatter;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-class VerseItemViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, TextWatcher {
+class VerseItemViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener,
+        View.OnLongClickListener, TextWatcher, VerseDetailDialogFragment.Listener {
+    private static final String VERSE_DETAIL_FRAGMENT_TAG = "net.zionsoft.net.VERSE_DETAIL_FRAGMENT_TAG";
+
     private static final StringBuilder STRING_BUILDER = new StringBuilder();
     static final PorterDuffColorFilter ON = new PorterDuffColorFilter(Color.RED, PorterDuff.Mode.MULTIPLY);
     static final PorterDuffColorFilter OFF = new PorterDuffColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
@@ -60,7 +68,7 @@ class VerseItemViewHolder extends RecyclerView.ViewHolder implements View.OnClic
     TextInputLayout noteHolder;
 
     @BindView(R.id.note)
-    TextView note;
+    TextInputEditText noteEdit;
 
     @BindView(R.id.bookmark_icon)
     AppCompatImageView bookmarkIcon;
@@ -71,9 +79,12 @@ class VerseItemViewHolder extends RecyclerView.ViewHolder implements View.OnClic
     @BindView(R.id.divider)
     View divider;
 
+    private Verse verse;
+    private boolean bookmarked;
+    private String note;
+    private boolean expanded;
+
     private VerseIndex verseIndex;
-    private boolean isBookmarked;
-    private boolean isExpanded;
 
     VerseItemViewHolder(LayoutInflater inflater, ViewGroup parent,
                         VersePagerPresenter versePagerPresenter, Resources resources) {
@@ -87,39 +98,65 @@ class VerseItemViewHolder extends RecyclerView.ViewHolder implements View.OnClic
         noteIcon.setOnClickListener(this);
     }
 
-    void bind(Verse verse, int totalVerses, boolean selected) {
+    void bind(Verse verse, int totalVerses, boolean bookmarked, String note, boolean selected, boolean expanded) {
+        this.verse = verse;
+        this.bookmarked = bookmarked;
+        this.note = note;
+        this.expanded = expanded;
+
         itemView.setSelected(selected);
 
-        if (verse.parallel.size() == 0) {
-            divider.setVisibility(View.GONE);
+        final Settings settings = versePagerPresenter.getSettings();
+        if (settings.isSimpleReading()) {
+            itemView.setOnLongClickListener(this);
 
-            index.setVisibility(View.VISIBLE);
-            final Settings settings = versePagerPresenter.getSettings();
-            final int textColor = settings.getTextColor();
-            final float textSize = resources.getDimension(settings.getTextSize().textSize);
-            index.setTextColor(textColor);
-            index.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
-            if (totalVerses < 10) {
-                index.setText(Integer.toString(verse.verseIndex.verse() + 1));
-            } else if (totalVerses < 100) {
-                index.setText(TextFormatter.format("%2d", verse.verseIndex.verse() + 1));
+            if (verse.parallel.size() == 0) {
+                divider.setVisibility(View.GONE);
+
+                index.setVisibility(View.VISIBLE);
+                final int textColor = settings.getTextColor();
+                final float textSize = resources.getDimension(settings.getTextSize().textSize);
+                index.setTextColor(textColor);
+                index.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+                if (totalVerses < 10) {
+                    index.setText(Integer.toString(verse.verseIndex.verse() + 1));
+                } else if (totalVerses < 100) {
+                    index.setText(TextFormatter.format("%2d", verse.verseIndex.verse() + 1));
+                } else {
+                    index.setText(TextFormatter.format("%3d", verse.verseIndex.verse() + 1));
+                }
+
+                verseIndex = verse.verseIndex;
+
+                text.setTextColor(textColor);
+                text.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+                text.setText(verse.text.text);
             } else {
-                index.setText(TextFormatter.format("%3d", verse.verseIndex.verse() + 1));
+                bindVerse(verse);
             }
 
-            text.setTextColor(textColor);
-            text.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
-            text.setText(verse.text.text);
+            bookmarkIcon.setVisibility(View.GONE);
+            noteIcon.setVisibility(View.GONE);
+            setExpanded(false);
         } else {
-            setVerse(verse);
-        }
+            itemView.setOnLongClickListener(null);
 
-        bookmarkIcon.setVisibility(View.GONE);
-        noteIcon.setVisibility(View.GONE);
-        setExpanded(false);
+            bindVerse(verse);
+
+            bookmarkIcon.setVisibility(View.VISIBLE);
+            bindBookmark(bookmarked);
+
+            noteIcon.setVisibility(View.VISIBLE);
+
+            this.noteEdit.setTextColor(settings.getTextColor());
+            this.noteEdit.setTextSize(TypedValue.COMPLEX_UNIT_PX,
+                    resources.getDimension(settings.getTextSize().smallerTextSize));
+            bindNote(note, expanded);
+            setExpanded(expanded);
+        }
     }
 
-    private void setVerse(Verse verse) {
+    private void bindVerse(Verse verse) {
         final Settings settings = versePagerPresenter.getSettings();
         text.setTextColor(settings.getTextColor());
         text.setTextSize(TypedValue.COMPLEX_UNIT_PX,
@@ -153,35 +190,18 @@ class VerseItemViewHolder extends RecyclerView.ViewHolder implements View.OnClic
                 .append('\n').append(text.text).append('\n').append('\n');
     }
 
-    void bind(Verse verse, boolean selected, boolean isBookmarked, String note, boolean expanded) {
-        itemView.setSelected(selected);
-
-        setVerse(verse);
-
-        bookmarkIcon.setVisibility(View.VISIBLE);
-        bindBookmark(isBookmarked);
-
-        final Settings settings = versePagerPresenter.getSettings();
-        noteIcon.setVisibility(View.VISIBLE);
-        this.note.setTextColor(settings.getTextColor());
-        this.note.setTextSize(TypedValue.COMPLEX_UNIT_PX,
-                resources.getDimension(settings.getTextSize().smallerTextSize));
-        bindNote(note, expanded);
-        setExpanded(expanded);
-    }
-
     void bindBookmark(boolean isBookmarked) {
-        this.isBookmarked = isBookmarked;
+        this.bookmarked = isBookmarked;
         bookmarkIcon.setColorFilter(isBookmarked ? ON : OFF);
     }
 
     void bindNote(String note, boolean expanded) {
-        if (!this.note.isFocused()) {
+        if (!this.noteEdit.isFocused()) {
             // due to synchronization, the model would trigger the update, so we only update if it's
             // not focused (i.e. user is not typing here)
-            this.note.removeTextChangedListener(this);
-            this.note.setText(note);
-            this.note.addTextChangedListener(this);
+            this.noteEdit.removeTextChangedListener(this);
+            this.noteEdit.setText(note);
+            this.noteEdit.addTextChangedListener(this);
 
             noteIcon.setColorFilter(TextUtils.isEmpty(note) ? OFF : ON);
         }
@@ -190,7 +210,7 @@ class VerseItemViewHolder extends RecyclerView.ViewHolder implements View.OnClic
     }
 
     private void setExpanded(boolean expanded) {
-        isExpanded = expanded;
+        this.expanded = expanded;
         noteHolder.setVisibility(expanded ? View.VISIBLE : View.GONE);
     }
 
@@ -198,20 +218,44 @@ class VerseItemViewHolder extends RecyclerView.ViewHolder implements View.OnClic
     public void onClick(View v) {
         if (verseIndex != null) {
             if (v == bookmarkIcon) {
-                if (isBookmarked) {
+                if (bookmarked) {
                     versePagerPresenter.removeBookmark(verseIndex);
                 } else {
                     versePagerPresenter.addBookmark(verseIndex);
                 }
             } else if (v == noteIcon) {
-                if (isExpanded) {
+                if (expanded) {
                     versePagerPresenter.hideNote(verseIndex);
                 } else {
                     versePagerPresenter.showNote(verseIndex);
                 }
-                setExpanded(!isExpanded);
+                setExpanded(!expanded);
             }
         }
+    }
+
+    @Override
+    public boolean onLongClick(View v) {
+        final Context context = itemView.getContext();
+        if (!(context instanceof FragmentActivity)) {
+            return false;
+        }
+
+        STRING_BUILDER.setLength(0);
+        STRING_BUILDER.append(verse.text.bookName).append(' ')
+                .append(verse.verseIndex.chapter() + 1).append(':').append(verse.verseIndex.verse() + 1);
+
+        final FragmentManager fm = ((FragmentActivity) context).getSupportFragmentManager();
+        final Fragment fragment = fm.findFragmentByTag(VERSE_DETAIL_FRAGMENT_TAG);
+        if (fragment != null) {
+            fm.beginTransaction().remove(fragment).commitNowAllowingStateLoss();
+        }
+        final VerseDetailDialogFragment dialogFragment
+                = VerseDetailDialogFragment.newInstance(STRING_BUILDER.toString(), bookmarked, note);
+        dialogFragment.setListener(this);
+        dialogFragment.show(fm, VERSE_DETAIL_FRAGMENT_TAG);
+
+        return true;
     }
 
     @Override
@@ -232,6 +276,22 @@ class VerseItemViewHolder extends RecyclerView.ViewHolder implements View.OnClic
                 versePagerPresenter.removeNote(verseIndex);
             } else {
                 versePagerPresenter.updateNote(verseIndex, s.toString());
+            }
+        }
+    }
+
+    @Override
+    public void onVerseDetailUpdated(boolean bookmarked, String note) {
+        if (verseIndex != null) {
+            if (bookmarked) {
+                versePagerPresenter.addBookmark(verseIndex);
+            } else {
+                versePagerPresenter.removeBookmark(verseIndex);
+            }
+            if (TextUtils.isEmpty(note)) {
+                versePagerPresenter.removeNote(verseIndex);
+            } else {
+                versePagerPresenter.updateNote(verseIndex, note);
             }
         }
     }

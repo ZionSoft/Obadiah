@@ -98,6 +98,7 @@
         <item>Dec</item>
     </string-array>
 
+    <string name="text_bookmark">Bookmark</string>
     <string name="text_note">Note</string>
 
     <string name="toast_translation_deleted">Deleted.</string>

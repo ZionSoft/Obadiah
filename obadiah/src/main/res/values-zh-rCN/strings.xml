@@ -98,6 +98,7 @@
         <item>12</item>
     </string-array>
 
+    <string name="text_bookmark">书签</string>
     <string name="text_note">笔记</string>
 
     <string name="toast_translation_deleted">已删除。</string>
