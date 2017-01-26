@@ -3,7 +3,7 @@ CHANGELOG
 
 #### Next Release
 - Updated dependencies:
-  - Updated Android Gradle plugin to 2.3.0-beta2.
+  - Updated Android Gradle plugin to 2.3.0-beta3.
   - Updated Gradle to 3.3.
   - Updated RxJava to 1.2.5.
 - Features:
