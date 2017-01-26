@@ -6,6 +6,8 @@ CHANGELOG
   - Updated Android Gradle plugin to 2.3.0-beta2.
   - Updated Gradle to 3.3.
   - Updated RxJava to 1.2.5.
+- Features:
+  - Supported bookmarks & notes in simple reading mode.
 - Fixes:
   - Checked if Play Services is available before showing ads.
 
