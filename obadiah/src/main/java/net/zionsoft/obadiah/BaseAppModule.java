@@ -21,8 +21,6 @@ import android.content.Context;
 
 import com.squareup.moshi.Moshi;
 
-import net.zionsoft.obadiah.model.database.DatabaseHelper;
-
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Singleton;
@@ -35,7 +33,7 @@ import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.moshi.MoshiConverterFactory;
 
 @Module
-public class BaseAppModule {
+class BaseAppModule {
     private final App application;
 
     BaseAppModule(App application) {
@@ -46,12 +44,6 @@ public class BaseAppModule {
     @Singleton
     Context provideContext() {
         return application;
-    }
-
-    @Provides
-    @Singleton
-    DatabaseHelper provideDatabaseHelper() {
-        return new DatabaseHelper(application);
     }
 
     @Provides
