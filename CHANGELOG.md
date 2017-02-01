@@ -2,6 +2,8 @@ CHANGELOG
 ---------
 
 #### Next Release
+
+#### v1.18.0 (2017-02-01)
 - Updated dependencies:
   - Updated Android Gradle plugin to 2.3.0-beta3.
   - Updated Gradle to 3.3.
