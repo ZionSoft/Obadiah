@@ -5,7 +5,11 @@ CHANGELOG
 - Updated dependencies:
   - Updated Android Gradle plugin to 2.3.0-beta3.
   - Updated Gradle to 3.3.
+  - Updated support library to 25.1.1.
   - Updated RxJava to 1.2.5.
+  - Updated ButterKnife to 8.5.1.
+  - Updated okhttp to 3.6.0.
+  - Updated Stetho to 1.4.2.
 - Features:
   - Supported bookmarks & notes in simple reading mode.
 - Fixes:
