@@ -2,6 +2,10 @@ CHANGELOG
 ---------
 
 #### Next Release
+- Updated dependencies:
+  - Updated Dagger to 2.9.
+  - Updated RxJava to 1.2.6.
+  - Updated Moshi to 1.4.0.
 
 #### v1.18.0 (2017-02-01)
 - Updated dependencies:
