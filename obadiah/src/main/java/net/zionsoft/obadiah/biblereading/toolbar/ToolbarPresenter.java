@@ -17,7 +17,6 @@
 
 package net.zionsoft.obadiah.biblereading.toolbar;
 
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import net.zionsoft.obadiah.model.datamodel.BibleReadingModel;
@@ -34,7 +33,7 @@ import rx.subscriptions.CompositeSubscription;
 
 public class ToolbarPresenter extends MVPPresenter<ToolbarView> {
     private final BibleReadingModel bibleReadingModel;
-    private CompositeSubscription subscription;
+    private final CompositeSubscription subscriptions = new CompositeSubscription();
 
     public ToolbarPresenter(BibleReadingModel bibleReadingModel) {
         this.bibleReadingModel = bibleReadingModel;
@@ -44,7 +43,7 @@ public class ToolbarPresenter extends MVPPresenter<ToolbarView> {
     protected void onViewTaken() {
         super.onViewTaken();
 
-        getSubscription().add(bibleReadingModel.observeCurrentTranslation()
+        subscriptions.add(bibleReadingModel.observeCurrentTranslation()
                 .subscribe(new Subscriber<String>() {
                     @Override
                     public void onCompleted() {
@@ -61,7 +60,7 @@ public class ToolbarPresenter extends MVPPresenter<ToolbarView> {
                         loadBookNames(translation);
                     }
                 }));
-        getSubscription().add(bibleReadingModel.observeCurrentReadingProgress()
+        subscriptions.add(bibleReadingModel.observeCurrentReadingProgress()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<VerseIndex>() {
                     @Override
@@ -84,16 +83,9 @@ public class ToolbarPresenter extends MVPPresenter<ToolbarView> {
                 }));
     }
 
-    @NonNull
-    private CompositeSubscription getSubscription() {
-        if (subscription == null) {
-            subscription = new CompositeSubscription();
-        }
-        return subscription;
-    }
-
+    @SuppressWarnings("WeakerAccess")
     void loadBookNames(String translation) {
-        getSubscription().add(bibleReadingModel.loadBookNames(translation)
+        subscriptions.add(bibleReadingModel.loadBookNames(translation)
                 .compose(RxHelper.<List<String>>applySchedulers())
                 .subscribe(new Subscriber<List<String>>() {
                     @Override
@@ -122,10 +114,7 @@ public class ToolbarPresenter extends MVPPresenter<ToolbarView> {
 
     @Override
     protected void onViewDropped() {
-        if (subscription != null) {
-            subscription.unsubscribe();
-            subscription = null;
-        }
+        subscriptions.clear();
 
         super.onViewDropped();
     }
@@ -148,7 +137,7 @@ public class ToolbarPresenter extends MVPPresenter<ToolbarView> {
     }
 
     void loadTranslations() {
-        getSubscription().add(bibleReadingModel.loadTranslations()
+        subscriptions.add(bibleReadingModel.loadTranslations()
                 .compose(RxHelper.<List<String>>applySchedulersForSingle())
                 .subscribe(new SingleSubscriber<List<String>>() {
                     @Override

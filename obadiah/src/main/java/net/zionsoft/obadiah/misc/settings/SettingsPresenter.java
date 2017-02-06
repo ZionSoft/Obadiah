@@ -33,6 +33,7 @@ import net.zionsoft.obadiah.model.datamodel.Settings;
 import net.zionsoft.obadiah.model.datamodel.UserModel;
 import net.zionsoft.obadiah.model.domain.User;
 import net.zionsoft.obadiah.mvp.BasePresenter;
+import net.zionsoft.obadiah.utils.RxHelper;
 
 import java.util.concurrent.Callable;
 
@@ -51,8 +52,10 @@ class SettingsPresenter extends BasePresenter<SettingsView> {
     final GoogleApiClient googleApiClient;
 
     private Subscription currentUserSubscription;
-    private Subscription loginSubscription;
-    private Subscription logoutSubscription;
+    @SuppressWarnings("WeakerAccess")
+    Subscription loginSubscription;
+    @SuppressWarnings("WeakerAccess")
+    Subscription logoutSubscription;
 
     SettingsPresenter(Context context, UserModel userModel, Settings settings) {
         super(settings);
@@ -164,11 +167,12 @@ class SettingsPresenter extends BasePresenter<SettingsView> {
                         .subscribe(new SingleSubscriber<User>() {
                             @Override
                             public void onSuccess(User user) {
-                                // do nothing
+                                loginSubscription = null;
                             }
 
                             @Override
                             public void onError(Throwable e) {
+                                loginSubscription = null;
                                 final SettingsView v = getView();
                                 if (v != null) {
                                     v.onUserLoginFailed();
@@ -196,15 +200,16 @@ class SettingsPresenter extends BasePresenter<SettingsView> {
                         }
                         return null;
                     }
-                })).subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                })).compose(RxHelper.applySchedulersForCompletable())
                 .subscribe(new Action0() {
                     @Override
                     public void call() {
+                        logoutSubscription = null;
                     }
                 }, new Action1<Throwable>() {
                     @Override
                     public void call(Throwable e) {
+                        logoutSubscription = null;
                         final SettingsView v = getView();
                         if (v != null) {
                             v.onUserLogoutFailed();

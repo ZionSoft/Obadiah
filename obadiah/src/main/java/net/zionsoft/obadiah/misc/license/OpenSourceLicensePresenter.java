@@ -23,13 +23,14 @@ import net.zionsoft.obadiah.utils.RxHelper;
 
 import java.util.List;
 
+import rx.SingleSubscriber;
 import rx.Subscription;
-import rx.functions.Action1;
 
 class OpenSourceLicensePresenter extends BasePresenter<OpenSourceLicenseView> {
     private final OpenSourceLicenseModel openSourceLicenseModel;
 
-    private Subscription subscription;
+    @SuppressWarnings("WeakerAccess")
+    Subscription subscription;
 
     OpenSourceLicensePresenter(OpenSourceLicenseModel openSourceLicenseModel, Settings settings) {
         super(settings);
@@ -49,13 +50,19 @@ class OpenSourceLicensePresenter extends BasePresenter<OpenSourceLicenseView> {
     void loadLicense() {
         subscription = openSourceLicenseModel.loadLicense()
                 .compose(RxHelper.<List<String>>applySchedulersForSingle())
-                .subscribe(new Action1<List<String>>() {
+                .subscribe(new SingleSubscriber<List<String>>() {
                     @Override
-                    public void call(List<String> licenses) {
-                        OpenSourceLicenseView v = getView();
+                    public void onSuccess(List<String> licenses) {
+                        subscription = null;
+                        final OpenSourceLicenseView v = getView();
                         if (v != null) {
                             v.onLicensesLoaded(licenses);
                         }
+                    }
+
+                    @Override
+                    public void onError(Throwable error) {
+                        subscription = null;
                     }
                 });
     }

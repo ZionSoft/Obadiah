@@ -17,8 +17,6 @@
 
 package net.zionsoft.obadiah.biblereading.chapterselection;
 
-import android.support.annotation.NonNull;
-
 import net.zionsoft.obadiah.model.datamodel.BibleReadingModel;
 import net.zionsoft.obadiah.model.domain.VerseIndex;
 import net.zionsoft.obadiah.mvp.MVPPresenter;
@@ -32,7 +30,7 @@ import rx.subscriptions.CompositeSubscription;
 
 public class ChapterPresenter extends MVPPresenter<ChapterView> {
     private final BibleReadingModel bibleReadingModel;
-    private CompositeSubscription subscription;
+    private final CompositeSubscription subscriptions = new CompositeSubscription();
 
     public ChapterPresenter(BibleReadingModel bibleReadingModel) {
         this.bibleReadingModel = bibleReadingModel;
@@ -42,7 +40,7 @@ public class ChapterPresenter extends MVPPresenter<ChapterView> {
     protected void onViewTaken() {
         super.onViewTaken();
 
-        getSubscription().add(bibleReadingModel.observeCurrentTranslation()
+        subscriptions.add(bibleReadingModel.observeCurrentTranslation()
                 .subscribe(new Subscriber<String>() {
                     @Override
                     public void onCompleted() {
@@ -59,7 +57,7 @@ public class ChapterPresenter extends MVPPresenter<ChapterView> {
                         loadBookNames(translation);
                     }
                 }));
-        getSubscription().add(bibleReadingModel.observeCurrentReadingProgress()
+        subscriptions.add(bibleReadingModel.observeCurrentReadingProgress()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<VerseIndex>() {
                     @Override
@@ -82,16 +80,9 @@ public class ChapterPresenter extends MVPPresenter<ChapterView> {
                 }));
     }
 
-    @NonNull
-    private CompositeSubscription getSubscription() {
-        if (subscription == null) {
-            subscription = new CompositeSubscription();
-        }
-        return subscription;
-    }
-
+    @SuppressWarnings("WeakerAccess")
     void loadBookNames(String translation) {
-        getSubscription().add(bibleReadingModel.loadBookNames(translation)
+        subscriptions.add(bibleReadingModel.loadBookNames(translation)
                 .compose(RxHelper.<List<String>>applySchedulers())
                 .subscribe(new Subscriber<List<String>>() {
                     @Override
@@ -120,11 +111,7 @@ public class ChapterPresenter extends MVPPresenter<ChapterView> {
 
     @Override
     protected void onViewDropped() {
-        if (subscription != null) {
-            subscription.unsubscribe();
-            subscription = null;
-        }
-
+        subscriptions.clear();
         super.onViewDropped();
     }
 

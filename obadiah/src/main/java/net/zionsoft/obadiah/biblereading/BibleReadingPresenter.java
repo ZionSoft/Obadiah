@@ -17,7 +17,6 @@
 
 package net.zionsoft.obadiah.biblereading;
 
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import net.zionsoft.obadiah.model.datamodel.BibleReadingModel;
@@ -41,7 +40,7 @@ class BibleReadingPresenter extends BasePresenter<BibleReadingView> {
     private final BibleReadingModel bibleReadingModel;
     private final ReadingProgressModel readingProgressModel;
 
-    private CompositeSubscription subscription;
+    private final CompositeSubscription subscriptions = new CompositeSubscription();
     private Subscription trackReadingProgressSubscription;
 
     BibleReadingPresenter(BibleReadingModel bibleReadingModel, ReadingProgressModel readingProgressModel, Settings settings) {
@@ -54,7 +53,7 @@ class BibleReadingPresenter extends BasePresenter<BibleReadingView> {
     protected void onViewTaken() {
         super.onViewTaken();
 
-        getSubscription().add(bibleReadingModel.observeCurrentTranslation()
+        subscriptions.add(bibleReadingModel.observeCurrentTranslation()
                 .subscribe(new Subscriber<String>() {
                     @Override
                     public void onCompleted() {
@@ -75,7 +74,7 @@ class BibleReadingPresenter extends BasePresenter<BibleReadingView> {
                         }
                     }
                 }));
-        getSubscription().add(bibleReadingModel.observeCurrentReadingProgress()
+        subscriptions.add(bibleReadingModel.observeCurrentReadingProgress()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<VerseIndex>() {
                     @Override
@@ -98,20 +97,9 @@ class BibleReadingPresenter extends BasePresenter<BibleReadingView> {
                 }));
     }
 
-    @NonNull
-    private CompositeSubscription getSubscription() {
-        if (subscription == null) {
-            subscription = new CompositeSubscription();
-        }
-        return subscription;
-    }
-
     @Override
     protected void onViewDropped() {
-        if (subscription != null) {
-            subscription.unsubscribe();
-            subscription = null;
-        }
+        subscriptions.clear();
         cancelTrackReadingProgress();
 
         super.onViewDropped();
@@ -167,7 +155,7 @@ class BibleReadingPresenter extends BasePresenter<BibleReadingView> {
 
     @SuppressWarnings("WeakerAccess")
     void loadBookNames(String translation) {
-        getSubscription().add(bibleReadingModel.loadBookNames(translation)
+        subscriptions.add(bibleReadingModel.loadBookNames(translation)
                 .compose(RxHelper.<List<String>>applySchedulers())
                 .subscribe(new Subscriber<List<String>>() {
                     @Override

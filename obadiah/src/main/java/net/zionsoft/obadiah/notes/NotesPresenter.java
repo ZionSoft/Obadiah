@@ -40,7 +40,8 @@ class NotesPresenter extends BasePresenter<NotesView> {
     final BibleReadingModel bibleReadingModel;
     private final NoteModel noteModel;
 
-    private Subscription subscription;
+    @SuppressWarnings("WeakerAccess")
+    Subscription subscription;
 
     NotesPresenter(BibleReadingModel bibleReadingModel, NoteModel noteModel, Settings settings) {
         super(settings);
@@ -77,6 +78,7 @@ class NotesPresenter extends BasePresenter<NotesView> {
                 .subscribe(new SingleSubscriber<Pair<List<Note>, List<Verse>>>() {
                     @Override
                     public void onSuccess(Pair<List<Note>, List<Verse>> notes) {
+                        subscription = null;
                         final NotesView v = getView();
                         if (v != null) {
                             v.onNotesLoaded(notes.first, notes.second);
@@ -85,6 +87,7 @@ class NotesPresenter extends BasePresenter<NotesView> {
 
                     @Override
                     public void onError(Throwable error) {
+                        subscription = null;
                         final NotesView v = getView();
                         if (v != null) {
                             v.onNotesLoadFailed();

@@ -38,7 +38,8 @@ class ReadingProgressPresenter extends BasePresenter<ReadingProgressView> {
     private final BibleReadingModel bibleReadingModel;
     private final ReadingProgressModel readingProgressModel;
 
-    private Subscription subscription;
+    @SuppressWarnings("WeakerAccess")
+    Subscription subscription;
 
     ReadingProgressPresenter(BibleReadingModel bibleReadingModel,
                              ReadingProgressModel readingProgressModel,
@@ -70,12 +71,13 @@ class ReadingProgressPresenter extends BasePresenter<ReadingProgressView> {
                 .subscribe(new Subscriber<Pair<ReadingProgress, List<String>>>() {
                     @Override
                     public void onCompleted() {
-                        // do nothing
+                        subscription = null;
                     }
 
                     @Override
                     public void onError(Throwable e) {
-                        ReadingProgressView v = getView();
+                        subscription = null;
+                        final ReadingProgressView v = getView();
                         if (v != null) {
                             v.onReadingProgressLoadFailed();
                         }
@@ -83,7 +85,7 @@ class ReadingProgressPresenter extends BasePresenter<ReadingProgressView> {
 
                     @Override
                     public void onNext(Pair<ReadingProgress, List<String>> readingProgress) {
-                        ReadingProgressView v = getView();
+                        final ReadingProgressView v = getView();
                         if (v != null) {
                             v.onReadingProgressLoaded(readingProgress.first, readingProgress.second);
                         }

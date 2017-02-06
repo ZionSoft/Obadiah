@@ -17,7 +17,6 @@
 
 package net.zionsoft.obadiah.biblereading.verse;
 
-import android.support.annotation.NonNull;
 import android.support.v4.util.Pair;
 
 import net.zionsoft.obadiah.model.datamodel.BibleReadingModel;
@@ -49,7 +48,8 @@ public class VersePagerPresenter extends BasePresenter<VersePagerView> {
     private final BibleReadingModel bibleReadingModel;
     private final BookmarkModel bookmarkModel;
     private final NoteModel noteModel;
-    private CompositeSubscription subscription;
+    @SuppressWarnings("WeakerAccess")
+    final CompositeSubscription subscriptions = new CompositeSubscription();
 
     public VersePagerPresenter(BibleReadingModel bibleReadingModel, BookmarkModel bookmarkModel,
                                NoteModel noteModel, Settings settings) {
@@ -63,7 +63,7 @@ public class VersePagerPresenter extends BasePresenter<VersePagerView> {
     protected void onViewTaken() {
         super.onViewTaken();
 
-        getSubscription().add(Observable.merge(
+        subscriptions.add(Observable.merge(
                 bibleReadingModel.observeCurrentTranslation()
                         .map(new Func1<String, Void>() {
                             @Override
@@ -92,7 +92,7 @@ public class VersePagerPresenter extends BasePresenter<VersePagerView> {
                         }
                     }
                 }));
-        getSubscription().add(bibleReadingModel.observeCurrentReadingProgress()
+        subscriptions.add(bibleReadingModel.observeCurrentReadingProgress()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<VerseIndex>() {
                     @Override
@@ -113,7 +113,7 @@ public class VersePagerPresenter extends BasePresenter<VersePagerView> {
                         }
                     }
                 }));
-        getSubscription().add(bookmarkModel.observeBookmarks()
+        subscriptions.add(bookmarkModel.observeBookmarks()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<Pair<Integer, Bookmark>>() {
                     @Override
@@ -141,7 +141,7 @@ public class VersePagerPresenter extends BasePresenter<VersePagerView> {
                         }
                     }
                 }));
-        getSubscription().add(noteModel.observeNotes()
+        subscriptions.add(noteModel.observeNotes()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<Pair<Integer, Note>>() {
                     @Override
@@ -171,20 +171,9 @@ public class VersePagerPresenter extends BasePresenter<VersePagerView> {
                 }));
     }
 
-    @NonNull
-    CompositeSubscription getSubscription() {
-        if (subscription == null) {
-            subscription = new CompositeSubscription();
-        }
-        return subscription;
-    }
-
     @Override
     protected void onViewDropped() {
-        if (subscription != null) {
-            subscription.unsubscribe();
-            subscription = null;
-        }
+        subscriptions.clear();
 
         super.onViewDropped();
     }
@@ -217,7 +206,7 @@ public class VersePagerPresenter extends BasePresenter<VersePagerView> {
             verses = bibleReadingModel.loadVerses(loadCurrentTranslation(), book, chapter);
         }
 
-        getSubscription().add(Single.zip(verses.subscribeOn(Schedulers.io()),
+        subscriptions.add(Single.zip(verses.subscribeOn(Schedulers.io()),
                 bookmarkModel.loadBookmarks(book, chapter).subscribeOn(Schedulers.io()),
                 noteModel.loadNotes(book, chapter).subscribeOn(Schedulers.io()),
                 new Func3<List<Verse>, List<Bookmark>, List<Note>, VerseList>() {
@@ -246,7 +235,7 @@ public class VersePagerPresenter extends BasePresenter<VersePagerView> {
     }
 
     void addBookmark(final VerseIndex verseIndex) {
-        getSubscription().add(bookmarkModel.addBookmark(verseIndex)
+        subscriptions.add(bookmarkModel.addBookmark(verseIndex)
                 .compose(RxHelper.<Bookmark>applySchedulersForSingle())
                 .subscribe(new SingleSubscriber<Bookmark>() {
                     @Override
@@ -283,13 +272,13 @@ public class VersePagerPresenter extends BasePresenter<VersePagerView> {
 
                     @Override
                     public void onSubscribe(Subscription subscription) {
-                        getSubscription().add(subscription);
+                        subscriptions.add(subscription);
                     }
                 });
     }
 
     void updateNote(final VerseIndex verseIndex, final String note) {
-        getSubscription().add(noteModel.updateNote(verseIndex, note)
+        subscriptions.add(noteModel.updateNote(verseIndex, note)
                 .compose(RxHelper.<Note>applySchedulersForSingle())
                 .subscribe(new SingleSubscriber<Note>() {
                     @Override
@@ -327,7 +316,7 @@ public class VersePagerPresenter extends BasePresenter<VersePagerView> {
 
                     @Override
                     public void onSubscribe(Subscription subscription) {
-                        getSubscription().add(subscription);
+                        subscriptions.add(subscription);
                     }
                 });
     }

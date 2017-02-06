@@ -38,7 +38,8 @@ class SearchPresenter extends BasePresenter<SearchView> {
     private final BibleReadingModel bibleReadingModel;
     private final SearchModel searchModel;
 
-    private Subscription subscription;
+    @SuppressWarnings("WeakerAccess")
+    Subscription subscription;
 
     SearchPresenter(BibleReadingModel bibleReadingModel, SearchModel searchModel, Settings settings) {
         super(settings);
@@ -48,15 +49,21 @@ class SearchPresenter extends BasePresenter<SearchView> {
 
     @Override
     protected void onViewDropped() {
-        if (subscription != null) {
-            subscription.unsubscribe();
-            subscription = null;
-        }
+        unsubscribe();
 
         super.onViewDropped();
     }
 
+    private void unsubscribe() {
+        if (subscription != null) {
+            subscription.unsubscribe();
+            subscription = null;
+        }
+    }
+
     void search(String translation, final String query) {
+        unsubscribe();
+
         subscription = searchModel.search(translation, query)
                 .map(new Func1<List<VerseSearchResult>, List<SearchedVerse>>() {
                     @Override
@@ -73,6 +80,7 @@ class SearchPresenter extends BasePresenter<SearchView> {
                 .subscribe(new Subscriber<List<SearchedVerse>>() {
                     @Override
                     public void onCompleted() {
+                        subscription = null;
                         final SearchView v = getView();
                         if (v != null) {
                             v.onVersesSearchFinished();
@@ -81,6 +89,7 @@ class SearchPresenter extends BasePresenter<SearchView> {
 
                     @Override
                     public void onError(Throwable e) {
+                        subscription = null;
                         final SearchView v = getView();
                         if (v != null) {
                             v.onVersesSearchFailed();
@@ -114,7 +123,7 @@ class SearchPresenter extends BasePresenter<SearchView> {
     }
 
     void openBibleReadingActivity() {
-        SearchView v = getView();
+        final SearchView v = getView();
         if (v != null) {
             v.openBibleReadingActivity();
         }

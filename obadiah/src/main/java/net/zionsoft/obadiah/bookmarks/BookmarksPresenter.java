@@ -40,7 +40,8 @@ class BookmarksPresenter extends BasePresenter<BookmarksView> {
     final BibleReadingModel bibleReadingModel;
     private final BookmarkModel bookmarkModel;
 
-    private Subscription subscription;
+    @SuppressWarnings("WeakerAccess")
+    Subscription subscription;
 
     BookmarksPresenter(BibleReadingModel bibleReadingModel, BookmarkModel bookmarkModel, Settings settings) {
         super(settings);
@@ -77,6 +78,7 @@ class BookmarksPresenter extends BasePresenter<BookmarksView> {
                 .subscribe(new SingleSubscriber<Pair<List<Bookmark>, List<Verse>>>() {
                     @Override
                     public void onSuccess(Pair<List<Bookmark>, List<Verse>> bookmarks) {
+                        subscription = null;
                         final BookmarksView v = getView();
                         if (v != null) {
                             v.onBookmarksLoaded(bookmarks.first, bookmarks.second);
@@ -85,6 +87,7 @@ class BookmarksPresenter extends BasePresenter<BookmarksView> {
 
                     @Override
                     public void onError(Throwable error) {
+                        subscription = null;
                         final BookmarksView v = getView();
                         if (v != null) {
                             v.onBookmarksLoadFailed();

@@ -37,7 +37,6 @@ import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action0;
-import rx.subscriptions.CompositeSubscription;
 
 class TranslationManagementPresenter extends BasePresenter<TranslationManagementView>
         implements AdsModel.OnAdsRemovalPurchasedListener {
@@ -47,7 +46,10 @@ class TranslationManagementPresenter extends BasePresenter<TranslationManagement
     final BibleReadingModel bibleReadingModel;
     private final TranslationManagementModel translationManagementModel;
 
-    private CompositeSubscription subscription = new CompositeSubscription();
+    @SuppressWarnings("WeakerAccess")
+    Subscription loadAdsSubscription;
+    @SuppressWarnings("WeakerAccess")
+    Subscription loadTranslationsSubscription;
     @SuppressWarnings("WeakerAccess")
     Subscription removeTranslationSubscription;
     @SuppressWarnings("WeakerAccess")
@@ -63,21 +65,25 @@ class TranslationManagementPresenter extends BasePresenter<TranslationManagement
     }
 
     @Override
-    protected void onViewTaken() {
-        super.onViewTaken();
-        if (subscription == null) {
-            subscription = new CompositeSubscription();
+    protected void onViewDropped() {
+        unsubscribeLoadAdsSubscription();
+        unsubscribeLoadTranslationsSubscription();
+
+        super.onViewDropped();
+    }
+
+    private void unsubscribeLoadAdsSubscription() {
+        if (loadAdsSubscription != null) {
+            loadAdsSubscription.unsubscribe();
+            loadAdsSubscription = null;
         }
     }
 
-    @Override
-    protected void onViewDropped() {
-        if (subscription != null) {
-            subscription.unsubscribe();
-            subscription = null;
+    private void unsubscribeLoadTranslationsSubscription() {
+        if (loadTranslationsSubscription != null) {
+            loadTranslationsSubscription.unsubscribe();
+            loadTranslationsSubscription = null;
         }
-
-        super.onViewDropped();
     }
 
     String loadCurrentTranslation() {
@@ -89,16 +95,19 @@ class TranslationManagementPresenter extends BasePresenter<TranslationManagement
     }
 
     void loadTranslations(boolean forceRefresh) {
-        subscription.add(translationManagementModel.loadTranslations(forceRefresh)
+        unsubscribeLoadTranslationsSubscription();
+
+        loadTranslationsSubscription = translationManagementModel.loadTranslations(forceRefresh)
                 .compose(RxHelper.<Translations>applySchedulers())
                 .subscribe(new Subscriber<Translations>() {
                     @Override
                     public void onCompleted() {
-                        // do nothing
+                        loadTranslationsSubscription = null;
                     }
 
                     @Override
                     public void onError(Throwable e) {
+                        loadTranslationsSubscription = null;
                         final TranslationManagementView v = getView();
                         if (v != null) {
                             v.onTranslationLoadFailed();
@@ -112,7 +121,7 @@ class TranslationManagementPresenter extends BasePresenter<TranslationManagement
                             v.onTranslationLoaded(translations);
                         }
                     }
-                }));
+                });
     }
 
     void removeTranslation(final TranslationInfo translation) {
@@ -217,11 +226,14 @@ class TranslationManagementPresenter extends BasePresenter<TranslationManagement
             return;
         }
 
-        subscription.add(adsModel.shouldHideAds()
+        unsubscribeLoadAdsSubscription();
+
+        loadAdsSubscription = adsModel.shouldHideAds()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new SingleSubscriber<Boolean>() {
                     @Override
                     public void onSuccess(Boolean shouldHideAds) {
+                        loadAdsSubscription = null;
                         final TranslationManagementView v = getView();
                         if (v != null) {
                             if (shouldHideAds) {
@@ -234,12 +246,13 @@ class TranslationManagementPresenter extends BasePresenter<TranslationManagement
 
                     @Override
                     public void onError(Throwable e) {
+                        loadAdsSubscription = null;
                         final TranslationManagementView v = getView();
                         if (v != null) {
                             v.showAds();
                         }
                     }
-                }));
+                });
     }
 
     void removeAds(Activity activity) {
