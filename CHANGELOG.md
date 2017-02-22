@@ -3,9 +3,16 @@ CHANGELOG
 
 #### Next Release
 - Updated dependencies:
+  - Updated Android Gradle plugin to 2.3.0-rc1.
+  - Updated Gradle to 3.4.
+  - Updated support library to 25.2.0.
+  - Updated Play Services and Firebase to 10.2.0.
   - Updated Dagger to 2.9.
   - Updated RxJava to 1.2.6.
+  - Updated Retrofit to 2.2.0.
   - Updated Moshi to 1.4.0.
+  - Updated auto value to 1.3.
+  - Updated auto droid to 0.2.1.
 - Features:
   - Enabled large heap.
 
