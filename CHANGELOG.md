@@ -8,6 +8,8 @@ CHANGELOG
   - Updated support library to 25.3.0.
   - Updated RxJava to 1.2.7.
   - Deprecated apt.
+- Features:
+  - Do not close current activity when opening bookmarks / notes.
 
 #### v1.18.1 (2017-02-22)
 - Updated dependencies:

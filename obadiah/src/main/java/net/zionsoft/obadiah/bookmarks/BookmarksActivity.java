@@ -26,6 +26,7 @@ import android.support.v4.app.FragmentManager;
 import android.view.View;
 
 import net.zionsoft.obadiah.R;
+import net.zionsoft.obadiah.biblereading.BibleReadingActivity;
 import net.zionsoft.obadiah.model.analytics.Analytics;
 import net.zionsoft.obadiah.model.datamodel.Settings;
 import net.zionsoft.obadiah.model.domain.Bookmark;
@@ -129,7 +130,7 @@ public class BookmarksActivity extends BaseRecyclerViewActivity implements Bookm
                     + "-" + verse.verseIndex.chapter() + "-" + verse.verseIndex.verse());
             Analytics.logEvent(Analytics.EVENT_SELECT_CONTENT, params);
 
-            finish();
+            startActivity(BibleReadingActivity.newStartIntent(this));
         }
     }
 }
