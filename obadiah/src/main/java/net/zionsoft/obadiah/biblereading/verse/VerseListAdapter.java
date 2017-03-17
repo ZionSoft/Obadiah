@@ -80,7 +80,8 @@ class VerseListAdapter extends RecyclerView.Adapter<VerseItemViewHolder> {
         Crash.log("Verses count: " + verses.size()
                 + "\nSelected length: " + selected.length
                 + "\nExpanded length: " + (expanded != null ? expanded.length : -1)
-                + "\nVerse index: " + verses.get(position).verseIndex);
+                + "\nVerse index: " + verses.get(position).verseIndex
+                + "\nIs simple reading: " + versePagerPresenter.getSettings().isSimpleReading());
         holder.bind(verses.get(position), verses.size(), isBookmarked, getNote(position),
                 selected[position], expanded != null && expanded[position]);
     }
