@@ -2,6 +2,12 @@ CHANGELOG
 ---------
 
 #### Next Release
+- Updated dependencies:
+  - Updated Android Gradle plugin to 2.3.0.
+  - Updated Gradle to 3.4.1.
+  - Updated support library to 25.3.0.
+  - Updated RxJava to 1.2.7.
+  - Deprecated apt.
 
 #### v1.18.1 (2017-02-22)
 - Updated dependencies:

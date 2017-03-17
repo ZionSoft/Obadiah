@@ -2,9 +2,6 @@ buildscript {
     repositories {
         mavenCentral()
     }
-    dependencies {
-        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
-    }
 }
 
 repositories {
@@ -14,7 +11,6 @@ repositories {
 }
 
 apply plugin: 'com.android.application'
-apply plugin: 'com.neenbedankt.android-apt'
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
@@ -84,7 +80,7 @@ dependencies {
     compile "com.google.android.gms:play-services-auth:$rootProject.ext.playServicesVersion"
 
     compile "com.google.dagger:dagger:$rootProject.ext.daggerVersion"
-    apt "com.google.dagger:dagger-compiler:$rootProject.ext.daggerVersion"
+    annotationProcessor "com.google.dagger:dagger-compiler:$rootProject.ext.daggerVersion"
     provided "javax.annotation:javax.annotation-api:$rootProject.ext.javaxAnnotationApiVersion"
 
     compile "io.reactivex:rxandroid:$rootProject.ext.rxAndroidVersion"
@@ -92,7 +88,7 @@ dependencies {
     compile "com.artemzin.rxjava:proguard-rules:$rootProject.ext.rxJavaProguardRulesVersion"
 
     compile "com.jakewharton:butterknife:$rootProject.ext.butterKnifeVersion"
-    apt "com.jakewharton:butterknife-compiler:$rootProject.ext.butterKnifeVersion"
+    annotationProcessor "com.jakewharton:butterknife-compiler:$rootProject.ext.butterKnifeVersion"
 
     compile "com.squareup.retrofit2:retrofit:$rootProject.ext.retrofitVersion"
     compile "com.squareup.retrofit2:converter-moshi:$rootProject.ext.retrofitVersion"
@@ -103,7 +99,7 @@ dependencies {
     compile "com.squareup.okio:okio:$rootProject.ext.okioVersion"
 
     compile "com.github.xizzhu.auto-droid:auto-droid-annotations:$rootProject.ext.autoDroidVersion"
-    apt "com.github.xizzhu.auto-droid:auto-droid-processors:$rootProject.ext.autoDroidVersion"
+    annotationProcessor "com.github.xizzhu.auto-droid:auto-droid-processors:$rootProject.ext.autoDroidVersion"
     provided "com.google.auto.value:auto-value:$rootProject.ext.autoValueVersion"
 
     debugCompile "com.facebook.stetho:stetho:$rootProject.ext.stethoVersion"
