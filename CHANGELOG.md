@@ -8,6 +8,8 @@ CHANGELOG
   - Updated Play Services and Firebase to 10.2.1.
   - Updated Dagger to 2.10.
   - Updated RxJava to 1.2.9.
+- Fixes:
+  - Fixed potential crash in simple reading mode.
 
 #### v1.18.2 (2017-03-17)
 - Updated dependencies:

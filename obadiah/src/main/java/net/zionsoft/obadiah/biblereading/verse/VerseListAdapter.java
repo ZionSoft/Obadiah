@@ -120,13 +120,11 @@ class VerseListAdapter extends RecyclerView.Adapter<VerseItemViewHolder> {
         }
         deselectVerses();
 
-        if (!versePagerPresenter.getSettings().isSimpleReading()) {
-            if (expanded == null || expanded.length < size) {
-                expanded = new boolean[size];
-            }
-            for (int i = 0; i < expanded.length; ++i) {
-                expanded[i] = false;
-            }
+        if (expanded == null || expanded.length < size) {
+            expanded = new boolean[size];
+        }
+        for (int i = 0; i < expanded.length; ++i) {
+            expanded[i] = false;
         }
 
         notifyDataSetChanged();
