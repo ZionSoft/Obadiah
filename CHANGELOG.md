@@ -2,6 +2,12 @@ CHANGELOG
 ---------
 
 #### Next Release
+- Updated dependencies:
+  - Updated Android Gradle plugin to 2.4.0-alpha4.
+  - Updated support library to 25.3.0.
+  - Updated Play Services and Firebase to 10.2.1.
+  - Updated Dagger to 2.10.
+  - Updated RxJava to 1.2.9.
 
 #### v1.18.2 (2017-03-17)
 - Updated dependencies:
