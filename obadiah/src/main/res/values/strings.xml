@@ -32,6 +32,7 @@
 
     <string name="pref_account">Account</string>
     <string name="pref_login">Log In</string>
+    <string name="pref_login_description">Sync Everything</string>
     <string name="pref_logout">Log Out</string>
     <string name="pref_reading">Reading</string>
     <string name="pref_simple_reading">Simple Reading</string>

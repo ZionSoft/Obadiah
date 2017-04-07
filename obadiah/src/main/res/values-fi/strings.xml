@@ -32,6 +32,7 @@
 
     <string name="pref_account">Tili</string>
     <string name="pref_login">Kirjaudu</string>
+    <string name="pref_login_description">Synkronoi kaikki</string>
     <string name="pref_logout">Kirjaudu ulos</string>
     <string name="pref_reading">Lukeminen</string>
     <string name="pref_simple_reading">Perus</string>

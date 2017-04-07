@@ -26,8 +26,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/background_text"
-                android:clickable="true"
                 android:visibility="gone"
+                obadiah:settingTitleDescriptionButtonDescription="@string/pref_login_description"
                 obadiah:settingTitleDescriptionButtonTitle="@string/pref_login"/>
 
             <net.zionsoft.obadiah.misc.settings.SettingTitleDescriptionButton
@@ -44,7 +44,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/background_text"
-                android:clickable="true"
                 android:visibility="gone"
                 obadiah:settingTitleDescriptionButtonTitle="@string/pref_logout"/>
 
@@ -131,7 +130,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/background_text"
-                android:clickable="true"
                 obadiah:settingTitleDescriptionButtonTitle="@string/pref_license"/>
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
