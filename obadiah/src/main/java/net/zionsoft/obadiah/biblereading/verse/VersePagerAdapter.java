@@ -29,6 +29,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import net.zionsoft.obadiah.R;
+import net.zionsoft.obadiah.misc.settings.SettingsActivity;
 import net.zionsoft.obadiah.model.domain.Bible;
 import net.zionsoft.obadiah.model.domain.Bookmark;
 import net.zionsoft.obadiah.model.domain.Note;
@@ -111,7 +112,8 @@ class VersePagerAdapter extends PagerAdapter implements VersePagerView {
         }
     }
 
-    private final Context context;
+    @SuppressWarnings("WeakerAccess")
+    final Context context;
     @SuppressWarnings("WeakerAccess")
     final VersePagerPresenter versePagerPresenter;
     private final LayoutInflater inflater;
@@ -352,6 +354,17 @@ class VersePagerAdapter extends PagerAdapter implements VersePagerView {
                 return;
             }
         }
+    }
+
+    @Override
+    public void remindLogin() {
+        DialogHelper.showDialog(context, true, R.string.text_login, R.string.text_login_description,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        context.startActivity(SettingsActivity.newStartIntent(context));
+                    }
+                }, null);
     }
 
     @Override

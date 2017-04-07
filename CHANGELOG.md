@@ -10,6 +10,7 @@ CHANGELOG
   - Updated RxJava to 1.2.9.
 - Features:
   - Smaller texts for parallel verses.
+  - Remind users to log in when adding bookmarks / notes.
 - Fixes:
   - Fixed potential crash in simple reading mode.
   - Fixed UI issue when all bookmaks / notes are deleted.

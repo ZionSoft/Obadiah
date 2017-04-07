@@ -23,6 +23,7 @@ import net.zionsoft.obadiah.model.datamodel.BibleReadingModel;
 import net.zionsoft.obadiah.model.datamodel.BookmarkModel;
 import net.zionsoft.obadiah.model.datamodel.NoteModel;
 import net.zionsoft.obadiah.model.datamodel.Settings;
+import net.zionsoft.obadiah.model.datamodel.UserModel;
 import net.zionsoft.obadiah.model.domain.Bookmark;
 import net.zionsoft.obadiah.model.domain.Note;
 import net.zionsoft.obadiah.model.domain.Verse;
@@ -48,21 +49,27 @@ public class VersePagerPresenter extends BasePresenter<VersePagerView> {
     private final BibleReadingModel bibleReadingModel;
     private final BookmarkModel bookmarkModel;
     private final NoteModel noteModel;
+    private final UserModel userModel;
     @SuppressWarnings("WeakerAccess")
     final CompositeSubscription subscriptions = new CompositeSubscription();
 
+    @SuppressWarnings("WeakerAccess")
+    boolean alreadyRemindedToLogin;
+
     public VersePagerPresenter(BibleReadingModel bibleReadingModel, BookmarkModel bookmarkModel,
-                               NoteModel noteModel, Settings settings) {
+                               NoteModel noteModel, UserModel userModel, Settings settings) {
         super(settings);
         this.bibleReadingModel = bibleReadingModel;
         this.bookmarkModel = bookmarkModel;
         this.noteModel = noteModel;
+        this.userModel = userModel;
     }
 
     @Override
     protected void onViewTaken() {
         super.onViewTaken();
 
+        alreadyRemindedToLogin = false;
         subscriptions.add(Observable.merge(
                 bibleReadingModel.observeCurrentTranslation()
                         .map(new Func1<String, Void>() {
@@ -240,7 +247,11 @@ public class VersePagerPresenter extends BasePresenter<VersePagerView> {
                 .subscribe(new SingleSubscriber<Bookmark>() {
                     @Override
                     public void onSuccess(Bookmark bookmark) {
-                        // already handled in the listener
+                        final VersePagerView v = getView();
+                        if (v != null && shouldRemindToLogin()) {
+                            alreadyRemindedToLogin = true;
+                            v.remindLogin();
+                        }
                     }
 
                     @Override
@@ -251,6 +262,11 @@ public class VersePagerPresenter extends BasePresenter<VersePagerView> {
                         }
                     }
                 }));
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    boolean shouldRemindToLogin() {
+        return !alreadyRemindedToLogin && !userModel.isLoggedIn();
     }
 
     void removeBookmark(final VerseIndex verseIndex) {
@@ -283,7 +299,11 @@ public class VersePagerPresenter extends BasePresenter<VersePagerView> {
                 .subscribe(new SingleSubscriber<Note>() {
                     @Override
                     public void onSuccess(Note note) {
-                        // already handled in the listener
+                        final VersePagerView v = getView();
+                        if (v != null && shouldRemindToLogin()) {
+                            alreadyRemindedToLogin = true;
+                            v.remindLogin();
+                        }
                     }
 
                     @Override

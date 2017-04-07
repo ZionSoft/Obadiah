@@ -79,6 +79,9 @@
     <string name="text_no_bookmark">Ei kirjanmerkkejä.</string>
     <string name="text_no_note">Ei huomautus.</string>
 
+    <string name="text_login">Kirjaudu</string>
+    <string name="text_login_description">Kirjaudu palveluun synkronoidaksesi kirjanmerkit, huomautus, jne.</string>
+
     <!--
     %1$d: date, %2$s: month, %3$d: year
      -->

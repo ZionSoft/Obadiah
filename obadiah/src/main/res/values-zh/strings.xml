@@ -79,6 +79,9 @@
     <string name="text_no_bookmark">您尚未添加任何的書籤。</string>
     <string name="text_no_note">您尚未添加任何的筆記。</string>
 
+    <string name="text_login">登錄</string>
+    <string name="text_login_description">登錄以同步您的書籤、筆記，等等。</string>
+
     <!--
         %1$d: date, %2$s: month, %3$d: year
          -->

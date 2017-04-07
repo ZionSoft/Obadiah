@@ -79,6 +79,9 @@
     <string name="text_no_bookmark">No bookmarks yet.</string>
     <string name="text_no_note">No notes yet.</string>
 
+    <string name="text_login">Log In</string>
+    <string name="text_login_description">Log in to have your bookmarks, notes, etc. synced.</string>
+
     <!--
     %1$d: date, %2$s: month, %3$d: year
      -->

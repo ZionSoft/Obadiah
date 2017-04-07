@@ -50,6 +50,8 @@ interface VersePagerView extends MVPView {
 
     void hideNote(VerseIndex verseIndex);
 
+    void remindLogin();
+
     void onTranslationUpdated();
 
     void onReadingProgressChanged(VerseIndex verseIndex);

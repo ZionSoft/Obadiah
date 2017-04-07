@@ -42,6 +42,19 @@ public class DialogHelper {
                 .create().show();
     }
 
+    public static void showDialog(Context context, boolean cancelable,
+                                  @StringRes int title, @StringRes int message,
+                                  DialogInterface.OnClickListener onPositive,
+                                  DialogInterface.OnClickListener onNegative) {
+        new AlertDialog.Builder(context)
+                .setCancelable(cancelable)
+                .setPositiveButton(android.R.string.yes, onPositive)
+                .setNegativeButton(android.R.string.no, onNegative)
+                .setTitle(title)
+                .setMessage(message)
+                .create().show();
+    }
+
     public static void showDialog(Context context, boolean cancelable, @StringRes int message,
                                   DialogInterface.OnClickListener onPositive,
                                   DialogInterface.OnClickListener onNegative) {

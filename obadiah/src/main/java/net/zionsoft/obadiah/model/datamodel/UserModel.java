@@ -55,6 +55,10 @@ public class UserModel implements FirebaseAuth.AuthStateListener {
         firebaseAuth.addAuthStateListener(this);
     }
 
+    public boolean isLoggedIn() {
+        return firebaseAuth.getCurrentUser() != null;
+    }
+
     @Nullable
     public User getCurrentUser() {
         return fromFirebaseUser(firebaseAuth.getCurrentUser());
