@@ -8,6 +8,8 @@ CHANGELOG
   - Updated Play Services and Firebase to 10.2.1.
   - Updated Dagger to 2.10.
   - Updated RxJava to 1.2.9.
+- Features:
+  - Smaller texts for parallel verses.
 - Fixes:
   - Fixed potential crash in simple reading mode.
   - Fixed UI issue when all bookmaks / notes are deleted.

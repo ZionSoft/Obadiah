@@ -30,8 +30,10 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
+import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.text.style.RelativeSizeSpan;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -51,6 +53,8 @@ class VerseItemViewHolder extends RecyclerView.ViewHolder implements View.OnClic
         View.OnLongClickListener, TextWatcher, VerseDetailDialogFragment.Listener {
     private static final String VERSE_DETAIL_FRAGMENT_TAG = "net.zionsoft.net.VERSE_DETAIL_FRAGMENT_TAG";
 
+    private static final RelativeSizeSpan PARALLEL_VERSE_SIZE_SPAN = new RelativeSizeSpan(0.95F);
+    private static final SpannableStringBuilder SPANNABLE_STRING_BUILDER = new SpannableStringBuilder();
     private static final StringBuilder STRING_BUILDER = new StringBuilder();
     static final PorterDuffColorFilter ON = new PorterDuffColorFilter(Color.RED, PorterDuff.Mode.MULTIPLY);
     static final PorterDuffColorFilter OFF = new PorterDuffColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
@@ -162,20 +166,28 @@ class VerseItemViewHolder extends RecyclerView.ViewHolder implements View.OnClic
         text.setTextSize(TypedValue.COMPLEX_UNIT_PX,
                 resources.getDimension(settings.getTextSize().textSize));
 
-        STRING_BUILDER.setLength(0);
         if (verse.parallel.size() == 0) {
+            STRING_BUILDER.setLength(0);
             STRING_BUILDER.append(verse.text.bookName).append(' ')
                     .append(verse.verseIndex.chapter() + 1).append(':').append(verse.verseIndex.verse() + 1).append('\n')
                     .append(verse.text.text);
             text.setText(STRING_BUILDER.toString());
         } else {
+            STRING_BUILDER.setLength(0);
             buildVerse(STRING_BUILDER, verse.verseIndex, verse.text);
+            final int mainTextLength = STRING_BUILDER.length();
             final int size = verse.parallel.size();
             for (int i = 0; i < size; ++i) {
                 final Verse.Text text = verse.parallel.get(i);
                 buildVerse(STRING_BUILDER, verse.verseIndex, text);
             }
-            text.setText(STRING_BUILDER.substring(0, STRING_BUILDER.length() - 2));
+
+            SPANNABLE_STRING_BUILDER.clear();
+            SPANNABLE_STRING_BUILDER.clearSpans();
+            SPANNABLE_STRING_BUILDER.append(STRING_BUILDER);
+            final int length = SPANNABLE_STRING_BUILDER.length() - 2;
+            SPANNABLE_STRING_BUILDER.setSpan(PARALLEL_VERSE_SIZE_SPAN, mainTextLength, length, 0);
+            text.setText(SPANNABLE_STRING_BUILDER.subSequence(0, length));
         }
 
         verseIndex = verse.verseIndex;
