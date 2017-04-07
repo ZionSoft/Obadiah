@@ -23,7 +23,7 @@
             android:layout_margin="@dimen/bigger_padding"
             android:src="@drawable/ic_action_search"
             app:backgroundTint="@color/blue"
-            app:fabSize="normal"
+            app:fabSize="auto"
             app:layout_behavior="net.zionsoft.obadiah.ui.behavior.FloatingActionButtonScrollAwareBehavior"
             app:useCompatPadding="true"/>
 

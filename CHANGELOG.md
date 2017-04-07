@@ -13,6 +13,7 @@ CHANGELOG
 - Fixes:
   - Fixed potential crash in simple reading mode.
   - Fixed UI issue when all bookmaks / notes are deleted.
+  - Set search FAB size to "auto".
 
 #### v1.18.2 (2017-03-17)
 - Updated dependencies:
