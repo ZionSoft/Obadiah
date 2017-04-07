@@ -104,8 +104,8 @@ public class NotesActivity extends BaseRecyclerViewActivity implements NotesView
             empty.setVisibility(View.VISIBLE);
         } else {
             empty.setVisibility(View.GONE);
-            notesListAdapter.setNotes(notes, verses);
         }
+        notesListAdapter.setNotes(notes, verses);
     }
 
     @Override

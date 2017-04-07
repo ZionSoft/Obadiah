@@ -103,8 +103,8 @@ public class BookmarksActivity extends BaseRecyclerViewActivity implements Bookm
             empty.setVisibility(View.VISIBLE);
         } else {
             empty.setVisibility(View.GONE);
-            bookmarksListAdapter.setBookmarks(bookmarks, verses);
         }
+        bookmarksListAdapter.setBookmarks(bookmarks, verses);
     }
 
     @Override

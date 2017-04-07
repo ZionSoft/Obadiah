@@ -18,6 +18,7 @@
 package net.zionsoft.obadiah.bookmarks;
 
 import android.content.Context;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.util.TypedValue;
 import android.view.View;
@@ -86,7 +87,12 @@ class BookmarksListAdapter extends BaseSectionAdapter<Verse> {
         ((ViewHolder) holder).bind(item);
     }
 
-    void setBookmarks(List<Bookmark> bookmarks, List<Verse> verses) {
+    void setBookmarks(@Nullable List<Bookmark> bookmarks, @Nullable List<Verse> verses) {
+        if (bookmarks == null || verses == null) {
+            setData(null, null, 0);
+            return;
+        }
+
         final ArrayList<String> headers = new ArrayList<>();
         final ArrayList<ArrayList<Verse>> versesByDay = new ArrayList<>();
         int count = 0;

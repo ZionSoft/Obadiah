@@ -94,6 +94,11 @@ class NotesListAdapter extends BaseSectionAdapter<Pair<Note, Verse>> {
     }
 
     void setNotes(List<Note> notes, List<Verse> verses) {
+        if (notes == null || verses == null) {
+            setData(null, null, 0);
+            return;
+        }
+
         final ArrayList<String> headers = new ArrayList<>();
         final ArrayList<ArrayList<Pair<Note, Verse>>> notesByDay = new ArrayList<>();
         int count = 0;
