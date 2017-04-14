@@ -2,6 +2,12 @@ CHANGELOG
 ---------
 
 #### Next Release
+- Updated dependencies:
+  - Updated Gradle to 3.5.
+  - Updated Android Gradle plugin to 2.4.0-alpha6.
+  - Updated okio to 1.12.0.
+  - Updated AutoValue to 1.4.1.
+  - Updated Stetho to 1.5.0.
 
 #### v1.18.3 (2017-04-07)
 - Updated dependencies:

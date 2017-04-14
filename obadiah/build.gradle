@@ -6,7 +6,6 @@ buildscript {
 
 repositories {
     mavenCentral()
-    maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
     maven { url "https://jitpack.io" }
 }
 
@@ -31,6 +30,8 @@ android {
         applicationId 'net.zionsoft.obadiah'
 
         resConfigs "en", "fi", "zh", "zh-rCN"
+
+        javaCompileOptions.annotationProcessorOptions.includeCompileClasspath true
     }
 
     signingConfigs {
