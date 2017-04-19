@@ -24,7 +24,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
-import net.zionsoft.obadiah.model.crash.Crash;
 import net.zionsoft.obadiah.model.domain.Bookmark;
 import net.zionsoft.obadiah.model.domain.Note;
 import net.zionsoft.obadiah.model.domain.Verse;
@@ -75,13 +74,6 @@ class VerseListAdapter extends RecyclerView.Adapter<VerseItemViewHolder> {
             }
         }
 
-        // Collect some data for a top crash:
-        // https://console.firebase.google.com/project/z-bible/monitoring/app/android:net.zionsoft.obadiah/cluster/b07e9201
-        Crash.log("Verses count: " + verses.size()
-                + "\nSelected length: " + selected.length
-                + "\nExpanded length: " + (expanded != null ? expanded.length : -1)
-                + "\nVerse index: " + verses.get(position).verseIndex
-                + "\nIs simple reading: " + versePagerPresenter.getSettings().isSimpleReading());
         holder.bind(verses.get(position), verses.size(), isBookmarked, getNote(position),
                 selected[position], expanded != null && expanded[position]);
     }
