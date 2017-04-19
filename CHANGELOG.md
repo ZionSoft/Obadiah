@@ -5,6 +5,7 @@ CHANGELOG
 - Updated dependencies:
   - Updated Gradle to 3.5.
   - Updated Android Gradle plugin to 2.4.0-alpha6.
+  - Updated okhttp to 3.7.0.
   - Updated okio to 1.12.0.
   - Updated AutoValue to 1.4.1.
   - Updated Stetho to 1.5.0.

@@ -37,7 +37,7 @@ ext {
     rxJavaVersion = '1.2.9'
     rxJavaProguardRulesVersion = '1.2.9.0'
     retrofitVersion = '2.2.0'
-    okhttpVersion = '3.6.0'
+    okhttpVersion = '3.7.0'
     moshiVersion = '1.4.0'
     okioVersion = '1.12.0'
     autoDroidVersion = '0.2.1'
