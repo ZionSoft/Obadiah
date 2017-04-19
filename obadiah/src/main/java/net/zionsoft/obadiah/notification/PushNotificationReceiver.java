@@ -93,8 +93,15 @@ public class PushNotificationReceiver extends FirebaseMessagingService {
             return;
         }
 
-        final NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        nm.notify(notificationId, builder.build());
+        // And of course, we have weird devices that requires VIBRATE permission for whatever reason.
+        // https://console.firebase.google.com/project/z-bible/monitoring/app/android:net.zionsoft.obadiah/cluster/0810bcab
+        try {
+            final NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            nm.notify(notificationId, builder.build());
+        } catch (Throwable e) {
+            Crash.log("Default of the notification: " + builder.build().defaults);
+            Crash.report(e);
+        }
     }
 
     @NonNull
