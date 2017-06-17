@@ -214,7 +214,7 @@ class TranslationManagementModel {
     }
 
     Observable<Integer> fetchTranslation(final TranslationInfo translation) {
-        return Observable.fromEmitter(new Action1<Emitter<Integer>>() {
+        return Observable.create(new Action1<Emitter<Integer>>() {
             @Override
             public void call(Emitter<Integer> emitter) {
                 final long timestamp = SystemClock.elapsedRealtime();

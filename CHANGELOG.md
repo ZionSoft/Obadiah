@@ -3,11 +3,19 @@ CHANGELOG
 
 #### Next Release
 - Updated dependencies:
-  - Updated Gradle to 3.5.
-  - Updated Android Gradle plugin to 2.4.0-alpha6.
-  - Updated okhttp to 3.7.0.
-  - Updated okio to 1.12.0.
+  - Updated Gradle to 4.0.
+  - Updated Android Gradle plugin to 3.0.0-alpha4.
+  - Updated Play Services plugin to 3.1.0.
+  - Updated build tool to 26.0.0.
+  - Updated support library to 25.4.0.
+  - Updated Play Services & Firebase to 11.0.1.
+  - Updated Retrofit to 2.3.0.
+  - Updated okhttp to 3.8.0.
+  - Updated Moshi to 1.5.0.
+  - Updated okio to 1.13.0.
   - Updated AutoValue to 1.4.1.
+  - Updated ButterKnife to 8.6.0.
+  - Updated RxJava to 1.3.0.
   - Updated Stetho to 1.5.0.
 
 #### v1.18.3 (2017-04-07)
