@@ -1,3 +1,5 @@
+No longer maintained. New development happens [here](https://github.com/xizzhu/Joshua).
+
 Bible reader
 ------------
 
